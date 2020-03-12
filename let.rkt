@@ -25,6 +25,8 @@
        (- e e)
        (* e e)
        (/ e e)
+       (> e e)
+       (< e e)
        ;(e e ...)
        (e e)
        v
@@ -65,6 +67,8 @@
          (Let (x_!_ ...) (e_!_ ...) e)
          (And e e)
          (Or e e)
+         (Odd e)
+         (Even e)
          )
  
   ; a context is an expression with one hole in lieu of a sub-expression 
@@ -80,10 +84,14 @@
      (- C e)
      (* C e)
      (/ C e)
+     (> C e)
+     (< C e)
      ;Sugar
      (Let (x_!_ ...) C e)
      (And C e)
      (Or C e)
+     (Odd C)
+     (Even C)
      )
   )
 
@@ -132,14 +140,43 @@
    (--> (in-hole C (/ v_1 v_2))
         (in-hole C ,(/ (term v_1) (term v_2)))
         "12")
+   (--> (in-hole C (< v_1 v_2))
+        (in-hole C ,(< (term v_1) (term v_2)))
+        "13")
+   (--> (in-hole C (> v_1 v_2))
+        (in-hole C ,(> (term v_1) (term v_2)))
+        "14")
+   
+   (--> (in-hole C (Odd v))
+        (in-hole C (Even ,(- (term v) 1)))
+        "15"
+        (side-condition (> (term v) 1)))
+   (--> (in-hole C (Odd 0))
+        (in-hole C #t)
+        "16")
+   (--> (in-hole C (Odd 1))
+        (in-hole C #f)
+        "17")
+   (--> (in-hole C (Even v))
+        (in-hole C (Odd ,(- (term v) 1)))
+        "18"
+        (side-condition (> (term v) 1)))
+   (--> (in-hole C (Even 0))
+        (in-hole C #f)
+        "19")
+   (--> (in-hole C (Even 1))
+        (in-hole C #t)
+        "20")
    ))
 
-(traces -->β
+#;(traces -->β
         (term (Let (x) (#f) (Let (x y z) (#t #f (Or #t #f))
                          (And x (Or z (And x y)))
                ))))
-(traces -->β
+#;(traces -->β
         (term (Let (x) (2)
-                   (Let (x y) (1 2)
-                        ((lambda (y) y) x)
+                   (Let (x y z) (1 2 (lambda (t) (+ t 1)))
+                        (z x)
                ))))
+(traces -->β
+        (term (Even 3)))
