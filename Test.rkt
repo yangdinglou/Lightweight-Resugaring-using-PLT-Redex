@@ -182,11 +182,11 @@
 
 (define (approx-exp? exp1 exp2)
   
-  (if (and (eq? (length exp1) (length exp2))
-           (eq? (car exp1) (car exp2)))
-      (if (eq? (foldl + 0
+  (if (and (equal? (length exp1) (length exp2))
+           (equal? (car exp1) (car exp2)))
+      (if (equal? (foldl + 0
                       (map (lambda (lst1 lst2)
-                             (if (eq? lst1 lst2) 0 1))
+                             (if (equal? lst1 lst2) 0 1))
                            exp1 exp2))
                1)
           #t
@@ -228,7 +228,7 @@
                                                      explst))))
                         (set! ret (list-set exp i (one-step-reduce subexp)))
                         ))
-                (else (begin (display subexp) (error "error2 in cbv-reduce")))))))
+                ))))
       ret)))
 
 (define (one-step-reduce exp)
@@ -250,7 +250,7 @@
            (let ((tmp (filter (lambda (lst) (approx-exp? exp lst))
                               explst)))
              (if (empty? tmp)
-                 (error "error") ;(displayln explst) (cbv-reduce exp explst)
+                 (begin (displayln explst) (error "error")) ;(displayln explst) (cbv-reduce exp explst)
                  ;(begin (displayln "begin2") (displayln tmp) (cbv-reduce exp tmp))
                  (cbv-reduce exp tmp)
                  )))
@@ -259,12 +259,19 @@
       empty))
 
 
-#;(one-step-reduce (term (Or #f (Apply (lambda (xx y z) (And xx (Or z (And #f y)))) #t #f (Or #t #f)))))
+(define (get-step exp)
+  (let ((tmp (one-step-reduce exp)))
+    (if (equal? tmp empty)
+        void
+        (begin (displayln tmp) (get-step tmp))
+        )))
+
 #;(apply-reduction-relation Rule
                             (term (And (If #t (And #f #t) (And #t #t))
                                        (If #f (Or #t #f) (And #f #t)))
                                   ))
-
+#;(apply-reduction-relation Rule
+                            (term (Let (x) (2) (Apply (lambda (x y z) (Apply z x)) 1 2 (lambda (t) (+ t 1))))))
 
 #;(traces Rule
           (term (And (If #t (And #f #t) (And #t #t))
@@ -281,9 +288,19 @@
           (term (Let (x y z) (1 2 (lambda (t) (+ t 1)))
                         (Apply z x)
                         )))
-(traces Rule
+#;(traces Rule
           (term 
            (Let (x) (2)
                 (Let (x y z) (1 2 (lambda (t) (+ t 1)))
                      (Apply z x)
                      ))))
+(get-step (term 
+           (Let (x) (2)
+                (+ (Let (x y z) (1 2 (lambda (t) (+ t 1)))
+                        (Apply z x)
+                        ) x))))
+(displayln "")
+(get-step
+ (term (And (If #t (And #f #t) (And #t #t))
+            (If #f (Or #t #f) (And #f #t)))
+       ))
