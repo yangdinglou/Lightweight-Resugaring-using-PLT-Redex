@@ -1,7 +1,36 @@
 #lang racket
 (require redex)
+(define (tagged-list? tag exp)
+  (and (pair? exp)
+       (eq? tag (car exp))))
+(define (CoreHead? exp)
+  (member (car exp)
+          (list 'If
+                'lambda
+                'Apply))
+  )
+      
+(define (SurfHead? exp)
+  (member (car exp)
+          (list
+           'And
+           'Or
+           'Let
+           'Even
+           'Odd)))
+(define (CommonHead? exp)
+  (member (car exp)
+          (list
+           '+
+           '-
+           '*
+           '/
+           '>
+           '<
+           'eq?)))
 (define-language Test
   (Exp ::=
+       (Exp Exp)
        x
        Coreexp
        Otherexp)
@@ -11,7 +40,7 @@
   (Coreexp ::=
            (If Exp Exp Exp)
            (lambda (x_!_ ...) Exp)
-           
+           (Apply Exp Exp_!_ ...)
            )
   (Surfexp ::=
            (And Exp Exp)
@@ -41,7 +70,7 @@
      (Exp ... C Exp ...)
      (v C)
      (If C Exp Exp)
-     (lambda (x_!_ ...) C)
+     ;(lambda (x_!_ ...) C)
      (+ C Exp)
      (- C Exp)
      (* C Exp)
@@ -61,8 +90,8 @@
      (And Otherexp C)
      (Or C Exp)
      (Or Otherexp C)
-     (Let (x_!_ ...) C e)
-     (Let (x_!_ ...) e C)
+     ;(Let (x_!_ ...) C Exp)
+     (Let (x_!_ ...) (Exp_!_ ...) C)
      ))
 (define-metafunction Test
   subst : ((any x) ...) any ->
@@ -88,7 +117,7 @@
 (define Rule
   (reduction-relation
    Test
-   (--> (in-hole C ((lambda (x_1 ..._n) Exp) Exp_1 ..._n))
+   (--> (in-hole C (Apply (lambda (x_1 ..._n) Exp) Exp_1 ..._n))
         (in-hole C (subst ([Exp_1 x_1] ...) Exp))
         "lambda")
    (--> (in-hole C (If #t Exp_1 Exp_2))
@@ -100,27 +129,27 @@
 
    (--> (in-hole C (+ v_1 v_2))
         (in-hole C ,(+ (term v_1) (term v_2)))
-        "9")
+        "+")
    (--> (in-hole C (- v_1 v_2))
         (in-hole C ,(- (term v_1) (term v_2)))
-        "10")
+        "-")
    (--> (in-hole C (* v_1 v_2))
         (in-hole C ,(* (term v_1) (term v_2)))
-        "11")
+        "*")
    (--> (in-hole C (/ v_1 v_2))
         (in-hole C ,(/ (term v_1) (term v_2)))
-        "12")
+        "/")
    (--> (in-hole C (< v_1 v_2))
         (in-hole C ,(< (term v_1) (term v_2)))
-        "13")
+        "<")
    (--> (in-hole C (> v_1 v_2))
         (in-hole C ,(> (term v_1) (term v_2)))
-        "14")
+        ">")
    (--> (in-hole C (Eq? v_1 v_2))
         (in-hole C ,(eq? (term v_1) (term v_2)))
         "Eq?")
    (--> (in-hole C (Let (x_1 ..._n) (Exp_1 ..._n) Exp))
-        (in-hole C ((lambda (x_1 ...) Exp) Exp_1 ...))
+        (in-hole C (Apply (lambda (x_1 ...) Exp) Exp_1 ...))
         "Let-sugar")
    (--> (in-hole C (And Exp_1 Exp_2))
         (in-hole C (If Exp_1 Exp_2 #f))
@@ -150,26 +179,111 @@
         "Even 1")
    ))
 
+
+(define (approx-exp? exp1 exp2)
+  
+  (if (and (eq? (length exp1) (length exp2))
+           (eq? (car exp1) (car exp2)))
+      (if (eq? (foldl + 0
+                      (map (lambda (lst1 lst2)
+                             (if (eq? lst1 lst2) 0 1))
+                           exp1 exp2))
+               1)
+          #t
+          #f)
+      #f))
+(define (cbv-reduce exp explst)
+  (let ((surf 0) (core 0) (ret empty))
+    (begin
+      (for ([i (length exp)])
+        (let ((subexp (list-ref exp i)))
+          (if (not (pair? subexp))
+              void
+              (cond
+                ((> core 0) void)
+                ((CoreHead? subexp)
+                 (begin (set! core i)
+                        (let ((newlst (filter (lambda (expinlst) (not (eq? (list-ref expinlst i) subexp)))
+                                              explst)))
+                          (if (eq? (length newlst) 1)
+                              (set! ret (car newlst))
+                              ;(begin (displayln newlst)
+                              ;(displayln "error1 in cbv-reduce")
+                              (set! ret (car (filter (lambda (expinlst) (eq? (list-ref expinlst i) (one-step-reduce subexp)))
+                                                     newlst)))
+                              ;)
+                              ))
+                        ))
+                ((> surf 0) void)
+                ((or (SurfHead? subexp) (CommonHead? subexp))
+                 (begin (set! surf i)
+                        #;(let ((newlst (filter (lambda (expinlst) (not (eq? (list-ref expinlst i) subexp)))
+                                                explst)))
+                            (if (eq? (length newlst) 1)
+                                (set! ret (car newlst))
+                                (set! ret (car (filter (lambda (expinlst) (eq? (list-ref expinlst i) (one-step-reduce subexp)))
+                                                       newlst)))
+                                )
+                            #;(set! ret (car (filter (lambda (expinlst) (approx-exp? (list-ref expinlst i) subexp))
+                                                     explst))))
+                        (set! ret (list-set exp i (one-step-reduce subexp)))
+                        ))
+                (else (begin (display subexp) (error "error2 in cbv-reduce")))))))
+      ret)))
+
+(define (one-step-reduce exp)
+  (if (pair? exp)
+      (let ((explst (apply-reduction-relation Rule exp)))
+        (cond
+          ((eq? (length explst) 0)
+           '())
+          ((eq? (length explst) 1)
+           (car explst))
+          ((CoreHead? exp)
+           (let ((tmp (filter (lambda (lst) (not (approx-exp? exp lst)))
+                              explst)))
+             (begin (display tmp)
+                    (if (eq? (length tmp) 1)
+                        (car tmp)
+                        (error "e1")))))
+          ((or (SurfHead? exp) (CommonHead? exp))
+           (let ((tmp (filter (lambda (lst) (approx-exp? exp lst))
+                              explst)))
+             (if (empty? tmp)
+                 (error "error") ;(displayln explst) (cbv-reduce exp explst)
+                 ;(begin (displayln "begin2") (displayln tmp) (cbv-reduce exp tmp))
+                 (cbv-reduce exp tmp)
+                 )))
+             
+          ))
+      empty))
+
+
+#;(one-step-reduce (term (Or #f (Apply (lambda (xx y z) (And xx (Or z (And #f y)))) #t #f (Or #t #f)))))
+#;(apply-reduction-relation Rule
+                            (term (And (If #t (And #f #t) (And #t #t))
+                                       (If #f (Or #t #f) (And #f #t)))
+                                  ))
+
+
 #;(traces Rule
           (term (And (If #t (And #f #t) (And #t #t))
                      (If #f (Or #t #f) (And #f #t)))
-           ))
+                ))
 #;(traces Rule
-        (term (Or
-               #f
-               (Let
-                (x y z)
-                (#t #f (Or #t #f))
-                (And #f (Or z (And #f y)))))))
+          (term (Or
+                 #f
+                 (Let
+                  (x y z)
+                  (#t #f (Or #t #f))
+                  (And #f (Or z (And #f y)))))))
+#;(traces Rule
+          (term (Let (x y z) (1 2 (lambda (t) (+ t 1)))
+                        (Apply z x)
+                        )))
 (traces Rule
-        (term ((lambda (t) (+ t 1)) 2)))
-#;(traces Rule
- (term 
-  (Let (x) (2)
-       (Let (x y z) (1 2 (lambda (t) (+ t 1)))
-            (z x)
-            ))))
-#;(apply-reduction-relation/tag-with-names Rule
-          (term (And (If #t (And #f #t) (And #t #t))
-                     (If #f (Or #t #f) (And #f #t)))
-           ))
+          (term 
+           (Let (x) (2)
+                (Let (x y z) (1 2 (lambda (t) (+ t 1)))
+                     (Apply z x)
+                     ))))
