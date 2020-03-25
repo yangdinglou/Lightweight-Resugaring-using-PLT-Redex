@@ -90,6 +90,7 @@
      (Let (x_!_ ...) C e)
      (Let (x_!_ ...) e C)
      (And C e)
+     (And v C) ;**********************************************************************
      (Or C e)
      (Or e C)
      (Odd C)
@@ -184,7 +185,7 @@
                                    (And x (Or z (And x y)))
                                          ;x
                                    )))))
-#;(traces -->β
+(traces -->β
         (term (Let (x) (2)
                    (Let (x y z) (1 2 (lambda (t) (+ t 1)))
                         (z x)
@@ -203,3 +204,8 @@
           #:filter
           (lambda (exp name) (expfilter exp))
           )
+
+#;(traces -->β
+          (term (And (If #t (And #f #t) (And #t #t))
+                     (If #f (Or #t #f) (And #f #t)))
+           ))
