@@ -1,0 +1,1 @@
+("7.6" racket ("6535b78ca467f64d192069fd4523fd1305584743" . "5d15b4c6f103151e829110cd64b7061edfedc520") (collects #"errortrace" #"errortrace-key.rkt") (collects #"racket" #"main.rkt") (collects #"racket" #"runtime-config.rkt") (collects #"redex" #"reduction-semantics.rkt"))

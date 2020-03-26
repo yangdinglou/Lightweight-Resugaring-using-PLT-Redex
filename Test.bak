@@ -294,13 +294,13 @@
                 (Let (x y z) (1 2 (lambda (t) (+ t 1)))
                      (Apply z x)
                      ))))
-#;(get-step (term 
+(get-step (term 
            (Let (x) (2)
                 (+ (Let (x y z) (1 2 (lambda (t) (+ t 1)))
                         (Apply z x)
                         ) x))))
 (displayln "")
-#;(get-step
+(get-step
  (term (And (If #t (And #f #t) (And #t #t))
             (If #f (Or #t #f) (And #f #t)))
        ))
