@@ -21,7 +21,7 @@
            'Odd
            'Apply
            'Lambda
-           'If)))
+           )))
 (define (CommonHead? exp)
   (member (car exp)
           (list
@@ -39,7 +39,6 @@
           (andmap SurfExp? exp))
       #t))
 (define (approx-exp? exp1 exp2)
-  ;todo:corner case like (and (and a exp) exp)
   (if (and (equal? (length exp1) (length exp2))
            (equal? (car exp1) (car exp2)))
       (if (equal? (foldl + 0
@@ -47,9 +46,10 @@
                              (if (equal? lst1 lst2) 0 1))
                            exp1 exp2))
                1)
-          #t
+          (not (or (member exp1 exp2) (member exp2 exp1)))
           #f)
       #f))
+
 (define (cbv-reduce exp explst)
   (let ((surf 0) (core 0) (ret empty))
     (begin
@@ -124,7 +124,7 @@
   (let ((tmp (one-step-reduce exp)))
     (if (equal? tmp empty)
         (void)
-        (begin (if (SurfExp? tmp) (displayln tmp) void) #;(displayln tmp) (get-step tmp))
+        (begin #;(if (SurfExp? tmp) (displayln tmp) void) (displayln tmp) (get-step tmp))
         )))
 
 
@@ -164,7 +164,7 @@
        ))
 (displayln "")
 (get-step
- (term (Even 5)))
+ (term (if #t (if #t 1 2) 2)))
 
 #;(apply-reduction-relation Rule
                           (term (Let (x y z) (1 2 (Lambda (t) (+ t 1)))
