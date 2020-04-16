@@ -34,6 +34,72 @@
            '>
            '<
            'eq?)))
+
+(define (map-of-order head)
+  (cond
+    ((equal? head 'if) '(1 2 3))
+    ((or (equal? head '+)
+         (equal? head '-)
+         (equal? head '*)
+         (equal? head '/)
+         (equal? head '>)
+         (equal? head '<)
+         (equal? head 'eq?))
+     '(1 2))
+    (else "error in mapoforder")))
+(define (map-of-template head)
+  (cond
+    ((equal? head 'Sg) '(Sg Exp1 Exp2))
+    ((equal? head 'And) '(And Exp1 Exp2))
+    ((equal? head 'Or) '(Or Exp1 Exp2))
+    (else empty)))
+(define (exp-to-num exp)
+  (cond
+    ((equal? exp 'Exp1) 1)
+    ((equal? exp 'Exp2) 2)
+    ((equal? exp 'Exp3) 3)
+    (else (error "please add more in exp-to-num"))))
+(define (tmpexp? exp)
+  (member exp '(Exp1 Exp2 Exp3)))
+(define (desugar-total exp)
+  (if (pair? exp)
+      (if (SurfHead? exp)
+          (let ((desugar-exp (car (filter (lambda (lst) (not (approx-exp? exp lst)))
+                                          (apply-reduction-relation Rule exp)))))
+            (desugar-total desugar-exp))
+          (let ((tmpexp exp))
+            (begin
+              (for ((i (length exp)))
+                (set! tmpexp (list-set tmpexp i (desugar-total (list-ref exp i)))))
+              tmpexp)))
+      exp))
+(define (get-order-recur exp);corner case:some exp useless in exp
+  (let ((tmporder (map-of-order (car exp))) (tmpout empty))
+    (begin
+      (for-each (lambda (loc)
+                  (if (pair? (list-ref exp loc))
+                      (let ((ret (get-order-recur (list-ref exp loc))))
+                        (for-each (lambda (retnum)
+                                    (if (member retnum tmpout)
+                                        (void)
+                                        (set! tmpout (append tmpout (list retnum)))))
+                                  ret
+                                  ))
+                      (if (tmpexp? (list-ref exp loc))
+                          (let ((num (exp-to-num (list-ref exp loc))))
+                            (if (member num tmpout)
+                                (void)
+                                (set! tmpout (append tmpout (list num)))
+                                   ))
+                          (void))))
+                tmporder)
+      tmpout)))
+                      
+(define (get-order head)
+  (let ((tmpexp (map-of-template head)))
+    (let ((desugar-exp (desugar-total tmpexp)))
+      (get-order-recur desugar-exp))))
+      
 (define (SurfExp? exp)
   (if (pair? exp)
       (if (CoreHead? exp)
@@ -95,54 +161,25 @@
                         ))
                 ))))
       ret)))
-(define (get-change-loc exp desugar-exp desugar-onestep)
-  (let ((loc -1))
-    (for ([i (length desugar-exp)])
-      (if (not (equal? (list-ref desugar-exp i) (list-ref desugar-onestep i)))
-          (if (member (list-ref desugar-exp i) exp)
-              (let ((tmp (indexes-of exp (list-ref desugar-exp i))))
-                (if (equal? (length tmp) 1)
-                    (set! loc (car tmp))
-                    (let ((tmpexp empty))
-                      (begin
-                        (for-each (lambda (tmploc)
-                                    (begin
-                                      (set! tmpexp (list-set exp tmploc (one-step-reduce (list-ref exp tmploc))))
-                                      (let ((tmpexplst (apply-reduction-relation Rule tmpexp)))
-                                        (let ((desugar-tmpexp (car (filter (lambda (lst) (not (approx-exp? tmpexp lst)))
-                                                                           tmpexplst))))
-                                          (let ((desugar-tmponestep (one-step-reduce desugar-tmpexp)))
-                                            (for ([ii (length desugar-tmpexp)])
-                                              (if (not (equal? (list-ref desugar-tmpexp ii) (list-ref desugar-tmponestep ii)))
-                                                  (if (not (equal? (list-ref desugar-tmpexp ii) (list-ref desugar-exp i)))
-                                                      (set! loc tmploc)
-                                                      (void))
-                                                  (void))))))))
-                                  tmp)
-                        (if (not (equal? -1 loc))
-                            loc
-                            (set! loc (get-change-loc exp (list-ref desugar-exp i) (list-ref desugar-onestep i))))))))
-              (set! loc (get-change-loc exp (list-ref desugar-exp i) (list-ref desugar-onestep i))))
-          (void)))
-    loc))
             
-(define (one-step-try exp explst)
-  (if (CommonHead? exp)
+(define (one-step-try exp)
+  (if (equal? empty (map-of-template (car exp)))
       (cbv-reduce exp (filter (lambda (lst) (approx-exp? exp lst))
-                              explst))
-      (let ((desugar-exp (car (filter (lambda (lst) (not (approx-exp? exp lst)))
-                                      explst)))
-            (tmp (filter (lambda (lst) (approx-exp? exp lst))
-                         explst)))
-    
-        (let ((desugar-onestep (one-step-reduce desugar-exp)))
-          (if (approx-exp? desugar-exp desugar-onestep)
-              (let ((tmploc (get-change-loc exp desugar-exp desugar-onestep)))
-                (list-set exp tmploc (one-step-reduce (list-ref exp tmploc)))
-                )
-              (cbv-reduce exp tmp))))))
-                     
-
+                              (apply-reduction-relation Rule exp)))
+      (let ((tmporder (get-order (car exp))) (tmpexp exp) (flag #f))
+        (begin
+          (for ((i (length exp)))
+            (if flag
+                (void)
+                (let ((subexp (one-step-reduce (list-ref exp (list-ref tmporder i)))))
+                  (if (equal? empty subexp)
+                      (void)
+                      (begin (set! tmpexp (list-set tmpexp (list-ref tmporder i) subexp)) (set! flag #t))))))
+          (if flag
+              tmpexp
+              (error "in onesteptry2"))))))
+          
+        
 (define (one-step-reduce exp)
   (if (pair? exp)
       (let ((explst (apply-reduction-relation Rule exp)))
@@ -165,7 +202,7 @@
                  (begin (displayln explst) (error "error")) ;(displayln explst) (cbv-reduce exp explst)
                  ;(begin (displayln "begin2") (displayln tmp) (cbv-reduce exp tmp))
                  ;(cbv-reduce exp tmp)
-                 (one-step-try exp explst)
+                 (one-step-try exp)
                  )))
              
           ))
@@ -198,7 +235,7 @@
           (term (Let (x y z) (1 2 (lambda (t) (+ t 1)))
                         (apply z x)
                         )))
-(traces Rule
+#;(traces Rule
           (term 
            (Let (x) (2)
                 (+ (+ 1 (Let (x y z) (1 2 (Lambda (t) (+ t 1)))
@@ -216,7 +253,7 @@
        ))
 ;(displayln "")
 (get-step
- (term (Sg (And #t #t) #f)))
+ (term (Sg (And #t #t) (And #t #f))))
 (displayln "")
 (get-step
  (term (Myor (And #t #f) (Or #f #t))))
