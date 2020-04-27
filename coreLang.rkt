@@ -1,16 +1,7 @@
 #lang racket
 (require redex)
-
-#|
-
-A model of Racket's letrec
-
-|#
-
 (provide lang
          surface-lang
-         result-and-output-of
-         result-of
          run)
 
 (define-language surface-lang
@@ -18,17 +9,24 @@ A model of Racket's letrec
      (let ((x_!_ e) ...) e)
      (letrec ((x_!_ e) ...) e)
      (if e e e)
+     (first e)
+     (rest e)
+     (empty e)
+     (cons e e)
+     (map e e)
      (begin e e ...)
      (e e ...)
-     (writeln e)
      x
      v)
   (v fv sv)
   (fv (λ (x_!_ ...) e) + - * =)
   (sv number
       (void)
+      
       #t
-      #f)
+      #f
+      (list e ...)
+      )
   (x variable-not-otherwise-mentioned)
 
   #:binding-forms
@@ -51,11 +49,16 @@ A model of Racket's letrec
      (let ((x v-or-undefined) ... (x E) (x e) ...) e)
      (if E e e)
      (begin E e e ...)
-     (writeln E)
+     (first E)
+     (rest E)
+     (empty E)
+     (cons E e)
+     (cons v E)
+     (map E e)
+     (map v E)
+     (list v ... E e ...)
      hole)
   (v-or-undefined v undefined))
-
-(define v? (redex-match? lang v))
 
 ;; collect : term -> term
 ;; performs a garbage collection on the term `p'
@@ -88,7 +91,6 @@ A model of Racket's letrec
       [(cons a b) (or (loop a) (loop b))]
       [(? symbol?) (equal? body var)]
       [else #f])))
-
 
 (define reductions
   (reduction-relation
@@ -163,6 +165,23 @@ A model of Racket's letrec
         (in-hole P e_then)
         (side-condition (not (equal? (term v) #f)))
         "ift")
+   
+   (==> (in-hole P (first (list v_1 v_2 ...)))
+        (in-hole P v_1)
+        "first")
+   (==> (in-hole P (rest (list v_1 v_2 ...)))
+        (in-hole P (list v_2 ...))
+        "rest")
+   (==> (in-hole P (cons v_1 (list v_2 ...)))
+        (in-hole P (list v_1 v_2 ...))
+        "cons")
+   (==> (in-hole P (empty (list)))
+        (in-hole P #t)
+        "emptyt")
+   (==> (in-hole P (empty (list v_1 ...)))
+        (in-hole P #f)
+        "emptyf")
+   
 
    (==> ((store (x_old v-or-undefined_old) ...)
          (output o ...)
@@ -180,61 +199,22 @@ A model of Racket's letrec
         (in-hole P (let ((x undefined) ...) (begin (lset! x e_1) ... e_2)))
         "letrec")
 
-   (==> ((store (x v-or-undefined) ...)
-         (output o ...)
-         (in-hole E (writeln sv)))
-        ((store (x v-or-undefined) ...)
-         (output o ... sv)
-         (in-hole E (void)))
-        "write flat")
-   (==> ((store (x v-or-undefined) ...)
-         (output o ...)
-         (in-hole E (writeln fv)))
-        ((store (x v-or-undefined) ...)
-         (output o ... procedure)
-         (in-hole E (void)))
-        "write proc")
+   (==> (in-hole P (map (list sv_1 sv_2 ...) e))
+        (in-hole P (cons (e sv_1) (map (list sv_2 ...) e)))
+        "maps")
+   (==> (in-hole P (map (list) e))
+        (in-hole P (list))
+        "map0")
 
    with
    [(--> a ,(collect (term b))) (==> a b)]))
 
 (define (run e) (traces reductions (term ((store) (output) ,e))))
 
-(define (result-of prog #:steps [steps #f])
-  (define-values (result io) (result-and-output-of prog #:steps steps))
-  result)
-
-(define (io-of prog #:steps [steps #f])
-  (define-values (result io) (result-and-output-of prog #:steps steps))
-  io)
-
-(define (result-and-output-of e #:steps [steps #f])
-  (define cache (make-immutable-binding-hash lang))
-  (let loop ([prog (term ((store) (output) ,e))]
-             [steps-so-far 0])
-    (define cycle? (dict-ref cache prog #f))
-    (set! cache (dict-set cache prog #t))
-    (cond
-      [cycle?
-       (values 'infinite-loop '())]
-      [(or (not steps) (< steps-so-far steps))
-       (define nexts (apply-reduction-relation reductions prog))
-       (cond
-         [(null? nexts)
-          (match prog
-            [`((store . ,_) (output ,o ...) ,res)
-             (values res o)])]
-         [(null? (cdr nexts))
-          (loop (car nexts) (+ steps-so-far 1))]
-         [else
-          (error 'result-and-output-of
-                 (string-append
-                  "term reduced to multiple things\n"
-                  "  e: ~s\n"
-                  "  reduced to: ~s\n"
-                  "  which reduced to multiple things\n"
-                  "  ~s")
-                 e
-                 prog
-                 nexts)])]
-      [else (values 'ran-out-of-steps '())])))
+#;(run
+    (term (letrec ((f (λ (x) (begin (set! f x) f))))
+            (begin (f 8)
+                   f))))
+(run
+    (term (let ((f (λ (x) (+ 1 x))))
+            (map (list 1 2) f))))
