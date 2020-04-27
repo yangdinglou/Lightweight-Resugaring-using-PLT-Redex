@@ -22,7 +22,7 @@
   (fv (λ (x_!_ ...) e) + - * =)
   (sv number
       (void)
-      
+      xx yy
       #t
       #f
       (list e ...)
@@ -138,9 +138,15 @@
          (in-hole E (void)))
         "lset!")
 
-   (==> (in-hole P ((λ (x ..._1) e) v ..._1))
+   #;(==> (in-hole P ((λ (x ..._1) e) v ..._1))
         (in-hole P (let ([x v] ...) e))
         "βv")
+   (==> (in-hole P ((λ (x_0 x_1 ... x) e) e_1 e_2 ...))
+        (in-hole P (let ([x_0 e_1]) ((λ (x_1 ... x) e) e_2 ...)))
+        "βn")
+   (==> (in-hole P ((λ (x) e) e_1))
+        (in-hole P (let ([x e_1]) e))
+        "βn0")
 
    (==> (in-hole P (= number_1 number_2 ...))
         (in-hole P ,(apply = (term (number_1 number_2 ...))))
@@ -194,7 +200,7 @@
    (==> (in-hole P (let () e))
         (in-hole P e)
         "let0")
-
+   
    (==> (in-hole P (letrec ((x e_1) ...) e_2))
         (in-hole P (let ((x undefined) ...) (begin (lset! x e_1) ... e_2)))
         "letrec")
@@ -215,6 +221,8 @@
     (term (letrec ((f (λ (x) (begin (set! f x) f))))
             (begin (f 8)
                    f))))
-(run
+#;(run
     (term (let ((f (λ (x) (+ 1 x))))
             (map (list 1 2) f))))
+(run
+    (term (((λ (x y) (λ (z) (+ x y z))) xx yy) yy)))
