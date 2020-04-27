@@ -26,6 +26,7 @@
       #t
       #f
       (list e ...)
+      S K I
       )
   (x variable-not-otherwise-mentioned)
 
@@ -35,18 +36,17 @@
   (letrec ([x e_x] ...) #:refers-to (shadow x ...) e_body #:refers-to (shadow x ...)))
 
 (define-extended-language lang surface-lang
-  (p ((store (x_!_ v-or-undefined) ...)
-      (output o ...)
+  (p ((store (x_!_ e) ...)
       e))
   (e ::= ....
      undefined
      (lset! x e))
   (o ::= procedure sv)
-  (P ((store (x v-or-undefined) ...) (output o ...) E))
+  (P ((store (x e) ...) E))
   (E (v ... E e ...)
      (set! x E)
      (lset! x E)
-     (let ((x v-or-undefined) ... (x E) (x e) ...) e)
+     (let ((x e) ... (x E) (x e) ...) e)
      (if E e e)
      (begin E e e ...)
      (first E)
@@ -58,13 +58,13 @@
      (map v E)
      (list v ... E e ...)
      hole)
-  (v-or-undefined v undefined))
+  )
 
 ;; collect : term -> term
 ;; performs a garbage collection on the term `p'
 (define (collect p)
   (match p
-    [`((store (,vars ,vs) ...) ,o ,e)
+    [`((store (,vars ,vs) ...) ,e)
 
      (define (unused-var? var)
        (and (not (in? var e))
@@ -82,7 +82,6 @@
         (collect
          (term ((store ,@(filter (λ (binding) (not (memq (car binding) unused)))
                                  (cdar p)))
-                ,o
                 ,e)))])]))
 
 (define (in? var body)
@@ -103,49 +102,49 @@
         (in-hole P_1 e_1)
         "begin one")
 
-   (==> ((store (x_before v-or-undefined_before) ...
-                (x_i v_i)
-                (x_after v-or-undefined_after) ...)
-         (output o ...)
+   (==> ((store (x_before e_before) ...
+                (x_i e_i)
+                (x_after e_after) ...)
          (in-hole E_1 x_i))
-        ((store (x_before v-or-undefined_before) ...
-                (x_i v_i)
-                (x_after v-or-undefined_after) ...)
-         (output o ...)
-         (in-hole E_1 v_i))
+        ((store (x_before e_before) ...
+                (x_i e_i)
+                (x_after e_after) ...)
+         (in-hole E_1 e_i))
         "get")
 
-   (==> ((store (x_before v-or-undefined_before) ...
+   (==> ((store (x_before e_before) ...
                 (x_i v_old)
-                (x_after v-or-undefined_after) ...)
-         (output o ...)
+                (x_after e_after) ...)
          (in-hole E (set! x_i v_new)))
-        ((store (x_before v-or-undefined_before) ...
+        ((store (x_before e_before) ...
                 (x_i v_new)
-                (x_after v-or-undefined_after) ...)
-         (output o ...)
+                (x_after e_after) ...)
          (in-hole E (void)))
         "set!")
-   (==> ((store (x_before v-or-undefined_before) ...
-                (x_i v-or-undefined)
-                (x_after v-or-undefined_after) ...)
-         (output o ...)
+   (==> ((store (x_before e_before) ...
+                (x_i e)
+                (x_after e_after) ...)
          (in-hole E (lset! x_i v_new)))
-        ((store (x_before v-or-undefined_before) ...
+        ((store (x_before e_before) ...
                 (x_i v_new)
-                (x_after v-or-undefined_after) ...)
-         (output o ...)
+                (x_after e_after) ...)
          (in-hole E (void)))
         "lset!")
 
    #;(==> (in-hole P ((λ (x ..._1) e) v ..._1))
         (in-hole P (let ([x v] ...) e))
         "βv")
-   (==> (in-hole P ((λ (x_0 x_1 ... x) e) e_1 e_2 ...))
-        (in-hole P (let ([x_0 e_1]) ((λ (x_1 ... x) e) e_2 ...)))
+   (==> (in-hole P ((λ (x_0 x_1 ... x) e_0) e_1 e_2 ... e))
+        (in-hole P (let ([x_0 e_1]) ((λ (x_1 ... x) e_0) e_2 ... e)))
         "βn")
-   (==> (in-hole P ((λ (x) e) e_1))
-        (in-hole P (let ([x e_1]) e))
+   (==> (in-hole P ((λ (x_0 x_1 ... x) e_0) e_1))
+        (in-hole P (let ([x_0 e_1]) (λ (x_1 ... x) e_0)))
+        "βn1")
+   (==> (in-hole P ((λ (x) e_0) e_1 e_2 ... e))
+        (in-hole P (let ([x e_1]) (e_0 e_2 ... e)))
+        "βns")
+   (==> (in-hole P ((λ (x) e_0) e_1))
+        (in-hole P (let ([x e_1]) e_0))
         "βn0")
 
    (==> (in-hole P (= number_1 number_2 ...))
@@ -189,12 +188,10 @@
         "emptyf")
    
 
-   (==> ((store (x_old v-or-undefined_old) ...)
-         (output o ...)
-         (in-hole E (let ([x_1 v-or-undefined_1] [x_2 v-or-undefined_2] ...) e)))
-        ((store (x_old v-or-undefined_old) ... (x_new v-or-undefined_1))
-         (output o ...)
-         (in-hole E (let ([x_2 v-or-undefined_2] ...) (substitute e x_1 x_new))))
+   (==> ((store (x_old e_old) ...)
+         (in-hole E (let ([x_1 e_1] [x_2 e_2] ...) e)))
+        ((store (x_old e_old) ... (x_new e_1))
+         (in-hole E (let ([x_2 e_2] ...) (substitute e x_1 x_new))))
         (fresh x_new)
         "let1")
    (==> (in-hole P (let () e))
@@ -211,11 +208,20 @@
    (==> (in-hole P (map (list) e))
         (in-hole P (list))
         "map0")
+   (==> (in-hole P I)
+        (in-hole P (λ (x) x))
+        "I")
+   (==> (in-hole P K)
+        (in-hole P (λ (x_1 x_2) x_1))
+        "K")
+   (==> (in-hole P S)
+        (in-hole P (λ (x_1 x_2 x_3) (x_1 x_3 (x_2 x_3))))
+        "S")
 
    with
    [(--> a ,(collect (term b))) (==> a b)]))
 
-(define (run e) (traces reductions (term ((store) (output) ,e))))
+(define (run e) (traces reductions (term ((store) ,e))))
 
 #;(run
     (term (letrec ((f (λ (x) (begin (set! f x) f))))
@@ -224,5 +230,9 @@
 #;(run
     (term (let ((f (λ (x) (+ 1 x))))
             (map (list 1 2) f))))
-(run
-    (term (((λ (x y) (λ (z) (+ x y z))) xx yy) yy)))
+#;(run
+    (term (((λ (x y) (+ x y)) xx) yy)))
+
+(run (term (S (K (S I)) K xx yy )))
+;(run (term (S I (K xx) yy)))
+;(run (term (I yy ((K xx) yy))))
