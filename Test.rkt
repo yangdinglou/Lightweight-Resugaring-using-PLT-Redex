@@ -167,6 +167,12 @@
 ;(displayln "")
 (get-step
  (term (Sg (And #t #t) #f)))
+(traces Rule
+          (term 
+           (Let (x) (2)
+                (+ (+ 1 (Let (x y z) (1 2 (Lambda (t) (+ t 1)))
+                        (Apply z x)
+                        )) x))))
 (displayln "")
 (get-step
  (term (Myor (And #t #f) (Or #f #t))))
