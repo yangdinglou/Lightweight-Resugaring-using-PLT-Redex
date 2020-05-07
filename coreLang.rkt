@@ -1,6 +1,7 @@
 #lang racket
 (require redex)
 (provide lang
+         reductions
          run)
 ;; collect : term -> term
 ;; performs a garbage collection on the term `p'
@@ -38,8 +39,9 @@
      coreexp
      commonexp
      surfexp
-     (e e ...)
+     
      undefined
+     
      x)
   (coreexp ::=
            (set! x e)
@@ -49,27 +51,36 @@
            (first e)
            (rest e)
            (empty e)
-           (cons e e)
+           (e e ...)
            (begin e e ...)
            (lset! x e))
   (surfexp ::=
-           (map e e))
+           (map e e)
+           (and e e)
+           (or e e)
+           (not e))
   (commonexp ::=
+             (cons e e)
              (+ e e ...)
              (- e e ...)
              (* e e ...)
              (/ e e ...)
+             (== e e)
+             (> e e)
+             (< e e)
              v)
            
   (v ::=
-     (λ (x_!_ ...) e)
+     lambda
      number
      (void)
      xx yy
-     #t
-     #f
+     boolean
+     tmpval;for one-step-try
      (list e ...)
      S K I)
+  (lambda ::=
+          (λ (x_!_ ...) e))
 
   (x variable-not-otherwise-mentioned)
   (v-or-undefined v undefined)
@@ -93,8 +104,19 @@
      (- v ... E e ...)
      (* v ... E e ...)
      (/ v ... E e ...)
+     (== E e)
+     (== v E)
+     (> E e)
+     (> v E)
+     (< E e)
+     (< v E)
      (map E e)
      (map v E)
+     (and E e)
+     (and e E)
+     (or E e)
+     (or e E)
+     (not E)
      (S e ... E e ...)
      (K e ... E e ...)
      (I e ... E e ...)
@@ -149,18 +171,18 @@
    #;(==> (in-hole P ((λ (x ..._1) e) v ..._1))
         (in-hole P (let ([x v] ...) e))
         "βv")
-   (==> (in-hole P ((λ (x_0 x_1 ... x) e_0) v_1 v_2 ... v))
-        (in-hole P (let ([x_0 v_1]) ((λ (x_1 ... x) e_0) v_2 ... v)))
-        "βn")
-   (==> (in-hole P ((λ (x_0 x_1 ... x) e_0) v_1))
-        (in-hole P (let ([x_0 v_1]) (λ (x_1 ... x) e_0)))
-        "βn1")
-   (==> (in-hole P ((λ (x) e_0) v_1 e_2 ... e))
-        (in-hole P (let ([x v_1]) (e_0 e_2 ... e)))
-        "βns")
-   (==> (in-hole P ((λ (x) e_0) v_1))
-        (in-hole P (let ([x v_1]) e_0))
-        "βn0")
+   (==> (in-hole P ((λ (x_0 x_1 ... x) e_0) v_0 v_1 ... v))
+        (in-hole P (let ([x_0 v_0]) ((λ (x_1 ... x) e_0) v_1 ... v)))
+        "βv")
+   (==> (in-hole P ((λ (x_0 x_1 ... x) e_0) v_0))
+        (in-hole P (let ([x_0 v_0]) (λ (x_1 ... x) e_0)))
+        "βv1")
+   (==> (in-hole P ((λ (x) e_0) v_0 v_1 ... v))
+        (in-hole P (let ([x v_0]) (e_0 v_1 ... v)))
+        "βvs")
+   (==> (in-hole P ((λ (x) e_0) v_0))
+        (in-hole P (let ([x v_0]) e_0))
+        "βv0")
 
    (==> (in-hole P (= number_1 number_2 ...))
         (in-hole P ,(apply = (term (number_1 number_2 ...))))
@@ -174,9 +196,15 @@
    (==> (in-hole P (* number ...))
         (in-hole P ,(apply * (term (number ...))))
         "*")
-   (==> (in-hole P (zero? number))
-        (in-hole P (δ zero? number))
-        "zero")
+   (==> (in-hole P (> number_1 number_2))
+        (in-hole P ,(> (term number_1) (term number_2)))
+        ">")
+   (==> (in-hole P (< number_1 number_2))
+        (in-hole P ,(< (term number_1) (term number_2)))
+        "<")
+   (==> (in-hole P (== number_1 number_2))
+        (in-hole P ,(equal? (term number_1) (term number_2)))
+        "==")
 
    (==> (in-hole P (if #f e_then e_else))
         (in-hole P e_else)
@@ -217,12 +245,22 @@
         (in-hole P (let ((x undefined) ...) (begin (lset! x e_1) ... e_2)))
         "letrec")
 
-   (==> (in-hole P (map (list v_1 v_2 ...) e))
-        (in-hole P (cons (e v_1) (map (list v_2 ...) e)))
+   (==> (in-hole P (map e (list v_1 v_2 ...)))
+        (in-hole P (cons (e v_1) (map e (list v_2 ...))))
         "maps")
-   (==> (in-hole P (map (list) e))
+   (==> (in-hole P (map e (list)))
         (in-hole P (list))
         "map0")
+   
+   (==> (in-hole P (and e_1 e_2))
+        (in-hole P (if e_1 e_2 #f))
+        "and")
+   (==> (in-hole P (or e_1 e_2))
+        (in-hole P (if e_1 #t e_2))
+        "or")
+   (==> (in-hole P (not e_1))
+        (in-hole P (if e_1 #f #t))
+        "not")
    (==> (in-hole P I)
         (in-hole P (λ (x) x))
         "I")
@@ -243,22 +281,22 @@
             (begin (f 8)
                    f))))
 #;(run
-    (term (map (list 1 2 3) (λ (x) (+ 1 x)))))
+    (term (map (λ (x) (+ 1 x)) (list 1 2 3))))
 #;(run
     (term (((λ (x y) (+ x y)) xx) yy)))
-(run
+#;(run
  (term ((λ (x_1 x_2 x_3)
           (x_1 x_3 (x_2 x_3)))
         (λ (x) x)
         ((λ (x_1 x_2) x_1) xx)
         yy)))
 
-;(run (term (S (K (S I)) K xx yy )))
+;(run (term (S (K S I) K xx yy)))
 
-(run (term (S I (K xx) yy)))
+;(run (term (S I (K xx) yy)))
 
 ;(run (term (I yy ((K xx) yy))))
-
+;(run (term (if (and (and #t #t) (or #t #f)) 1 2)))
 #;(apply-reduction-relation reductions (term ((store)
  (S I (K xx) yy)
  )))

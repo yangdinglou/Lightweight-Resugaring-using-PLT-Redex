@@ -126,7 +126,7 @@
       (for ([i (length exp)])
         (let ((subexp (list-ref exp i)))
           (if (not (pair? subexp))
-              void
+              (void)
               (cond
                 ((> core 0) void)
                 ((CoreHead? subexp)
