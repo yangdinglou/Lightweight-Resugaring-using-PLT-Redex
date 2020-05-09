@@ -1,0 +1,67 @@
+\pagestyle{fancy}
+\normalsize
+\linespread{1.5}\selectfont
+\chapter{算法定义及正确性证明}
+\addtocontents{los}{\protect\addvspace{10pt}}
+
+\section{对语言的规定}
+对于给定求值规则的内部语言CoreLang，和在CoreLang基础上用语法糖构造的SurfLang；对于任意SurfLang的表达式，得到其在SurfLang上的求值序列且该求值序列满足三个性质：
+
+首先，我们需要将语言限定在基于树形表达式的结构化语言。
+
+树形表达式：此处我们使用类似Lisp的S表达式的递归树，基础定义如下。
+
+Exp::= (Headid Exp*)
+
+|  Value
+
+|  Variable
+
+结构化：对于每个表达式中的子表达式，其规约规则只和子表达式本身有关。
+
+此外：我们对CoreLang和SurfLang进行一些简单的限制。
+
+对CoreLang，任意一个Exp（每个子表达式都不包含surfexp）最多只能有一条规约路径。这一点约束并不过分，为了保证每个程序只能有一条执行路径。
+
+对SurfLang，任意一个语法糖只能有一个CoreLang的表达式与之对应。
+
+在PLT Redex中，我们将CoreLang和SurfLang视为同一个语言。则当我们定义了一个语言内部各种规约规则后，对于任意Exp都有其对应的一条或多条规约规则。根据对CoreLang的约定，有多条规约规则的表达式必然存在SurfLang的表达式。
+
+为了区分CoreLang的语言和SurfLang的语言，我们将表达式的文法定义为如下
+
+Exp::= Coreexp
+
+|  Surfexp
+
+|  Commonexp
+
+|  Otherexp
+
+Coreexp::= (CoreHead Exp*)
+
+Surfexp::= (SurfHead (Surfexp|Commonexp)*)
+
+Commonexp ::= (CommonHead (Surfexp|Commonexp)*)
+
+|   value | variable
+
+OtherSurfexp ::= (SurfHead Exp* Coreexp Exp*)
+
+OtherCommonexp ::= (CommonHead Exp* Coreexp Exp*)
+
+可以看出，在我们的重组糖方法中，可以输出的表达式是Surfexp和Commonexp，即不存在任何子表达式中存在Coreexp。
+
+
+\section{算法描述}
+
+核心算法f定义如下：
+
+对于每个表达式Exp，我们将对它所有规约规则中选择一条符合resugaring的仿真性规则的规约，且尽可能不破坏任何语法糖。
+
+1.	如果Exp是Coreexp或Commonexp或OtherCommonexp，则其规约规则或是将表达式规约到另一个表达式，此时只有一条规则；
+
+2.	或是其规约不满足导致内部子表达式需要规约，此时因为CoreLang的定序性，只会有一个子表达式被规约（且此表达式为Surfexp），此时对该子表达式Subexp递归调用核心算法f得到Subexp’，则将此Exp中子表达式Subexp规约为Subexp’的规则就是我们需要的规则。
+
+3.	如果Exp是Surfexp或OtherSurfexp，如果内部子表达式无可规约的，则必然会展开该语法糖；
+
+4.	如果存在可规约的子表达式对于每个子表达式，如果可规约，则根据我们的设定，存在一条关于此子表达式的规约规则。因此每个子表达式都可能被规约的前提下，我们需要对Surfexp或OtherSurfexp的语法糖进行展开为Exp’（此展开只有一种规约规则对应），之后对Exp’调用核心算法f，检测内部哪个子表达式在f调用过程中被规约，则此子表达式需要在Exp处首先被规约，对应对该子表达式进行规约的规约规则即为所需要的路径。

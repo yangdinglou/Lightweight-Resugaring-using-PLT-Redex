@@ -39,10 +39,9 @@
      coreexp
      commonexp
      surfexp
+     x
      
-     undefined
-     
-     x)
+     undefined)
   (coreexp ::=
            (set! x e)
            (let ((x_!_ e) ...) e)
@@ -51,10 +50,11 @@
            (first e)
            (rest e)
            (empty e)
-           (e e ...)
+           
            (begin e e ...)
            (lset! x e))
   (surfexp ::=
+           (e e ...);lambda?
            (map e e)
            (and e e)
            (or e e)

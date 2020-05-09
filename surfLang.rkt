@@ -1,32 +1,7 @@
 #lang racket
 (require redex)
 (require "coreLang.rkt")
-(define (CoreHead? exp)
-  (member (car exp)
-          (list 'set!
-                'lset!
-                'letrec
-                'if
-                'first
-                'rest
-                'empty
-                'begin))
-  )
-(define (SurfHead? exp)
-  (member (car exp)
-          (list
-           'map)))
-(define (CommonHead? exp)
-  (member (car exp)
-          (list
-           '+
-           '-
-           '*
-           '/
-           '>
-           '<
-           '==
-           'cons)))
+
 (define (CbvHead? exp)
   (member (car exp)
           (list
@@ -50,7 +25,7 @@
           #f
           (andmap SurfExp? exp))
       #t))
-(define (func desugar-exp desugar-tried exp)
+(define (func desugar-exp desugar-tried exp);judge if exp with tmpval is the right one.
   (define (eq3 e1 e2 e3) (and (equal? e1 e2) (equal? e2 e3)))
   (let ((tmp 0))
     (begin
