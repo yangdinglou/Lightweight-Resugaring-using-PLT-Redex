@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019/W32TeX) (preloaded format=xelatex 2020.4.9)  10 MAY 2020 02:13
+This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019/W32TeX) (preloaded format=xelatex 2020.4.9)  11 MAY 2020 19:18
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -957,6 +957,11 @@ Package fontspec Info: Font family 'SimSun(1)' created for font 'SimSun' with
 (fontspec)             - 'bold italic small caps'  (bx/itsc) with NFSS spec.: 
 
 
+Overfull \hbox (6.99203pt too wide) in paragraph at lines 24--24
+[]\TU/SimSun(1)/bx/n/16.06 题 目\TU/TimesNewRoman(0)/bx/n/16.06 : 
+ []
+
+
 Package fontspec Info: Font family '楷体(0)' created for font '楷体' with options
 (fontspec)             [Script={CJK},AutoFakeBold={1.5},AutoFakeSlant={0.167}].
 
@@ -980,7 +985,7 @@ Package fontspec Info: Font family '楷体(0)' created for font '楷体' with op
 
 LaTeX Font Info:    Calculating math sizes for size <22> on input line 26.
 LaTeX Font Info:    Try loading font information for U+msa on input line 26.
- (d:/texlive/2019/texmf-dist/tex/latex/amsfonts/umsa.fd
+(d:/texlive/2019/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
 LaTeX Font Info:    Try loading font information for U+msb on input line 26.
@@ -988,12 +993,12 @@ LaTeX Font Info:    Try loading font information for U+msb on input line 26.
 (d:/texlive/2019/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-Overfull \hbox (49.69055pt too wide) in paragraph at lines 26--26
+Overfull \hbox (78.14331pt too wide) in paragraph at lines 26--26
 []$[]$ 
  []
 
 
-Overfull \hbox (37.81055pt too wide) in paragraph at lines 27--27
+Overfull \hbox (9.35779pt too wide) in paragraph at lines 27--27
 []$[]$ 
  []
 
@@ -1095,44 +1100,90 @@ This may cause the page layout to be inconsistent, however.
 
  [3
 
-]
+] (./chapter/introduction.tex
 第一章
-File: sample.jpg Graphic file (type bmp)
-<sample.jpg>
 [4
 
 
-] (./chapter/xulun.tex
+]
+File: images/chapter1/example.png Graphic file (type bmp)
+<images/chapter1/example.png>
+ [5]) (./chapter/background.tex [6]
 第二章
-[5
+[7
 
-
-] [6]) (./chapter/background.tex [7]
+]
+File: images/chapter2/fullbeta.png Graphic file (type bmp)
+<images/chapter2/fullbeta.png>
+ [8]
+File: images/chapter2/fullreduction.png Graphic file (type bmp)
+<images/chapter2/fullreduction.png>
+) (./chapter/algorithm.tex [9]
 第三章
-) (./chapter/algorithm.tex [8
 
-] [9]
+Overfull \hbox (32.88849pt too wide) in paragraph at lines 61--61
+\TU/TimesNewRoman(0)/m/n/12.045 Exp::=[]  
+ []
+
+
+Overfull \hbox (75.71646pt too wide) in paragraph at lines 61--61
+[]\TU/TimesNewRoman(0)/m/n/12.045 Commonexp::=[]  
+ []
+
+
+Underfull \vbox (badness 4967) has occurred while \output is active []
+
+ [10
+
+]
+[11]
+Overfull \hbox (12.82248pt too wide) in paragraph at lines 103--104
+[]  
+ []
+
+[12]
+Underfull \hbox (badness 10000) in paragraph at lines 109--110
+
+ []
+
+
+Overfull \hbox (36.91248pt too wide) in paragraph at lines 129--130
+[][] 
+ []
+
+) (./chapter/evaluation.tex [13]
 第四章
-[10
+) (./chapter/conclusion.tex [14
 
-]) [11] (./Template.bbl [12
+]
+第五章
+) [15
 
-]) [13
+]
+第六章
+File: sample.jpg Graphic file (type bmp)
+<sample.jpg>
+[16
 
-] [14
+] (./Template.bbl [17
 
 
-] [15
+]) [18
+
+] [19
+
+
+] [20
 
 
 ] (./Template.aux) ) 
 Here is how much of TeX's memory you used:
- 21282 strings out of 492922
- 476638 string characters out of 6136752
- 547847 words of memory out of 5000000
- 25017 multiletter control sequences out of 15000+600000
- 563506 words of font info for 197 fonts, out of 8000000 for 9000
+ 21353 strings out of 492922
+ 479783 string characters out of 6136752
+ 545969 words of memory out of 5000000
+ 25067 multiletter control sequences out of 15000+600000
+ 566004 words of font info for 210 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  54i,12n,79p,793b,446s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on Template.pdf (19 pages).
+Output written on Template.pdf (24 pages).
