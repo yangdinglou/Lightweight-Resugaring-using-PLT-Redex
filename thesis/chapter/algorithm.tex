@@ -65,7 +65,6 @@
 可以看出，在我们的重组糖方法中，可以输出的表达式是Surfexp和Commonexp，即不存在任何子表达式中存在Coreexp。
 
 {\bfseries 小结：}todo
-\newpage
 
 \section{算法描述}
 本节讨论建立在符合约定的语言基础上。
@@ -84,25 +83,47 @@
 		}	
 	\end{flushleft}
 	\begin{itemize}
-		\item 或是将表达式规约到另一个表达式，此时只有一条规则，应用后输出Exp';
-		\item 或是其规约不满足导致内部子表达式需要规约，此时因为CoreLang的定序性，只会有一个子表达式被规约（且此表达式为Surfexp），此时对该子表达式Subexp递归调用核心算法f得到Subexp’，则在ListofExp'中找到将此Exp中子表达式Subexp规约为Subexp’的表达式就是我们需要的表达式；
-		\item 或是已经无法被规约（ListofExp'为空），此时返回的表达式为空。
+		\item 或是将表达式规约到另一个表达式，此时只有一条规则，应用后输出Exp';\begin{flushright}
+			Rule1.1
+		\end{flushright}
+		\item 或是其规约不满足导致内部子表达式需要规约，此时因为CoreLang的定序性，只会有一个子表达式被规约（且此表达式为Surfexp），此时对该子表达式Subexp递归调用核心算法f得到Subexp’，则在ListofExp'中找到将此Exp中子表达式Subexp规约为Subexp’的表达式就是我们需要的表达式；\begin{flushright}
+			Rule1.2
+		\end{flushright}
+		\item 或是已经无法被规约（ListofExp'为空），此时返回的表达式为空。\begin{flushright}
+			Rule1.3
+		\end{flushright}
 	\end{itemize}
-
+\begin{flushright}
+	接下页
+\end{flushright}
+}}
+\end{flushleft}
+\begin{flushleft}
+	\fbox{
+		\parbox{\textwidth}{
 	\begin{flushleft}
 		\large{\bfseries{
 				2.	如果Exp是Surfexp或OtherSurfexp	
-			}	
+			}
 		}
 	\end{flushleft}
 	\begin{itemize}
-		\item 如果内部子表达式无可规约的，则必然会展开该语法糖，此时输出表达式为Exp解糖后的表达式;
-		\item 如果存在可规约的子表达式对于每个子表达式，如果可规约，则根据我们的设定，存在一条关于此子表达式的规约规则。因此每个子表达式都可能被规约的前提下，我们需要对Surfexp或OtherSurfexp的语法糖进行展开为Exp’（此展开只有一种规约规则对应），之后对Exp’调用核心算法f，检测内部哪个子表达式Subexp在f调用过程中被规约，则此子表达式Subexp需要在Exp处首先被规约，对应对该子表达式被规约的表达式。
+		\item 如果内部子表达式无可规约的，则必然会展开该语法糖，此时输出表达式为Exp解糖后的表达式;\begin{flushright}
+			Rule2.1
+		\end{flushright}
+		\item 如果存在可规约的子表达式对于每个子表达式，如果可规约，则根据我们的设定，存在一条关于此子表达式的规约规则。因此每个子表达式都可能被规约的前提下，我们需要对Surfexp或OtherSurfexp的语法糖进行展开为DesugarExp’（此展开只有一种规约规则对应），之后对Exp’调用核心算法f
+		\begin{itemize}
+			\item 如果f(DesugarExp')是对DesugarExp'的子表达式进行规约，由于此子表达式一定由Exp的子表达式组成，需要检测是哪一个子表达式$Subexp_{i}$先被规约为$Subexp'_{i}$，则在ListofExp'中将此子表达式规约的表达式就是所需要的。\begin{flushright}
+				Rule2.2.1
+			\end{flushright}
+			\item 如果f(DesugarExp')不是对子表达式进行规约，则说明这个糖不会被重组（此糖被展开后必然会被继续破坏），因此输出不在ListofExp'中，而是输出DesugarExp'\begin{flushright}
+				Rule2.2.2
+			\end{flushright}
+		\end{itemize}
 	\end{itemize}
 	}
 }
 \end{flushleft}
-\pagebreak
 
 {\bfseries 整体算法lightweight-resugaring}定义如下
 
@@ -129,12 +150,74 @@
 }
 
 \section{正确性证明}
+
+首先，由于我们的算法和先解糖后重组糖的区别就是我们只在需要的时候将语法糖解开，而传统意义上语法糖是先将语法糖全部展开然后再CoreLang上进行执行。
+
+其次，为了证明方便，定义一些术语。
+
+$(Headid\;Subexp_{1}\;Subexp_{\ldots} \ldots)$为任意可规约表达式
+
+对表达式运用Headid的对应规则进行规约，称为外部规约。
+
+对其子表达式$Subexp_{i}$规约。其中$Subexp_{i}$为$(Headid_{i} Subexp_{i1} Subexp_{i\ldots} \ldots)$
+\begin{itemize}
+	\item 如果对$Subexp_{i}$=$(Headid_{i} Subexp_{i1} Subexp_{i\ldots} \ldots)$进行外部规约，则称为表面规约。
+	\item 如果对$Subexp_{ij}$进行规约，则称为内部规约。
+\end{itemize}
+
+{\bfseries 例：}
+
+$(if\; \#t\; Exp1\; Exp2)$--->$Exp1$ \begin{flushright}外部规约\end{flushright}
+
+$(if\; (And\; \#t\; \#f)\; Exp1\; Exp2)$--->$(if\; (if\; \#t\; \#f\; \#f)\; Exp1\; Exp2)$ \begin{flushright}表面规约\end{flushright}
+
+$(if\; (And\; (And\; \#t\; \#t)\; \#t)\; \#f)\; Exp1\; Exp2)$--->$(if\; (And\; \#t\; \#t)\; Exp1\; Exp2)$ \begin{flushright}内部规约\end{flushright}
+
+对$Exp$=$(Headid\;Subexp_{1}\;Subexp_{\ldots} \ldots)$，$Exp$称为上层表达式，$Subexp_{i}$称为下层表达式。
 \subsection{仿真性}
+仿真性：求值序列需要和在CoreLang上的求值顺序相同，即存在CoreLang上的求值序列中的部分中间过程与该序列中的元素对应。
+
+对核心算法f逐条进行分析。
+
+首先$Rule1.1$和$Rule1.3$不会影响仿真性，因为其本身就是在对CoreLang的表达式进行操作；
+
+对$Rule1.2$是对子表达式进行规约（用核心算法f），因为$Coreexp$内部的上下文规则是定的，因此即使将表达式所有糖都进行展开，也是该位置先进行规约。而在递归调用f的过程中，由于表达式深度优先，如果对下层的表达式调用f满足仿真性，那么此处上层表达式也满足仿真性。
+
+%如果被规约的子表达式是$Coreexp$或$Commonexp$，则和CoreLang上的表现一致；如果是$Surfexp$或$OtherSurfexp$，则相当于一个解糖操作，解糖是不影响仿真性的；而如果是
+
+对Rule2.1和Rule2.2.2，解糖操作也不会破坏仿真性。
+
+对Rule2.2.1，由于由于仿真性的定义，重组糖的序列是可以解糖到CoreLang上执行序列的子序列的，因此证明仿真性只需要证明我们的序列在CoreLang上的序列有对应。我们在对$(Surfid\;Subexp_{1}\;Subexp_{\ldots}\;\ldots)$进行正常运算时，也会将其依据Surfid的规约规则进行展开；而在我们的核心算法中，我们也是这样进行单步展开，区别在于内部的糖没有规约。由于Rule2.2对Exp进行外部规约后得到DesugarExp'，并调用了f(DesugarExp')
+\begin{itemize}
+	\item 如果DesugarExp'是$Coreexp$或$Commonexp$或$OtherCommonexp$，且其子表达式规约，因此对于将Exp完全解糖后也是该子表达式的位置进行规约，其他子表达式的内容不变，因此对Exp的该子表达式规约后完全解糖和对Exp整体先解糖再规约，得到的是相同的表达式。如下图所示
+	\item 如果DesugarExp'是$Surfexp$或$OtherSurfexp$，则此处将递归调用f，由于表达式深度有限，如果下层的表达式满足仿真性，则此处也满足仿真性
+\end{itemize}
+
 
 \subsection{抽象性}
-抽象性的正确性是显然的，因为我们在每次输出都判断了输出的$Exp$是否是$Surfexp$或$Commonexp$。
+抽象性：求值序列中只存在SurfLang中存在的术语，没有引入CoreLang中的术语。
+
+抽象性的正确性是显然的，因为我们在每次输出都判断了输出的$Exp$是否是$Surfexp$或$Commonexp$。（在lightweight-resugaring算法中）
 
 \subsection{覆盖性}
+覆盖性：在求值序列中没有跳过一些中间过程。
 
+引理：如果在重组糖序列中语法糖没有在不必须破坏的时候被破坏，那么就没有跳过中间过程。
+
+引理证明：假设没有语法糖提前破坏的情况下，存在CoreLang序列中的某一项$Exp$=$(Headid\;Subexp_{1}\;Subexp_{\ldots} \ldots)$可被重组为$ResugarExp'$=$(Surfid\;Subexp'_{1}\;Subexp'_{\ldots} \ldots)$,且todo
+
+对f的每一条进行讨论。
+
+对Rule1.1和Rule1.3显然没有破坏不必须破坏的语法糖。
+
+对Rule1.2，由于CoreLang的表达式需要进一步规约必须对特定子表达式进行规约，因此要对相应的下层表达式作用f。同仿真性，由于表达式深度有限，下层表达式作用f满足覆盖性可递归证明上层表达式满足覆盖性。
+
+对Rule2.1，此时必须破坏语法糖，否则无法继续规约。
+
+对Rule2.2.1，与Rule1.2相同，递归的对下层表达式作用f，递归证明覆盖性。
+
+对Rule2.2.2，因为单步尝试后发现语法糖解糖后，解糖后结构继续被破坏，因此无法还原回语法糖，也是必须破坏的语法糖。
+
+因此求值序列没有破坏任何不必须破坏的语法糖，核心算法f满足覆盖性。
 
 
