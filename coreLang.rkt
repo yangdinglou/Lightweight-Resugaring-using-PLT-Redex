@@ -43,7 +43,7 @@
      
      undefined)
   (coreexp ::=
-           (set! x e)
+           ;(set! x e)
            (let ((x_!_ e) ...) e)
            (letrec ((x_!_ e) ...) e)
            (if e e e)
@@ -51,8 +51,8 @@
            (rest e)
            (empty e)
            
-           (begin e e ...)
-           (lset! x e))
+           (begin e e ...))
+           ;(lset! x e))
   (surfexp ::=
            (e e ...);lambda?
            (map e e)
@@ -89,8 +89,8 @@
       e))
   (P ((store (x v-or-undefined) ...) E))
   (E (v ... E e ...)
-     (set! x E)
-     (lset! x E)
+     ;(set! x E)
+     ;(lset! x E)
      (let ((x v-or-undefined) ... (x E) (x e) ...) e)
      (if E e e)
      (begin E e e ...)
@@ -125,8 +125,8 @@
   
   #:binding-forms
   (λ (x ...) e #:refers-to (shadow x ...))
-  (let ([x e_x] ...) e_body #:refers-to (shadow x ...))
-  (letrec ([x e_x] ...) #:refers-to (shadow x ...) e_body #:refers-to (shadow x ...)))
+  (let ([x e_x] ...) e_body #:refers-to (shadow x ...)))
+  ;(letrec ([x e_x] ...) #:refers-to (shadow x ...) e_body #:refers-to (shadow x ...)))
 
 (define reductions
   (reduction-relation
@@ -149,24 +149,6 @@
          (in-hole E_1 v_i))
         "get")
 
-   (==> ((store (x_before v-or-undefined_before) ...
-                (x_i v_old)
-                (x_after v-or-undefined_after) ...)
-         (in-hole E (set! x_i v_new)))
-        ((store (x_before v-or-undefined_before) ...
-                (x_i v_new)
-                (x_after v-or-undefined_after) ...)
-         (in-hole E (void)))
-        "set!")
-   (==> ((store (x_before v-or-undefined_before) ...
-                (x_i v-or-undefined)
-                (x_after v-or-undefined_after) ...)
-         (in-hole E (lset! x_i v_new)))
-        ((store (x_before v-or-undefined_before) ...
-                (x_i v_new)
-                (x_after v-or-undefined_after) ...)
-         (in-hole E (void)))
-        "lset!")
 
    #;(==> (in-hole P ((λ (x ..._1) e) v ..._1))
         (in-hole P (let ([x v] ...) e))
@@ -234,16 +216,12 @@
    (==> ((store (x_old v-or-undefined_old) ...)
          (in-hole E (let ([x_1 v-or-undefined_1] [x_2 v-or-undefined_2] ...) e)))
         ((store (x_old v-or-undefined_old) ... (x_new v-or-undefined_1))
-         (in-hole E (let ([x_2 v-or-undefined_2] ...) (substitute e x_1 x_new))))
-        (fresh x_new)
+         (in-hole E (let ([x_2 v-or-undefined_2] ...) (substitute e x_1 v-or-undefined_1))))
         "let1")
    (==> (in-hole P (let () e))
         (in-hole P e)
         "let0")
-   
-   (==> (in-hole P (letrec ((x e_1) ...) e_2))
-        (in-hole P (let ((x undefined) ...) (begin (lset! x e_1) ... e_2)))
-        "letrec")
+
 
    (==> (in-hole P (map e (list v_1 v_2 ...)))
         (in-hole P (cons (e v_1) (map e (list v_2 ...))))
@@ -276,14 +254,11 @@
 
 (define (run e) (traces reductions (term ((store) ,e))))
 
-#;(run
-    (term (letrec ((f (λ (x) (begin (set! f x) f))))
-            (begin (f 8)
-                   f))))
+
 (run
     (term (map (λ (x) (+ 1 x)) (list 1 2 3))))
-#;(run
-    (term (((λ (x y) (+ x y)) xx) yy)))
+(run
+    (term ((λ (x) (((λ (x y) (+ x y)) xx) yy)) 1)))
 #;(run
  (term ((λ (x_1 x_2 x_3)
           (x_1 x_3 (x_2 x_3)))
