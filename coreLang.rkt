@@ -21,11 +21,13 @@
   (surfexp ::=
            (e e ...);lambda?
            (map e e)
+           (filter e e)
            
            (and e e)
            (or e e)
            (not e)
-           (Let x e e))
+           (Let x e e)
+           (Sg e e e))
   (commonexp ::=
              (cons e e)
              (+ e e ...)
@@ -75,7 +77,7 @@
      (< E e)
      (< v E)
      (map E e)
-     (map v E)
+     (map e E)
      (Let x E e)
      (Let x e E)
      (and E e)
@@ -83,6 +85,10 @@
      (or E e)
      (or e E)
      (not E)
+     (Sg e e E)
+     (Sg e E e)
+     (Sg E e e)
+     
      (S e ... E e ...)
      (K e ... E e ...)
      (I e ... E e ...)
@@ -184,6 +190,12 @@
    (==> (in-hole P (map e (list)))
         (in-hole P (list))
         "map0")
+   (==> (in-hole P (filter e (list v_1 v_2 ...)))
+        (in-hole P (if (e v_1 ) (cons v_1 (filter e (list v_2 ...))) (filter e (list v_2 ...))))
+        "filters")
+   (==> (in-hole P (filter e (list)))
+        (in-hole P (list))
+        "filter0")
    
    (==> (in-hole P (and e_1 e_2))
         (in-hole P (if e_1 e_2 #f))
@@ -194,6 +206,12 @@
    (==> (in-hole P (not e_1))
         (in-hole P (if e_1 #f #t))
         "not")
+   (==> (in-hole P (Sg e_1 e_2 e_3))
+        (in-hole P (and (or e_1 e_2) (not e_3)))
+        "Sg")
+
+
+   
    (==> (in-hole P I)
         (in-hole P (λ (x) x))
         "I")
@@ -209,6 +227,8 @@
 
 (define (run e) (traces reductions (term ((store) ,e))))
 
+#;(run
+    (term (filter (λ (x) (and (> x 3) (< x 8))) (list 1 2 3 4 5 6 7 8 9))))
 
 #;(run
     (term (map (λ (x) (+ 1 x)) (list 1 2 3))))
@@ -231,3 +251,6 @@
 #;(apply-reduction-relation reductions (term ((store)
  (S I (K xx) yy)
  )))
+
+#;(run
+    (term (Sg (and #t #f) (not #f) #f)))
