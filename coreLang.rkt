@@ -280,7 +280,7 @@
     (term (letrec ((f (λ (x) (begin (set! f x) f))))
             (begin (f 8)
                    f))))
-#;(run
+(run
     (term (map (λ (x) (+ 1 x)) (list 1 2 3))))
 #;(run
     (term (((λ (x y) (+ x y)) xx) yy)))
