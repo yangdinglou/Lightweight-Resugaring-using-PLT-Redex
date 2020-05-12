@@ -24,7 +24,8 @@
            
            (and e e)
            (or e e)
-           (not e))
+           (not e)
+           (Let x e e))
   (commonexp ::=
              (cons e e)
              (+ e e ...)
@@ -75,6 +76,8 @@
      (< v E)
      (map E e)
      (map v E)
+     (Let x E e)
+     (Let x e E)
      (and E e)
      (and e E)
      (or E e)
@@ -88,11 +91,12 @@
   
   #:binding-forms
   (λ (x ...) e #:refers-to (shadow x ...))
+  (Let x e e_body #:refers-to (shadow x))
   (let ([x e_x] ...) e_body #:refers-to (shadow x ...)))
 
 (define reductions
   (reduction-relation
-   lang #:domain p
+   lang ;#:domain p
    (==> (in-hole P_1 (begin v e_1 e_2 ...))
         (in-hole P_1 (begin e_1 e_2 ...))
         "begin many")
@@ -169,6 +173,9 @@
    (==> (in-hole P (let () e))
         (in-hole P e)
         "let0")
+   (==> (in-hole P (Let x e_1 e_2))
+        (in-hole P ((λ (x) e_2) e_1))
+        "MyLet")
 
 
    (==> (in-hole P (map e (list v_1 v_2 ...)))
@@ -213,7 +220,8 @@
         (λ (x) x)
         ((λ (x_1 x_2) x_1) xx)
         yy)))
-
+#;(run
+    (term (Let x (+ 1 2) (Let x 4 (+ x 1)))))
 ;(run (term (S (K S I) K xx yy)))
 
 ;(run (term (S I (K xx) yy)))
