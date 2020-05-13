@@ -5,8 +5,65 @@
 \addtocontents{los}{\protect\addvspace{10pt}}
 
 \section{实现细节}
-todo
+在PLT Redex中，对一个语言的定义主要需要三个内容。
+\begin{itemize}
+	\item 文法
+	\item 上下文环境
+	\item 规约规则
+\end{itemize}
 
+我们在实现中，对所有表达式按如下文法进行子类划分。
+\begin{verbatim}
+exp ::= coreexp | surfexp | commonexp
+\end{verbatim}
+
+与(第三章第1节)的定义有所差别的是，这里的surfexp包括了第三章第1节的Surfexp和OtherSurfexp，commonexp包括了第三章第一节的Commonexp和OtherCommonexp。
+
+对于coreexp，自然是包含了所有内部语言的术语。因为我们的定义是将Exp的形式限制在$(Headid\;Subexp_{1}\ldots)$，通常情况下可以根据Headid判断是否是coreexp。
+
+例：
+\begin{verbatim}
+coreexp ::= (if exp exp exp)
+		|   (let ((x exp) ...) exp)
+		|   (first exp)
+		|   (rest exp)
+		|   ...
+\end{verbatim}
+
+对于surfexp，就是$Headid$是表示DSL的标识的表达式。
+
+例：
+\begin{verbatim}
+surfexp ::= (and exp exp)
+		|   (or exp exp)
+		|   (map exp exp)
+		|   (filter exp exp)
+		|   ...
+\end{verbatim}
+
+对于commonexp，是为了让我们的重组糖序列中有一些包含在内部语言、但是可以输出的中间过程。例如对于高阶糖
+
+$(Map\;f\;lst)-->(cons\;(f\;(first\;lst))\;(Map\;f\;(rest\;lst)))$
+
+\begin{flushleft}
+	我们需要一些中间序列用cons表示，来输出有用的中间过程。我们主要需要的commonexp有所有值、所有基础运算（包括算数运算和列表运算）。
+\end{flushleft}
+
+对于上下文规则，对coreLang为了限制每个表达式只有一条规则可以规约，需要仔细限制位置。
+而对于surfLang，由于我们不知道哪个子表达式需要先规约，要把每一个位置都设为可规约的洞。
+\begin{verbatim}
+(E  (v ... E e ...)
+	(let ((x v) ... (x E) (x e) ...) e)
+	(if E e e)
+	(and E e)
+	(and e E)
+	(or E e)
+	(or e E)
+	...
+	hole)
+\end{verbatim}
+
+规约规则没有特殊说明。具体可参见代码。\footnote{\url{http://wikipedia.org}}
 \section{评估}
 
 \subsection{普通糖}
@@ -14,5 +71,9 @@ todo
 \subsection{卫生宏}
 
 \subsection{递归糖}
+
+\subsection{高阶糖}
+
+\section{一些其他讨论}
 
 \subsection{副作用}
