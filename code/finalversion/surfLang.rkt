@@ -7,6 +7,20 @@
           (list
            'map
            'filter)))
+
+(define (rename exp)
+  (define (f s)
+    (let ((ss (symbol->string s)))
+      (let ((tmp (index-of (string->list ss) #\«)))
+        (if tmp
+            (string->symbol (substring ss 0 tmp))
+            s))))
+  (if (pair? exp)
+      (map (lambda (x)
+             (if (pair? x) (rename x) (if (symbol? x) (f x) x))) exp)
+      (f exp))
+)
+
 (define (approx-exp? exp1 exp2)
   (if (and (pair? exp1) (pair? exp2))
       (if (and (equal? (length exp1) (length exp2))
@@ -51,7 +65,7 @@
       (for ((i (length (cadr exp))))
         (if (and (not (eq? i 0)) (eq? ret -1) (pair? (list-ref (cadr exp) i)))
             (let ((tmpexp (filter (lambda (x) (not (approx-exp? (list-set (cadr exp) i 'tmpval) (cadr x))))
-                                  (apply-reduction-relation reductions (list-set exp 1 (list-set (cadr exp) i 'tmpval))))))
+                                  (map rename (apply-reduction-relation reductions (list-set exp 1 (list-set (cadr exp) i 'tmpval)))))))
               
               (if (eq? (length tmpexp) 1)
                   (if (equal? 'tmpval (list-ref (cadr (car tmpexp)) idx))
@@ -63,9 +77,10 @@
                       )
                   (begin (displayln tmpexp) (error "1"))))
             (void)))
+      ;(display "return") (displayln desugar-tried) (displayln desugar-exp) (displayln exp) (displayln ret)
       ret)))
 (define (one-step-try exp)
-  (let ((all-possible (apply-reduction-relation reductions exp)))
+  (let ((all-possible (map rename (apply-reduction-relation reductions exp))))
     (if (CbvHead? (cadr exp))
         (let ((ret empty) (flg #f))
           (begin
@@ -90,32 +105,26 @@
                       (let ((tmpidx (get-index (cadr desugar-tried) (cadr (car tmpexp)) exp)))
                         (if (eq? tmpidx -1)
                             (set! ret (car tmpexp))
-                            (set! idx (get-index (cadr desugar-tried) (cadr (car tmpexp)) exp))))
+                            (set! idx tmpidx)))
                       (set! ret (car tmpexp))))
                 (begin (displayln tmpexp) (error "at line 80")))
             (if (not (empty? ret))
                 ret
-                (car (filter (lambda (x)
+                (let ((retlst (filter (lambda (x)
                                (and (approx-exp? (cadr x) (cadr exp))
-                                    (not (equal? (list-ref (cadr exp) idx) (list-ref (cadr x) idx)))))
-                             all-possible))))))))
-      
-      
-        
+                                    (equal? (cadr (core-algo (list-set exp 1 (list-ref (cadr exp) idx)))) (list-ref (cadr x) idx))))
+                             all-possible)))
+                      (if (> (length retlst) 1)
+                          (begin (displayln "///") (displayln exp) (displayln retlst) (displayln idx) (displayln "///")
+                                 (car retlst))
+                          (car retlst)))
 
-(define (get-recur-seq exp)
-  (let ((tmpexp (core-algo exp)))
-    (if (empty? (cadr exp))
-        empty
-        (if (SurfExp? (cadr exp))
-            (append (list (cadr exp)) (get-recur-seq tmpexp));todo:add support for get
-            (get-recur-seq tmpexp)))
-    ))
-    
+                      ))))))
+
   
 (define (core-algo exp)
   (if (pair? (cadr exp))
-      (let ((explst (apply-reduction-relation reductions exp)))
+      (let ((explst (map rename (apply-reduction-relation reductions exp))))
         (cond
           ((equal? (length explst) 0) (list '(store) empty))
           ((equal? (length explst) 1) (car explst))
@@ -154,8 +163,11 @@
       (list (car exp) empty)))
 
 #;(core-algo (term ((store)
-                  (if (and (if #t #t #f) (or #t #f)) 1 2)
-                  )))
+ (Sg
+  (if #t #f #f)
+  (not #f)
+  #f))))
+
 (define (lightweight-resugaring exp)
   (let ((tmp (core-algo exp)))
     (if (equal? (cadr tmp) empty)
@@ -167,8 +179,10 @@
                   (and (and #t #f) (or #f #t))
                   )))
 #;(lightweight-resugaring (term ((store)
-                  (and (or #f #t) (and #t #f))
+                  (Myor (Myor #f #f) (and #t #t))
                   )))
+#;(core-algo (term ((store) (Myor (let ((tmp #f)) (if #f #f #f)) (and #t #t)))))
+#;(core-algo (term ((store) (let ((tmp (let ((tmp #f)) (if #f #f #f)))) (if (let ((tmp #f)) (if #f #f #f)) (let ((tmp #f)) (if #f #f #f)) (and #t #t))))))
 #;(lightweight-resugaring (term ((store)
                   (Let f (λ (x) (+ 1 x)) (map f (list 1 2 3)))
                   )))
@@ -187,6 +201,6 @@
                                (Sg (and #t #f) (not #f) #f)
                                )))
 
-(lightweight-resugaring (term ((store)
+#;(lightweight-resugaring (term ((store)
                                (Odd 6)
                                )))

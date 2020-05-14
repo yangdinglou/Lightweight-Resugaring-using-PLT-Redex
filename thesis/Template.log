@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019/W32TeX) (preloaded format=xelatex 2020.4.9)  13 MAY 2020 21:18
+This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019/W32TeX) (preloaded format=xelatex 2020.4.9)  14 MAY 2020 08:03
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1236,33 +1236,37 @@ This may cause the page layout to be inconsistent, however.
 ] [2
 
 
-] (./Template.toc)
-\tf@toc=\write4
-\openout4 = `Template.toc'.
+] (./Template.toc
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [3
 
-] (./chapter/introduction.tex
+])
+\tf@toc=\write4
+\openout4 = `Template.toc'.
+
+
+[4] (./chapter/introduction.tex
 第一章
-[4
+[5
 
 
 ]
 File: images/chapter1/example.png Graphic file (type bmp)
 <images/chapter1/example.png>
- [5]) (./chapter/background.tex [6]
+ [6]) (./chapter/background.tex [7]
 第二章
-[7
+[8
 
 ]
 File: images/chapter2/fullbeta.png Graphic file (type bmp)
 <images/chapter2/fullbeta.png>
- [8]
+ [9]
 File: images/chapter2/fullreduction.png Graphic file (type bmp)
 <images/chapter2/fullreduction.png>
-) (./chapter/algorithm.tex [9]
+) (./chapter/algorithm.tex [10]
 第三章
-[10
+[11
 
 ]
 Overfull \hbox (32.88849pt too wide) in paragraph at lines 68--68
@@ -1277,7 +1281,7 @@ Overfull \hbox (75.71646pt too wide) in paragraph at lines 68--68
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [11]
+ [12]
 Overfull \hbox (9.81123pt too wide) in paragraph at lines 106--107
 []  
  []
@@ -1290,7 +1294,7 @@ Overfull \hbox (12.82248pt too wide) in paragraph at lines 132--133
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [12]
+ [13]
 Underfull \hbox (badness 10000) in paragraph at lines 137--138
 
  []
@@ -1303,8 +1307,8 @@ Overfull \hbox (36.91248pt too wide) in paragraph at lines 157--158
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [13]
-[14] [15]
+ [14]
+[15] [16]
 Overfull \hbox (85.36105pt too wide) in paragraph at lines 214--215
 \TU/SimSun(1)/m/n/12.045 项 $\OML/cmm/m/it/12.045 Exp$\TU/TimesNewRoman(0)/m/n/1
 2.045 =$\OT1/cmr/m/n/12.045 (\OML/cmm/m/it/12.045 Headid Subexp[] Subexp[] []\O
@@ -1314,7 +1318,7 @@ t/12.045 Surfid Subexp[] Subexp[] []\OT1/cmr/m/n/12.045 )$\TU/TimesNewRoman(0)/
 m/n/12.045 ,
  []
 
-) (./chapter/evaluation.tex [16]
+) (./chapter/evaluation.tex [17]
 第四章
 
 Package fontspec Info: Font family 'FangSong(0)' created for font 'FangSong'
@@ -1338,33 +1342,42 @@ Package fontspec Info: Font family 'FangSong(0)' created for font 'FangSong'
 nt=0.167;"
 (fontspec)             - 'bold italic small caps'  (bx/itsc) with NFSS spec.: 
 
-[17
+[18
 
-]) (./chapter/conclusion.tex
+]
 Underfull \vbox (badness 5105) has occurred while \output is active []
 
- [18]
-[19]
+ [19]
+Underfull \hbox (badness 10000) in paragraph at lines 99--100
+
+ []
+
+
+Overfull \hbox (7.03368pt too wide) in paragraph at lines 113--115
+[][] \TU/SimSun(1)/m/n/12.045 结 果 显
+ []
+
+[20]) (./chapter/conclusion.tex [21]
 第五章
-) [20
+) [22
 
 ]
 第六章
 File: sample.jpg Graphic file (type bmp)
 <sample.jpg>
-[21
+[23
 
-] (./Template.bbl [22
+] (./Template.bbl [24
 
 
-]) [23
+]) [25
 
-] [24
+] [26
 
 
 ]
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 458.
- [25
+ [27
 
 
 ]
@@ -1372,24 +1385,17 @@ Package atveryend Info: Empty hook `AfterLastShipout' on input line 458.
  (./Template.aux)
 Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 458.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 458.
-
-
-Package rerunfilecheck Warning: File `Template.out' has changed.
-(rerunfilecheck)                Rerun to get outlines right
-(rerunfilecheck)                or use package `bookmark'.
-
-Package rerunfilecheck Info: Checksums for `Template.out':
-(rerunfilecheck)             Before: 4C84FB9E667E3C7625A0A38A0D7A5790
-(rerunfilecheck)             After:  FD1EFD84F3C40CFABDBF1CF0B47AB64B.
+Package rerunfilecheck Info: File `Template.out' has not changed.
+(rerunfilecheck)             Checksum: 38A9986AA9C1F03A20F5227EEADA0DE7.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 458.
  ) 
 Here is how much of TeX's memory you used:
- 28383 strings out of 492922
- 580204 string characters out of 6136752
- 665083 words of memory out of 5000000
- 32038 multiletter control sequences out of 15000+600000
+ 28384 strings out of 492922
+ 580217 string characters out of 6136752
+ 665390 words of memory out of 5000000
+ 32039 multiletter control sequences out of 15000+600000
  566404 words of font info for 216 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
- 54i,12n,79p,793b,1053s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 54i,12n,79p,793b,1055s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on Template.pdf (29 pages).
+Output written on Template.pdf (31 pages).

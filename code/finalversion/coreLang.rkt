@@ -8,8 +8,7 @@
   (e ::=
      coreexp
      commonexp
-     surfexp
-     x)
+     surfexp)
   (coreexp ::=
            (let ((x_!_ e) ...) e)
            (if e e e)
@@ -25,6 +24,7 @@
            
            (and e e)
            (or e e)
+           (Myor e e)
            (not e)
            (Let x e e)
            (Sg e e e)
@@ -39,6 +39,7 @@
              (== e e)
              (> e e)
              (< e e)
+             x
              v)
            
   (v ::=
@@ -86,6 +87,8 @@
      (and e E)
      (or E e)
      (or e E)
+     (Myor E e)
+     (Myor e E)
      (not E)
      (Sg e e E)
      (Sg e E e)
@@ -207,6 +210,9 @@
    (--> (in-hole P (or e_1 e_2))
         (in-hole P (if e_1 #t e_2))
         "or")
+   (--> (in-hole P (Myor e_1 e_2))
+        (in-hole P (let ((tmp e_1)) (if tmp tmp e_2)))
+        "Myor")
    (--> (in-hole P (not e_1))
         (in-hole P (if e_1 #f #t))
         "not")
@@ -276,4 +282,5 @@
 #;(run
     (term (Sg (and #t #f) (not #f) #f)))
 #;(run
-    (term (Odd 6)))
+    (term (Myor (Myor #f #f) (and #t #t))))
+#;(run (term ((λ (x) (Let x (+ 1 4) (+ x 1))) 3)))

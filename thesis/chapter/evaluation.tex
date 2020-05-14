@@ -63,11 +63,73 @@ $(Map\;f\;lst)-->(cons\;(f\;(first\;lst))\;(Map\;f\;(rest\;lst)))$
 	hole)
 \end{verbatim}
 
-规约规则没有特殊说明。具体可参见代码。\footnote{\url{http://wikipedia.org}}
+规约规则没有特殊说明。具体可参见代码。\footnote{\url{https://github.com/yangdinglou/Lightweight-Resugaring-using-PLT-Redex}}
+
+\pagebreak
 \section{评估}
 
 \subsection{普通糖}
 
+我们首先就简单的
+
+$(and\;e1\;e2)-->(if\;e1\;e2\;\#f)$
+
+$(or\;e1\;e2)-->(if\;e1\;\#t\;e2)$
+糖进行测试。
+
+因为我们的CoreLang上规定的求值顺序是，对$(if \;e1\;e2\;e3)$的$e1$求到值后就规约，因此我们应该看到的是对$and$和$or$糖，先将第一个值求到值，如何对糖进行破坏。
+
+\framebox[30em][l]{
+\parbox[t]{\textwidth}{
+	(and (and \#t \#f) (or \#f \#t))\\
+	(and \#f (or \#f \#t))\\
+	\#f
+}
+}
+
+\framebox[30em][l]{
+	\parbox[t]{\textwidth}{
+		(and (or \#f \#t) (or \#f \#f))\\
+		(and \#t (or \#f \#f))\\
+		(or \#f \#f)\\
+		\#f
+	}
+}
+
+我们可以看到如上的两个例子皆按照我们预想的样子输出了重组糖序列。\\[6pt]
+
+另外尽管我们的重组糖序列不考虑有副作用的语言，但我们依然测试了一下考虑副作用时的糖的正确性。
+
+$(Myor\;e1\;e2)-->(let\;((tmp\;e1))\;(if\;tmp\;tmp\;e2))$
+其中没有用到任何其他糖，因此我们可以期待它的效果和上面的or糖一样。
+
+\framebox[30em][l]{
+	\parbox[t]{\textwidth}{
+		(Myor (Myor \#f \#f) (and \#t \#t))\\
+		(Myor \#f (and \#t \#t))\\
+		(and \#t \#t)\\
+		\#t
+	}
+}
+结果显示我们的方法确实正确得到了该重组糖的序列。
+
+\subsection{复合糖}
+
+尽管和普通糖没有本质区别，但本节测试的糖在解糖后依然存在语法糖结构。我们构造如下Sg糖为例
+
+$(Sg\;e1\;e2\;e3)-->(and\;(or\;e1\;e2)\;(not\;e3))$
+
+\framebox[30em][l]{
+	\parbox[t]{\textwidth}{
+		(Sg (and \#t \#f) (not \#f) \#f)\\
+		(Sg \#f (not \#f) \#f)\\
+		(and (or \#f (not \#f)) (not \#f))\\
+		(and (not \#f) (not \#f))\\
+		(and \#t (not \#f))\\
+		(not \#f)\\
+		\#t
+	}
+}
 \subsection{卫生宏}
 
 \subsection{递归糖}
