@@ -191,12 +191,10 @@
         "MyLet")
 
 
-   (--> (in-hole P (map e (list v_1 v_2 ...)))
-        (in-hole P (cons (e v_1) (map e (list v_2 ...))))
-        "maps")
-   (--> (in-hole P (map e (list)))
-        (in-hole P (list))
-        "map0")
+
+   (--> (in-hole P (map e (list v_1 ...)))
+        (in-hole P (if (empty (list v_1 ...)) (list) (cons (e (first (list v_1 ...))) (map e (rest (list v_1 ...))))))
+        "map")
    (--> (in-hole P (filter e (list v_1 v_2 ...)))
         (in-hole P (if (e v_1) (cons v_1 (filter e (list v_2 ...))) (filter e (list v_2 ...))))
         "filters")

@@ -19,7 +19,7 @@
 	}%  
 }  
 
-结构化：对于每个表达式中的子表达式，其规约规则只和子表达式本身有关。此限制约束了Corelang的作用域，限制语言子表达式不能有对外的副作用。我们将在第五章详细讨论副作用的一些具体解决办法
+\label{mark:struct}结构化：对于每个表达式中的子表达式，其规约规则只和子表达式本身有关。此限制约束了Corelang的作用域，限制语言子表达式不能有对外的副作用。我们将在第五章详细讨论副作用的一些具体解决办法
 
 {\bfseries 此外}：我们对CoreLang和SurfLang进行一些简单的限制。
 
@@ -149,6 +149,8 @@ $(Surfid\;e_{1}\;e_{2}\ldots)--->(Id\; \ldots)$
 	\qquad \qquad else if($tmpexp$ is surfexp or commonexp):
 	
 	\qquad \qquad \qquad output $tmpexp$;
+	
+	\qquad \qquad \qquad $Lightweight-resugaring$($tmpexp$);
 	
 	\qquad \qquad else:
 	

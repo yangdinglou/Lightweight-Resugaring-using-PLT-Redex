@@ -6,4 +6,19 @@ A.~Einstein, B.~Podolsky, and N.~Rosen.
   complete?
 \newblock {\em Phys. Rev.}, 47:777--780, May 1935.
 
+\bibitem{SEwPR}
+Matthias Felleisen, Robert~Bruce Findler, and Matthew Flatt.
+\newblock {\em Semantics Engineering with PLT Redex}.
+\newblock The MIT Press, 1st edition, 2009.
+
+\bibitem{hygienic}
+Justin Pombrio and Shriram Krishnamurthi.
+\newblock Hygienic resugaring of compositional desugaring.
+\newblock {\em SIGPLAN Not.}, 50(9):75–87, August 2015.
+
+\bibitem{resugaring}
+Justin Pombrio and Shriram Krishnamurthi.
+\newblock Resugaring: Lifting evaluation sequences through syntactic sugar.
+\newblock {\em SIGPLAN Not.}, 49(6):361–371, June 2014.
+
 \end{thebibliography}

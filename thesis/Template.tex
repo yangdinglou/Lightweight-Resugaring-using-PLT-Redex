@@ -161,10 +161,10 @@
 \chapter*{摘要}
 随着计算机科学的普及和编程语言的发展，编程语言、特别是领域特定语言的应用越来越日常化。语法糖作为实现领域特定语言的一项重要技术在近年来发展火热，相关的研究\upcite{PhysRev.47.777}以及为DSL而诞生的编程语言(例如Racket\upcite{PhysRev.47.777})都在进展显著。
 
-我们对一个重组糖\upcite{PhysRev.47.777}（语法糖的一项工作）系列的文章进行学习，并基于PLT Redex设计了一个轻量级重组糖算法，简单实现了一套工具并在一些例子上进行测试。结果显示我们的轻量级重组糖算法相较于现有重组糖算法可以多处理一些语法糖特性。除此之外，由于该方法在某种意义上是对领域特定语言的一种解释执行，因此对自动生成领域特定语言的解释器研究有一定参考价值。
+我们对一个重组糖\upcite{PhysRev.47.777}（语法糖的一项工作）系列的文章进行学习，并基于PLT Redex设计了一个轻量级重组糖算法，简单实现了一套工具并在一些例子上进行测试。结果显示我们的轻量级重组糖算法相较于现有重组糖算法可以多处理一些语法糖特性，也更容易处理卫生宏等特性。除此之外，由于该方法在某种意义上是对领域特定语言的一种解释执行，因此对自动生成领域特定语言的解释器研究有一定参考价值。
 
 \bigskip
-\noindent{\bfseries\songti 关键词: 领域特定语言、语法糖、函数式语言、解释器 }
+\noindent{\bfseries\songti 关键词: 领域特定语言、语法糖、重写系统、函数式语言、解释器 }
 
 
 
@@ -207,11 +207,11 @@
 \chapter*{\bfseries Abstract}
 With the popularization of computer science and the development of programming languages, the application of programming languages, especially domain-specific languages, is becoming more and more routine. Syntactic sugar, as an important technique for implementing a domain-specific language, has developed fiercely in recent years, and related research and programming languages born for DSL(such as Racket) are making significant progress.
 
-We studied a series of articles on Resugaring (a work of syntactic sugar), and designed a lightweight resugaring algorithm based on PLT Redex, simply implemented a set of tools and tested on some examples. The results show that our lightweight resugaring algorithm can handle more syntactic sugar characteristics than existing resugaring algorithms. In addition, because the method is a kind of interpretation of domain-specific language in a sense, it has a certain reference value for the research of  automatic generating the interpreter of domain-specific language.
+We studied a series of articles on Resugaring (a work of syntactic sugar), and designed a lightweight resugaring algorithm based on PLT Redex, simply implemented a set of tools and tested on some examples. The results show that our lightweight resugaring algorithm can handle more syntactic sugar features than existing resugaring algorithms, also handle features like hygienic macro more simply. In addition, because the method is a kind of interpretation of domain-specific language in a sense, it has a certain reference value for the research of  automatic generating the interpreter of domain-specific language.
 \bigskip
 \noindent
 
-{\bfseries Key Words: Domain-specific language, syntactic sugar, functional language, interpreter }
+{\bfseries Key Words: Domain-specific language, syntactic sugar, rewriting system, functional language, interpreter }
 
 
 
@@ -288,35 +288,7 @@ We studied a series of articles on Resugaring (a work of syntactic sugar), and d
 \input{chapter/algorithm}
 \input{chapter/evaluation}
 \input{chapter/conclusion}
-
-\chapter{章节名称}
-\section{一级段落名称}
-\subsection{二级段落名称}
-\subsubsection{三级段落名称}
-引用如\upcite{PhysRev.47.777}，引用表如表\ref{tab:input_output_r}，引用图如图\ref{fig:sample}．
-
-\begin{table}[h]
-	\small %内容，（五号，宋体/Time new roman）
-	\centering
-	\caption{不同频率下的输入和输出阻抗}
-	\label{tab:input_output_r}
-	\begin{tabular}{cccc} %表格使用三线表
-		\toprule %不确定说明中三条线的粗细，待改
-		频率(Hz) & 1 & 10k & 1M \\
-		\midrule
-		输入电阻($\Omega/^\circ$) & 339.719k/-87.84 & 5.6707k/-9.827 & 351.188/-72.377\\
-		输出电阻($\Omega/^\circ$) & 338.638k/-89.663 & 1.9866k/-1.1228 & 1.9189k/-14.801 \\
-		\bottomrule
-	\end{tabular}
-\end{table}
-
-\begin{figure}[h]
-	\centering
-	\includegraphics[width=12cm]{sample.jpg}
-	\caption{示例图片}
-	\label{fig:sample}
-\end{figure}
-\clearpage
+%\input{tmp}
 
 
 \chapter*{参考文献}

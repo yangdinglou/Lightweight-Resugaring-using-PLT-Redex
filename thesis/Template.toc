@@ -24,14 +24,13 @@
 \contentsline {subsection}{\numberline {2.2}复合糖}{20}{subsection.4.2.2}% 
 \contentsline {subsection}{\numberline {2.3}卫生宏}{21}{subsection.4.2.3}% 
 \contentsline {subsection}{\numberline {2.4}递归糖}{22}{subsection.4.2.4}% 
-\contentsline {subsection}{\numberline {2.5}高阶糖}{22}{subsection.4.2.5}% 
-\contentsline {section}{\numberline {3}一些其他讨论}{22}{section.4.3}% 
-\contentsline {subsection}{\numberline {3.1}副作用}{22}{subsection.4.3.1}% 
-\contentsline {chapter}{\numberline {第五章\hspace {.3em}}总结与展望}{23}{chapter.5}% 
-\contentsline {chapter}{\numberline {第六章\hspace {.3em}}章节名称}{24}{chapter.6}% 
-\contentsline {section}{\numberline {1}一级段落名称}{24}{section.6.1}% 
-\contentsline {subsection}{\numberline {1.1}二级段落名称}{24}{subsection.6.1.1}% 
-\contentsline {subsubsection}{\numberline {1.1.1}三级段落名称}{24}{subsubsection.6.1.1.1}% 
-\contentsline {chapter}{参考文献}{25}{Item.2}% 
-\contentsline {chapter}{本科期间的主要工作和成果}{27}{Item.4}% 
-\contentsline {chapter}{致谢}{28}{chapter*.13}% 
+\contentsline {subsection}{\numberline {2.5}高阶糖}{23}{subsection.4.2.5}% 
+\contentsline {section}{\numberline {3}与现有方法对比}{24}{section.4.3}% 
+\contentsline {section}{\numberline {4}一些其他讨论}{26}{section.4.4}% 
+\contentsline {subsection}{\numberline {4.1}副作用}{26}{subsection.4.4.1}% 
+\contentsline {chapter}{\numberline {第五章\hspace {.3em}}总结与展望}{27}{chapter.5}% 
+\contentsline {section}{\numberline {1}结论}{27}{section.5.1}% 
+\contentsline {section}{\numberline {2}未来可能的工作}{27}{section.5.2}% 
+\contentsline {chapter}{参考文献}{28}{Item.2}% 
+\contentsline {chapter}{本科期间的主要工作和成果}{30}{Item.4}% 
+\contentsline {chapter}{致谢}{31}{chapter*.11}% 
