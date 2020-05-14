@@ -198,8 +198,16 @@ $(if\; (And\; (And\; \#t\; \#t)\; \#t)\; \#f)\; Exp1\; Exp2)$--->$(if\; (And\; \
 
 对Rule2.2.1，由于由于仿真性的定义，重组糖的序列是可以解糖到CoreLang上执行序列的子序列的，因此证明仿真性只需要证明我们的序列在CoreLang上的序列有对应。我们在对$(Surfid\;Subexp_{1}\;Subexp_{\ldots}\;\ldots)$进行正常运算时，也会将其依据Surfid的规约规则进行展开；而在我们的核心算法中，我们也是这样进行单步展开，区别在于内部的糖没有规约。由于Rule2.2对Exp进行外部规约后得到DesugarExp'，并调用了f(DesugarExp')
 \begin{itemize}
-	\item 如果DesugarExp'是$Coreexp$或$Commonexp$或$OtherCommonexp$，且其子表达式规约，因此对于将Exp完全解糖后也是该子表达式的位置进行规约，其他子表达式的内容不变，因此对Exp的该子表达式规约后完全解糖和对Exp整体先解糖再规约，得到的是相同的表达式。如下图所示
-	\item 如果DesugarExp'是$Surfexp$或$OtherSurfexp$，则此处将递归调用f，由于表达式深度有限，如果下层的表达式满足仿真性，则此处也满足仿真性
+	\item 如果DesugarExp'是$Coreexp$或$Commonexp$或$OtherCommonexp$，且其子表达式规约，因此对于将Exp完全解糖后也是该子表达式的位置进行规约，其他子表达式的内容不变，因此对Exp的该子表达式规约后完全解糖和对Exp整体先解糖再规约，得到的是相同的表达式。如下图\ref{fig:emulation}所示
+	
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=12cm]{images/chapter3/flowgraph.jpg}
+		\caption{Rule2.2.1仿真性图示}
+		\label{fig:emulation}
+	\end{figure}
+
+	\item 如果DesugarExp'是$Surfexp$或$OtherSurfexp$，则此处将递归调用f，由于表达式深度有限，如果下层的表达式满足仿真性，则此处也满足仿真性.
 \end{itemize}
 
 
