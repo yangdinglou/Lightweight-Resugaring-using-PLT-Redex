@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019/W32TeX) (preloaded format=xelatex 2020.4.9)  14 MAY 2020 08:03
+This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019/W32TeX) (preloaded format=xelatex 2020.4.9)  14 MAY 2020 08:48
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1352,32 +1352,31 @@ Underfull \hbox (badness 10000) in paragraph at lines 99--100
 
  []
 
+[20]
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
-Overfull \hbox (7.03368pt too wide) in paragraph at lines 113--115
-[][] \TU/SimSun(1)/m/n/12.045 结 果 显
- []
-
-[20]) (./chapter/conclusion.tex [21]
+ [21])
+(./chapter/conclusion.tex [22]
 第五章
-) [22
+) [23
 
 ]
 第六章
 File: sample.jpg Graphic file (type bmp)
 <sample.jpg>
-[23
+[24
 
-] (./Template.bbl [24
+] (./Template.bbl [25
 
 
-]) [25
+]) [26
 
-] [26
+] [27
 
 
 ]
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 458.
- [27
+ [28
 
 
 ]
@@ -1398,4 +1397,4 @@ Here is how much of TeX's memory you used:
  1348 hyphenation exceptions out of 8191
  54i,12n,79p,793b,1055s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on Template.pdf (31 pages).
+Output written on Template.pdf (32 pages).

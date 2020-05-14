@@ -191,10 +191,10 @@
                                )))
 
 #;(lightweight-resugaring (term ((store)
-                               (Let x (+ 1 2) (Let x (+ 1 4) (+ x 1)))
+                               (Let x (+ 1 2) (+ x (Let x (+ 1 4) (+ x 1))))
                                )))
 
-#;(lightweight-resugaring (term ((store)
+(lightweight-resugaring (term ((store)
                                (filter (λ (x) (and (> x 3) (< x 6))) (list 1 2 3 4 5 6 7))
                                )))
 #;(lightweight-resugaring (term ((store)

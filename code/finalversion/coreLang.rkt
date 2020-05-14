@@ -198,7 +198,7 @@
         (in-hole P (list))
         "map0")
    (--> (in-hole P (filter e (list v_1 v_2 ...)))
-        (in-hole P (if (e v_1 ) (cons v_1 (filter e (list v_2 ...))) (filter e (list v_2 ...))))
+        (in-hole P (if (e v_1) (cons v_1 (filter e (list v_2 ...))) (filter e (list v_2 ...))))
         "filters")
    (--> (in-hole P (filter e (list)))
         (in-hole P (list))
@@ -220,25 +220,12 @@
         (in-hole P (and (or e_1 e_2) (not e_3)))
         "Sg")
    (--> (in-hole P (Odd v))
-        (in-hole P (Even (- v 1)))
-        "Odd v"
-        (side-condition (> (term v) 1)))
-   (--> (in-hole P (Odd 0))
-        (in-hole P #t)
-        "Odd 0")
-   (--> (in-hole P (Odd 1))
-        (in-hole P #f)
-        "Odd 1")
+        (in-hole P (if (> v 0) (Even (- v 1)) #f))
+        "Odd")
    (--> (in-hole P (Even v))
-        (in-hole P (Odd (- v 1)))
-        "Even v"
-        (side-condition (> (term v) 1)))
-   (--> (in-hole P (Even 0))
-        (in-hole P #f)
-        "Even 0")
-   (--> (in-hole P (Even 1))
-        (in-hole P #t)
-        "Even 1")
+        (in-hole P (if (> v 0) (Odd (- v 1)) #t))
+        "Even")
+
 
 
    
@@ -284,3 +271,6 @@
 #;(run
     (term (Myor (Myor #f #f) (and #t #t))))
 #;(run (term ((λ (x) (Let x (+ 1 4) (+ x 1))) 3)))
+
+#;(run
+    (term (Odd 6)))
