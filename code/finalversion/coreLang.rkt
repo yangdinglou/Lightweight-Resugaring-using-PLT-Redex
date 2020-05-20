@@ -10,6 +10,7 @@
      commonexp
      surfexp)
   (coreexp ::=
+           (λN (x_!_ ...) e)
            (coreexp e ...)
            (let ((x_!_ e) ...) e)
            (if e e e)
@@ -30,9 +31,8 @@
            (Let x e e)
            (Sg e e e)
 
-           (shell e)
-           (λN x ... e)
            (S comb) (K comb) (I comb)
+           (SS comb) (KK comb) (II comb)
            ;(S e ...)
            ;(K e ...)
            ;(I e ...)
@@ -69,7 +69,7 @@
       e))
   (P ((store (x v) ...) E))
   (E (v ... E e ...)
-     (let ((x v) ... (x E) (x e) ...) e)
+     ;(let ((x v) ... (x E) (x e) ...) e)
      (if E e e)
      (begin E e e ...)
      (first E)
@@ -105,10 +105,12 @@
      (Odd E)
      (Even E)
 
-     (λN x ... E)
      ((S comb) e ... E e ...)
      ((K comb) e ... E e ...)
      ((I comb) e ... E e ...)
+     ((SS comb) e ... E e ...)
+     ((KK comb) e ... E e ...)
+     ((II comb) e ... E e ...)
      
      hole)
   
@@ -140,6 +142,19 @@
    (--> (in-hole P ((λ (x) e_0) v_0))
         (in-hole P (let ([x v_0]) e_0))
         "βv0")
+
+   (--> (in-hole P ((λN (x_0 x_1 ... x) e_tmp) e_0 e_1 ... e))
+        (in-hole P (let ([x_0 e_0]) ((λN (x_1 ... x) e_tmp) e_1 ... e)))
+        "βn")
+   (--> (in-hole P ((λN (x_0 x_1 ... x) e) e_0))
+        (in-hole P (let ([x_0 e_0]) (λN (x_1 ... x) e)))
+        "βn1")
+   (--> (in-hole P ((λN (x) e_tmp) e_0 e_1 ... e))
+        (in-hole P (let ([x e_0]) (e_tmp e_1 ... e)))
+        "βns")
+   (--> (in-hole P ((λN (x) e_tmp) e_0))
+        (in-hole P (let ([x e_0]) e_tmp))
+        "βn0")
 
    (--> (in-hole P (= number_1 number_2 ...))
         (in-hole P ,(apply = (term (number_1 number_2 ...))))
@@ -189,9 +204,9 @@
    
 
    (--> ((store (x_old v_old) ...)
-         (in-hole E (let ([x_1 v_1] [x_2 v_2] ...) e)))
+         (in-hole E (let ([x_1 e_1] [x_2 e_2] ...) e)))
         ((store (x_old v_old) ...)
-         (in-hole E (let ([x_2 v_2] ...) (substitute e x_1 v_1))))
+         (in-hole E (let ([x_2 e_2] ...) (substitute e x_1 e_1))))
         "let1")
    (--> (in-hole P (let () e))
         (in-hole P e)
@@ -246,6 +261,15 @@
    (--> (in-hole P (S comb))
         (in-hole P (λ (x_1 x_2 x_3) (x_1 x_3 (x_2 x_3))))
         "S")
+   (--> (in-hole P (II comb))
+        (in-hole P (λN (x) x))
+        "II")
+   (--> (in-hole P (KK comb))
+        (in-hole P (λN (x_1 x_2) x_1))
+        "KK")
+   (--> (in-hole P (SS comb))
+        (in-hole P (λN (x_1 x_2 x_3) (x_1 x_3 (x_2 x_3))))
+        "SS")
    #;(--> (in-hole P (I e ...))
         (in-hole P ((λ (x) x) e ...))
         "II")
@@ -256,16 +280,6 @@
         (in-hole P ((λ (x_1 x_2 x_3) (x_1 x_3 (x_2 x_3))) e ...))
         "SS")
 
-   (--> (in-hole P (shell (λN x ... e)))
-        (in-hole P (λ (x ...) (shell e)) )
-        "shell-lambda")
-   (--> (in-hole P (shell (e_1 e_2)))
-        (in-hole P ((shell e_1) (λ (x_new) (shell e_2))) )
-        (fresh x_new)
-        "shell-app")
-   (--> (in-hole P (shell (λ (x ...) (shell e))))
-        (in-hole P e)
-        "deshell")
 
    ))
 
@@ -316,5 +330,10 @@
 
 #;(run
     (term
-     (shell (((λN x y x) (+ 1 2)) (+ 1 3)))
+     ((SS comb) (II comb) ((KK comb) xx) yy)
+     ))
+
+#;(run
+    (term
+     ((S comb) (I comb) ((K comb) xx) yy)
      ))
