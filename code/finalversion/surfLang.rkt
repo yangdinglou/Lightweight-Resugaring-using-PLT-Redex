@@ -193,7 +193,7 @@
 #;(lightweight-resugaring (term ((store)
                                (Let x (+ 1 2) (+ x (Let x (+ 1 4) (+ x 1))))
                                )))
-#;(lightweight-resugaring (term ((store)
+(lightweight-resugaring (term ((store)
                                (map (λ (x) (+ 1 x)) (list 1 2 3))
                                )))
 #;(lightweight-resugaring (term ((store)
@@ -203,6 +203,6 @@
                                (Sg (and #t #f) (not #f) #f)
                                )))
 
-(lightweight-resugaring (term ((store)
+#;(lightweight-resugaring (term ((store)
                                (Odd 6)
                                )))

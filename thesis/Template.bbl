@@ -1,24 +1,41 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{4}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{#1}
+\expandafter\ifx\csname urlstyle\endcsname\relax\else
+  \urlstyle{same}\fi
+\expandafter\ifx\csname href\endcsname\relax
+  \DeclareUrlCommand\doi{\urlstyle{rm}}\else
+  \providecommand\doi[1]{\href{https://doi.org/#1}{\nolinkurl{#1}}}\fi
 
-\bibitem{PhysRev.47.777}
-A.~Einstein, B.~Podolsky, and N.~Rosen.
-\newblock Can quantum-mechanical description of physical reality be considered
-  complete?
-\newblock {\em Phys. Rev.}, 47:777--780, May 1935.
+\bibitem[Pombrio et~al.(2014)Pombrio and Krishnamurthi]{resugaring}
+POMBRIO~J, KRISHNAMURTHI~S.
+\newblock Resugaring: Lifting evaluation sequences through syntactic
+  sugar\allowbreak[J/OL].
+\newblock SIGPLAN Not., 2014, 49\penalty0 (6):\penalty0 361–371.
+\newblock \url{https://doi.org/10.1145/2666356.2594319}.
 
-\bibitem{SEwPR}
-Matthias Felleisen, Robert~Bruce Findler, and Matthew Flatt.
-\newblock {\em Semantics Engineering with PLT Redex}.
-\newblock The MIT Press, 1st edition, 2009.
+\bibitem[Felleisen et~al.(2009)Felleisen, Findler, and Flatt]{SEwPR}
+FELLEISEN~M, FINDLER~R~B, FLATT~M.
+\newblock Semantics engineering with plt redex\allowbreak[M].
+\newblock 1st ed.
+\newblock [S.l.]: The MIT Press, 2009.
 
-\bibitem{hygienic}
-Justin Pombrio and Shriram Krishnamurthi.
-\newblock Hygienic resugaring of compositional desugaring.
-\newblock {\em SIGPLAN Not.}, 50(9):75–87, August 2015.
+\bibitem[Culpepper et~al.(2019)Culpepper, Felleisen, Flatt, and
+  Krishnamurthi]{frommacro}
+CULPEPPER~R, FELLEISEN~M, FLATT~M, et~al.
+\newblock From macros to dsls: The evolution of
+  racket\allowbreak[C/OL]//\allowbreak
+LERNER~B~S, BOD{\'{I}}K~R, KRISHNAMURTHI~S.
+\newblock LIPIcs: volume 136\quad 3rd Summit on Advances in Programming
+  Languages, {SNAPL} 2019, May 16-17, 2019, Providence, RI, {USA}.
+\newblock Schloss Dagstuhl - Leibniz-Zentrum f{\"{u}}r Informatik, 2019:
+  5:1-5:19.
+\newblock \url{https://doi.org/10.4230/LIPIcs.SNAPL.2019.5}.
 
-\bibitem{resugaring}
-Justin Pombrio and Shriram Krishnamurthi.
-\newblock Resugaring: Lifting evaluation sequences through syntactic sugar.
-\newblock {\em SIGPLAN Not.}, 49(6):361–371, June 2014.
+\bibitem[Pombrio et~al.(2015)Pombrio and Krishnamurthi]{hygienic}
+POMBRIO~J, KRISHNAMURTHI~S.
+\newblock Hygienic resugaring of compositional desugaring\allowbreak[J/OL].
+\newblock SIGPLAN Not., 2015, 50\penalty0 (9):\penalty0 75–87.
+\newblock \url{https://doi.org/10.1145/2858949.2784755}.
 
 \end{thebibliography}

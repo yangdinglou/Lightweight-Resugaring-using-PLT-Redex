@@ -1,136 +1,112 @@
 \pagestyle{fancy}
 \normalsize
 \linespread{1.5}\selectfont
-\chapter{实现细节与评估}
+\label{mark:chapter4}\chapter{应用及讨论}
 \addtocontents{los}{\protect\addvspace{10pt}}
 
-\section{实现细节}
-在PLT Redex中，对一个语言的定义主要需要三个内容。
-\begin{itemize}
-	\item 文法
-	\item 上下文环境
-	\item 规约规则
-\end{itemize}
 
-我们在实现中，对所有表达式按如下文法进行子类划分。
-\begin{verbatim}
-exp ::= coreexp | surfexp | commonexp
-\end{verbatim}
 
-与(第三章第1节)的定义有所差别的是，这里的surfexp包括了第三章第1节的Surfexp和OtherSurfexp，commonexp包括了第三章第一节的Commonexp和OtherCommonexp。
-
-对于coreexp，自然是包含了所有内部语言的术语。因为我们的定义是将Exp的形式限制在$(Headid\;Subexp_{1}\ldots)$，通常情况下可以根据Headid判断是否是coreexp。
-
-例：
-\begin{verbatim}
-coreexp ::= (if exp exp exp)
-		|   (let ((x exp) ...) exp)
-		|   (first exp)
-		|   (rest exp)
-		|   ...
-\end{verbatim}
-
-对于surfexp，就是$Headid$是表示DSL的标识的表达式。
-
-例：
-\begin{verbatim}
-surfexp ::= (and exp exp)
-		|   (or exp exp)
-		|   (map exp exp)
-		|   (filter exp exp)
-		|   ...
-\end{verbatim}
-
-对于commonexp，是为了让我们的重组糖序列中有一些包含在内部语言、但是可以输出的中间过程。例如对于高阶糖
-
-$(Map\;f\;lst)-->(cons\;(f\;(first\;lst))\;(Map\;f\;(rest\;lst)))$
-
-\begin{flushleft}
-	我们需要一些中间序列用cons表示，来输出有用的中间过程。我们主要需要的commonexp有所有值、所有基础运算（包括算数运算和列表运算）。
-\end{flushleft}
-
-对于上下文规则，对coreLang为了限制每个表达式只有一条规则可以规约，需要仔细限制位置。
-而对于surfLang，由于我们不知道哪个子表达式需要先规约，要把每一个位置都设为可规约的洞。
-\begin{verbatim}
-(E  (v ... E e ...)
-	(let ((x v) ... (x E) (x e) ...) e)
-	(if E e e)
-	(and E e)
-	(and e E)
-	(or E e)
-	(or e E)
-	...
-	hole)
-\end{verbatim}
-
-规约规则没有特殊说明。具体可参见代码。\footnote{\url{https://github.com/yangdinglou/Lightweight-Resugaring-using-PLT-Redex}}
-
-\pagebreak
-\section{评估}
+\section{应用}
+我们就不同类型（特性）的语法糖分别进行尝试。
 
 \subsection{普通糖}
 
 我们首先就简单的
 
-$(and\;e1\;e2)-->(if\;e1\;e2\;\#f)$
+$(and\;e1\;e2)→(if\;e1\;e2\;\#f)$
 
-$(or\;e1\;e2)-->(if\;e1\;\#t\;e2)$
+$(or\;e1\;e2)→(if\;e1\;\#t\;e2)$
 糖进行测试。
 
 因为我们的CoreLang上规定的求值顺序是，对$(if \;e1\;e2\;e3)$的$e1$求到值后就规约，因此我们应该看到的是对$and$和$or$糖，先将第一个值求到值，如何对糖进行破坏。
 
-\framebox[30em][l]{
-\parbox[t]{\textwidth}{
-	(and (and \#t \#f) (or \#f \#t))\\
-	(and \#f (or \#f \#t))\\
-	\#f
-}
-}
-
-\framebox[30em][l]{
-	\parbox[t]{\textwidth}{
-		(and (or \#f \#t) (or \#f \#f))\\
-		(and \#t (or \#f \#f))\\
-		(or \#f \#f)\\
-		\#f
+\begin{center}
+	\framebox[35em][l]{
+		\parbox[t]{\textwidth}{
+			\begin{center}
+				(and (and \#t \#f) (or \#f \#t))\\
+				↓\\
+				(and \#f (or \#f \#t))\\
+				↓\\
+				\#f
+			\end{center}
+			
+		}
 	}
-}
+\end{center}
+
+\begin{center}
+	\framebox[35em][l]{
+		\parbox[t]{\textwidth}{
+			\begin{center}
+				(and (or \#f \#t) (or \#f \#f))\\
+				↓\\
+				(and \#t (or \#f \#f))\\
+				↓\\
+				(or \#f \#f)\\
+				↓\\
+				\#f
+			\end{center}
+			
+		}
+	}
+\end{center}
+
 
 我们可以看到如上的两个例子皆按照我们预想的样子输出了重组糖序列。\\[6pt]
 
 另外尽管我们的重组糖序列不考虑有副作用的语言，但我们依然测试了一下考虑副作用时的糖的正确性。
 
-$(Myor\;e1\;e2)-->(let\;((tmp\;e1))\;(if\;tmp\;tmp\;e2))$
+$(Myor\;e1\;e2)→(let\;((tmp\;e1))\;(if\;tmp\;tmp\;e2))$
 其中没有用到任何其他糖，因此我们可以期待它的效果和上面的or糖一样。
 
-\framebox[30em][l]{
-	\parbox[t]{\textwidth}{
-		(Myor (Myor \#f \#f) (and \#t \#t))\\
-		(Myor \#f (and \#t \#t))\\
-		(and \#t \#t)\\
-		\#t
+\begin{center}
+	\framebox[35em][l]{
+		\parbox[t]{\textwidth}{
+			\begin{center}
+				(Myor (Myor \#f \#f) (and \#t \#t))\\
+				↓\\
+				(Myor \#f (and \#t \#t))\\
+				↓\\
+				(and \#t \#t)\\
+				↓\\
+				\#t
+			\end{center}
+			
+		}
 	}
-}
-
+\end{center}
 结果显示我们的方法确实正确得到了该重组糖的序列。
 
 \subsection{复合糖}
 
 尽管和普通糖没有本质区别，但本节测试的糖在解糖后依然存在语法糖结构。我们构造如下Sg糖为例
 
-$(Sg\;e1\;e2\;e3)-->(and\;(or\;e1\;e2)\;(not\;e3))$
+$(Sg\;e1\;e2\;e3)→(and\;(or\;e1\;e2)\;(not\;e3))$
 
-\framebox[30em][l]{
-	\parbox[t]{\textwidth}{
-		(Sg (and \#t \#f) (not \#f) \#f)\\
-		(Sg \#f (not \#f) \#f)\\
-		(and (or \#f (not \#f)) (not \#f))\\
-		(and (not \#f) (not \#f))\\
-		(and \#t (not \#f))\\
-		(not \#f)\\
-		\#t
+\begin{center}
+	\framebox[35em][l]{
+		\parbox[t]{\textwidth}{
+			\begin{center}
+				(Sg (and \#t \#f) (not \#f) \#f)\\
+				↓\\
+				(Sg \#f (not \#f) \#f)\\
+				↓\\
+				(and (or \#f (not \#f)) (not \#f))\\
+				↓\\
+				(and (not \#f) (not \#f))\\
+				↓\\
+				(and \#t (not \#f))\\
+				↓\\
+				(not \#f)\\
+				↓\\
+				\#t
+			\end{center}
+			
+		}
 	}
-}
+\end{center}
+
 
 通过简单的展开验证我们发现，对于该语法糖表达式我们的方法确实做到了在语法糖需要展开的时候展开。
 
@@ -140,7 +116,7 @@ $(Sg\;e1\;e2\;e3)-->(and\;(or\;e1\;e2)\;(not\;e3))$
 
 {\bfseries 例：}
 
-对语法糖$(Let\;x\;v\;exp)$-->$(Apply\;(\lambda\;(x)\;exp)\;v)$
+对语法糖$(Let\;x\;v\;exp)$→$(Apply\;(\lambda\;(x)\;exp)\;v)$
 
 表达式$(Let\;x\;1\;(Let\;x\;2\;(+\;x\;1)))$中的(+ x 1)将用值为2的x，因为他在内部Let的作用域内。
 
@@ -152,99 +128,150 @@ $(Apply\;(\lambda\;(x)\;(Let\;x\;2\;(+\;x\;1)))\;1)$，接着用Apply的规则�
 而在实现过程中，我们发现借助PLT Redex的$\#:refers-to$命令，我们可以更简单的实现更漂亮的卫生宏重组糖。
 
 测试结果如下。
-
-\framebox[30em][l]{
-	\parbox[t]{\textwidth}{
-		(Let x (+ 1 2) (+ x (Let x (+ 1 4) (Let x 3 (+ x (Let x (+ 1 4) (+ x 1))))\\
-		((λ (x) (+ x (Let x (+ 1 4) (+ x 1)))) 3)\\
-		(+ 3 (Let x (+ 1 4) (+ x 1)))\\
-		(+ 3 (Let x 5 (+ x 1)))\\
-		(+ 3 ((λ (x) (+ x 1)) 5))\\
-		(+ 3 (+ 5 1))\\
-		(+ 3 6)\\
-		9
+\begin{center}
+	\framebox[35em][l]{
+		\parbox[t]{\textwidth}{
+			\begin{center}
+				(Let x (+ 1 2) (+ x (Let x (+ 1 4) (+ x 1))))\\
+				↓\\
+				(Let x 3 (+ x (Let x (+ 1 4) (+ x 1))))\\
+				↓\\
+				((λ (x) (+ x (Let x (+ 1 4) (+ x 1)))) 3)\\
+				↓\\
+				(+ 3 (Let x (+ 1 4) (+ x 1)))\\
+				↓\\
+				(+ 3 (Let x 5 (+ x 1)))\\
+				↓\\
+				(+ 3 ((λ (x) (+ x 1)) 5))\\
+				↓\\
+				(+ 3 (+ 5 1))\\
+				↓\\
+				(+ 3 6)\\
+				↓\\
+				9
+			\end{center}
+			
+		}
 	}
-}
+\end{center}
+
 \subsection{递归糖}
 
 递归糖是对于现有重组糖方法很难处理的一种语法糖，指的是多个语法糖相互调用。在本节我们主要用如下例子说明。
 
-$(Odd\;e)$-->$(if\;(>\;e\;0)\;(Even (-\;e\;1)\;\#f))$
+$(Odd\;e)$→$(if\;(>\;e\;0)\;(Even (-\;e\;1)\;\#f))$
 
-$(Even\;e)$-->$(if\;(>\;e\;0)\;(Odd (-\;e\;1)\;\#t))$
+$(Even\;e)$→$(if\;(>\;e\;0)\;(Odd (-\;e\;1)\;\#t))$
 
 看似不复杂的两条语法糖规则，对于现有方法来说并不是一件容易的事情。具体原因我们将在下一高阶糖和下一节中仔细探讨。测试结果如下：
 
-\framebox[30em][l]{
-	\parbox[t]{\textwidth}{
-		(Odd 6)\\
-		(Even (- 6 1))\\
-		(Even 5)\\
-		(Odd (- 5 1))\\
-		(Odd 4)\\
-		(Even (- 4 1))\\
-		(Even 3)\\
-		(Odd (- 3 1))\\
-		(Odd 2)\\
-		(Even (- 2 1))\\
-		(Even 1)\\
-		(Odd (- 1 1))\\
-		(Odd 0)\\
-		\#f
-		
+\begin{center}
+	\framebox[35em][l]{
+		\parbox[t]{\textwidth}{
+			\begin{center}
+				(Odd 4)\\
+				↓\\
+				(Even (- 4 1))\\
+				↓\\
+				(Even 3)\\
+				↓\\
+				(Odd (- 3 1))\\
+				↓\\
+				(Odd 2)\\
+				↓\\
+				(Even (- 2 1))\\
+				↓\\
+				(Even 1)\\
+				↓\\
+				(Odd (- 1 1))\\
+				↓\\
+				(Odd 0)\\
+				↓\\
+				\#f
+			\end{center}
+			
+		}
 	}
-}
+\end{center}
+
 \subsection{高阶糖}
 
 高阶糖本质上和递归糖没有区别，
 
 我们分别用两种不同的语法糖形式实现了$map$和$filter$两个语法糖。
 \begin{flushleft}
-	$(map\;e\;(list\;v_1\ldots))$-->
+	$(map\;e\;(list\;v_1\ldots))$→
 	
 	$(if\;(empty\;(list\;v_1\ldots))\;(list)\;(cons\;(e\;(first\;(list\;v_1\ldots)))\;(map\;e\;(rest\;(list\;v_1\ldots)))))$
 \end{flushleft}
 
 \begin{flushleft}
-	$(filter\;e\;(list\;v_1\;v_2\ldots))$-->
+	$(filter\;e\;(list\;v_1\;v_2\ldots))$→
 	
 	$(if\;(e\;v_1)\;(cons\;v_1\;(filter\;e\;(list\;v_2\ldots)))\;(filter\;e\;(list\;v_2\ldots)))$
 	
-	$(filter\;e\;(list))$-->$(list)$
+	$(filter\;e\;(list))$→$(list)$
 \end{flushleft}
 
 可以看出，对map糖我们将边界条件用解糖后的if表达式进行了限制；而对filter糖，我们用两个糖的参数区分了不同的条件用来表示边界条件。在保证同名不同参数的糖没有二义性的前提下，我们允许一糖多参，让书写语法糖更加简单。
 
 测试结果如下
-
-\framebox[30em][l]{
-	\parbox[t]{\textwidth}{
-		(map (λ (x) (+ 1 x)) (list 1 2 3))\\
-		(cons 2 (map (λ (x) (+ 1 x)) (list 2 3)))\\
-		(cons 2 (cons 3 (map (λ (x) (+ 1 x)) (list 3))))\\
-		(cons 2 (cons 3 (cons 4 (map (λ (x) (+ 1 x)) (list)))))\\
-		(cons 2 (cons 3 (cons 4 (list))))\\
-		(cons 2 (cons 3 (list 4)))\\
-		(cons 2 (list 3 4))\\
-		(list 2 3 4)
+\begin{center}
+	\framebox[35em][l]{
+		\parbox[t]{\textwidth}{
+			\begin{center}
+				(map (λ (x) (+ 1 x)) (list 1 2 3))\\
+				↓\\
+				(cons 2 (map (λ (x) (+ 1 x)) (list 2 3)))\\
+				↓\\
+				(cons 2 (cons 3 (map (λ (x) (+ 1 x)) (list 3))))\\
+				↓\\
+				(cons 2 (cons 3 (cons 4 (map (λ (x) (+ 1 x)) (list)))))\\
+				↓\\
+				(cons 2 (cons 3 (cons 4 (list))))\\
+				↓\\
+				(cons 2 (cons 3 (list 4)))\\
+				↓\\
+				(cons 2 (list 3 4))\\
+				↓\\
+				(list 2 3 4)
+			\end{center}
+			
+		}
 	}
-}
+\end{center}
 
-\framebox[30em][l]{
-	\parbox[t]{\textwidth}{
-		(filter (λ (x) (and (> x 3) (< x 6))) (list 1 2 3 4 5 6 7))\\
-		(filter (λ (x) (and (> x 3) (< x 6))) (list 2 3 4 5 6 7))\\
-		(filter (λ (x) (and (> x 3) (< x 6))) (list 3 4 5 6 7))\\
-		(filter (λ (x) (and (> x 3) (< x 6))) (list 4 5 6 7))\\
-		(cons 4 (filter (λ (x) (and (> x 3) (< x 6))) (list 5 6 7)))\\
-		(cons 4 (cons 5 (filter (λ (x) (and (> x 3) (< x 6))) (list 6 7))))\\
-		(cons 4 (cons 5 (filter (λ (x) (and (> x 3) (< x 6))) (list 7))))\\
-		(cons 4 (cons 5 (filter (λ (x) (and (> x 3) (< x 6))) (list))))\\
-		(cons 4 (cons 5 (list)))\\
-		(cons 4 (list 5))\\
-		(list 4 5)
+\begin{center}
+	\framebox[35em][l]{
+		\parbox[t]{\textwidth}{
+			\begin{center}
+				(filter (λ (x) (and (> x 3) (< x 6))) (list 1 2 3 4 5 6 7))\\
+				↓\\
+				(filter (λ (x) (and (> x 3) (< x 6))) (list 2 3 4 5 6 7))\\
+				↓\\
+				(filter (λ (x) (and (> x 3) (< x 6))) (list 3 4 5 6 7))\\
+				↓\\
+				(filter (λ (x) (and (> x 3) (< x 6))) (list 4 5 6 7))\\
+				↓\\
+				(cons 4 (filter (λ (x) (and (> x 3) (< x 6))) (list 5 6 7)))\\
+				↓\\
+				(cons 4 (cons 5 (filter (λ (x) (and (> x 3) (< x 6))) (list 6 7))))\\
+				↓\\
+				(cons 4 (cons 5 (filter (λ (x) (and (> x 3) (< x 6))) (list 7))))\\
+				↓\\
+				(cons 4 (cons 5 (filter (λ (x) (and (> x 3) (< x 6))) (list))))\\
+				↓\\
+				(cons 4 (cons 5 (list)))\\
+				↓\\
+				(cons 4 (list 5))\\
+				↓\\
+				(list 4 5)
+			\end{center}
+			
+		}
 	}
-}
+\end{center}
+
 
 以$(map\;(\lambda\;(x)\;(+\;1\;x))\;(list\;1\;2\;3))$为例。如果将该糖完全展开，将变成如下表达式
 \begin{flushleft}
@@ -272,21 +299,23 @@ $(Even\;e)$-->$(if\;(>\;e\;0)\;(Odd (-\;e\;1)\;\#t))$
 todo:SKI with lazy lambda.
 
 \section{与现有方法对比}
-正如前文多次提到的，我们的方法与现有重组糖方法最大的不同是，不会完全将语法糖展开。这个区别导致了我们需要限制语法糖和内部语言的结构化\ref{mark:struct}。该限制最大的影响就是语言不能有副作用，我们将在下一节对该问题进行讨论。抛去这点劣势，我们的重组糖相比现有方法有如下的优点。
+正如前文多次提到的，我们的方法与现有重组糖方法最大的不同是，不会完全将语法糖展开。我们的轻量级重组糖方法先比于现有工作有如下优点。
 \begin{itemize}
 	\item 轻量级。不将语法糖完全展开，意味着不需要对语法糖表达式展开后的内部语言表达式的多步执行过程进行一次又一次的匹配和替代。因为对于一个相对比较大的程序来说，这样的匹配开销并不小，因此我们的做法---只在需要（不得不）展开语法糖时再将语法糖破坏的方法，理论上很大程度节省了重组糖的时间开销。
 	\item 对卫生宏友好。重组糖系列工作第二篇用一个新的数据结构---抽象语法有向无环图，来处理卫生宏的重组糖问题；而正如上一小节所介绍\ref{mark:hygienic}，我们的系统处理卫生宏和普通宏的区别只在于借用PLT Redex的重命名；并且即使不用这个功能，算法依然可以有效运行。\footnote{需要对Rule2.2进行微小改动，代码中也有运行实例}这条优点本身也属于一种“轻量级”的表现---算法本身简单以至于拓展性强，而现有工作则对算法进行重新设计。
 	\item 更多语法糖特性（尤其递归语法糖）。正如前一节所介绍的，我们的方法处理递归糖和高阶糖的能力，是现有方法很难达到的。原因很简单：递归糖需要处理终止条件，而本身语法糖处理终止条件就不是一件容易的事情。而得益于规约语义的强大能力，加上算法本身的精心设计，让处理递归这件事成为可能，进而让高阶语法糖成为可能。我们可以发现，高阶函数作为函数式语言的一个非常重要的特性，在近年来被多种其他编程范式的语言所支持。因此支持递归的语法糖是本工作十分重要的优势。
 	\item 更简单的书写语法糖。相比于resugaring系列工作\upcite{resugaring}，我们的方法得益于规约语义的友好形式，对语法糖的书写并不必须是模式匹配为基础的。只要可以保证对同一个语法糖没有出现多种解糖方式，我们可以对语法糖的各种条件进行分类处理。比如说实现一个斐波那契数列语法糖，我们可以设计如下解糖规则。（对应写在规约规则中）
 	
-	$(f\;0)$-->$1$
+	$(f\;0)$→$1$
 	
-	$(f\;1)$-->$1$
+	$(f\;1)$→$1$
 	
-	$(f\;x)$-->$(+\;(f\;(-\;x\;1))\;(f\;(-\;x\;2)))$\qquad side-condition (x>1)
+	$(f\;x)$→$(+\;(f\;(-\;x\;1))\;(f\;(-\;x\;2)))$\qquad side-condition (x>1)
 	
 	这种语法糖写法相对于简单的pattern based语法糖，更加友好。
 \end{itemize}
+
+在前文有提到，我们需要限制语法糖和内部语言的结构化\ref{mark:struct}。该限制最大的影响就是语言不能有副作用，我们将在下一节对该问题进行讨论。
 \section{一些其他讨论}
 
 
@@ -296,5 +325,17 @@ todo:SKI with lazy lambda.
 表达式不能用对外副作用一定程度我们我们方法的便利性。在一定解决范围内，我可以基于let（变量绑定）解决部分需求。
 
 不能有副作用的主要原因，是因为：一旦语法糖的子表达式带有副作用，而当表达式并没有执行到带副作用语句前是可以重组糖的，执行后便不能重组。而对于嵌套表达式来说，判断是否执行过有副作用的语句是一件很困难的事情。可能的解决方案是设计一个检测副作用的算法来增强我们的系统。
+
+如下语法糖
+
+$(Sg~exp_{1}~exp_{2})→(begin~(if~exp_{1}~(set!~x~0)~(set!~x~exp_{2}))~x)$
+
+如果$exp_{1}$不包含副作用，那么显然可以不展开Sg糖，先对$exp_{1}$进行规约，再根据$exp_{1}$的值决定之后的重组糖序列。
+
+但是一旦$exp_{1}$表达式包含了副作用，我们就不得不将Sg糖展开。此时该糖就不会有重组糖序列，只会得到最后x的值。
+
+另一方面，我们可以发现的是，对于有副作用的语法糖来说，重组糖的是没有很大作用的。因为当一个语法糖表达式内部副作用语句被执行，该糖就不能重组了。
+
+另一种可能的解决方法，是将副作用封装到内部语言的两个函数中，比如表达式$exp_{1}$中将x改为x'，y改为y'，则$f(exp_{1})$为$(list~(cons~x~x')~(cons~y~y'))$
 
 \subsection{其他相关工作}

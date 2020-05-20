@@ -21,10 +21,12 @@
 
 
 \usepackage{amsmath}
+\usepackage{amsthm}
 \usepackage{bm}
 \usepackage{amsfonts}
 \usepackage{enumerate}
 \usepackage{fancyhdr}
+\usepackage{color}
 
 
 
@@ -32,6 +34,7 @@
 \newcommand{\upcite}[1]{\textsuperscript{\cite{#1}}} %引用在右上角
 
 \usepackage{hyperref}
+\usepackage{gbt7714}
 
 \usepackage{multirow,booktabs,makecell}
 \usepackage{graphicx}
@@ -110,7 +113,7 @@
 % 评阅表依赖的宏包
 \input{ReviewTableHead}
 
-
+% yzy
 
 \title{}
 \author{}
@@ -119,7 +122,7 @@
 
 % 封面中需要修改的内容直接在此处更改即可
 \newcommand{\chineseTitle}{一种利用Redex实现重组糖的轻量级方法}
-\newcommand{\englishTitle}{A lightweight resugaring method using PLT Redex}
+\newcommand{\englishTitle}{A Lightweight Resugaring Method using PLT Redex}
 \newcommand{\name}{杨子毅}
 \newcommand{\studentID}{1600011063}
 \newcommand{\school}{信息科学技术学院}
@@ -159,13 +162,16 @@
 \linespread{1.5}\selectfont
 %小四号，宋体/Time new roman，1.5倍行距
 \chapter*{摘要}
-随着计算机科学的普及和编程语言的发展，编程语言、特别是领域特定语言的应用越来越日常化。语法糖作为实现领域特定语言的一项重要技术在近年来发展火热，相关的研究\upcite{PhysRev.47.777}以及为DSL而诞生的编程语言(例如Racket\upcite{PhysRev.47.777})都在进展显著。
+随着计算机科学的普及和编程语言的发展，编程语言、特别是领域特定语言的应用越来越日常化。语法糖作为实现领域特定语言的一项重要技术在近年来发展火热，相关的研究\cite{resugaring}以及为DSL而诞生的编程语言(例如Racket、Scala)都有显著进展显著。
 
-我们对一个重组糖\upcite{PhysRev.47.777}（语法糖的一项工作）系列的文章进行学习，并基于PLT Redex设计了一个轻量级重组糖算法，简单实现了一套工具并在一些例子上进行测试。结果显示我们的轻量级重组糖算法相较于现有重组糖算法可以多处理一些语法糖特性，也更容易处理卫生宏等特性。除此之外，由于该方法在某种意义上是对领域特定语言的一种解释执行，因此对自动生成领域特定语言的解释器研究有一定参考价值。
+重组糖\upcite{resugaring}是一项关于语法糖的研究---将嵌入在内部语言的语法糖表达式执行序列在表面语言（语法糖）上提取出来，以得到在语法糖层面的执行序列（详见\ref{mark:resugaring}）。其目的是为了解决语法糖解糖的单向性\ref{mark:onedirect}，让语法糖表达式的执行过程能表现在语法糖结构上。但现存方法很难处理递归糖、高阶糖等语法糖特性，且对于卫生宏处理很繁琐。
+
+我们基于PLT Redex\upcite{SEwPR}设计了一个轻量级重组糖算法，简单实现了一套工具并在一些例子上应用进行测试。结果显示我们的轻量级重组糖算法相较于现有重组糖算法可以多处理一些语法糖特性，也更容易处理卫生宏等特性。除此之外，我们的方法在表示语法糖的方式上更加灵活。
+
+%背景 解决什么问题 得到什么结果
 
 \bigskip
-\noindent{\bfseries\songti 关键词: 领域特定语言、语法糖、重写系统、函数式语言、解释器 }
-
+\noindent{\bfseries\songti 关键词: 领域特定语言、语法糖、解释器、重写系统 }
 
 
 \addcontentsline{toc}{chapter}{摘要} %手动加入目录
@@ -205,13 +211,15 @@
 \linespread{1.5}\selectfont
 %5号，Time new roman，1.5倍行距
 \chapter*{\bfseries Abstract}
-With the popularization of computer science and the development of programming languages, the application of programming languages, especially domain-specific languages, is becoming more and more routine. Syntactic sugar, as an important technique for implementing a domain-specific language, has developed fiercely in recent years, and related research and programming languages born for DSL(such as Racket) are making significant progress.
+With the popularization of computer science and the development of programming languages, the application of programming languages, especially domain-specific languages, is becoming more and more routine. Syntactic sugar, as an important technique for implementing a domain-specific language, has developed fiercely in recent years, and related research\upcite{resugaring} and programming languages born for DSL(such as Racket) are making significant progress.
 
-We studied a series of articles on Resugaring (a work of syntactic sugar), and designed a lightweight resugaring algorithm based on PLT Redex, simply implemented a set of tools and tested on some examples. The results show that our lightweight resugaring algorithm can handle more syntactic sugar features than existing resugaring algorithms, also handle features like hygienic macro more simply. In addition, because the method is a kind of interpretation of domain-specific language in a sense, it has a certain reference value for the research of  automatic generating the interpreter of domain-specific language.
+Resugaring\upcite{resugaring} is a research on syntactic sugar--lifting the evaluation sequence of syntactic sugar expression embedded in the core language on the surface language (syntactic sugar) to get the sequence at the level of syntactic sugar.(see detail\ref{mark:resugaring}) The purpose of resugaring is to solve the unidirectionality of desugaring the syntactic sugar expression\ref{mark:onedirect}, so that the evaluation sequence of syntactic sugar expression can be expressed in the structure of syntactic sugar. However, the existing methods are difficult to deal with the features of syntactic sugar such as recursive sugar and high-order sugar, and are very cumbersome for hygienic macro processing.
+
+We designed a lightweight resugaring algorithm based on PLT Redex\upcite{SEwPR}, simply implemented a set of tools and tested on some examples. The results show that our lightweight resugaring algorithm can handle more syntactic sugar features than existing resugaring algorithms, also handle features like hygienic macro more simply. In addition, our method is more flexible in the way of representing syntactic sugar.
 \bigskip
 \noindent
 
-{\bfseries Key Words: Domain-specific language, syntactic sugar, rewriting system, functional language, interpreter }
+{\bfseries Key Words: Domain-specific language, Syntactic sugar, Interpreter, Rewriting system }
 
 
 
@@ -287,6 +295,7 @@ We studied a series of articles on Resugaring (a work of syntactic sugar), and d
 \input{chapter/background}
 \input{chapter/algorithm}
 \input{chapter/evaluation}
+\input{chapter/implement}
 \input{chapter/conclusion}
 %\input{tmp}
 
@@ -334,8 +343,8 @@ We studied a series of articles on Resugaring (a work of syntactic sugar), and d
 
 
 
+\bibliographystyle{gbt7714-numerical}
 
-\bibliographystyle{unsrt}
 \bibliography{ref}
 这是参考“参考文献”，主要用来看引用的顺序，请手动些参考文献或自行写程序，最终编译请删除
 \clearpage
