@@ -45,6 +45,7 @@
         shell=cbv)
    (--> (in-hole c (shell (e_1 e_2)))
         (in-hole c ((shell e_1) (lambda (x_new) (shell e_2))))
+        (fresh x_new)
         ;(where (x_new) ,(variable-not-in (term (e_1 e_2)) (term newvar) ))
         shell=app)
    ))

@@ -113,7 +113,6 @@
 % 评阅表依赖的宏包
 \input{ReviewTableHead}
 
-% yzy
 
 \title{}
 \author{}
@@ -148,12 +147,12 @@
 \clearpage
 
 %版权声明后空白一页，使得摘要从奇数页开始。
-\quad
-\setcounter{page}{0}
+%\quad
+%\setcounter{page}{0}
 % 本页不计页码
-\thispagestyle{empty}
+%\thispagestyle{empty}
 % 本页无页眉和页脚
-\clearpage
+%\clearpage
 
 
 
@@ -162,7 +161,7 @@
 \linespread{1.5}\selectfont
 %小四号，宋体/Time new roman，1.5倍行距
 \chapter*{摘要}
-随着计算机科学的普及和编程语言的发展，编程语言、特别是领域特定语言的应用越来越日常化。语法糖作为实现领域特定语言的一项重要技术在近年来发展火热，相关的研究\cite{resugaring}以及为DSL而诞生的编程语言(例如Racket、Scala)都有显著进展显著。
+随着计算机科学的普及和编程语言的发展，编程语言、特别是领域特定语言的应用越来越日常化。语法糖作为实现领域特定语言的一项重要技术在近年来发展火热，相关的研究\upcite{resugaring}以及为DSL而诞生的编程语言(例如Racket\upcite{racket}、Scala)都有显著进展显著。
 
 重组糖\upcite{resugaring}是一项关于语法糖的研究---将嵌入在内部语言的语法糖表达式执行序列在表面语言（语法糖）上提取出来，以得到在语法糖层面的执行序列（详见\ref{mark:resugaring}）。其目的是为了解决语法糖解糖的单向性\ref{mark:onedirect}，让语法糖表达式的执行过程能表现在语法糖结构上。但现存方法很难处理递归糖、高阶糖等语法糖特性，且对于卫生宏处理很繁琐。
 

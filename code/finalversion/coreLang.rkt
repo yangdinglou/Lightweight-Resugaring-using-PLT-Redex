@@ -10,6 +10,7 @@
      commonexp
      surfexp)
   (coreexp ::=
+           (coreexp e ...)
            (let ((x_!_ e) ...) e)
            (if e e e)
            (first e)
@@ -18,7 +19,7 @@
            
            (begin e e ...))
   (surfexp ::=
-           (e e ...);lambda?
+           (surfexp e ...)
            (map e e)
            (filter e e)
            
@@ -28,9 +29,14 @@
            (not e)
            (Let x e e)
            (Sg e e e)
+           (S comb) (K comb) (I comb)
+           ;(S e ...)
+           ;(K e ...)
+           ;(I e ...)
            (Odd e)
            (Even e))
   (commonexp ::=
+             (commonexp e ...);lambda?
              (cons e e)
              (+ e e ...)
              (- e e ...)
@@ -50,7 +56,7 @@
      boolean
      tmpval;for one-step-try
      (list e ...)
-     S K I)
+     )
   (lambda ::=
           (λ (x_!_ ...) e))
 
@@ -96,9 +102,9 @@
      (Odd E)
      (Even E)
      
-     (S e ... E e ...)
-     (K e ... E e ...)
-     (I e ... E e ...)
+     ((S comb) e ... E e ...)
+     ((K comb) e ... E e ...)
+     ((I comb) e ... E e ...)
      
      hole)
   
@@ -227,15 +233,26 @@
 
 
    
-   (--> (in-hole P I)
+   (--> (in-hole P (I comb))
         (in-hole P (λ (x) x))
         "I")
-   (--> (in-hole P K)
+   (--> (in-hole P (K comb))
         (in-hole P (λ (x_1 x_2) x_1))
         "K")
-   (--> (in-hole P S)
+   (--> (in-hole P (S comb))
         (in-hole P (λ (x_1 x_2 x_3) (x_1 x_3 (x_2 x_3))))
-        "S")))
+        "S")
+   #;(--> (in-hole P (I e ...))
+        (in-hole P ((λ (x) x) e ...))
+        "II")
+   #;(--> (in-hole P (K e ...))
+        (in-hole P ((λ (x_1 x_2) x_1) e ...))
+        "KK")
+   #;(--> (in-hole P (S e ...))
+        (in-hole P ((λ (x_1 x_2 x_3) (x_1 x_3 (x_2 x_3))) e ...))
+        "SS")
+
+   ))
 
 (define (run e) (traces reductions (term ((store) ,e))))
 
@@ -257,8 +274,11 @@
 ;(run (term (S (K S I) K xx yy)))
 
 ;(run (term (S I (K xx) yy)))
-
-;(run (term (I yy ((K xx) yy))))
+#;(apply-reduction-relation/tag-with-names reductions
+                                         (term ((store)
+                                                (S I (K xx) yy)
+                                                )))
+#;(run (term (I yy ((K xx) yy))))
 ;(run (term (if (and (and #t #t) (or #t #f)) 1 2)))
 #;(apply-reduction-relation reductions (term ((store)
  (S I (K xx) yy)
@@ -272,3 +292,5 @@
 
 #;(run
     (term (Odd 6)))
+
+;(run (term I))
