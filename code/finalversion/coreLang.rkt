@@ -29,6 +29,9 @@
            (not e)
            (Let x e e)
            (Sg e e e)
+
+           (shell e)
+           (λN x ... e)
            (S comb) (K comb) (I comb)
            ;(S e ...)
            ;(K e ...)
@@ -101,7 +104,8 @@
      (Sg E e e)
      (Odd E)
      (Even E)
-     
+
+     (λN x ... E)
      ((S comb) e ... E e ...)
      ((K comb) e ... E e ...)
      ((I comb) e ... E e ...)
@@ -252,6 +256,17 @@
         (in-hole P ((λ (x_1 x_2 x_3) (x_1 x_3 (x_2 x_3))) e ...))
         "SS")
 
+   (--> (in-hole P (shell (λN x ... e)))
+        (in-hole P (λ (x ...) (shell e)) )
+        "shell-lambda")
+   (--> (in-hole P (shell (e_1 e_2)))
+        (in-hole P ((shell e_1) (λ (x_new) (shell e_2))) )
+        (fresh x_new)
+        "shell-app")
+   (--> (in-hole P (shell (λ (x ...) (shell e))))
+        (in-hole P e)
+        "deshell")
+
    ))
 
 (define (run e) (traces reductions (term ((store) ,e))))
@@ -263,6 +278,10 @@
     (term (map (λ (x) (+ 1 x)) (list 1 2 3))))
 #;(run
     (term ((λ (x) (((λ (x y) (+ x y)) xx) yy)) 1)))
+#;(run
+    (term
+     (((λ (x y) x) xx) ((λ (x) x) yy))
+     ))
 #;(run
  (term ((λ (x_1 x_2 x_3)
           (x_1 x_3 (x_2 x_3)))
@@ -294,3 +313,8 @@
     (term (Odd 6)))
 
 ;(run (term I))
+
+#;(run
+    (term
+     (shell (((λN x y x) (+ 1 2)) (+ 1 3)))
+     ))

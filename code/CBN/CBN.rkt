@@ -12,6 +12,7 @@
      ;(lambda (x) c)
      hole)
   (v number
+     xx yy
      (lambda (x) e))
   
   (x variable-not-otherwise-mentioned))
@@ -34,9 +35,7 @@
    (--> (in-hole c ((lambda (x) e) v))
         (in-hole c (subst (x v e)))
         βv)
-   (--> (in-hole c (shell x))
-        (in-hole c x)
-        shellx)
+   
    (--> (in-hole c (shell (lambdaN (x) e)))
         (in-hole c (lambda (x) (shell e)))
         shell=cbn)
@@ -49,6 +48,6 @@
         ;(where (x_new) ,(variable-not-in (term (e_1 e_2)) (term newvar) ))
         shell=app)
    ))
-(traces reductions '((lambda (x) ((lambda (y) x) ((lambda (t) t) 1))) 2))
+(traces reductions '((lambda (x) ((lambda (y) x) ((lambda (t) t) xx))) yy))
 
-(traces reductions '(shell ((lambdaN (x) ((lambdaN (y) x) ((lambdaN (t) t) 1))) 2)))
+(traces reductions '(shell ((lambdaN (x) ((lambdaN (y) x) ((lambdaN (t) t) xx))) yy)))
