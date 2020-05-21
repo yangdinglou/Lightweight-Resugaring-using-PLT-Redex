@@ -1,4 +1,4 @@
-\begin{thebibliography}{5}
+\begin{thebibliography}{9}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{#1}
 \expandafter\ifx\csname urlstyle\endcsname\relax\else
@@ -43,5 +43,36 @@ POMBRIO~J, KRISHNAMURTHI~S.
 \newblock Hygienic resugaring of compositional desugaring\allowbreak[J/OL].
 \newblock SIGPLAN Not., 2015, 50\penalty0 (9):\penalty0 75–87.
 \newblock \url{https://doi.org/10.1145/2858949.2784755}.
+
+\bibitem[Plotkin(1975)]{PLOTKIN}
+PLOTKIN~G.
+\newblock Call-by-name, call-by-value and the λ-calculus\allowbreak[J/OL].
+\newblock Theoretical Computer Science, 1975, 1\penalty0 (2):\penalty0 125 -
+  159.
+\newblock
+  \url{http://www.sciencedirect.com/science/article/pii/0304397575900171}.
+\newblock DOI: \doi{https://doi.org/10.1016/0304-3975(75)90017-1}.
+
+\bibitem[Felleisen et~al.(1992)Felleisen and Hieb]{reduction}
+FELLEISEN~M, HIEB~R.
+\newblock The revised report on the syntactic theories of sequential control
+  and state\allowbreak[J/OL].
+\newblock Theor. Comput. Sci., 1992, 103\penalty0 (2):\penalty0 235–271.
+\newblock \url{https://doi.org/10.1016/0304-3975(92)90014-7}.
+
+\bibitem[Curry(1930)]{SKI}
+CURRY~H~B.
+\newblock Grundlagen der kombinatorischen logik\allowbreak[J/OL].
+\newblock American Journal of Mathematics, 1930, 52\penalty0 (3):\penalty0
+  509-536.
+\newblock \url{http://www.jstor.org/stable/2370619}.
+
+\bibitem[Smullyan(2016)]{mathlogic}
+SMULLYAN~R.
+\newblock A beginner's further guide to mathematical logic: Principles and
+  applications (with companion media pack)fourth edition of rapid prototyping
+  fourth edition\allowbreak[M/OL].
+\newblock World Scientific Publishing Company, 2016.
+\newblock \url{https://books.google.com/books?id=tFEyDwAAQBAJ}.
 
 \end{thebibliography}

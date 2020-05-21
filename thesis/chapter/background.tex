@@ -5,7 +5,7 @@
 \addtocontents{los}{\protect\addvspace{10pt}}
 
 \section{重组糖形式化定义}
-\label{mark:resugaring}对于给定求值规则的内部语言CoreLang，和在CoreLang基础上用语法糖构造的表面语言SurfLang；对于任意SurfLang的表达式，得到其在SurfLang上的求值序列，且该求值序列满足三个性质：
+\label{mark:resugaring}对于给定求值规则的内部语言CoreLang，和在CoreLang基础上用语法糖构造的表面语言SurfLang；对于任意SurfLang的表达式，得到其在SurfLang上的求值序列，且该求值序列满足三个性质\label{mark:three}：
 
 1.	仿真性：求值序列需要和在CoreLang上的求值顺序相同，即存在CoreLang上的求值序列中的部分中间过程与该序列中的元素对应。该性质是重组糖有意义的前提。
 
@@ -73,10 +73,35 @@ $and(or(\#f,\#t),and(\#t,\#f))$
 
 可以看出，在完全β规则中，对任何位置的可β规约的lambda表达式，都可以进行规约。因此，与call-by-name和call-by-value不同的是，这种求值规则是不定序的。
 
+结构化操作语义之父Gordon Plotkin在1975年的文章\upcite{PLOTKIN}中说明了抽象自动机和递归解释器的表达能力是相同的，而λ演算在一定约束下也具有相同的表达能力，Plotkin的λ演算基于推理规则，如图\ref{fig:plotkin}
 
-规约语义：我们需要在求值规则中约定每一个表达式的规约规则，。。。PLT Redex\upcite{SEwPR}是基于此语义的语义工程工具。todo
+\begin{figure}[h]
+	\centering
+	\[\infer {(v~e) → (v~e')}{e~→~e'}  \]
+	\[\infer {(e~e'') → (e'~e'')} {e~→~e'}  \]
+	\caption{Plotkin's lambda}
+	\label{fig:plotkin}
+\end{figure} 
 
-\pagebreak
+	
+
+而1992年Felleisen等人提出的规约语义\upcite{reduction}则是将推理规则优化为了规约规则加上上下文规则，如图\ref{fig:felleisen}的规约语义规则就是和上面两条推理规则等价的。
+
+
+		\begin{figure}[h]
+			\centering 
+			E = (E e) | (v E) | []
+			
+			if e → e' then E[e] → E[e']
+			\caption{Reduction semantic}
+			\label{fig:felleisen}
+		\end{figure}  
+
+
+相较于传统的操作语义，规约语义的优点是更容易处理顺序控制和状态信息，本质上属于操作语义，是传统操作语义的一种修订和优化。
+
+PLT Redex\upcite{SEwPR}则是基于规约语义的语言建模工具（也称为语义工程工具），是基于Racket实现的。给定一个语言的文法、上下文规则和规约规则，PLT Redex可以对这个语言的表达式进行规约，生成规约图，随机测试语言正确性等功能。本文运用PLT Redex主要是运用其优秀的语言建模功能。
+
 
 本文工作的最初思想就是基于完全beta规约。我们在对规约语义不限制上下文环境的情况下，其规约路径也将成为类似完全β规约的图。还是基于上文的例子and(or(\#f,\#t),and(\#t,\#f))，我们可以得到如下的完全规约图\ref{fig:full_reduction}。
 

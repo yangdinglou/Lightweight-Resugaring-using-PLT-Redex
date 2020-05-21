@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019/W32TeX) (preloaded format=xelatex 2020.4.9)  20 MAY 2020 16:02
+This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019/W32TeX) (preloaded format=xelatex 2020.4.9)  21 MAY 2020 16:12
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -570,6 +570,31 @@ Package color Info: Driver file: xetex.def on input line 147.
 (d:/texlive/2019/texmf-dist/tex/latex/graphics-def/xetex.def
 File: xetex.def 2017/06/24 v5.0h Graphics/color driver for xetex
 ))
+(d:/texlive/2019/texmf-dist/tex/latex/lkproof/proof.sty
+\inferLineSkip=\dimen193
+\inferLabelSkip=\dimen194
+\@LeftOffset=\dimen195
+\@RightOffset=\dimen196
+\@SavedLeftOffset=\dimen197
+\UpperWidth=\dimen198
+\LowerWidth=\dimen199
+\LowerHeight=\dimen256
+\UpperLeftOffset=\dimen257
+\UpperRightOffset=\dimen258
+\UpperCenter=\dimen259
+\LowerCenter=\dimen260
+\UpperAdjust=\dimen261
+\RuleAdjust=\dimen262
+\LowerAdjust=\dimen263
+\RuleWidth=\dimen264
+\HLabelAdjust=\dimen265
+\VLabelAdjust=\dimen266
+\WidthAdjust=\dimen267
+\@UpperPart=\box57
+\@LowerPart=\box58
+\@LabelPart=\box59
+\ResultBox=\box60
+)
 (d:/texlive/2019/texmf-dist/tex/latex/cite/cite.sty
 LaTeX Info: Redefining \cite on input line 302.
 LaTeX Info: Redefining \nocite on input line 332.
@@ -624,7 +649,7 @@ Package: auxhook 2016/05/16 v1.4 Hooks for auxiliary files (HO)
 (d:/texlive/2019/texmf-dist/tex/latex/oberdiek/kvoptions.sty
 Package: kvoptions 2016/05/16 v3.12 Key value format for package options (HO)
 )
-\@linkdim=\dimen193
+\@linkdim=\dimen268
 \Hy@linkcounter=\count288
 \Hy@pagecounter=\count289
 
@@ -655,10 +680,10 @@ Package hyperref Info: Bookmarks ON on input line 4772.
 Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
 )
 LaTeX Info: Redefining \url on input line 5125.
-\XeTeXLinkMargin=\dimen194
+\XeTeXLinkMargin=\dimen269
 \Fld@menulength=\count292
-\Field@Width=\dimen195
-\Fld@charsize=\dimen196
+\Field@Width=\dimen270
+\Fld@charsize=\dimen271
 Package hyperref Info: Hyper figures OFF on input line 6380.
 Package hyperref Info: Link nesting OFF on input line 6385.
 Package hyperref Info: Hyper index ON on input line 6388.
@@ -681,7 +706,7 @@ File: hxetex.def 2018/11/30 v6.88e Hyperref driver for XeTeX
 Package: stringenc 2016/05/16 v1.11 Convert strings between diff. encodings (HO
 )
 )
-\pdfm@box=\box57
+\pdfm@box=\box61
 \c@Hy@AnnotLevel=\count296
 \HyField@AnnotCount=\count297
 \Fld@listcount=\count298
@@ -714,42 +739,42 @@ Package: multirow 2019/01/01 v2.4 Span multiple rows of a table
 \multirow@colwidth=\skip80
 \multirow@cntb=\count301
 \multirow@dima=\skip81
-\bigstrutjot=\dimen197
+\bigstrutjot=\dimen272
 )
 (d:/texlive/2019/texmf-dist/tex/latex/booktabs/booktabs.sty
 Package: booktabs 2016/04/27 v1.618033 publication quality tables
-\heavyrulewidth=\dimen198
-\lightrulewidth=\dimen199
-\cmidrulewidth=\dimen256
-\belowrulesep=\dimen257
-\belowbottomsep=\dimen258
-\aboverulesep=\dimen259
-\abovetopsep=\dimen260
-\cmidrulesep=\dimen261
-\cmidrulekern=\dimen262
-\defaultaddspace=\dimen263
+\heavyrulewidth=\dimen273
+\lightrulewidth=\dimen274
+\cmidrulewidth=\dimen275
+\belowrulesep=\dimen276
+\belowbottomsep=\dimen277
+\aboverulesep=\dimen278
+\abovetopsep=\dimen279
+\cmidrulesep=\dimen280
+\cmidrulekern=\dimen281
+\defaultaddspace=\dimen282
 \@cmidla=\count302
 \@cmidlb=\count303
-\@aboverulesep=\dimen264
-\@belowrulesep=\dimen265
+\@aboverulesep=\dimen283
+\@belowrulesep=\dimen284
 \@thisruleclass=\count304
 \@lastruleclass=\count305
-\@thisrulewidth=\dimen266
+\@thisrulewidth=\dimen285
 )
 (d:/texlive/2019/texmf-dist/tex/latex/makecell/makecell.sty
 Package: makecell 2009/08/03 V0.1e Managing of Tab Column Heads and Cells
 
 (d:/texlive/2019/texmf-dist/tex/latex/tools/array.sty
 Package: array 2018/12/30 v2.4k Tabular extension package (FMi)
-\col@sep=\dimen267
-\ar@mcellbox=\box58
-\extrarowheight=\dimen268
+\col@sep=\dimen286
+\ar@mcellbox=\box62
+\extrarowheight=\dimen287
 \NC@list=\toks29
 \extratabsurround=\skip82
 \backup@length=\skip83
-\ar@cellbox=\box59
+\ar@cellbox=\box63
 )
-\rotheadsize=\dimen269
+\rotheadsize=\dimen288
 \c@nlinenum=\count306
 \TeXr@lab=\toks30
 )
@@ -767,8 +792,8 @@ File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
 )
 Package graphics Info: Driver file: xetex.def on input line 99.
 )
-\Gin@req@height=\dimen270
-\Gin@req@width=\dimen271
+\Gin@req@height=\dimen289
+\Gin@req@width=\dimen290
 )
 (d:/texlive/2019/texmf-dist/tex/latex/caption/caption.sty
 Package: caption 2018/10/06 v3.3-154 Customizing captions (AR)
@@ -776,13 +801,13 @@ Package: caption 2018/10/06 v3.3-154 Customizing captions (AR)
 (d:/texlive/2019/texmf-dist/tex/latex/caption/caption3.sty
 Package: caption3 2018/09/12 v1.8c caption3 kernel (AR)
 Package caption3 Info: TeX engine: e-TeX on input line 64.
-\captionmargin=\dimen272
-\captionmargin@=\dimen273
-\captionwidth=\dimen274
-\caption@tempdima=\dimen275
-\caption@indent=\dimen276
-\caption@parindent=\dimen277
-\caption@hangindent=\dimen278
+\captionmargin=\dimen291
+\captionmargin@=\dimen292
+\captionwidth=\dimen293
+\caption@tempdima=\dimen294
+\caption@indent=\dimen295
+\caption@parindent=\dimen296
+\caption@hangindent=\dimen297
 )
 \c@caption@flags=\count307
 \c@ContinuedFloat=\count308
@@ -830,15 +855,15 @@ Package tocloft Info: The document has chapter divisions on input line 51.
 )
 (d:/texlive/2019/texmf-dist/tex/latex/titlesec/titlesec.sty
 Package: titlesec 2016/03/21 v2.10.2 Sectioning titles
-\ttl@box=\box60
+\ttl@box=\box64
 \beforetitleunit=\skip118
 \aftertitleunit=\skip119
-\ttl@plus=\dimen279
-\ttl@minus=\dimen280
+\ttl@plus=\dimen298
+\ttl@minus=\dimen299
 \ttl@toksa=\toks31
-\titlewidth=\dimen281
-\titlewidthlast=\dimen282
-\titlewidthfirst=\dimen283
+\titlewidth=\dimen300
+\titlewidthlast=\dimen301
+\titlewidthfirst=\dimen302
 )
 
 Package ctex Warning: Command \CTEXsetup is deprecated.
@@ -848,12 +873,12 @@ Package ctex Warning: Command \CTEXsetup is deprecated.
 (./CoverHead.tex
 (d:/texlive/2019/texmf-dist/tex/latex/l3experimental/xcoffins/xcoffins.sty
 Package: xcoffins 2019-03-05 L3 Experimental design level coffins
-\l__coffin_hoffset_dim=\dimen284
-\l__coffin_voffset_dim=\dimen285
-\l__coffin_height_dim=\dimen286
-\l__coffin_depth_dim=\dimen287
-\l__coffin_width_dim=\dimen288
-\l__coffin_totalheight_dim=\dimen289
+\l__coffin_hoffset_dim=\dimen303
+\l__coffin_voffset_dim=\dimen304
+\l__coffin_height_dim=\dimen305
+\l__coffin_depth_dim=\dimen306
+\l__coffin_width_dim=\dimen307
+\l__coffin_totalheight_dim=\dimen308
 )
 (d:/texlive/2019/texmf-dist/tex/latex/xcolor/xcolor.sty
 Package: xcolor 2016/05/11 v2.12 LaTeX color extensions (UK)
@@ -880,9 +905,9 @@ Package: soul 2003/11/17 v2.4 letterspacing/underlining (mf)
 \SOUL@buffer=\toks35
 \SOUL@token=\toks36
 \SOUL@spaceskip=\skip120
-\SOUL@ttwidth=\dimen290
-\SOUL@uldp=\dimen291
-\SOUL@ulht=\dimen292
+\SOUL@ttwidth=\dimen309
+\SOUL@uldp=\dimen310
+\SOUL@ulht=\dimen311
 )
 
 Package fontspec Info: Font family 'TimesNewRoman(0)' created for font 'Times
@@ -922,99 +947,99 @@ LaTeX Info: Redefining \rmfamily on input line 8.
 Package: float 2001/11/08 v1.3d Float enhancements (AL)
 \c@float@type=\count311
 \float@exts=\toks37
-\float@box=\box61
+\float@box=\box65
 \@float@everytoks=\toks38
-\@floatcapt=\box62
+\@floatcapt=\box66
 )) (./Template.aux)
 \openout1 = `Template.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 120.
-LaTeX Font Info:    ... okay on input line 120.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 120.
-LaTeX Font Info:    ... okay on input line 120.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 120.
-LaTeX Font Info:    ... okay on input line 120.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 120.
-LaTeX Font Info:    ... okay on input line 120.
-LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 120.
-LaTeX Font Info:    ... okay on input line 120.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 120.
-LaTeX Font Info:    ... okay on input line 120.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 120.
-LaTeX Font Info:    ... okay on input line 120.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 120.
-LaTeX Font Info:    ... okay on input line 120.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 120.
-LaTeX Font Info:    ... okay on input line 120.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 120.
-LaTeX Font Info:    ... okay on input line 120.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 121.
+LaTeX Font Info:    ... okay on input line 121.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 121.
+LaTeX Font Info:    ... okay on input line 121.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 121.
+LaTeX Font Info:    ... okay on input line 121.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 121.
+LaTeX Font Info:    ... okay on input line 121.
+LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 121.
+LaTeX Font Info:    ... okay on input line 121.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 121.
+LaTeX Font Info:    ... okay on input line 121.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 121.
+LaTeX Font Info:    ... okay on input line 121.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 121.
+LaTeX Font Info:    ... okay on input line 121.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 121.
+LaTeX Font Info:    ... okay on input line 121.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 121.
+LaTeX Font Info:    ... okay on input line 121.
 
 ABD: EverySelectfont initializing macros
-LaTeX Info: Redefining \selectfont on input line 120.
+LaTeX Info: Redefining \selectfont on input line 121.
 
 Package fontspec Info: Adjusting the maths setup (use [no-math] to avoid
 (fontspec)             this).
 
 \symlegacymaths=\mathgroup9
 LaTeX Font Info:    Overwriting symbol font `legacymaths' in version `bold'
-(Font)                  OT1/cmr/m/n --> OT1/cmr/bx/n on input line 120.
-LaTeX Font Info:    Redeclaring math accent \acute on input line 120.
-LaTeX Font Info:    Redeclaring math accent \grave on input line 120.
-LaTeX Font Info:    Redeclaring math accent \ddot on input line 120.
-LaTeX Font Info:    Redeclaring math accent \tilde on input line 120.
-LaTeX Font Info:    Redeclaring math accent \bar on input line 120.
-LaTeX Font Info:    Redeclaring math accent \breve on input line 120.
-LaTeX Font Info:    Redeclaring math accent \check on input line 120.
-LaTeX Font Info:    Redeclaring math accent \hat on input line 120.
-LaTeX Font Info:    Redeclaring math accent \dot on input line 120.
-LaTeX Font Info:    Redeclaring math accent \mathring on input line 120.
-LaTeX Font Info:    Redeclaring math symbol \Gamma on input line 120.
-LaTeX Font Info:    Redeclaring math symbol \Delta on input line 120.
-LaTeX Font Info:    Redeclaring math symbol \Theta on input line 120.
-LaTeX Font Info:    Redeclaring math symbol \Lambda on input line 120.
-LaTeX Font Info:    Redeclaring math symbol \Xi on input line 120.
-LaTeX Font Info:    Redeclaring math symbol \Pi on input line 120.
-LaTeX Font Info:    Redeclaring math symbol \Sigma on input line 120.
-LaTeX Font Info:    Redeclaring math symbol \Upsilon on input line 120.
-LaTeX Font Info:    Redeclaring math symbol \Phi on input line 120.
-LaTeX Font Info:    Redeclaring math symbol \Psi on input line 120.
-LaTeX Font Info:    Redeclaring math symbol \Omega on input line 120.
-LaTeX Font Info:    Redeclaring math symbol \mathdollar on input line 120.
-LaTeX Font Info:    Redeclaring symbol font `operators' on input line 120.
+(Font)                  OT1/cmr/m/n --> OT1/cmr/bx/n on input line 121.
+LaTeX Font Info:    Redeclaring math accent \acute on input line 121.
+LaTeX Font Info:    Redeclaring math accent \grave on input line 121.
+LaTeX Font Info:    Redeclaring math accent \ddot on input line 121.
+LaTeX Font Info:    Redeclaring math accent \tilde on input line 121.
+LaTeX Font Info:    Redeclaring math accent \bar on input line 121.
+LaTeX Font Info:    Redeclaring math accent \breve on input line 121.
+LaTeX Font Info:    Redeclaring math accent \check on input line 121.
+LaTeX Font Info:    Redeclaring math accent \hat on input line 121.
+LaTeX Font Info:    Redeclaring math accent \dot on input line 121.
+LaTeX Font Info:    Redeclaring math accent \mathring on input line 121.
+LaTeX Font Info:    Redeclaring math symbol \Gamma on input line 121.
+LaTeX Font Info:    Redeclaring math symbol \Delta on input line 121.
+LaTeX Font Info:    Redeclaring math symbol \Theta on input line 121.
+LaTeX Font Info:    Redeclaring math symbol \Lambda on input line 121.
+LaTeX Font Info:    Redeclaring math symbol \Xi on input line 121.
+LaTeX Font Info:    Redeclaring math symbol \Pi on input line 121.
+LaTeX Font Info:    Redeclaring math symbol \Sigma on input line 121.
+LaTeX Font Info:    Redeclaring math symbol \Upsilon on input line 121.
+LaTeX Font Info:    Redeclaring math symbol \Phi on input line 121.
+LaTeX Font Info:    Redeclaring math symbol \Psi on input line 121.
+LaTeX Font Info:    Redeclaring math symbol \Omega on input line 121.
+LaTeX Font Info:    Redeclaring math symbol \mathdollar on input line 121.
+LaTeX Font Info:    Redeclaring symbol font `operators' on input line 121.
 LaTeX Font Info:    Encoding `OT1' has changed to `TU' for symbol font
-(Font)              `operators' in the math version `normal' on input line 120.
+(Font)              `operators' in the math version `normal' on input line 121.
 
 LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
 (Font)                  OT1/cmr/m/n --> TU/TimesNewRoman(0)/m/n on input line 1
-20.
+21.
 LaTeX Font Info:    Encoding `OT1' has changed to `TU' for symbol font
-(Font)              `operators' in the math version `bold' on input line 120.
+(Font)              `operators' in the math version `bold' on input line 121.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
 (Font)                  OT1/cmr/bx/n --> TU/TimesNewRoman(0)/m/n on input line 
-120.
+121.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
 (Font)                  TU/TimesNewRoman(0)/m/n --> TU/TimesNewRoman(0)/m/n on 
-input line 120.
+input line 121.
 LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `normal'
 (Font)                  OT1/cmr/m/it --> TU/TimesNewRoman(0)/m/it on input line
- 120.
+ 121.
 LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `normal'
 (Font)                  OT1/cmr/bx/n --> TU/TimesNewRoman(0)/bx/n on input line
- 120.
+ 121.
 LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `normal'
-(Font)                  OT1/cmss/m/n --> TU/lmss/m/n on input line 120.
+(Font)                  OT1/cmss/m/n --> TU/lmss/m/n on input line 121.
 LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `normal'
-(Font)                  OT1/cmtt/m/n --> TU/lmtt/m/n on input line 120.
+(Font)                  OT1/cmtt/m/n --> TU/lmtt/m/n on input line 121.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
 (Font)                  TU/TimesNewRoman(0)/m/n --> TU/TimesNewRoman(0)/bx/n on
- input line 120.
+ input line 121.
 LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `bold'
 (Font)                  OT1/cmr/bx/it --> TU/TimesNewRoman(0)/bx/it on input li
-ne 120.
+ne 121.
 LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `bold'
-(Font)                  OT1/cmss/bx/n --> TU/lmss/bx/n on input line 120.
+(Font)                  OT1/cmss/bx/n --> TU/lmss/bx/n on input line 121.
 LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `bold'
-(Font)                  OT1/cmtt/m/n --> TU/lmtt/bx/n on input line 120.
+(Font)                  OT1/cmtt/m/n --> TU/lmtt/bx/n on input line 121.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: xetex
@@ -1050,8 +1075,8 @@ LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `bold'
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-\AtBeginShipoutBox=\box63
-Package hyperref Info: Link coloring OFF on input line 120.
+\AtBeginShipoutBox=\box67
+Package hyperref Info: Link coloring OFF on input line 121.
 (d:/texlive/2019/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2016/05/21 v2.44 Cross-referencing by name of section
 
@@ -1060,9 +1085,9 @@ Package: gettitlestring 2016/05/16 v1.5 Cleanup title references (HO)
 )
 \c@section@level=\count312
 )
-LaTeX Info: Redefining \ref on input line 120.
-LaTeX Info: Redefining \pageref on input line 120.
-LaTeX Info: Redefining \nameref on input line 120.
+LaTeX Info: Redefining \ref on input line 121.
+LaTeX Info: Redefining \pageref on input line 121.
+LaTeX Info: Redefining \nameref on input line 121.
 
 (./Template.out) (./Template.out)
 \@outlinefile=\write3
@@ -1072,20 +1097,20 @@ Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: float package is loaded.
 Package caption Info: End \AtBeginDocument code.
  (./cover.tex
-\result=\box64
-\topBox=\box65
-\badge=\box66
-\pku=\box67
-\headingText=\box68
-\titleText=\box69
-\chineseTitleText=\box70
-\englishTitleText=\box71
-\nameText=\box72
-\studentIDText=\box73
-\schoolText=\box74
-\majorText=\box75
-\advisorText=\box76
-\dateText=\box77
+\result=\box68
+\topBox=\box69
+\badge=\box70
+\pku=\box71
+\headingText=\box72
+\titleText=\box73
+\chineseTitleText=\box74
+\englishTitleText=\box75
+\nameText=\box76
+\studentIDText=\box77
+\schoolText=\box78
+\majorText=\box79
+\advisorText=\box80
+\dateText=\box81
 File: images/badge.png Graphic file (type bmp)
 <images/badge.png>
 File: images/pku.png Graphic file (type bmp)
@@ -1314,13 +1339,16 @@ Overfull \hbox (5.02617pt too wide) in paragraph at lines 126--127
 LaTeX Warning: `h' float specifier changed to `ht'.
 
 [7]
+Underfull \hbox (badness 10000) in paragraph at lines 140--142
+
+ []
+
 File: images/chapter1/example.png Graphic file (type bmp)
 <images/chapter1/example.png>
 
-
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[8]) (./chapter/background.tex [9] [10]
+[8] [9]) (./chapter/background.tex [10]
 第二章
 
 Overfull \hbox (5.02617pt too wide) in paragraph at lines 58--59
@@ -1336,13 +1364,13 @@ LaTeX Warning: `h' float specifier changed to `ht'.
 File: images/chapter2/fullbeta.png Graphic file (type bmp)
 <images/chapter2/fullbeta.png>
  [12]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [13]
 File: images/chapter2/fullreduction.png Graphic file (type bmp)
 <images/chapter2/fullreduction.png>
-)
-(./chapter/algorithm.tex [14]
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+) (./chapter/algorithm.tex [13] [14]
 第三章
 
 Overfull \hbox (5.02617pt too wide) in paragraph at lines 32--33
@@ -1362,48 +1390,34 @@ Overfull \hbox (77.72397pt too wide) in paragraph at lines 84--84
  []
 
 [16]
-Overfull \hbox (5.02617pt too wide) in paragraph at lines 121--122
-[]  
+Overfull \hbox (5.02617pt too wide) in paragraph at lines 139--140
+ [][] 
  []
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [17]
-Overfull \hbox (5.02617pt too wide) in paragraph at lines 147--148
-[]  
- []
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [18]
-Underfull \hbox (badness 10000) in paragraph at lines 152--153
-
- []
-
-
-Overfull \hbox (5.02617pt too wide) in paragraph at lines 174--175
- [] 
- []
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [19]
-\c@mythm=\count313
-
-[20]
-File: images/chapter3/flowgraph.jpg Graphic file (type bmp)
-<images/chapter3/flowgraph.jpg>
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[21]
-\c@lemma=\count314
 
-Overfull \hbox (30.08206pt too wide) in paragraph at lines 268--269
+Overfull \hbox (10.64099pt too wide) in paragraph at lines 146--147
+[]\TU/SimSun(1)/m/n/12.045 对 \TU/TimesNewRoman(0)/m/n/12.045 Exp \TU/SimSun(1)/
+m/n/12.045 尝 试 所 有 规 约 规 则，|  得 到 多 个 可 能 的 表 达 式 \TU/TimesNewRoman(0)/m/n/12.0
+45 ListofExp’={$\OML/cmm/m/it/12.045 Exp[]$\TU/TimesNewRoman(0)/m/n/12.045 ,$\O
+ML/cmm/m/it/12.045 Exp[]$\TU/TimesNewRoman(0)/m/n/12.045 ,$[]$} 
+ []
+
+[17] [18]
+Overfull \hbox (5.02617pt too wide) in paragraph at lines 205--206
+ [][] 
+ []
+
+[19]
+\c@mythm=\count313
+ [20]
+File: images/chapter3/flowgraph.jpg Graphic file (type bmp)
+<images/chapter3/flowgraph.jpg>
+\c@lemma=\count314
+ [21]
+Overfull \hbox (30.08206pt too wide) in paragraph at lines 301--302
 []$\OML/cmm/m/it/12.045 ResugarExp[]$\TU/TimesNewRoman(0)/m/n/12.045 =$\OT1/cmr
 /m/n/12.045 (\OML/cmm/m/it/12.045 Surfid Subexp[] Subexp[] []\OT1/cmr/m/n/12.04
 5 )$\TU/TimesNewRoman(0)/m/n/12.045 , \TU/SimSun(1)/m/n/12.045 且 没 有 在 算 法 \TU/
@@ -1478,10 +1492,35 @@ Overfull \hbox (5.02617pt too wide) in paragraph at lines 272--273
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [29]
-[30] [31]) (./chapter/implement.tex [32] [33]
+[30]
+Overfull \hbox (5.02617pt too wide) in paragraph at lines 334--335
+ [] 
+ []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [31]
+Overfull \hbox (5.02617pt too wide) in paragraph at lines 394--395
+ [] 
+ []
+
+[32]
+Overfull \hbox (5.02617pt too wide) in paragraph at lines 418--419
+ [] 
+ []
+
+
+Underfull \vbox (badness 1931) has occurred while \output is active []
+
+ [33]
+[34] [35]) (./chapter/implement.tex [36]
 第五章
 File: images/chapter5/structure.png Graphic file (type bmp)
 <images/chapter5/structure.png>
+[37
+
+]
 
 Package fontspec Info: Font family 'FangSong(0)' created for font 'FangSong'
 (fontspec)             with options
@@ -1504,54 +1543,52 @@ Package fontspec Info: Font family 'FangSong(0)' created for font 'FangSong'
 nt=0.167;"
 (fontspec)             - 'bold italic small caps'  (bx/itsc) with NFSS spec.: 
 
-[34
-
-] [35]) (./chapter/conclusion.tex
-Overfull \hbox (0.64948pt too wide) in paragraph at lines 78--4
+ [38]) (./chapter/conclusion.tex
+Overfull \hbox (0.64948pt too wide) in paragraph at lines 85--4
 []\TU/SimSun(1)/m/n/12.045 具 体 算 法 实 现 中，|  比 较 复 杂 的 是 单 步 尝 试 的 过 程  |（对 应 核 
 心 算 法 \TU/TimesNewRoman(0)/m/n/12.045 f \TU/SimSun(1)/m/n/12.045 的 \TU/TimesNew
 Roman(0)/m/n/12.045 Rule2.2)\TU/SimSun(1)/m/n/12.045 。|
  []
 
 
-Overfull \hbox (2.10902pt too wide) in paragraph at lines 78--4
+Overfull \hbox (2.10902pt too wide) in paragraph at lines 85--4
 \TU/SimSun(1)/m/n/12.045 情 况 的 特 例。|  比 如 多 个 子 表 达 式 相 同，|  我 们 不 用 匹 配 替 代 的 
 方 法  |（\TU/TimesNewRoman(0)/m/n/12.045 match/substitute\TU/SimSun(1)/m/n/12.045
  ） ，|
  []
 
-[36]
+[39]
 第六章
-) [37
+[40
 
-] (./Template.bbl [38
+]) [41] (./Template.bbl [42
 
-]) [39
+] [43
 
-] [40
-
-
-]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 438.
- [41
+]) [44] [45
 
 
 ]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 438.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 439.
+ [46
+
+
+]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 439.
  (./Template.aux)
-Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 438.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 438.
+Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 439.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 439.
 Package rerunfilecheck Info: File `Template.out' has not changed.
-(rerunfilecheck)             Checksum: 9CFEFA38871F2FC3478B88A359C53B4F.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 438.
+(rerunfilecheck)             Checksum: 6DAD44199BC0BAF1BA14D403538BBAE6.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 439.
  ) 
 Here is how much of TeX's memory you used:
- 28922 strings out of 492922
- 590806 string characters out of 6136752
- 674803 words of memory out of 5000000
- 32555 multiletter control sequences out of 15000+600000
+ 28983 strings out of 492922
+ 590982 string characters out of 6136752
+ 681434 words of memory out of 5000000
+ 32613 multiletter control sequences out of 15000+600000
  566404 words of font info for 216 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
- 54i,12n,79p,811b,977s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 54i,12n,79p,811b,537s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on Template.pdf (44 pages).
+Output written on Template.pdf (49 pages).

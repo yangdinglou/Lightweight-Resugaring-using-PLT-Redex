@@ -1,6 +1,6 @@
 #lang racket
 (require redex)
-(require "coreLang.rkt")
+(require "model.rkt")
 
 (define (CbvHead? exp)
   (member (car exp)

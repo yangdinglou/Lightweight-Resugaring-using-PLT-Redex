@@ -196,7 +196,7 @@ $(Even\;e)$→$(if\;(>\;e\;0)\;(Odd (-\;e\;1)\;\#t))$
 
 \subsection{高阶糖}
 
-高阶糖本质上和递归糖没有区别，
+高阶糖本质上和递归糖没有区别，但在实际应用中，对高阶糖的支持是很有意义的。
 
 我们分别用两种不同的语法糖形式实现了$map$和$filter$两个语法糖。
 \begin{flushleft}
@@ -273,7 +273,9 @@ $(Even\;e)$→$(if\;(>\;e\;0)\;(Odd (-\;e\;1)\;\#t))$
 \end{center}
 
 
-以$(map\;(\lambda\;(x)\;(+\;1\;x))\;(list\;1\;2\;3))$为例。如果将该糖完全展开，将变成如下表达式
+我们接下来讨论为什么我们的方法能处理递归语法糖。以
+
+$(map\;(\lambda\;(x)\;(+\;1\;x))\;(list\;1\;2\;3))$为例。如果将该糖完全展开，将变成如下表达式
 \begin{flushleft}
 	$(if\;(empty\;(list\;1\;2\;3))$
 	
@@ -281,22 +283,142 @@ $(Even\;e)$→$(if\;(>\;e\;0)\;(Odd (-\;e\;1)\;\#t))$
 	
 	$\qquad(cons\;((\lambda\;(x)\;(+\;1\;x))\;(first\;(list\;1\;2\;3)))$
 	
-	$\qquad\qquad(if\;(empty\;(list\;1\;2\;3))$
+	$\qquad\qquad(if\;(empty\;(rest\;(list\;1\;2\;3)))$
 	
 	$\qquad\qquad\qquad(list)$
 	
-	$\qquad\qquad\qquad(cons\;((\lambda\;(x)\;(+\;1\;x))\;(first\;(list\;1\;2\;3)))$
-	
-	$\qquad\qquad\qquad\qquad(if\;(empty\;(list\;1\;2\;3))$
-	
-	$\qquad\qquad\qquad\qquad\qquad(list)$
-	
-	$\qquad\qquad\qquad\qquad\qquad(cons\;((\lambda\;(x)\;(+\;1\;x))\;(first\;(list\;1\;2\;3)))$
-	
-	$\qquad\qquad\qquad\qquad\qquad(map\;(\lambda\;(x)\;(+\;1\;x))\;(rest\;(list\;1\;2\;3)))))$
+	$\qquad\qquad\qquad(cons\;((\lambda\;(x)\;(+\;1\;x))\;(first\;(rest\;(list\;1\;2\;3))))$ $\ldots$
 \end{flushleft}
 
-todo:SKI with lazy lambda.
+我们可以看出，由于糖的分支条件写在了语法糖内部，展开过程中不会判断if分支，因此语法糖第二个子表达式$(list~1~2~3)$会在递归中不断变为
+\begin{flushleft}
+	$(rest~(list~1~2~3))$~$(rest~(rest~(list~1~2~3)))$~$\ldots$
+\end{flushleft}
+而不会停止。而我们的重组糖方法则不需要将语法糖完全展开，因此不会发生这种事情。实际上，将语法糖展开条件写在语法糖内部是一个很自然的想法，而现有的语法糖基本上并不支持这么做，而更多的需要手动书写边界条件，这对于作为实现领域特定语言的工具的语法糖来说，是不太友好的。
+
+\subsection{其他例子}
+
+\subsubsection{惰性求值}
+
+我们的工具设计之初以call-by-value的λ演算作为内部语言的基础。而实际应用时，惰性求值，也就是call-by-need也是比较常见的。我们试图构造一个惰性求值λ演算的语法糖。
+
+\begin{flushleft}
+	$(shell~(\lambda_{N}~x~\ldots~e))$→$(\lambda~(x~\ldots)~(shell~e))$
+	
+	$(shell~(e_{1}~e_{2}))$→$((shell~e_{1})~(\lambda~(x_{new})~(shell~e_{2})))$
+	
+	$(shell~(\lambda~(x~\ldots)~(shell~e)))$→$e$
+\end{flushleft}
+
+并进行一个样例测试。
+
+\begin{center}
+	\framebox[35em][l]{
+		\parbox[t]{\textwidth}{
+			\begin{center}
+				(shell (((λN x y x) xx) ((λN x x) yy)))\\
+				↓\\
+				((shell ((λN x y x) xx)) (λ ($x_{new}$) (shell ((λN x x) yy))))\\
+				↓\\
+				(((shell (λN x y x)) (λ ($x_{new1}$) (shell xx))) (λ ($x_{new}$) (shell ((λN x x) yy))))\\
+				↓\\
+				(((λ (x y) (shell x)) (λ ($x_{new1}$) (shell xx))) (λ ($x_{new}$) (shell ((λN x x) yy))))\\
+				↓\\
+				((λ (y) (shell (λ ($x_{new1}$) (shell xx)))) (λ ($x_{new}$) (shell ((λN x x) yy))))\\
+				↓\\
+				(shell (λ ($x_{new1}$) (shell xx)))\\
+				↓\\
+				xx
+			\end{center}
+		}
+	}
+\end{center}
+
+结果发现，我们构造的shell糖和λN糖虽然能够在我们的框架下执行得到求值序列，但并没有进行重组糖。经过简单思考，我们发现原因在于惰性求值本身就是不会对子表达式优先进行计算，因此根据核心算法的$Rule2.2.2$，语法糖展开后不会重组，因此得到的序列虽然满足重组糖的性质，但看起来没有重组。而用shell糖来构造这种call-by-need到call-by-value的转化是一种自认为不错的想法，因此也记录在这里。
+
+\subsubsection{SKI组合子}
+
+SKI组合子演算\upcite{SKI}是无类型λ演算的一种简化版，其运用$S$~$K$~$I$三个组合子的组合使用，可以表达无类型λ演算的所有行为，是一个极小的图灵完备语言。\upcite{mathlogic}我们在我们的工具上尝试构造这三个组合子，并尝试输出SKI组合子表达式的重组糖序列。语法糖定义如下\footnote{此处实现时，为了方便，我们将$S$写做$(S~comb)$（满足Racket的pair形式即可）}：
+
+\begin{flushleft}
+	$S$ → $(\lambda~(x_{1}~x_{2}~x_{3})~(x_{1}~x_{2}~(x_{1}~x_{3})))$
+	
+	$K$ → $(\lambda~(x_{1}~x_{2})~x_{1})$
+	
+	$I$ → $(\lambda~(x)~x)$
+\end{flushleft}
+
+并构造一个将两个参数对置的SKI演算。
+
+\begin{center}
+	\framebox[35em][l]{
+		\parbox[t]{\textwidth}{
+			\begin{center}
+				{\linespread{1}\selectfont
+				(S (K (S I)) K xx yy)\\
+				↓\\
+				(S (K (S (λ (x) x))) K xx yy)\\
+				↓\\
+				(S (K ((λ ($x_{1}$ $x_{2}$ $x_{3}$) ($x_{1}$ $x_{3}$ ($x_{2}$ $x_{3}$))) (λ (x) x))) K xx yy)\\
+				↓\\
+				(S (K (λ ($x_{2}$ $x_{3}$) ((λ (x) x) $x_{3}$ ($x_{2}$ $x_{3}$)))) K xx yy)\\
+				↓\\
+				(S ((λ ($x_{1}$ $x_{2}$) $x_{1}$) (λ ($x_{2}$ $x_{3}$) ((λ (x) x) $x_{3}$ ($x_{2}$ $x_{3}$)))) K xx yy)\\
+				↓\\
+				(S (λ ($x_{2}$) (λ ($x_{2}$ $x_{3}$) ((λ (x) x) $x_{3}$ ($x_{2}$ $x_{3}$)))) K xx yy)\\
+				↓\\
+				(S (λ ($x_{2}$) (λ ($x_{2}$ $x_{3}$) ((λ (x) x) $x_{3}$ ($x_{2}$ $x_{3}$)))) (λ ($x_{1}$ $x_{2}$) $x_{1}$) xx yy)\\
+				↓\\
+				((λ ($x_{1}$ $x_{2}$ $x_{3}$) ($x_{1}$ $x_{3}$ ($x_{2}$ $x_{3}$))) (λ ($x_{2}$) (λ ($x_{2}$ $x_{3}$) ((λ (x) x) $x_{3}$ ($x_{2}$ $x_{3}$)))) (λ ($x_{1}$ $x_{2}$) $x_{1}$) xx yy)\\
+				↓\\
+				((λ ($x_{2}$ $x_{3}$) ((λ ($x_{2}$) (λ ($x_{2}$ $x_{3}$) ((λ (x) x) $x_{3}$ ($x_{2}$ $x_{3}$)))) $x_{3}$ ($x_{2}$ $x_{3}$))) (λ ($x_{1}$ $x_{2}$) $x_{1}$) xx yy)\\
+				↓\\
+				((λ ($x_{3}$) ((λ ($x_{2}$) (λ ($x_{2}$ $x_{3}$) ((λ (x) x) $x_{3}$ ($x_{2}$ $x_{3}$)))) $x_{3}$ ((λ ($x_{1}$ $x_{2}$) $x_{1}$) $x_{3}$))) xx yy)\\
+				↓\\
+				(((λ ($x_{2}$) (λ ($x_{2}$ $x_{3}$) ((λ (x) x) $x_{3}$ ($x_{2}$ $x_{3}$)))) xx ((λ ($x_{1}$ $x_{2}$) $x_{1}$) xx)) yy)\\
+				↓\\
+				(((λ ($x_{2}$) (λ ($x_{2}$ $x_{3}$) ((λ (x) x) $x_{3}$ ($x_{2}$ $x_{3}$)))) xx (λ ($x_{2}$) xx)) yy)\\
+				↓\\
+				(((λ ($x_{2}$ $x_{3}$) ((λ (x) x) $x_{3}$ ($x_{2}$ $x_{3}$))) (λ ($x_{2}$) xx)) yy)\\
+				↓\\
+				((λ ($x_{3}$) ((λ (x) x) $x_{3}$ ((λ ($x_{2}$) xx) $x_{3}$))) yy)\\
+				↓\\
+				((λ (x) x) yy ((λ ($x_{2}$) xx) yy))\\
+				↓\\
+				((λ (x) x) yy xx)\\
+				↓\\
+				(yy xx)}
+			\end{center}
+			
+		}
+	}
+\end{center}
+
+而实际上，对SKI组合子，构建在惰性求值的λ演算是一种更合适的语法糖，于是我们构造了惰性求值的$\lambda_{N}$作为coreLang的一部分，并重新测试该表达式。
+
+\begin{center}
+	\framebox[35em][l]{
+		\parbox[t]{\textwidth}{
+			\begin{center}
+				(S (K (S I)) K xx yy)\\
+				↓\\
+				(((K (S I)) xx (K xx)) yy)\\
+				↓\\
+				(((S I) (K xx)) yy)\\
+				↓\\
+				(I yy ((K xx) yy))\\
+				↓\\
+				(yy ((K xx) yy))\\
+				↓\\
+				(yy xx)
+				
+			\end{center}
+			
+		}
+	}
+\end{center}
+
+结果显示我们的重组糖工具漂亮的显示了该SKI表达式的序列。
 
 \section{与现有方法对比}
 正如前文多次提到的，我们的方法与现有重组糖方法最大的不同是，不会完全将语法糖展开。我们的轻量级重组糖方法先比于现有工作有如下优点。
@@ -320,7 +442,7 @@ todo:SKI with lazy lambda.
 
 
 
-\subsection{副作用}
+\label{mark:side}\subsection{副作用}
 
 表达式不能用对外副作用一定程度我们我们方法的便利性。在一定解决范围内，我可以基于let（变量绑定）解决部分需求。
 
@@ -336,6 +458,6 @@ $(Sg~exp_{1}~exp_{2})→(begin~(if~exp_{1}~(set!~x~0)~(set!~x~exp_{2}))~x)$
 
 另一方面，我们可以发现的是，对于有副作用的语法糖来说，重组糖的是没有很大作用的。因为当一个语法糖表达式内部副作用语句被执行，该糖就不能重组了。
 
-另一种可能的解决方法，是将副作用封装到内部语言的两个函数中，比如表达式$exp_{1}$中将x改为x'，y改为y'，则$f(exp_{1})$为$(list~(cons~x~x')~(cons~y~y'))$
+另一种可能的解决方法，是将副作用封装到内部语言的两个函数中，比如表达式$exp_{1}$中将x改为x'，y改为y'，则$f(exp_{1})$为$(list~(cons~x~x')~(cons~y~y'))$，如果别的表达式需要得到$exp_{1}$的副作用，就将$f(exp_{1})$保存到一个let绑定中，供别的表达式使用。
 
 \subsection{其他相关工作}

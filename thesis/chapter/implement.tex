@@ -14,6 +14,13 @@
 	\label{fig:struct}
 \end{figure}
 
+我们将语言模型（内部语言和外部语言）的文法、上下文规则、规约规则放在model.rkt中，而算法部分放在resugar.rkt中。对于任意新的语法糖，需要进行的修改就是在model.rkt中
+\begin{itemize}
+	\item 增加对应文法到surfexp
+	\item 增加对于上下文规则（让每个子表达式都能进行规约）
+	\item 增加语法糖解糖规则到reduction
+\end{itemize}
+之后在resugar.rkt中构造表达式进行测试即可输出对应重组糖序列。
 \section{实现细节}
 在PLT Redex中，对一个语言的定义主要需要三个内容。
 \begin{itemize}
