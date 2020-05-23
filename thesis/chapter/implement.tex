@@ -41,10 +41,10 @@ exp ::= coreexp | surfexp | commonexp
 例：
 \begin{verbatim}
 coreexp ::= (if exp exp exp)
-|   (let ((x exp) ...) exp)
-|   (first exp)
-|   (rest exp)
-|   ...
+        |   (let ((x exp) ...) exp)
+        |   (first exp)
+        |   (rest exp)
+        |   ...
 \end{verbatim}
 
 对于surfexp，就是$Headid$是表示DSL的标识的表达式。
@@ -52,15 +52,15 @@ coreexp ::= (if exp exp exp)
 例：
 \begin{verbatim}
 surfexp ::= (and exp exp)
-|   (or exp exp)
-|   (map exp exp)
-|   (filter exp exp)
-|   ...
+        |   (or exp exp)
+        |   (map exp exp)
+        |   (filter exp exp)
+        |   ...
 \end{verbatim}
 
 对于commonexp，是为了让我们的重组糖序列中有一些包含在内部语言、但是可以输出的中间过程。例如对于高阶糖
 
-$(Map\;f\;lst)-->(cons\;(f\;(first\;lst))\;(Map\;f\;(rest\;lst)))$
+$(Map\;f\;lst)→(cons\;(f\;(first\;lst))\;(Map\;f\;(rest\;lst)))$
 
 \begin{flushleft}
 	我们需要一些中间序列用cons表示，来输出有用的中间过程。我们主要需要的commonexp有所有值、所有基础运算（包括算数运算和列表运算）。

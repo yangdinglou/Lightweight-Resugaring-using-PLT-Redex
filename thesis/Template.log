@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019/W32TeX) (preloaded format=xelatex 2020.4.9)  21 MAY 2020 16:12
+This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019/W32TeX) (preloaded format=xelatex 2020.4.9)  24 MAY 2020 05:01
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1307,17 +1307,30 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 
 [4] (./chapter/introduction.tex
 第一章
-File: images/chapter1/restaurant.png Graphic file (type bmp)
-<images/chapter1/restaurant.png>
 
-Overfull \hbox (5.02617pt too wide) in paragraph at lines 47--48
- [] 
+Overfull \hbox (6.66876pt too wide) in paragraph at lines 8--9
+[]\TU/SimSun(1)/m/n/12.045 领 域 特 定 语 言 的 研 究 及 应 用 日 益 广 泛，|  其 中 不 乏 正 则 表 达 式
+$[]$、| \TU/TimesNewRoman(0)/m/n/12.045 SQL$[]$\TU/SimSun(1)/m/n/12.045 、| \TU/T
+imesNewRoman(0)/m/n/12.045 XML$[]$
  []
 
+
+Overfull \hbox (0.43578pt too wide) in paragraph at lines 10--11
+[]\TU/SimSun(1)/m/n/12.045 语 法 糖 是 近 些 年 一 种 流 行 的 领 域 特 定 语 言 实 现 方 法，|  其 方 法
+ 源 于 \TU/TimesNewRoman(0)/m/n/12.045 Peter Landin
+ []
+
+File: images/chapter1/restaurant.png Graphic file (type bmp)
+<images/chapter1/restaurant.png>
 [5
 
 
 ]
+Overfull \hbox (5.02617pt too wide) in paragraph at lines 47--48
+ [] 
+ []
+
+
 Overfull \hbox (5.02617pt too wide) in paragraph at lines 70--71
  [] 
  []
@@ -1327,36 +1340,24 @@ Overfull \hbox (5.02617pt too wide) in paragraph at lines 97--98
 [][] 
  []
 
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
 [6]
-Overfull \hbox (5.02617pt too wide) in paragraph at lines 126--127
+Overfull \hbox (5.02617pt too wide) in paragraph at lines 128--129
 [][] 
  []
 
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
 [7]
-Underfull \hbox (badness 10000) in paragraph at lines 140--142
+Underfull \hbox (badness 10000) in paragraph at lines 142--144
 
  []
 
 File: images/chapter1/example.png Graphic file (type bmp)
 <images/chapter1/example.png>
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
 [8] [9]) (./chapter/background.tex [10]
 第二章
 
 Overfull \hbox (5.02617pt too wide) in paragraph at lines 58--59
 [][] 
  []
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
 
 [11
 
@@ -1366,39 +1367,22 @@ File: images/chapter2/fullbeta.png Graphic file (type bmp)
  [12]
 File: images/chapter2/fullreduction.png Graphic file (type bmp)
 <images/chapter2/fullreduction.png>
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-) (./chapter/algorithm.tex [13] [14]
+ [13]) (./chapter/algorithm.tex [14]
 第三章
-
-Overfull \hbox (5.02617pt too wide) in paragraph at lines 32--33
- [] 
- []
-
 [15
 
 ]
-Overfull \hbox (34.896pt too wide) in paragraph at lines 84--84
-\TU/TimesNewRoman(0)/m/n/12.045 Exp::= []  
- []
-
-
-Overfull \hbox (77.72397pt too wide) in paragraph at lines 84--84
-[]\TU/TimesNewRoman(0)/m/n/12.045 Commonexp ::=[]  
+Overfull \hbox (5.02617pt too wide) in paragraph at lines 98--99
+ [] 
  []
 
 [16]
-Overfull \hbox (5.02617pt too wide) in paragraph at lines 139--140
+Overfull \hbox (5.02617pt too wide) in paragraph at lines 157--158
  [][] 
  []
 
 
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-Overfull \hbox (10.64099pt too wide) in paragraph at lines 146--147
+Overfull \hbox (10.64099pt too wide) in paragraph at lines 164--165
 []\TU/SimSun(1)/m/n/12.045 对 \TU/TimesNewRoman(0)/m/n/12.045 Exp \TU/SimSun(1)/
 m/n/12.045 尝 试 所 有 规 约 规 则，|  得 到 多 个 可 能 的 表 达 式 \TU/TimesNewRoman(0)/m/n/12.0
 45 ListofExp’={$\OML/cmm/m/it/12.045 Exp[]$\TU/TimesNewRoman(0)/m/n/12.045 ,$\O
@@ -1406,8 +1390,16 @@ ML/cmm/m/it/12.045 Exp[]$\TU/TimesNewRoman(0)/m/n/12.045 ,$[]$}
  []
 
 [17] [18]
-Overfull \hbox (5.02617pt too wide) in paragraph at lines 205--206
+Overfull \hbox (5.02617pt too wide) in paragraph at lines 223--224
  [][] 
+ []
+
+
+Overfull \hbox (3.06082pt too wide) in paragraph at lines 239--240
+[]\TU/SimSun(1)/m/n/12.045 对 其 子 表 达 式 $\OML/cmm/m/it/12.045 Subexp[]$ \TU/SimS
+un(1)/m/n/12.045 规 约。|  其 中 $\OML/cmm/m/it/12.045 Subexp[]$ \TU/SimSun(1)/m/n/1
+2.045 为 $\OT1/cmr/m/n/12.045 (\OML/cmm/m/it/12.045 Headid[] []Subexp[] []Subexp
+[] []\OT1/cmr/m/n/12.045 )$ 
  []
 
 [19]
@@ -1417,108 +1409,18 @@ File: images/chapter3/flowgraph.jpg Graphic file (type bmp)
 <images/chapter3/flowgraph.jpg>
 \c@lemma=\count314
  [21]
-Overfull \hbox (30.08206pt too wide) in paragraph at lines 301--302
+Overfull \hbox (30.08206pt too wide) in paragraph at lines 319--320
 []$\OML/cmm/m/it/12.045 ResugarExp[]$\TU/TimesNewRoman(0)/m/n/12.045 =$\OT1/cmr
 /m/n/12.045 (\OML/cmm/m/it/12.045 Surfid Subexp[] Subexp[] []\OT1/cmr/m/n/12.04
 5 )$\TU/TimesNewRoman(0)/m/n/12.045 , \TU/SimSun(1)/m/n/12.045 且 没 有 在 算 法 \TU/
 TimesNewRoman(0)/m/n/12.045 lightweight-resugaring
  []
 
-[22]) (./chapter/evaluation.tex [23]
+[22]) (./chapter/implement.tex [23]
 第四章
-
-Overfull \hbox (5.02617pt too wide) in paragraph at lines 35--36
- [] 
- []
-
-
-Overfull \hbox (5.02617pt too wide) in paragraph at lines 52--53
- [] 
- []
-
-
-Underfull \vbox (badness 7631) has occurred while \output is active []
-
- [24
-
-]
-Underfull \hbox (badness 10000) in paragraph at lines 56--57
-
- []
-
-
-Overfull \hbox (5.02617pt too wide) in paragraph at lines 77--78
- [] 
- []
-
-
-Overfull \hbox (5.02617pt too wide) in paragraph at lines 107--108
- [] 
- []
-
-[25] [26]
-Overfull \hbox (5.02617pt too wide) in paragraph at lines 155--156
- [] 
- []
-
-
-Overfull \hbox (5.02617pt too wide) in paragraph at lines 194--195
- [] 
- []
-
-[27]
-Overfull \hbox (28.03542pt too wide) in paragraph at lines 205--206
-[]$\OT1/cmr/m/n/12.045 (\OML/cmm/m/it/12.045 if \OT1/cmr/m/n/12.045 (\OML/cmm/m
-/it/12.045 empty \OT1/cmr/m/n/12.045 (\OML/cmm/m/it/12.045 list v[] []\OT1/cmr/
-m/n/12.045 )) (\OML/cmm/m/it/12.045 list\OT1/cmr/m/n/12.045 ) (\OML/cmm/m/it/12
-.045 cons \OT1/cmr/m/n/12.045 (\OML/cmm/m/it/12.045 e \OT1/cmr/m/n/12.045 (\OML
-/cmm/m/it/12.045 first \OT1/cmr/m/n/12.045 (\OML/cmm/m/it/12.045 list v[] []\OT
-1/cmr/m/n/12.045 ))) (\OML/cmm/m/it/12.045 map e \OT1/cmr/m/n/12.045 (\OML/cmm/
-m/it/12.045 rest \OT1/cmr/m/n/12.045 (\OML/cmm/m/it/12.045 list v[] []\OT1/cmr/
-m/n/12.045 )))))$  
- []
-
-[28]
-Overfull \hbox (5.02617pt too wide) in paragraph at lines 241--242
- [] 
- []
-
-
-Overfull \hbox (5.02617pt too wide) in paragraph at lines 272--273
- [] 
- []
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [29]
-[30]
-Overfull \hbox (5.02617pt too wide) in paragraph at lines 334--335
- [] 
- []
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [31]
-Overfull \hbox (5.02617pt too wide) in paragraph at lines 394--395
- [] 
- []
-
-[32]
-Overfull \hbox (5.02617pt too wide) in paragraph at lines 418--419
- [] 
- []
-
-
-Underfull \vbox (badness 1931) has occurred while \output is active []
-
- [33]
-[34] [35]) (./chapter/implement.tex [36]
-第五章
 File: images/chapter5/structure.png Graphic file (type bmp)
 <images/chapter5/structure.png>
-[37
+[24
 
 ]
 
@@ -1543,7 +1445,7 @@ Package fontspec Info: Font family 'FangSong(0)' created for font 'FangSong'
 nt=0.167;"
 (fontspec)             - 'bold italic small caps'  (bx/itsc) with NFSS spec.: 
 
- [38]) (./chapter/conclusion.tex
+ [25]) (./chapter/evaluation.tex
 Overfull \hbox (0.64948pt too wide) in paragraph at lines 85--4
 []\TU/SimSun(1)/m/n/12.045 具 体 算 法 实 现 中，|  比 较 复 杂 的 是 单 步 尝 试 的 过 程  |（对 应 核 
 心 算 法 \TU/TimesNewRoman(0)/m/n/12.045 f \TU/SimSun(1)/m/n/12.045 的 \TU/TimesNew
@@ -1557,38 +1459,129 @@ Overfull \hbox (2.10902pt too wide) in paragraph at lines 85--4
  ） ，|
  []
 
-[39]
+[26]
+第五章
+
+Overfull \hbox (5.02617pt too wide) in paragraph at lines 35--36
+ [] 
+ []
+
+
+Overfull \hbox (5.02617pt too wide) in paragraph at lines 52--53
+ [] 
+ []
+
+
+Underfull \vbox (badness 7631) has occurred while \output is active []
+
+ [27
+
+]
+Overfull \hbox (5.02617pt too wide) in paragraph at lines 77--78
+ [] 
+ []
+
+
+Overfull \hbox (5.02617pt too wide) in paragraph at lines 107--108
+ [] 
+ []
+
+[28] [29]
+Overfull \hbox (5.02617pt too wide) in paragraph at lines 155--156
+ [] 
+ []
+
+
+Overfull \hbox (5.02617pt too wide) in paragraph at lines 194--195
+ [] 
+ []
+
+[30]
+Overfull \hbox (28.03542pt too wide) in paragraph at lines 205--206
+[]$\OT1/cmr/m/n/12.045 (\OML/cmm/m/it/12.045 if \OT1/cmr/m/n/12.045 (\OML/cmm/m
+/it/12.045 empty \OT1/cmr/m/n/12.045 (\OML/cmm/m/it/12.045 list v[] []\OT1/cmr/
+m/n/12.045 )) (\OML/cmm/m/it/12.045 list\OT1/cmr/m/n/12.045 ) (\OML/cmm/m/it/12
+.045 cons \OT1/cmr/m/n/12.045 (\OML/cmm/m/it/12.045 e \OT1/cmr/m/n/12.045 (\OML
+/cmm/m/it/12.045 first \OT1/cmr/m/n/12.045 (\OML/cmm/m/it/12.045 list v[] []\OT
+1/cmr/m/n/12.045 ))) (\OML/cmm/m/it/12.045 map e \OT1/cmr/m/n/12.045 (\OML/cmm/
+m/it/12.045 rest \OT1/cmr/m/n/12.045 (\OML/cmm/m/it/12.045 list v[] []\OT1/cmr/
+m/n/12.045 )))))$  
+ []
+
+[31]
+Overfull \hbox (5.02617pt too wide) in paragraph at lines 241--242
+ [] 
+ []
+
+
+Overfull \hbox (5.02617pt too wide) in paragraph at lines 272--273
+ [] 
+ []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [32]
+[33]
+Overfull \hbox (5.02617pt too wide) in paragraph at lines 334--335
+ [] 
+ []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [34]
+Overfull \hbox (5.02617pt too wide) in paragraph at lines 394--395
+ [] 
+ []
+
+[35]
+Overfull \hbox (5.02617pt too wide) in paragraph at lines 418--419
+ [] 
+ []
+
+
+Underfull \vbox (badness 1931) has occurred while \output is active []
+
+ [36]
+[37] [38]) (./chapter/conclusion.tex [39]
 第六章
 [40
 
-]) [41] (./Template.bbl [42
+] [41]) (./Template.bbl [42
 
-] [43
 
-]) [44] [45
 
+] [43]) [44] [45
 
 ]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 439.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 403.
  [46
 
 
 ]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 439.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 403.
  (./Template.aux)
-Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 439.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 439.
-Package rerunfilecheck Info: File `Template.out' has not changed.
-(rerunfilecheck)             Checksum: 6DAD44199BC0BAF1BA14D403538BBAE6.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 439.
+Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 403.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 403.
+
+
+Package rerunfilecheck Warning: File `Template.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `Template.out':
+(rerunfilecheck)             Before: B734E4B581A4FC844BFBAB9DA2192768
+(rerunfilecheck)             After:  61372DAFAB7BD9A201F4098D404CB1BF.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 403.
  ) 
 Here is how much of TeX's memory you used:
- 28983 strings out of 492922
- 590982 string characters out of 6136752
- 681434 words of memory out of 5000000
- 32613 multiletter control sequences out of 15000+600000
+ 29004 strings out of 492922
+ 590637 string characters out of 6136752
+ 681960 words of memory out of 5000000
+ 32634 multiletter control sequences out of 15000+600000
  566404 words of font info for 216 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
- 54i,12n,79p,811b,537s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 54i,12n,79p,811b,566s stack positions out of 5000i,500n,10000p,200000b,80000s
 
 Output written on Template.pdf (49 pages).

@@ -1,4 +1,4 @@
-\begin{thebibliography}{9}
+\begin{thebibliography}{20}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{#1}
 \expandafter\ifx\csname urlstyle\endcsname\relax\else
@@ -7,6 +7,13 @@
   \DeclareUrlCommand\doi{\urlstyle{rm}}\else
   \providecommand\doi[1]{\href{https://doi.org/#1}{\nolinkurl{#1}}}\fi
 
+\bibitem[Fowler(2010)]{dsl}
+FOWLER~M.
+\newblock Addison-wesley signature series (fowler): Domain-specific
+  languages\allowbreak[M/OL].
+\newblock Pearson Education, 2010.
+\newblock \url{https://books.google.com.hk/books?id=ri1muolw\_YwC}.
+
 \bibitem[Pombrio et~al.(2014)Pombrio and Krishnamurthi]{resugaring}
 POMBRIO~J, KRISHNAMURTHI~S.
 \newblock Resugaring: Lifting evaluation sequences through syntactic
@@ -14,17 +21,56 @@ POMBRIO~J, KRISHNAMURTHI~S.
 \newblock SIGPLAN Not., 2014, 49\penalty0 (6):\penalty0 361–371.
 \newblock \url{https://doi.org/10.1145/2666356.2594319}.
 
+\bibitem[Erdweg et~al.(2011)Erdweg, Rendel, K{\"a}stner, and Ostermann]{sugarj}
+ERDWEG~S, RENDEL~T, K{\"A}STNER~C, et~al.
+\newblock Sugarj: library-based syntactic language
+  extensibility\allowbreak[C]//\allowbreak
+Proceedings of the 2011 ACM international conference on Object oriented
+  programming systems languages and applications.
+\newblock [S.l.: s.n.], 2011: 391-406.
+
 \bibitem[Flatt(2012)]{racket}
 FLATT~M.
 \newblock Creating languages in racket\allowbreak[J/OL].
 \newblock Commun. ACM, 2012, 55\penalty0 (1):\penalty0 48–56.
 \newblock \url{https://doi.org/10.1145/2063176.2063195}.
 
+\bibitem[Wampler et~al.(2014)Wampler and Payne]{scala}
+WAMPLER~D, PAYNE~A.
+\newblock Programming scala: Scalability = functional programming +
+  objects\allowbreak[M].
+\newblock 2nd ed.
+\newblock [S.l.]: O’Reilly Media, Inc., 2014.
+
 \bibitem[Felleisen et~al.(2009)Felleisen, Findler, and Flatt]{SEwPR}
 FELLEISEN~M, FINDLER~R~B, FLATT~M.
 \newblock Semantics engineering with plt redex\allowbreak[M].
 \newblock 1st ed.
 \newblock [S.l.]: The MIT Press, 2009.
+
+\bibitem[Thompson(1968)]{regexp}
+THOMPSON~K.
+\newblock Programming techniques: Regular expression search
+  algorithm\allowbreak[J/OL].
+\newblock Commun. ACM, 1968, 11\penalty0 (6):\penalty0 419–422.
+\newblock \url{https://doi.org/10.1145/363347.363387}.
+
+\bibitem[Date et~al.(1997)Date and Darwen]{sql}
+DATE~C~J, DARWEN~H.
+\newblock A guide to the sql standard (4th ed.): A user’s guide to the
+  standard database language sql\allowbreak[M].
+\newblock USA: Addison-Wesley Longman Publishing Co., Inc., 1997.
+
+\bibitem[Textuality(2000)]{xml}
+TEXTUALITY~T.
+\newblock Extensible markup language (xml) 1.0 (second edition)\allowbreak[J].
+\newblock W3C Rec., 2000.
+
+\bibitem[Landin(1964)]{landin}
+LANDIN~P~J.
+\newblock {The Mechanical Evaluation of Expressions}\allowbreak[J/OL].
+\newblock The Computer Journal, 1964, 6\penalty0 (4):\penalty0 308-320.
+\newblock \url{https://doi.org/10.1093/comjnl/6.4.308}.
 
 \bibitem[Culpepper et~al.(2019)Culpepper, Felleisen, Flatt, and
   Krishnamurthi]{frommacro}
@@ -44,6 +90,38 @@ POMBRIO~J, KRISHNAMURTHI~S.
 \newblock SIGPLAN Not., 2015, 50\penalty0 (9):\penalty0 75–87.
 \newblock \url{https://doi.org/10.1145/2858949.2784755}.
 
+\bibitem[Pombrio et~al.(2017)Pombrio, Krishnamurthi, and Wand]{resugaringscpoe}
+POMBRIO~J, KRISHNAMURTHI~S, WAND~M.
+\newblock Inferring scope through syntactic sugar\allowbreak[J/OL].
+\newblock Proc. ACM Program. Lang., 2017, 1\penalty0 (ICFP).
+\newblock \url{https://doi.org/10.1145/3110288}.
+
+\bibitem[Pombrio et~al.(2018)Pombrio and Krishnamurthi]{resugaringtype}
+POMBRIO~J, KRISHNAMURTHI~S.
+\newblock Inferring type rules for syntactic sugar\allowbreak[J/OL].
+\newblock SIGPLAN Not., 2018, 53\penalty0 (4):\penalty0 812–825.
+\newblock \url{https://doi.org/10.1145/3296979.3192398}.
+
+\bibitem[Felleisen et~al.(1992)Felleisen and Hieb]{reduction}
+FELLEISEN~M, HIEB~R.
+\newblock The revised report on the syntactic theories of sequential control
+  and state\allowbreak[J/OL].
+\newblock Theor. Comput. Sci., 1992, 103\penalty0 (2):\penalty0 235–271.
+\newblock \url{https://doi.org/10.1016/0304-3975(92)90014-7}.
+
+\bibitem[Church et~al.(1936)Church and Rosser]{churchrosser}
+CHURCH~A, ROSSER~J~B.
+\newblock Some properties of conversion\allowbreak[J/OL].
+\newblock Transactions of the American Mathematical Society, 1936, 39\penalty0
+  (3):\penalty0 472-482.
+\newblock \url{http://www.jstor.org/stable/1989762}.
+
+\bibitem[Plotkin(2004)]{structural}
+PLOTKIN~G.
+\newblock A structural approach to operational semantics\allowbreak[J/OL].
+\newblock J. Log. Algebr. Program., 2004, 60-61:\penalty0 17-139.
+\newblock DOI: \doi{10.1016/j.jlap.2004.05.001}.
+
 \bibitem[Plotkin(1975)]{PLOTKIN}
 PLOTKIN~G.
 \newblock Call-by-name, call-by-value and the λ-calculus\allowbreak[J/OL].
@@ -52,13 +130,6 @@ PLOTKIN~G.
 \newblock
   \url{http://www.sciencedirect.com/science/article/pii/0304397575900171}.
 \newblock DOI: \doi{https://doi.org/10.1016/0304-3975(75)90017-1}.
-
-\bibitem[Felleisen et~al.(1992)Felleisen and Hieb]{reduction}
-FELLEISEN~M, HIEB~R.
-\newblock The revised report on the syntactic theories of sequential control
-  and state\allowbreak[J/OL].
-\newblock Theor. Comput. Sci., 1992, 103\penalty0 (2):\penalty0 235–271.
-\newblock \url{https://doi.org/10.1016/0304-3975(92)90014-7}.
 
 \bibitem[Curry(1930)]{SKI}
 CURRY~H~B.

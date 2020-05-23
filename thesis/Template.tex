@@ -161,8 +161,14 @@
 \normalsize
 \linespread{1.5}\selectfont
 %小四号，宋体/Time new roman，1.5倍行距
+
+
+
 \chapter*{摘要}
-随着计算机科学的普及和编程语言的发展，编程语言、特别是领域特定语言的应用越来越日常化。语法糖作为实现领域特定语言的一项重要技术在近年来发展火热，相关的研究\upcite{resugaring}以及为DSL而诞生的编程语言(例如Racket\upcite{racket}、Scala)都有显著进展显著。
+
+\phantomsection
+\addcontentsline{toc}{chapter}{摘要} %手动加入目录
+随着计算机科学的普及和程序设计语言的发展，程序设计语言、特别是领域特定语言\upcite{dsl}的应用越来越日常化。语法糖作为实现领域特定语言的一项重要技术在近年来发展火热，相关的研究\upcite{resugaring}\upcite{sugarj}以及为DSL而诞生的程序设计语言(例如Racket\upcite{racket}、Scala\upcite{scala})都有显著进展显著。
 
 重组糖\upcite{resugaring}是一项关于语法糖的研究---将嵌入在内部语言的语法糖表达式执行序列在表面语言（语法糖）上提取出来，以得到在语法糖层面的执行序列（详见\ref{mark:resugaring}）。其目的是为了解决语法糖解糖的单向性\ref{mark:onedirect}，让语法糖表达式的执行过程能表现在语法糖结构上。但现存方法很难处理递归糖、高阶糖等语法糖特性，且对于卫生宏处理很繁琐。
 
@@ -174,7 +180,6 @@
 \noindent{\bfseries\songti 关键词: 领域特定语言、语法糖、解释器、重写系统 }
 
 
-\addcontentsline{toc}{chapter}{摘要} %手动加入目录
 \fancypagestyle{plain} %因为latex默认每章第一页是plain所以需要重置一下plain和说明统一
 {
 	\fancyhf{} %清空
@@ -210,12 +215,17 @@
 \small
 \linespread{1.5}\selectfont
 %5号，Time new roman，1.5倍行距
+
 \chapter*{\bfseries Abstract}
-With the popularization of computer science and the development of programming languages, the application of programming languages, especially domain-specific languages, is becoming more and more routine. Syntactic sugar, as an important technique for implementing a domain-specific language, has developed fiercely in recent years, and related research\upcite{resugaring} and programming languages born for DSL(such as Racket) are making significant progress.
+\phantomsection
+\addcontentsline{toc}{chapter}{\bfseries Abstract} %Abstract加粗
+With the popularization of computer science and the development of programming languages, the application of programming languages, especially domain-specific languages\cite{dsl}, is becoming more and more routine. Syntactic sugar, as an important technique for implementing a domain-specific language, has developed fiercely in recent years, and related research\upcite{resugaring} and programming languages born for DSL(such as Racket) are making significant progress.
 
 Resugaring\upcite{resugaring} is a research on syntactic sugar--lifting the evaluation sequence of syntactic sugar expression embedded in the core language on the surface language (syntactic sugar) to get the sequence at the level of syntactic sugar.(see detail\ref{mark:resugaring}) The purpose of resugaring is to solve the unidirectionality of desugaring the syntactic sugar expression\ref{mark:onedirect}, so that the evaluation sequence of syntactic sugar expression can be expressed in the structure of syntactic sugar. However, the existing methods are difficult to deal with the features of syntactic sugar such as recursive sugar and high-order sugar, and are very cumbersome for hygienic macro processing.
 
 We designed a lightweight resugaring algorithm based on PLT Redex\upcite{SEwPR}, simply implemented a set of tools and tested on some examples. The results show that our lightweight resugaring algorithm can handle more syntactic sugar features than existing resugaring algorithms, also handle features like hygienic macro more simply. In addition, our method is more flexible in the way of representing syntactic sugar.
+
+
 \bigskip
 \noindent
 
@@ -223,7 +233,6 @@ We designed a lightweight resugaring algorithm based on PLT Redex\upcite{SEwPR},
 
 
 
-\addcontentsline{toc}{chapter}{\bfseries Abstract} %Abstract加粗
 \fancypagestyle{plain}
 {
 	\fancyhf{}
@@ -261,6 +270,7 @@ We designed a lightweight resugaring algorithm based on PLT Redex\upcite{SEwPR},
 \renewcommand{\headrulewidth}{0.7pt}
 \renewcommand{\footrulewidth}{0pt}
 \renewcommand{\contentsname}{\centerline{全文目录}}
+\phantomsection
 \tableofcontents
 \addcontentsline{toc}{chapter}{全文目录}
 \clearpage
@@ -294,63 +304,17 @@ We designed a lightweight resugaring algorithm based on PLT Redex\upcite{SEwPR},
 \input{chapter/introduction}
 \input{chapter/background}
 \input{chapter/algorithm}
-\input{chapter/evaluation}
 \input{chapter/implement}
+\input{chapter/evaluation}
 \input{chapter/conclusion}
-%\input{tmp}
 
 
-\chapter*{参考文献}
-\noindent
-\begin{enumerate}[{[1]}]
-\small
-	\item 期刊
-	\item 网络文档
-\end{enumerate}
-
-1.	期刊  作者. 论文名. 刊名, 出版年份, 卷号(期号): 起始-截止页
-
-2.	专著  作者. 书名. 版本(第一版不写). 出版城市: 出版社, 出版年份: 起始-截止页
-
-3.	论文集  论文作者. 论文题目//编者. 论文集名: 其他题名信息. 出版城市(或者会议城市): 出版者, 出版年: 引文起始-截止页码
-
-4.	学位论文  作者. 学位论文题名. 城市: 论文保存单位, 年份
-
-5.	网络文献  作者. 题名[文献类型标志/文献载体标志]. 出版地: 出版者, 出版年(更新日期)[引用日期]. 获取和访问路径
-
-*注意: 作者姓前名后, 超过3名作者列前3名, 后加“, 等”; 英文姓名, 姓前名后, 姓首字母大写, 名缩写; 文献的项目要完整, 各项的顺序和标点要和格式要求一致; 未公开发表的论文、报告不列入正式文献, 如有必要可在正文当页下加注。英文文献格式同上。参考文献在正文中按出现顺序用[1], [2]......在右上角标注, 放在“参考文献”中时, 用[1], [2], ...顺序标注。
-
-
-
+\clearpage
+\phantomsection
 \addcontentsline{toc}{chapter}{参考文献}
-\fancypagestyle{plain}
-{
-	\fancyhf{}
-	\fancyhead[RE,RO]{参考文献}
-	\fancyhead[LE,LO]{北京大学本科生毕业论文}
-	\fancyfoot[CO,CE]{~\thepage~}
-	\renewcommand{\headrulewidth}{0.7pt}
-	\renewcommand{\footrulewidth}{0pt}
-}
-\fancyhf{}
-\fancyhead[RE,RO]{参考文献}
-\fancyhead[LE,LO]{北京大学本科生毕业论文}
-\fancyfoot[CO,CE]{~\thepage~}
-\renewcommand{\headrulewidth}{0.7pt}
-\renewcommand{\footrulewidth}{0pt}
-
-
-
-
-
 \bibliographystyle{gbt7714-numerical}
 
 \bibliography{ref}
-这是参考“参考文献”，主要用来看引用的顺序，请手动些参考文献或自行写程序，最终编译请删除
-\clearpage
-
-
-
 
 
 \linespread{1}\selectfont
@@ -362,27 +326,15 @@ We designed a lightweight resugaring algorithm based on PLT Redex\upcite{SEwPR},
 
 \noindent 本研基金
 \begin{enumerate}
-	\item 基金名称. 基金类型. 指导老师. 基金支持年限
+	\item 北京大学本科生科研校长基金. 基金类型. 熊英飞. 1年
 \end{enumerate}
 
 \noindent 各种科研项目
 \begin{enumerate}
-	\item 项目名称. 项目类型
+	\item TV backscatter. 课程项目
+	\item 使用归纳逻辑编程的程序静态分析. 本科生科研
+	\item DryadSynth Solver. 暑期科研
 \end{enumerate}
-
-格式下
-
-期刊：
-
-全部作者. 论文名. 期刊名, 出版年份, 卷号(期号): 起始-截止页
-
-会议论文：
-
-全部作者. 论文名. 会议名, 会议举办地, 会议举办时间, 起始-截止页
-
-专利
-
-全部专利申请人. 专利名称. 专利申请号. 专利申请日期. 国别
 
 
 
@@ -412,7 +364,19 @@ We designed a lightweight resugaring algorithm based on PLT Redex\upcite{SEwPR},
 \normalsize
 %正文，小四号，中文宋体，英文Time new roman，1.5倍行距
 \chapter*{致谢}
+感谢胡振江老师对我毕设工作期间的指导。前期和胡老师的对DSL项目的多次探讨激发了本文的初步想法，并在胡老师的指引下对工作不断完善。胡老师对我研究方法、思考方式、写作等方面的指导都受益匪浅。尽管有时进度缓慢，胡老师依然对有限的进展予以肯定，让我整个项目的进度没有耽误，最终能够让标志着本科结束的工作有一个令自己满意的结果。
 
+感谢熊英飞老师对我本科生科研期间及之后的指导。熊老师是我正式步入科研的引路人，且对我很多学习习惯的培养、和我对工作生活态度的探讨对我帮助很大。并且毕设是熊老师推荐我和胡老师做的。
+
+感谢17级本科生关智超同学。关智超同学在今年3月加入胡老师和我的项目讨论，并在之后对我论文写作方面提出宝贵建议。特别是“resugaring”一词的中文翻译---重组糖是关智超同学提出的。
+
+感谢我的舍友们。尽管由于疫情原因，本文工作及写作大部分时间不是在宿舍进行的，但他们三个人努力学习，创造宿舍良好的学习环境，让不爱学习的我羞愧难当，没有完全不学习；并且宿舍的卫生条件、生活气氛等等都十分不错，让我在本科三年半的时间里生活愉快。
+
+感谢女朋友周宇航同学。周宇航同学在我整个本科期间督促我学习、陪我玩、帮助我、支持我。毕设工作的代码和论文经常是在夜间进行，她和她的猫经常熬夜陪我。
+
+感谢父母和其他家人。他们一直在支持我的各种选择，并且在物质上和精神上帮助我。父母对我要求极低，导致我有一个自认为不错的性格，以至于快乐的生活。
+
+感谢本科期间遇见的所有老师和同学及其他人士、动植物和其他事物。这些人和事构成了我本科期间的无数的碎片化回忆。
 
 
 \addcontentsline{toc}{chapter}{致谢}
