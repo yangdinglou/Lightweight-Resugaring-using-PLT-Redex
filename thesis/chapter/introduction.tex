@@ -5,21 +5,21 @@
 \addtocontents{los}{\protect\addvspace{10pt}}
 
 \section{研究背景}
-领域特定语言的研究及应用日益广泛，其中不乏正则表达式\cite{regexp}、SQL\cite{sql}、XML\cite{xml}等应用场合广泛的领域特定语言。而随着计算机科学技术的发展，DSL的应用场景步入了日常生活中（引用IFTTT、IOS快捷指令）。而在一般场合中，语言设计者是计算机科学家，语言使用者却是领域内的专家。因此，当领域特定语言的使用出现一些问题时，领域内的专家（使用者）需要得到领域特定的信息来进行处理。
+领域特定语言\cite{dsl}的研究及应用日益广泛，其中不乏正则表达式\cite{regexp}、SQL\cite{sql}、XML\cite{xml}等应用场合广泛的领域特定语言。而随着计算机科学技术的发展，DSL的应用场景步入了日常生活中，如IFTTT应用、IOS快捷指令。而在一般场合中，语言设计者是计算机科学家，语言使用者却是领域内的专家。因此，当领域特定语言的使用出现一些问题时，领域内的专家（使用者）需要得到领域特定的信息来进行处理。
 
-语法糖是近些年一种流行的领域特定语言实现方法，其方法源于Peter Landin对λ演算应用计算的替换\cite{landin}。经过Lisp的宏系统（Macro），Scheme语言的发展，再到Racket语言的扩展\cite{frommacro}，如今形成了比较完善的宏系统来用语法糖构造DSL。语法糖构造DSL的最主要优点就是简单高效，语言设计者只需要写一个简单的映射，就可以构造DSL。
+语法糖是近些年一种流行的领域特定语言实现方法，其方法源于Peter Landin对λ演算应用计算的替换\cite{landin}。函数式语言方面，经过Lisp的宏系统（Macro），Scheme语言的发展，再到Racket\cite{racket}语言的扩展\cite{frommacro}，如今形成了比较完善的宏系统来用语法糖构造DSL。而像如Scala\cite{scala}这种结合了面向对象和函数式语言的程序设计语言也对语法糖的构造很重视。语法糖相关的研究\cite{sugarj}也十分火热。
 
-然而，语法糖的一项缺陷，导致其应用领域大多局限于计算机科学内部。我们先来看下面这个例子。
+语法糖构造DSL的最主要优点就是简单高效，语言设计者只需要写一个简单的映射，就可以构造DSL。然而，语法糖的一项缺陷，导致其应用领域大多局限于计算机科学内部。我们先来看下面这个例子。
 
-	我们拟构造一个自动化饭店的DSL\ref{fig:restaurant}为例。箭头表示语法糖展开的形式。
+	我们拟构造一个自动化饭店的DSL（如图\ref{fig:restaurant}）为例。
 	
-	\begin{figure}[ht]
+	\begin{figure}[H]
 		\centering
 		\includegraphics[width=12cm]{images/chapter1/restaurant.png}
 		\caption{自动化饭店DSL}
 		\label{fig:restaurant}
 	\end{figure}
-
+其中箭头表示语法糖展开的形式。
 在这个DSL内，执行
 
 \begin{flushleft}
@@ -27,7 +27,7 @@
 \end{flushleft}
 
 因为其过程中会有很多中间过程，我们期望得到的执行过程是这样的\ref{fig:expect}。
-\begin{figure}[ht]
+\begin{figure}[H]
 	\begin{center}
 		\framebox[35em][l]{
 			\parbox[t]{\textwidth}{
@@ -52,7 +52,7 @@
 
 
 而实际上，这个DSL的执行序列是这样的\ref{fig:fact}。（先将语法糖展开成难懂的内部语言）
-\begin{figure}[ht]
+\begin{figure}[H]
 	\begin{center}
 		\framebox[35em][l]{
 			\parbox[t]{\textwidth}{
@@ -133,7 +133,7 @@
 我们将在第二章对重组糖问题进行形式化定义。在后文中，将领域特定语言视为外部语言，通用语言视为内部语言。
 
 \section{现有工作及存在的问题}
-我们的方法主要借鉴和对比Resugaring系列\cite{resugaring}\cite{hygienic}\cite{resugaringscpoe}\cite{resugaringtype}的一些工作，其中前两篇和本文的工作紧密相关，我们将简单讲述一下这两篇工作的方法及缺陷。
+我们的方法主要借鉴和对比Resugaring系列\cite{resugaring}\cite{hygienic}\cite{resugaringscpoe}\cite{resugaringtype}的一些工作，其中前两篇和本文的工作紧密相关，我们将在这里简单讲述一下这两篇工作的方法及缺陷，并在相关工作部分\ref{mark:relative}进一步讨论。
 
 第一篇工作\upcite{resugaring}提出了重组糖问题的概念，并介绍了一个解决重组糖的方法，其基本思想是将内部语言的求值序列每一步加上标签，进行搜索（匹配和替代），试图得到其对应的在外部语言的表示。这也是重组糖名字的由来---将解糖的语法糖表达式重新组成到语法糖。
 

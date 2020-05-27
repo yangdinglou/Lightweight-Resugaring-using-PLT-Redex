@@ -41,7 +41,7 @@
 对于语法糖的形式限制为如下。
 
 \fbox{
-$(\mbox{Surfid}\;e_{1}\;e_{2}\;\ldots)→(Headid\; \ldots)$
+$(\mbox{Surfid}\;e_{1}\;e_{2}\;\ldots) ~→~ (\mbox{Headid}\; \ldots)$
 }
 
 其中的主要约束是在语法糖这一侧不能出现形如$(\mbox{Surfid}\;\ldots\;(e1\;e2)\ldots))$这种形式。这对语法糖的表达能力并不会造成影响。\footnote{此约束主要是为了算法描述和实现更简单。}
@@ -107,61 +107,46 @@ $(\mbox{Surfid}\;e_{1}\;e_{2}\;\ldots)→(Headid\; \ldots)$
 
 
 \section{算法描述}
-本节讨论建立在符合约定的语言基础上。
+本节讨论建立在上一节中符合约定的语言基础上。
 
 \subsection{核心算法}
 
-{\bfseries 核心算法f}\footnote{核心思想：对于每个表达式Exp，我们将对它所有规约规则中选择一条符合resugaring的仿真性规则的规约，且尽可能不破坏任何语法糖。}定义如下图\ref{fig:corealgo}：（输入为一个任意Exp，输出为应用应该执行的规约规则后的表达式）
+{\bfseries 核心算法f}\footnote{核心思想：对于每个表达式Exp，我们将对它所有规约规则中选择一条符合resugaring的仿真性规则的规约，且尽可能不破坏任何语法糖。}定义如下\ref{alg:f}。
+\begin{algorithm}
+	\caption{核心算法f}
+	\label{alg:f}     % 给算法一个标签，以便其它地方引用该算法
+	\begin{algorithmic}[1]       % 数字 "1" 表示为算法显示行号的时候，每几行显示一个行号，如："1" 表示每行都显示行号，"2" 表示每两行显示一个行号，也是为了方便其它地方的引用
+		\REQUIRE ~~\\      % 算法的输入参数说明部分
+		符合规定语言的表达式$Exp$=$(Headid~Subexp_{1}~\ldots~Subexp_{\ldots})$
+		\ENSURE ~~\\     % 算法的输出说明
+		$Exp$的所有规约规则中选择合适的规则规约后的$Exp'$，使得该过程满足重组糖性质
+		\STATE     Let $ListofExp'$ = $\{Exp'_{1}\;,Exp'_{2}~\ldots\}$
+		\IF {$Exp$ is Coreexp or  Commonexp or OtherCommonexp}
+			\IF {Lengthof($ListofExp'$)==0}
+			\RETURN null; //\hfill Rule1.1
+			\ELSIF {Lengthof($ListofExp'$)==1}
+			\RETURN first($ListofExp'$); //\hfill Rule1.2
+			\ELSE 
+			\RETURN $Exp'_{i}$ = $(Headid~Subexp_{1}~\ldots~Subexp'_{i}~\ldots)$; //where i is the index of subexp which have to be reduced. \hfill Rule1.3
+			\ENDIF
+		\ELSE 
+			\IF {$Exp$ have to be desugared}
+			\RETURN desugarsurf($Exp$); //\hfill Rule2.1
+			\ELSE
+				\STATE Let $DesugarExp'$ = desugarsurf(Exp)
+				\IF {$Subexp_{i}$ is reduced to $Subexp'_{i}$ during $f(DesugarExp')$}
+				\RETURN $Exp'_{i}$ = $(Headid~Subexp_{1}~\ldots~Subexp'_{i}~\ldots)$; //\hfill Rule2.2.1
+				\ELSE
+				\RETURN desugarsurf($Exp$); //\hfill Rule2.2.2
+				\ENDIF
+			\ENDIF
+		\ENDIF
+		
+	\end{algorithmic}
+\end{algorithm}
 
-\begin{figure}[ht]
-	\centering
-	\framebox[35em][l]{
-		\parbox{\textwidth}{
-			$f$($Exp$): \qquad \qquad \qquad \qquad \qquad \qquad \quad //$Exp$=$(Headid~Subexp_{1}~\ldots~Subexp_{\ldots})$
-			
-			\qquad Let $ListofExp'~=~\{Exp'_{1}\;,Exp'_{2}~\ldots\}$
-			
-			\qquad if (Exp is Coreexp or Commonexp or OtherCommonexp):
-			
-			\qquad \qquad if (Lengthof ($ListofExp'$) == 0): \qquad \qquad \qquad \qquad \qquad \qquad //$Rule1.3$
-			
-			\qquad \qquad \qquad return null;
-			
-			\qquad \qquad else if (Lengthof ($ListofExp'$) == 1): \qquad \qquad \qquad \qquad \qquad //$Rule1.1$
-			
-			\qquad \qquad \qquad return first($ListofExp'$);
-			
-			\qquad \qquad else:
-			
-			\qquad \qquad \qquad return $Exp'_{i}$ = $(Headid~Subexp_{1}~\ldots~Subexp'_{i}~\ldots)$; \qquad  ~//$Rule1.2$ 
-			
-			/*where i is the index of subexp which have to be reduced. */
-			
-			\qquad else if (Exp is Surfexp or OtherSurfexp):
-			
-			\qquad \qquad if (Exp have to be desugared): \qquad \qquad \qquad \qquad \qquad \qquad \quad ~//$Rule2.1$
-			
-			\qquad \qquad \qquad return desugarsurf(Exp);
-			
-			\qquad \qquad else: let DesugarExp' = desugarsurf(Exp): \qquad \qquad \qquad \qquad  ~//$Rule2.2$
 
-			
-			\qquad \qquad \qquad if ($Subexp_{i}$ is reduced to $Subexp'_{i}$ during $f(DesugarExp')$):
-			
-			\qquad \qquad \qquad \qquad return $Exp'_{i}$ = $(Headid~Subexp_{1}~\ldots~Subexp'_{i}~\ldots)$;  //$Rule2.2.1$
-			
-			\qquad \qquad \qquad else:
-			
-			\qquad \qquad \qquad \qquad return desugarsurf(Exp); \qquad \qquad \qquad \qquad \qquad  ~~~//$Rule2.2.2$
-		}
-	}
-\caption{核心算法f}
-\label{fig:corealgo}
-\end{figure}
-
-接下来对整个算法语言说明，分别解释每一个分支规则。
-
-对Exp尝试所有规约规则，得到多个可能的表达式ListofExp'=\{$Exp'_{1}$,$Exp'_{2}$,$\ldots$\}
+接下来对整个算法语言说明，分别解释每一个分支规则。对Exp尝试所有规约规则，得到多个可能的表达式ListofExp'=\{$Exp'_{1}$,$Exp'_{2}$,$\ldots$\}
 
 \begin{flushleft}
 	\large{\bfseries{
@@ -170,11 +155,12 @@ $(\mbox{Surfid}\;e_{1}\;e_{2}\;\ldots)→(Headid\; \ldots)$
 	}	
 \end{flushleft}
 \begin{itemize}
+	\item 或是已经无法被规约（ListofExp'为空），此时返回的表达式为空。\hfill $Rule1.1$
 	\item 或是将表达式规约到另一个表达式，此时只有一条规则，应用后输出Exp';
 	
-	($Rule1.1$)
-	\item 或是其规约不满足导致内部子表达式需要规约，此时因为CoreLang的定序性，只会有一个子表达式被规约（且此表达式为Surfexp），此时对该子表达式Subexp递归调用核心算法f得到Subexp’，则在ListofExp'中找到将此Exp中子表达式Subexp规约为Subexp’的表达式就是我们需要的表达式；($Rule1.2$)
-	\item 或是已经无法被规约（ListofExp'为空），此时返回的表达式为空。($Rule1.3$)
+	\hfill $Rule1.2$
+	\item 或是其规约不满足导致内部子表达式需要规约，此时因为CoreLang的定序性，只会有一个子表达式被规约（且此表达式为Surfexp），此时对该子表达式Subexp递归调用核心算法f得到Subexp’，则在ListofExp'中找到将此Exp中子表达式Subexp规约为Subexp’的表达式就是我们需要的表达式；\hfill $Rule1.3$
+	
 \end{itemize}
 
 \begin{flushleft}
@@ -184,46 +170,40 @@ $(\mbox{Surfid}\;e_{1}\;e_{2}\;\ldots)→(Headid\; \ldots)$
 	}
 \end{flushleft}
 \begin{itemize}
-	\item 如果内部子表达式无可规约的，则必然会展开该语法糖，此时输出表达式为Exp解糖后的表达式;($Rule2.1$)
+	\item 如果内部子表达式无可规约的，则必然会展开该语法糖，此时输出表达式为Exp解糖后的表达式;\hfill $Rule2.1$
 	\item 如果存在可规约的子表达式对于每个子表达式，如果可规约，则根据我们的设定，存在一条关于此子表达式的规约规则。因此每个子表达式都可能被规约的前提下，我们需要对Surfexp或OtherSurfexp的外层语法糖进行展开为DesugarExp’（此展开只有一种规约规则对应），之后对Exp’调用核心算法f（{\bfseries 单步尝试}）
 	\begin{itemize}
-		\item 如果f(DesugarExp')是对DesugarExp'的子表达式进行规约，由于此子表达式一定由Exp的子表达式组成，需要检测是哪一个子表达式$Subexp_{i}$先被规约为$Subexp'_{i}$，则在ListofExp'中将此子表达式规约的表达式就是所需要的。($Rule2.2.1$)
-		\item 如果f(DesugarExp')不是对子表达式进行规约，则说明这个糖不会被重组（此糖被展开后必然会被继续破坏），因此输出不在ListofExp'中，而是输出DesugarExp'
-			($Rule2.2.2$)
+		\item 如果f(DesugarExp')是对DesugarExp'的子表达式进行规约，由于此子表达式一定由Exp的子表达式组成，需要检测是哪一个子表达式$Subexp_{i}$先被规约为$Subexp'_{i}$，则在ListofExp'中将此子表达式规约的表达式就是所需要的。\hfill $Rule2.2.1$
+		\item 如果f(DesugarExp')不是对子表达式进行规约，则说明这个糖不会被重组（此糖被展开后必然会被继续破坏），因此输出不在ListofExp'中，而是输出DesugarExp' \hfill $Rule2.2.2$ 
 	\end{itemize}
 \end{itemize}
 
 \subsection{轻量级重组糖算法}
 
-{\bfseries 整体算法lightweight-resugaring}定义如下图\ref{fig:lwresugar}。
+{\bfseries 整体算法lightweight-resugaring}定义如下\ref{alg:lwresugar}。
 
-算法Lightweight-resugaring：给定Surfexp的表达式$Exp$，输出其重组糖序列\\
-\begin{figure}[h]
-	\centering
-	\framebox[35em][l]{
-		\parbox{\textwidth}{
-			$Lightweight-resugaring$($Exp$)
-			
-			\qquad while ($tmpexp$ == f($Exp$)))
-			
-			\qquad \qquad if ($tmpexp$ is empty):
-			
-			\qquad \qquad \qquad return;
-			
-			\qquad \qquad else if ($tmpexp$ is surfexp or commonexp):
-			
-			\qquad \qquad \qquad output $tmpexp$;
-			
-			\qquad \qquad \qquad $Lightweight-resugaring$($tmpexp$);
-			
-			\qquad \qquad else:
-			
-			\qquad \qquad \qquad $Lightweight-resugaring$($tmpexp$);
-		}
-	}
-\caption{整体算法}
-\label{fig:lwresugar}
-\end{figure}
+\begin{algorithm}
+	\caption{轻量级重组糖算法Lightweight-resugaring}
+	\label{alg:lwresugar}     % 给算法一个标签，以便其它地方引用该算法
+	\begin{algorithmic}[1]       % 数字 "1" 表示为算法显示行号的时候，每几行显示一个行号，如："1" 表示每行都显示行号，"2" 表示每两行显示一个行号，也是为了方便其它地方的引用
+		\REQUIRE ~~\\      % 算法的输入参数说明部分
+		给定Surfexp的表达式$Exp$
+		\ENSURE ~~\\     % 算法的输出说明
+		$Exp$的重组糖序列
+		\WHILE {$tmpExp$ = f($Exp$)}
+			\IF {$tmpExp$ is empty}
+			\RETURN
+			\ELSIF {$tmpExp$ is Surfexp or Commonexp}
+			\PRINT $tmpExp$;
+			\STATE Lightweight-resugaring($tmpExp$);
+			\ELSE 
+			\STATE Lightweight-resugaring($tmpExp$);
+			\ENDIF
+		\ENDWHILE
+		
+	\end{algorithmic}
+\end{algorithm}
+
 
 
 \section{正确性证明}
@@ -244,13 +224,15 @@ $(Headid\;Subexp_{1}\;Subexp_{\ldots} \ldots)$为任意可规约表达式
 
 {\bfseries 例：}
 
-$(\mbox{if}\; \#t\; Exp_{1}\; Exp_{2})$--->$Exp1$ \begin{flushright}外部规约\end{flushright}
+$(\mbox{if}\; \#t\; Exp_{1}\; Exp_{2})$ → $Exp1$ \hfill 外部规约
 
-$(\mbox{if}\; (\mbox{And}\; \#t\; \#f)\; Exp_{1}\; Exp_{2})$--->$(\mbox{if}\; (\mbox{if}\; \#t\; \#f\; \#f)\; Exp_{1}\; Exp_{2})$ \begin{flushright}表面规约\end{flushright}
+$(\mbox{if}\; (\mbox{And}\; \#t\; \#f)\; Exp_{1}\; Exp_{2})$ → $(\mbox{if}\; (\mbox{if}\; \#t\; \#f\; \#f)\; Exp_{1}\; Exp_{2})$ \hfill 表面规约
 
-$(\mbox{if}\; (\mbox{And}\; (\mbox{And}\; \#t\; \#t)\; \#t)\; \#f)\; Exp_{1}\; Exp_{2})$--->$(\mbox{if}\; (\mbox{And}\; \#t\; \#t)\; Exp_{1}\; Exp_{2})$ \begin{flushright}内部规约\end{flushright}
+$(\mbox{if}\; (\mbox{And}\; (\mbox{And}\; \#t\; \#t)\; \#t)\; \#f)\; Exp_{1}\; Exp_{2})$ → $(\mbox{if}\; (\mbox{And}\; \#t\; \#t)\; Exp_{1}\; Exp_{2})$ 
 
-对$Exp$=$(Headid\;Subexp_{1}\;Subexp_{\ldots} \ldots)$，$Exp$称为上层表达式，$Subexp_{i}$称为下层表达式。
+\hfill 内部规约
+
+{\bfseries 定义.} 对$Exp$=$(Headid\;Subexp_{1}\;Subexp_{\ldots} \ldots)$，$Exp$称为{\bfseries 上层表达式}，$Subexp_{i}$称为{\bfseries 下层表达式}。
 
 %定理 证明
 \subsection{仿真性}
@@ -271,7 +253,7 @@ $(\mbox{if}\; (\mbox{And}\; (\mbox{And}\; \#t\; \#t)\; \#t)\; \#f)\; Exp_{1}\; E
 	
 	对$Rule2.2.1$，由于仿真性的定义，重组糖的序列的每一步可以解糖到CoreLang上执行序列的步骤，因此证明仿真性只需要证明我们的序列在CoreLang上的序列有对应。我们在对$(Surfid\;Subexp_{1}\;Subexp_{\ldots}\;\ldots)$进行正常运算时，也会将其依据Surfid的规约规则进行展开；而在我们的核心算法中，我们也是这样进行单步展开，区别在于内部的糖没有规约。由于Rule2.2对Exp进行外部规约后得到DesugarExp'，并调用了f(DesugarExp')
 	\begin{itemize}
-		\item 如果DesugarExp'是$Coreexp$或$Commonexp$或$OtherCommonexp$，且其子表达式规约，因此对于将Exp完全解糖后也是该子表达式的位置进行规约，其他子表达式的内容不变，因此对Exp的该子表达式规约后完全解糖和对Exp整体先解糖再规约，得到的是相同的表达式。如下图\ref{fig:emulation}所示
+		\item 如果DesugarExp'是$Coreexp$或$Commonexp$或$OtherCommonexp$，且其子表达式规约，因此对于将Exp完全解糖后也是该子表达式的位置进行规约，其他子表达式的内容不变，因此对Exp的该子表达式规约后完全解糖和对Exp整体先解糖再规约，得到的是相同的表达式。如下图\ref{fig:emulation}所示。
 		
 		\begin{figure}[h]
 			\centering
@@ -300,6 +282,10 @@ $(\mbox{if}\; (\mbox{And}\; (\mbox{And}\; \#t\; \#t)\; \#t)\; \#f)\; Exp_{1}\; E
 \subsection{抽象性}
 抽象性：求值序列中只存在SurfLang中存在的术语，没有引入CoreLang中的术语。
 
+\begin{mythm}[仿真性]
+	我们的轻量级重组糖具有仿真性。
+\end{mythm}
+
 抽象性的正确性是显然的，因为我们在每次输出都判断了输出的$Exp$是否是$Surfexp$或$Commonexp$。（在lightweight-resugaring算法中）
 
 \subsection{覆盖性}
@@ -314,9 +300,12 @@ $(\mbox{if}\; (\mbox{And}\; (\mbox{And}\; \#t\; \#t)\; \#t)\; \#f)\; Exp_{1}\; E
 \begin{proof}[引理证明]
 	假设没有语法糖提前破坏的情况下，存在CoreLang序列中的某一项
 	
-	$Exp$=$(Headid\;Subexp_{1}\;Subexp_{\ldots} \ldots)$可被重组为
+	$Exp$ = $(Headid\;Subexp_{1}\;Subexp_{\ldots} \ldots)$可被重组为
 	
-	$ResugarExp'$=$(Surfid\;Subexp'_{1}\;Subexp'_{\ldots}\ldots)$,且没有在算法lightweight-resugaring中被表现。则说明
+	$ResugarExp'$ = $(Surfid\;Subexp'_{1}\;Subexp'_{\ldots}\ldots)$,且没有在算法
+	\begin{flushleft}
+		lightweight-resugaring中被表现。则说明
+	\end{flushleft}
 	\begin{itemize}
 		\item 或是重组糖序列中存在
 		
@@ -354,6 +343,8 @@ $(\mbox{if}\; (\mbox{And}\; (\mbox{And}\; \#t\; \#t)\; \#t)\; \#f)\; Exp_{1}\; E
 	对Rule2.2.2，因为单步尝试后发现语法糖解糖后，解糖后结构继续被破坏，因此无法还原回语法糖，也是必须破坏的语法糖。
 	
 	因此求值序列没有破坏任何不必须破坏的语法糖，核心算法f满足覆盖性。
+	
+	证毕。
 \end{proof}
 
 

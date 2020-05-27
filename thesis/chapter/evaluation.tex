@@ -7,105 +7,124 @@
 
 
 \section{应用}
-我们就不同类型（特性）的语法糖分别进行尝试。
+我们就不同类型（特性）的语法糖分别进行尝试。因为本节中有一些高阶的例子需要将λ表达式作为term输出，因此本文的测试中将λ表达式视作commonexp，因此可以输出。如果不需要的话（比如Let语法糖），将λ表达式对应内容放到coreexp中即可。
 
 \subsection{普通糖}
 
 我们首先就简单的
 
-$(and\;e1\;e2)→(if\;e1\;e2\;\#f)$
+$(and\;e1\;e2)~→~(if\;e1\;e2\;\#f)$
 
-$(or\;e1\;e2)→(if\;e1\;\#t\;e2)$
+$(or\;e1\;e2)~→~(if\;e1\;\#t\;e2)$
 糖进行测试。
 
 因为我们的CoreLang上规定的求值顺序是，对$(if \;e1\;e2\;e3)$的$e1$求到值后就规约，因此我们应该看到的是对$and$和$or$糖，先将第一个值求到值，如何对糖进行破坏。
 
-\begin{center}
-	\framebox[35em][l]{
-		\parbox[t]{\textwidth}{
-			\begin{center}
-				(and (and \#t \#f) (or \#f \#t))\\
-				↓\\
-				(and \#f (or \#f \#t))\\
-				↓\\
-				\#f
-			\end{center}
-			
+测试结果如图\ref{fig:and1}、\ref{fig:and2}。
+\begin{figure}[ht]
+	\begin{center}
+		\framebox[35em][l]{
+			\parbox[t]{\textwidth}{
+				\begin{center}
+					(and (and \#t \#f) (or \#f \#t))\\
+					↓\\
+					(and \#f (or \#f \#t))\\
+					↓\\
+					\#f
+				\end{center}
+				
+			}
 		}
-	}
-\end{center}
+	\end{center}
+	\caption{and、or糖测试1}
+	\label{fig:and1}
+\end{figure}
 
-\begin{center}
-	\framebox[35em][l]{
-		\parbox[t]{\textwidth}{
-			\begin{center}
-				(and (or \#f \#t) (or \#f \#f))\\
-				↓\\
-				(and \#t (or \#f \#f))\\
-				↓\\
-				(or \#f \#f)\\
-				↓\\
-				\#f
-			\end{center}
-			
+\begin{figure}[ht]
+	\begin{center}
+		\framebox[35em][l]{
+			\parbox[t]{\textwidth}{
+				\begin{center}
+					(and (or \#f \#t) (or \#f \#f))\\
+					↓\\
+					(and \#t (or \#f \#f))\\
+					↓\\
+					(or \#f \#f)\\
+					↓\\
+					\#f
+				\end{center}
+				
+			}
 		}
-	}
-\end{center}
-
+	\end{center}
+	\caption{and、or糖测试2}
+	\label{fig:and2}
+\end{figure}
 
 我们可以看到如上的两个例子皆按照我们预想的样子输出了重组糖序列。
 
 另外尽管我们的重组糖序列不考虑有副作用的语言，但我们依然测试了一下考虑副作用时的糖的正确性。
 
-$(Myor\;e1\;e2)→(let\;((tmp\;e1))\;(if\;tmp\;tmp\;e2))$
+对语法糖$(Myor\;e1\;e2)~→~(let\;((tmp\;e1))\;(if\;tmp\;tmp\;e2))$
 其中没有用到任何其他糖，因此我们可以期待它的效果和上面的or糖一样。
 
-\begin{center}
-	\framebox[35em][l]{
-		\parbox[t]{\textwidth}{
-			\begin{center}
-				(Myor (Myor \#f \#f) (and \#t \#t))\\
-				↓\\
-				(Myor \#f (and \#t \#t))\\
-				↓\\
-				(and \#t \#t)\\
-				↓\\
-				\#t
-			\end{center}
-			
+测试结果如图\ref{fig:myor}。
+\begin{figure}[ht]
+	\begin{center}
+		\framebox[35em][l]{
+			\parbox[t]{\textwidth}{
+				\begin{center}
+					(Myor (Myor \#f \#f) (and \#t \#t))\\
+					↓\\
+					(Myor \#f (and \#t \#t))\\
+					↓\\
+					(and \#t \#t)\\
+					↓\\
+					\#t
+				\end{center}
+				
+			}
 		}
-	}
-\end{center}
+	\end{center}
+	\caption{Myor糖测试}
+	\label{fig:myor}
+\end{figure}
+
 结果显示我们的方法确实正确得到了该重组糖的序列。
 
 \subsection{复合糖}
 
 尽管和普通糖没有本质区别，但本节测试的糖在解糖后依然存在语法糖结构。我们构造如下Sg糖为例
 
-$(Sg\;e1\;e2\;e3)→(and\;(or\;e1\;e2)\;(not\;e3))$
+$(Sg\;e1\;e2\;e3)~→~(and\;(or\;e1\;e2)\;(not\;e3))$
+测试结果如图\ref{fig:sg}。
 
-\begin{center}
-	\framebox[35em][l]{
-		\parbox[t]{\textwidth}{
-			\begin{center}
-				(Sg (and \#t \#f) (not \#f) \#f)\\
-				↓\\
-				(Sg \#f (not \#f) \#f)\\
-				↓\\
-				(and (or \#f (not \#f)) (not \#f))\\
-				↓\\
-				(and (not \#f) (not \#f))\\
-				↓\\
-				(and \#t (not \#f))\\
-				↓\\
-				(not \#f)\\
-				↓\\
-				\#t
-			\end{center}
-			
+\begin{figure}[ht]
+	\begin{center}
+		\framebox[35em][l]{
+			\parbox[t]{\textwidth}{
+				\begin{center}
+					(Sg (and \#t \#f) (not \#f) \#f)\\
+					↓\\
+					(Sg \#f  (not \#f) \#f)\\
+					↓\\
+					(and (or \#f  (not \#f)) (not \#f))\\
+					↓\\
+					(and (not \#f) (not \#f))\\
+					↓\\
+					(and \#t (not \#f))\\
+					↓\\
+					(not \#f)\\
+					↓\\
+					\#t
+				\end{center}
+			}
 		}
-	}
-\end{center}
+	\end{center}
+\caption{Sg糖测试}
+\label{fig:sg}
+\end{figure}
+
 
 
 通过简单的展开验证我们发现，对于该语法糖表达式我们的方法确实做到了在语法糖需要展开的时候展开。
@@ -116,83 +135,93 @@ $(Sg\;e1\;e2\;e3)→(and\;(or\;e1\;e2)\;(not\;e3))$
 
 {\bfseries 例：}
 
-对语法糖$(Let\;x\;v\;exp)$→$(Apply\;(\lambda\;(x)\;exp)\;v)$
+对语法糖$(Let\;x\;v\;exp)$ → $(Apply\;(\lambda\;(x)\;exp)\;v)$
 
 表达式$(Let\;x\;1\;(Let\;x\;2\;(+\;x\;1)))$中的(+ x 1)将用值为2的x，因为他在内部Let的作用域内。
 
-实现卫生宏的方法有很多，但对于现有的重组糖方法，卫生宏的重组糖\upcite{hygienic}并不是那么容易。而在我们的方法中，实现卫生宏的重组糖很简单。
+实现卫生宏的方法有很多，但对于现有的重组糖方法，卫生宏的重组糖\cite{hygienic}并不是那么容易。而在我们的方法中，实现卫生宏的重组糖很简单。
 
 以表达式$(Let\;x\;1\;(Let\;x\;2\;(+\;x\;1)))$为例。我们会先将它单步展开到
 $(Apply\;(\lambda\;(x)\;(Let\;x\;2\;(+\;x\;1)))\;1)$，接着用Apply的规则进行规约，发现将$(Let\;x\;2\;(+\;x\;1)))$中的x置换为1后，表达式并不符合规则，因此这不是一条有效的规约，不能对外层Let糖先展开。因此输出的第一个重组糖中间序列是$(Let\;x\;1\;(+\;2\;1))$
 
 而在实现过程中，我们发现借助PLT Redex的$\#:refers-to$命令，我们可以更简单的实现更漂亮的卫生宏重组糖。
 
-测试结果如下。
-\begin{center}
-	\framebox[35em][l]{
-		\parbox[t]{\textwidth}{
-			\begin{center}
-				(Let x (+ 1 2) (+ x (Let x (+ 1 4) (+ x 1))))\\
-				↓\\
-				(Let x 3 (+ x (Let x (+ 1 4) (+ x 1))))\\
-				↓\\
-				((λ (x) (+ x (Let x (+ 1 4) (+ x 1)))) 3)\\
-				↓\\
-				(+ 3 (Let x (+ 1 4) (+ x 1)))\\
-				↓\\
-				(+ 3 (Let x 5 (+ x 1)))\\
-				↓\\
-				(+ 3 ((λ (x) (+ x 1)) 5))\\
-				↓\\
-				(+ 3 (+ 5 1))\\
-				↓\\
-				(+ 3 6)\\
-				↓\\
-				9
-			\end{center}
-			
+测试结果如图\ref{fig:let}。
+
+\begin{figure}[ht]
+	\begin{center}
+		\framebox[35em][l]{
+			\parbox[t]{\textwidth}{
+				\begin{center}
+					(Let x (+ 1 2) (+ x (Let x (+ 1 4) (+ x 1))))\\
+					↓\\
+					(Let x 3 (+ x (Let x (+ 1 4) (+ x 1))))\\
+					↓\\
+					((λ (x) (+ x (Let x (+ 1 4) (+ x 1)))) 3)\\
+					↓\\
+					(+ 3 (Let x (+ 1 4) (+ x 1)))\\
+					↓\\
+					(+ 3 (Let x 5 (+ x 1)))\\
+					↓\\
+					(+ 3 ((λ (x) (+ x 1)) 5))\\
+					↓\\
+					(+ 3 (+ 5 1))\\
+					↓\\
+					(+ 3 6)\\
+					↓\\
+					9
+				\end{center}
+				
+			}
 		}
-	}
-\end{center}
+	\end{center}
+	\caption{Let糖测试}
+	\label{fig:let}
+\end{figure}
+
 
 \subsection{递归糖}
 
 递归糖是对于现有重组糖方法很难处理的一种语法糖，指的是多个语法糖相互调用。在本节我们主要用如下例子说明。
 
-$(Odd\;e)$→$(if\;(>\;e\;0)\;(Even (-\;e\;1)\;\#f))$
+$(Odd\;e)$ → $(if\;(>\;e\;0)\;(Even (-\;e\;1)\;\#f))$
 
-$(Even\;e)$→$(if\;(>\;e\;0)\;(Odd (-\;e\;1)\;\#t))$
+$(Even\;e)$ → $(if\;(>\;e\;0)\;(Odd (-\;e\;1)\;\#t))$
 
-看似不复杂的两条语法糖规则，对于现有方法来说并不是一件容易的事情。具体原因我们将在下一高阶糖和下一节中仔细探讨。测试结果如下：
-
-\begin{center}
-	\framebox[35em][l]{
-		\parbox[t]{\textwidth}{
-			\begin{center}
-				(Odd 4)\\
-				↓\\
-				(Even (- 4 1))\\
-				↓\\
-				(Even 3)\\
-				↓\\
-				(Odd (- 3 1))\\
-				↓\\
-				(Odd 2)\\
-				↓\\
-				(Even (- 2 1))\\
-				↓\\
-				(Even 1)\\
-				↓\\
-				(Odd (- 1 1))\\
-				↓\\
-				(Odd 0)\\
-				↓\\
-				\#f
-			\end{center}
-			
+看似不复杂的两条语法糖规则，对于现有方法来说并不是一件容易的事情。具体原因我们将在下一高阶糖和下一节中仔细探讨。测试结果如图\ref{fig:rec}。
+\begin{figure}[ht]
+	\begin{center}
+		\framebox[35em][l]{
+			\parbox[t]{\textwidth}{
+				\begin{center}
+					(Odd 4)\\
+					↓\\
+					(Even (- 4 1))\\
+					↓\\
+					(Even 3)\\
+					↓\\
+					(Odd (- 3 1))\\
+					↓\\
+					(Odd 2)\\
+					↓\\
+					(Even (- 2 1))\\
+					↓\\
+					(Even 1)\\
+					↓\\
+					(Odd (- 1 1))\\
+					↓\\
+					(Odd 0)\\
+					↓\\
+					\#f
+				\end{center}
+				
+			}
 		}
-	}
-\end{center}
+	\end{center}
+	\caption{递归糖Odd、Even测试}
+\label{fig:rec}
+\end{figure}
+
 
 \subsection{高阶糖}
 
@@ -210,67 +239,76 @@ $(Even\;e)$→$(if\;(>\;e\;0)\;(Odd (-\;e\;1)\;\#t))$
 	
 	$(if\;(e\;v_1)\;(cons\;v_1\;(filter\;e\;(list\;v_2\ldots)))\;(filter\;e\;(list\;v_2\ldots)))$
 	
-	$(filter\;e\;(list))$→$(list)$
+	$(filter\;e\;(list))$ → $(list)$
 \end{flushleft}
 
 可以看出，对map糖我们将边界条件用解糖后的if表达式进行了限制；而对filter糖，我们用两个糖的参数区分了不同的条件用来表示边界条件。在保证同名不同参数的糖没有二义性的前提下，我们允许一糖多参，让书写语法糖更加简单。
 
-测试结果如下
-\begin{center}
-	\framebox[35em][l]{
-		\parbox[t]{\textwidth}{
-			\begin{center}
-				(map (λ (x) (+ 1 x)) (list 1 2 3))\\
-				↓\\
-				(cons 2 (map (λ (x) (+ 1 x)) (list 2 3)))\\
-				↓\\
-				(cons 2 (cons 3 (map (λ (x) (+ 1 x)) (list 3))))\\
-				↓\\
-				(cons 2 (cons 3 (cons 4 (map (λ (x) (+ 1 x)) (list)))))\\
-				↓\\
-				(cons 2 (cons 3 (cons 4 (list))))\\
-				↓\\
-				(cons 2 (cons 3 (list 4)))\\
-				↓\\
-				(cons 2 (list 3 4))\\
-				↓\\
-				(list 2 3 4)
-			\end{center}
-			
+测试结果如图\ref{fig:map}、\ref{fig:filter}。
+\begin{figure}[ht]
+	\begin{center}
+		\framebox[35em][l]{
+			\parbox[t]{\textwidth}{
+				\begin{center}
+					(map (λ (x) (+ 1 x)) (list 1 2 3))\\
+					↓\\
+					(cons 2 (map (λ (x) (+ 1 x)) (list 2 3)))\\
+					↓\\
+					(cons 2 (cons 3 (map (λ (x) (+ 1 x)) (list 3))))\\
+					↓\\
+					(cons 2 (cons 3 (cons 4 (map (λ (x) (+ 1 x)) (list)))))\\
+					↓\\
+					(cons 2 (cons 3 (cons 4 (list))))\\
+					↓\\
+					(cons 2 (cons 3 (list 4)))\\
+					↓\\
+					(cons 2 (list 3 4))\\
+					↓\\
+					(list 2 3 4)
+				\end{center}
+				
+			}
 		}
-	}
-\end{center}
+	\end{center}
+	\caption{高阶map糖测试}
+\label{fig:map}
+\end{figure}
 
-\begin{center}
-	\framebox[35em][l]{
-		\parbox[t]{\textwidth}{
-			\begin{center}
-				(filter (λ (x) (and (> x 3) (< x 6))) (list 1 2 3 4 5 6 7))\\
-				↓\\
-				(filter (λ (x) (and (> x 3) (< x 6))) (list 2 3 4 5 6 7))\\
-				↓\\
-				(filter (λ (x) (and (> x 3) (< x 6))) (list 3 4 5 6 7))\\
-				↓\\
-				(filter (λ (x) (and (> x 3) (< x 6))) (list 4 5 6 7))\\
-				↓\\
-				(cons 4 (filter (λ (x) (and (> x 3) (< x 6))) (list 5 6 7)))\\
-				↓\\
-				(cons 4 (cons 5 (filter (λ (x) (and (> x 3) (< x 6))) (list 6 7))))\\
-				↓\\
-				(cons 4 (cons 5 (filter (λ (x) (and (> x 3) (< x 6))) (list 7))))\\
-				↓\\
-				(cons 4 (cons 5 (filter (λ (x) (and (> x 3) (< x 6))) (list))))\\
-				↓\\
-				(cons 4 (cons 5 (list)))\\
-				↓\\
-				(cons 4 (list 5))\\
-				↓\\
-				(list 4 5)
-			\end{center}
-			
+\begin{figure}[H]
+	\begin{center}
+		\framebox[35em][l]{
+			\parbox[t]{\textwidth}{
+				\begin{center}
+					(filter (λ (x) (and (> x 3) (< x 6))) (list 1 2 3 4 5 6 7))\\
+					↓\\
+					(filter (λ (x) (and (> x 3) (< x 6))) (list 2 3 4 5 6 7))\\
+					↓\\
+					(filter (λ (x) (and (> x 3) (< x 6))) (list 3 4 5 6 7))\\
+					↓\\
+					(filter (λ (x) (and (> x 3) (< x 6))) (list 4 5 6 7))\\
+					↓\\
+					(cons 4 (filter (λ (x) (and (> x 3) (< x 6))) (list 5 6 7)))\\
+					↓\\
+					(cons 4 (cons 5 (filter (λ (x) (and (> x 3) (< x 6))) (list 6 7))))\\
+					↓\\
+					(cons 4 (cons 5 (filter (λ (x) (and (> x 3) (< x 6))) (list 7))))\\
+					↓\\
+					(cons 4 (cons 5 (filter (λ (x) (and (> x 3) (< x 6))) (list))))\\
+					↓\\
+					(cons 4 (cons 5 (list)))\\
+					↓\\
+					(cons 4 (list 5))\\
+					↓\\
+					(list 4 5)
+				\end{center}
+				
+			}
 		}
-	}
-\end{center}
+	\end{center}
+	\caption{高阶filter糖测试}
+	\label{fig:filter}
+\end{figure}
+
 
 
 我们接下来讨论为什么我们的方法能处理递归语法糖。以
@@ -281,7 +319,7 @@ $(map\;(\lambda\;(x)\;(+\;1\;x))\;(list\;1\;2\;3))$为例。如果将该糖完�
 	
 	$\qquad(list)$
 	
-	$\qquad(cons\;((\lambda\;(x)\;(+\;1\;x))\;(first\;(list\;1\;2\;3)))$
+	$\qquad(cons\;((\lambda\;(x)\;(+\;1\;x))\;(first\;(list\;1\;2\;3)))$ \qquad \qquad 接下页
 	
 	$\qquad\qquad(if\;(empty\;(rest\;(list\;1\;2\;3)))$
 	
@@ -303,36 +341,40 @@ $(map\;(\lambda\;(x)\;(+\;1\;x))\;(list\;1\;2\;3))$为例。如果将该糖完�
 我们的工具设计之初以call-by-value的λ演算作为内部语言的基础。而实际应用时，惰性求值，也就是call-by-need也是比较常见的。我们试图构造一个惰性求值λ演算的语法糖。
 
 \begin{flushleft}
-	$(shell~(\lambda_{N}~x~\ldots~e))$→$(\lambda~(x~\ldots)~(shell~e))$
+	$(shell~(\lambda_{N}~x~\ldots~e))$ → $(\lambda~(x~\ldots)~(shell~e))$
 	
-	$(shell~(e_{1}~e_{2}))$→$((shell~e_{1})~(\lambda~(x_{new})~(shell~e_{2})))$
+	$(shell~(e_{1}~e_{2}))$ → $((shell~e_{1})~(\lambda~(x_{new})~(shell~e_{2})))$
 	
-	$(shell~(\lambda~(x~\ldots)~(shell~e)))$→$e$
+	$(shell~(\lambda~(x~\ldots)~(shell~e)))$ → $e$
 \end{flushleft}
 
-并进行一个样例测试。
-
-\begin{center}
-	\framebox[35em][l]{
-		\parbox[t]{\textwidth}{
-			\begin{center}
-				(shell (((λN x y x) xx) ((λN x x) yy)))\\
-				↓\\
-				((shell ((λN x y x) xx)) (λ ($x_{new}$) (shell ((λN x x) yy))))\\
-				↓\\
-				(((shell (λN x y x)) (λ ($x_{new1}$) (shell xx))) (λ ($x_{new}$) (shell ((λN x x) yy))))\\
-				↓\\
-				(((λ (x y) (shell x)) (λ ($x_{new1}$) (shell xx))) (λ ($x_{new}$) (shell ((λN x x) yy))))\\
-				↓\\
-				((λ (y) (shell (λ ($x_{new1}$) (shell xx)))) (λ ($x_{new}$) (shell ((λN x x) yy))))\\
-				↓\\
-				(shell (λ ($x_{new1}$) (shell xx)))\\
-				↓\\
-				xx
-			\end{center}
+并进行一个样例测试，结果如图\ref{fig:lazy}。
+\begin{figure}[h]
+	\begin{center}
+		\framebox[35em][l]{
+			\parbox[t]{\textwidth}{
+				\begin{center}
+					(shell (((λN x y x) xx) ((λN x x) yy)))\\
+					↓\\
+					((shell ((λN x y x) xx)) (λ ($x_{new}$) (shell ((λN x x) yy))))\\
+					↓\\
+					(((shell (λN x y x)) (λ ($x_{new1}$) (shell xx))) (λ ($x_{new}$) (shell ((λN x x) yy))))\\
+					↓\\
+					(((λ (x y) (shell x)) (λ ($x_{new1}$) (shell xx))) (λ ($x_{new}$) (shell ((λN x x) yy))))\\
+					↓\\
+					((λ (y) (shell (λ ($x_{new1}$) (shell xx)))) (λ ($x_{new}$) (shell ((λN x x) yy))))\\
+					↓\\
+					(shell (λ ($x_{new1}$) (shell xx)))\\
+					↓\\
+					xx
+				\end{center}
+			}
 		}
-	}
-\end{center}
+	\end{center}
+	\caption{lazy λ糖测试}
+	\label{fig:lazy}
+\end{figure}
+
 
 结果发现，我们构造的shell糖和λN糖虽然能够在我们的框架下执行得到求值序列，但并没有进行重组糖。经过简单思考，我们发现原因在于惰性求值本身就是不会对子表达式优先进行计算，因此根据核心算法的$Rule2.2.2$，语法糖展开后不会重组，因此得到的序列虽然满足重组糖的性质，但看起来没有重组。而用shell糖来构造这种call-by-need到call-by-value的转化是一种自认为不错的想法，因此也记录在这里。
 
@@ -348,75 +390,83 @@ SKI组合子演算\upcite{SKI}是无类型λ演算的一种简化版，其运用
 	$I$ → $(\lambda~(x)~x)$
 \end{flushleft}
 
-并构造一个将两个参数对置的SKI演算。
-
-\begin{center}
-	\framebox[35em][l]{
-		\parbox[t]{\textwidth}{
-			\begin{center}
-				{\linespread{1}\selectfont
-				(S (K (S I)) K xx yy)\\
-				↓\\
-				(S (K (S (λ (x) x))) K xx yy)\\
-				↓\\
-				(S (K ((λ ($x_{1}$ $x_{2}$ $x_{3}$) ($x_{1}$ $x_{3}$ ($x_{2}$ $x_{3}$))) (λ (x) x))) K xx yy)\\
-				↓\\
-				(S (K (λ ($x_{2}$ $x_{3}$) ((λ (x) x) $x_{3}$ ($x_{2}$ $x_{3}$)))) K xx yy)\\
-				↓\\
-				(S ((λ ($x_{1}$ $x_{2}$) $x_{1}$) (λ ($x_{2}$ $x_{3}$) ((λ (x) x) $x_{3}$ ($x_{2}$ $x_{3}$)))) K xx yy)\\
-				↓\\
-				(S (λ ($x_{2}$) (λ ($x_{2}$ $x_{3}$) ((λ (x) x) $x_{3}$ ($x_{2}$ $x_{3}$)))) K xx yy)\\
-				↓\\
-				(S (λ ($x_{2}$) (λ ($x_{2}$ $x_{3}$) ((λ (x) x) $x_{3}$ ($x_{2}$ $x_{3}$)))) (λ ($x_{1}$ $x_{2}$) $x_{1}$) xx yy)\\
-				↓\\
-				((λ ($x_{1}$ $x_{2}$ $x_{3}$) ($x_{1}$ $x_{3}$ ($x_{2}$ $x_{3}$))) (λ ($x_{2}$) (λ ($x_{2}$ $x_{3}$) ((λ (x) x) $x_{3}$ ($x_{2}$ $x_{3}$)))) (λ ($x_{1}$ $x_{2}$) $x_{1}$) xx yy)\\
-				↓\\
-				((λ ($x_{2}$ $x_{3}$) ((λ ($x_{2}$) (λ ($x_{2}$ $x_{3}$) ((λ (x) x) $x_{3}$ ($x_{2}$ $x_{3}$)))) $x_{3}$ ($x_{2}$ $x_{3}$))) (λ ($x_{1}$ $x_{2}$) $x_{1}$) xx yy)\\
-				↓\\
-				((λ ($x_{3}$) ((λ ($x_{2}$) (λ ($x_{2}$ $x_{3}$) ((λ (x) x) $x_{3}$ ($x_{2}$ $x_{3}$)))) $x_{3}$ ((λ ($x_{1}$ $x_{2}$) $x_{1}$) $x_{3}$))) xx yy)\\
-				↓\\
-				(((λ ($x_{2}$) (λ ($x_{2}$ $x_{3}$) ((λ (x) x) $x_{3}$ ($x_{2}$ $x_{3}$)))) xx ((λ ($x_{1}$ $x_{2}$) $x_{1}$) xx)) yy)\\
-				↓\\
-				(((λ ($x_{2}$) (λ ($x_{2}$ $x_{3}$) ((λ (x) x) $x_{3}$ ($x_{2}$ $x_{3}$)))) xx (λ ($x_{2}$) xx)) yy)\\
-				↓\\
-				(((λ ($x_{2}$ $x_{3}$) ((λ (x) x) $x_{3}$ ($x_{2}$ $x_{3}$))) (λ ($x_{2}$) xx)) yy)\\
-				↓\\
-				((λ ($x_{3}$) ((λ (x) x) $x_{3}$ ((λ ($x_{2}$) xx) $x_{3}$))) yy)\\
-				↓\\
-				((λ (x) x) yy ((λ ($x_{2}$) xx) yy))\\
-				↓\\
-				((λ (x) x) yy xx)\\
-				↓\\
-				(yy xx)}
-			\end{center}
-			
-		}
-	}
-\end{center}
-
-而实际上，对SKI组合子，构建在惰性求值的λ演算是一种更合适的语法糖，于是我们构造了惰性求值的$\lambda_{N}$作为coreLang的一部分，并重新测试该表达式。
-
-\begin{center}
-	\framebox[35em][l]{
-		\parbox[t]{\textwidth}{
-			\begin{center}
-				(S (K (S I)) K xx yy)\\
-				↓\\
-				(((K (S I)) xx (K xx)) yy)\\
-				↓\\
-				(((S I) (K xx)) yy)\\
-				↓\\
-				(I yy ((K xx) yy))\\
-				↓\\
-				(yy ((K xx) yy))\\
-				↓\\
-				(yy xx)
+并构造一个将两个参数对置的SKI演算，结果如图\ref{fig:SKI1}。
+\begin{figure}[ht]
+	\begin{center}
+		\framebox[35em][l]{
+			\parbox[t]{\textwidth}{
+				\begin{center}
+					{\linespread{1}\selectfont
+						(S (K (S I)) K xx yy)\\
+						↓\\
+						(S (K (S (λ (x) x))) K xx yy)\\
+						↓\\
+						(S (K ((λ ($x_{1}$ $x_{2}$ $x_{3}$) ($x_{1}$ $x_{3}$ ($x_{2}$ $x_{3}$))) (λ (x) x))) K xx yy)\\
+						↓\\
+						(S (K (λ ($x_{2}$ $x_{3}$) ((λ (x) x) $x_{3}$ ($x_{2}$ $x_{3}$)))) K xx yy)\\
+						↓\\
+						(S ((λ ($x_{1}$ $x_{2}$) $x_{1}$) (λ ($x_{2}$ $x_{3}$) ((λ (x) x) $x_{3}$ ($x_{2}$ $x_{3}$)))) K xx yy)\\
+						↓\\
+						(S (λ ($x_{2}$) (λ ($x_{2}$ $x_{3}$) ((λ (x) x) $x_{3}$ ($x_{2}$ $x_{3}$)))) K xx yy)\\
+						↓\\
+						(S (λ ($x_{2}$) (λ ($x_{2}$ $x_{3}$) ((λ (x) x) $x_{3}$ ($x_{2}$ $x_{3}$)))) (λ ($x_{1}$ $x_{2}$) $x_{1}$) xx yy)\\
+						↓\\
+						((λ ($x_{1}$ $x_{2}$ $x_{3}$) ($x_{1}$ $x_{3}$ ($x_{2}$ $x_{3}$))) (λ ($x_{2}$) (λ ($x_{2}$ $x_{3}$) ((λ (x) x) $x_{3}$ ($x_{2}$ $x_{3}$)))) (λ ($x_{1}$ $x_{2}$) $x_{1}$) xx yy)\\
+						↓\\
+						((λ ($x_{2}$ $x_{3}$) ((λ ($x_{2}$) (λ ($x_{2}$ $x_{3}$) ((λ (x) x) $x_{3}$ ($x_{2}$ $x_{3}$)))) $x_{3}$ ($x_{2}$ $x_{3}$))) (λ ($x_{1}$ $x_{2}$) $x_{1}$) xx yy)\\
+						↓\\
+						((λ ($x_{3}$) ((λ ($x_{2}$) (λ ($x_{2}$ $x_{3}$) ((λ (x) x) $x_{3}$ ($x_{2}$ $x_{3}$)))) $x_{3}$ ((λ ($x_{1}$ $x_{2}$) $x_{1}$) $x_{3}$))) xx yy)\\
+						↓\\
+						(((λ ($x_{2}$) (λ ($x_{2}$ $x_{3}$) ((λ (x) x) $x_{3}$ ($x_{2}$ $x_{3}$)))) xx ((λ ($x_{1}$ $x_{2}$) $x_{1}$) xx)) yy)\\
+						↓\\
+						(((λ ($x_{2}$) (λ ($x_{2}$ $x_{3}$) ((λ (x) x) $x_{3}$ ($x_{2}$ $x_{3}$)))) xx (λ ($x_{2}$) xx)) yy)\\
+						↓\\
+						(((λ ($x_{2}$ $x_{3}$) ((λ (x) x) $x_{3}$ ($x_{2}$ $x_{3}$))) (λ ($x_{2}$) xx)) yy)\\
+						↓\\
+						((λ ($x_{3}$) ((λ (x) x) $x_{3}$ ((λ ($x_{2}$) xx) $x_{3}$))) yy)\\
+						↓\\
+						((λ (x) x) yy ((λ ($x_{2}$) xx) yy))\\
+						↓\\
+						((λ (x) x) yy xx)\\
+						↓\\
+						(yy xx)}
+				\end{center}
 				
-			\end{center}
-			
+			}
 		}
-	}
-\end{center}
+	\end{center}
+	\caption{SKI糖测试（基于CBV λ演算）}
+	\label{fig:SKI1}
+\end{figure}
+
+
+而实际上，对SKI组合子，构建在惰性求值的λ演算是一种更合适的语法糖，于是我们构造了惰性求值的$\lambda_{N}$作为coreLang的一部分，并重新测试该表达式。结果如图\ref{fig:SKI2}。
+\begin{figure}[H]
+	\begin{center}
+		\framebox[35em][l]{
+			\parbox[t]{\textwidth}{
+				\begin{center}
+					(S (K (S I)) K xx yy)\\
+					↓\\
+					(((K (S I)) xx (K xx)) yy)\\
+					↓\\
+					(((S I) (K xx)) yy)\\
+					↓\\
+					(I yy ((K xx) yy))\\
+					↓\\
+					(yy ((K xx) yy))\\
+					↓\\
+					(yy xx)
+					
+				\end{center}
+				
+			}
+		}
+	\end{center}
+	\caption{SKI糖测试（基于lazy λ演算）}
+	\label{fig:SKI2}
+\end{figure}
+
 
 结果显示我们的重组糖工具漂亮的显示了该SKI表达式的序列。
 
@@ -428,11 +478,11 @@ SKI组合子演算\upcite{SKI}是无类型λ演算的一种简化版，其运用
 	\item 更多语法糖特性（尤其递归语法糖）。正如前一节所介绍的，我们的方法处理递归糖和高阶糖的能力，是现有方法很难达到的。原因很简单：递归糖需要处理终止条件，而本身语法糖处理终止条件就不是一件容易的事情。而得益于规约语义的强大能力，加上算法本身的精心设计，让处理递归这件事成为可能，进而让高阶语法糖成为可能。我们可以发现，高阶函数作为函数式语言的一个非常重要的特性，在近年来被多种其他编程范式的语言所支持。因此支持递归的语法糖是本工作十分重要的优势。
 	\item 更简单的书写语法糖。相比于resugaring系列工作\upcite{resugaring}，我们的方法得益于规约语义的友好形式，对语法糖的书写并不必须是模式匹配为基础的。只要可以保证对同一个语法糖没有出现多种解糖方式，我们可以对语法糖的各种条件进行分类处理。比如说实现一个斐波那契数列语法糖，我们可以设计如下解糖规则。（对应写在规约规则中）
 	
-	$(f\;0)$→$1$
+	$(f\;0)$ → $1$
 	
-	$(f\;1)$→$1$
+	$(f\;1)$ → $1$
 	
-	$(f\;x)$→$(+\;(f\;(-\;x\;1))\;(f\;(-\;x\;2)))$\qquad side-condition (x>1)
+	$(f\;x)$ → $(+\;(f\;(-\;x\;1))\;(f\;(-\;x\;2)))$\hfill side-condition (x>1)
 	
 	这种语法糖写法相对于简单的pattern based语法糖，更加友好。
 \end{itemize}
@@ -450,7 +500,7 @@ SKI组合子演算\upcite{SKI}是无类型λ演算的一种简化版，其运用
 
 如下的语法糖
 
-$(Sg~exp_{1}~exp_{2})→(begin~(if~exp_{1}~(set!~x~0)~(set!~x~exp_{2}))~x)$
+$(Sg~exp_{1}~exp_{2}) → (begin~(if~exp_{1}~(set!~x~0)~(set!~x~exp_{2}))~x)$
 
 如果$exp_{1}$不包含副作用，那么显然可以不展开Sg糖，先对$exp_{1}$进行规约，再根据$exp_{1}$的值决定之后的重组糖序列。
 
@@ -462,4 +512,10 @@ $(Sg~exp_{1}~exp_{2})→(begin~(if~exp_{1}~(set!~x~0)~(set!~x~exp_{2}))~x)$
 
 
 
-\subsection{其他相关工作}
+\label{mark:relative}\subsection{相关工作}
+
+{\bfseries 重组糖(Resugaring)}系列工作\cite{resugaring}\cite{hygienic}\cite{resugaringscpoe}\cite{resugaringtype}是和我们工作最相关的工作。前两篇工作都是和本文类似的---对执行序列重组糖；第三篇是对语法糖的变量作用域实现自动推导，第四篇则是对语法糖的类型规则进行自动推导。这一系列工作与我们的目的很相似，尤其是前两篇工作。而受到重组糖系列工作的启发，我们希望将语法糖的求值规则也能进行自动推导，因为类型规则本身是求值规则的抽象。而本文是对语法糖求值规则自动推导的一个探索，尽管没有得到自动推导，但我们的核心思想---单步不完全展开既改进了现有对执行序列的重组糖，又对求值规则的自动推导有启发作用。
+
+{\bfseries 宏形成(Macrofication)}\cite{Macrofication}是一个对代码内部进行匹配，希望自动生成宏，用以进行代码重构的研究工作。而本文工作可以让利用宏形成得到重构的代码更加简洁---得到的宏看作领域特定语言，即可得到基于自动生成宏的执行序列。因为我们的实现设定十分简单，从得到自动生成的宏、到对生成的宏进行轻量级重组糖很容易做到。
+
+{\bfseries 基于伽罗瓦连接的函数式语言程序切片}\cite{slicing}是为了让函数式语言的程序在执行期间自动将执行过程进行自我阐述（比如程序在什么位置出现什么错误）。该工作和本文基本想法有相似之处---对结构化语言的子表达式进行递归运算。
