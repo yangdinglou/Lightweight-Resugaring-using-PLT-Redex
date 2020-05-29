@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019/W32TeX) (preloaded format=xelatex 2020.4.9)  27 MAY 2020 17:27
+This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019/W32TeX) (preloaded format=xelatex 2020.4.9)  28 MAY 2020 22:05
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1531,19 +1531,19 @@ Overfull \hbox (5.02617pt too wide) in paragraph at lines 464--465
 Underfull \vbox (badness 4531) has occurred while \output is active []
 
  [35]
-[36] [37]) (./chapter/conclusion.tex [38] [39]
+[36] [37]) (./chapter/conclusion.tex [38] [39] [40]
 第六章
-[40
+[41
 
-] [41]) (./Template.bbl [42
+] [42]) (./Template.bbl [43
 
 
 
-]) [43] [44
+]) [44] [45
 
 ]
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 409.
- [45
+ [46
 
 
 ]
@@ -1558,10 +1558,10 @@ Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 409.
 Here is how much of TeX's memory you used:
  29271 strings out of 492922
  595376 string characters out of 6136752
- 688591 words of memory out of 5000000
+ 689591 words of memory out of 5000000
  32892 multiletter control sequences out of 15000+600000
  566404 words of font info for 216 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  54i,12n,79p,811b,906s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on Template.pdf (48 pages).
+Output written on Template.xdv (49 pages, 524964 bytes).

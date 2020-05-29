@@ -1,3 +1,119 @@
-\section{Contribution1 ...}
+%!TEX root = ./main.tex
+\section{Dynamic Approach}
 
-Explain your first technical contribution.
+The goals of our dynamic approach is similar with Resugaring\cite{resugaring}\cite{hygienic}, that is, get evaluation sequences of surface language's expression using surface expression's syntax. However, their approach make it by converting evaluation sequences of desugared expressions into surface language's expression, using match and substitution on syntactic sugars' rule. We do this by{\bfseries not expanding syntactic sugar until necessary}. Our approach shows some better properties for implementing DSL.
+
+\subsection{Language setting}
+
+\[
+\begin{array}{rcl}
+\mbox{Exp} &::=& (\mbox{Headid}~\mbox{Exp}*)\\
+&|& \mbox{Value}\\
+&|& \mbox{Variable}
+\end{array}
+\]
+
+\begin{center}
+	\framebox[35em][l]{
+		\parbox[t]{35em}{
+			\[
+			\begin{array}{rcl}
+			\mbox{Exp} &::=& \mbox{Coreexp}\\
+			&|& \mbox{Surfexp}\\
+			&|& \mbox{Commonexp}\\
+			&|& \mbox{OtherSurfexp}\\
+			&|& \mbox{OtherCommonexp}
+			\end{array}
+			\]
+			
+			\[
+			\begin{array}{rcl}
+			\mbox{Coreexp} &::=& (\mbox{CoreHead}~\mbox{Exp}*)
+			\end{array}
+			\]
+			
+			\[
+			\begin{array}{rcl}
+			\mbox{Surfexp} &::=& (\mbox{SurfHead}~(\mbox{Surfexp}~|~\mbox{Commonexp})*)
+			\end{array}
+			\]
+			
+			\[
+			\begin{array}{rcl}
+			\mbox{Commonexp} &::=& (\mbox{CommonHead}~(\mbox{Surfexp}~|~\mbox{Commonexp})*)\\
+			&|& \mbox{Value}\\
+			&|& \mbox{Variable}
+			\end{array}
+			\]
+			
+			\[
+			\begin{array}{rcl}
+			\mbox{OtherSurfexp} &::=& (\mbox{SurfHead}~\mbox{Exp}*~\mbox{Coreexp}~\mbox{Exp}*)
+			\end{array}
+			\]
+			
+			\[
+			\begin{array}{rcl}
+			\mbox{OtherCommonexp} &::=& (\mbox{CommonHead}~\mbox{Exp}*~\mbox{Coreexp}~\mbox{Exp}*)
+			\end{array}
+			\]
+		}
+	}
+\end{center}
+
+\subsection{Algorithm}
+
+\begin{algorithm}
+	\caption{Core-algorithm f}
+	\label{alg:f}     % 给算法一个标签，以便其它地方引用该算法
+	\begin{algorithmic}[1]       % 数字 "1" 表示为算法显示行号的时候，每几行显示一个行号，如："1" 表示每行都显示行号，"2" 表示每两行显示一个行号，也是为了方便其它地方的引用
+		\REQUIRE ~~\\      % 算法的输入参数说明部分
+		Any expression $Exp$=$(Headid~Subexp_{1}~\ldots~Subexp_{\ldots})$ which satisfies Language setting
+		\ENSURE ~~\\     % 算法的输出说明
+		$Exp'$ reduced from $Exp$, s.t. the reduction satisfies three properties of resugaring
+		\STATE     Let $ListofExp'$ = $\{Exp'_{1}\;,Exp'_{2}~\ldots\}$
+		\IF {$Exp$ is Coreexp or  Commonexp or OtherCommonexp}
+		\IF {Lengthof($ListofExp'$)==0}
+		\RETURN null; //\hfill Rule1.1
+		\ELSIF {Lengthof($ListofExp'$)==1}
+		\RETURN first($ListofExp'$); //\hfill Rule1.2
+		\ELSE 
+		\RETURN $Exp'_{i}$ = $(Headid~Subexp_{1}~\ldots~Subexp'_{i}~\ldots)$; //where i is the index of subexp which have to be reduced. \hfill Rule1.3
+		\ENDIF
+		\ELSE 
+		\IF {$Exp$ have to be desugared}
+		\RETURN desugarsurf($Exp$); //\hfill Rule2.1
+		\ELSE
+		\STATE Let $DesugarExp'$ = desugarsurf(Exp)
+		\IF {$Subexp_{i}$ is reduced to $Subexp'_{i}$ during $f(DesugarExp')$}
+		\RETURN $Exp'_{i}$ = $(Headid~Subexp_{1}~\ldots~Subexp'_{i}~\ldots)$; //\hfill Rule2.2.1
+		\ELSE
+		\RETURN desugarsurf($Exp$); //\hfill Rule2.2.2
+		\ENDIF
+		\ENDIF
+		\ENDIF
+		
+	\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+	\caption{Lightweight-resugaring}
+	\label{alg:lwresugar}     % 给算法一个标签，以便其它地方引用该算法
+	\begin{algorithmic}[1]       % 数字 "1" 表示为算法显示行号的时候，每几行显示一个行号，如："1" 表示每行都显示行号，"2" 表示每两行显示一个行号，也是为了方便其它地方的引用
+		\REQUIRE ~~\\      % 算法的输入参数说明部分
+		Surfexp $Exp$
+		\ENSURE ~~\\     % 算法的输出说明
+		$Exp$'s evaluation sequences within DSL
+		\WHILE {$tmpExp$ = f($Exp$)}
+		\IF {$tmpExp$ is empty}
+		\RETURN
+		\ELSIF {$tmpExp$ is Surfexp or Commonexp}
+		\PRINT $tmpExp$;
+		\STATE Lightweight-resugaring($tmpExp$);
+		\ELSE 
+		\STATE Lightweight-resugaring($tmpExp$);
+		\ENDIF
+		\ENDWHILE
+		
+	\end{algorithmic}
+\end{algorithm}
