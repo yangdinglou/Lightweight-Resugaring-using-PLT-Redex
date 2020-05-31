@@ -1,3 +1,4 @@
+%!TEX root=./Template.tex
 \thispagestyle{empty}
 \newgeometry{left=2cm, right=2cm, top=2.64cm, bottom=2.54cm}
 \renewcommand\arraystretch{1.2}
@@ -8,29 +9,30 @@
 
 \begin{table}[H]
 	\centering
-    \begin{tabular}{|rrrrrr|}
+    \begin{tabular}{|rrrrrc|}
     \hline
     \multicolumn{1}{|p{4em}|}{学生姓名} & \multicolumn{1}{p{3em}|}{杨子毅} & \multicolumn{1}{p{5em}|}{学生学号} & \multicolumn{1}{p{6.5em}|}{1600011063} & \multicolumn{1}{p{6.565em}|}{论文成绩} &  \multicolumn{1}{r|}{}\\
     \hline
-    \multicolumn{1}{|p{4em}|}{学院(系)} & \multicolumn{3}{r|}{信息科学技术学院} & \multicolumn{1}{p{6.565em}|}{学生所在专业} &  
-    \multicolumn{1}{r|}{软件工程}\\
+    \multicolumn{1}{|p{4em}|}{学院(系)} & \multicolumn{3}{c|}{信息科学技术学院} & \multicolumn{1}{p{6.565em}|}{学生所在专业} &  
+    \multicolumn{1}{c|}{软件工程}\\
     \hline
-    \multicolumn{1}{|r|}{\multirow{2}[2]{*}{导师姓名}} & \multicolumn{1}{r|}{\multirow{2}[2]{*}{胡振江}} & \multicolumn{1}{p{5em}|}{导师单位/} & \multicolumn{1}{r|}{\multirow{2}[2]{*}{}} & \multicolumn{1}{p{6.565em}|}{\multirow{2}[2]{*}{导师职称}} & \multirow{2}[2]{*}{} \\
+    \multicolumn{1}{|r|}{\multirow{2}[2]{*}{导师姓名}} & \multicolumn{1}{c|}{\multirow{2}[2]{*}{\centering{胡振江}}} & \multicolumn{1}{p{5em}|}{导师单位/} & \multicolumn{1}{c|}{\multirow{2}[2]{*}{\centering{软件工程研究所}}} & \multicolumn{1}{p{6.565em}|}{\multirow{2}[2]{*}{导师职称}} & \multirow{2}[2]{*}{\centering{教授}} \\
     \multicolumn{1}{|r|}{} & \multicolumn{1}{r|}{} & \multicolumn{1}{p{5em}|}{所在研究所} & \multicolumn{1}{r|}{} & \multicolumn{1}{r|}{} &  \\
     \hline
-    \multicolumn{2}{|p{9em}|}{\centering{论文题目}} & \multicolumn{4}{r|}{\multirow{2}[2]{*}{}} \\
-    \multicolumn{2}{|p{9em}|}{\centering{（中、英文）}} & \multicolumn{4}{r|}{} \\
+    \multicolumn{2}{|p{9em}|}{\centering{论文题目}} & \multicolumn{4}{c|}{\centering{一种利用Redex实现重组糖的轻量级方法}} \\
+    \multicolumn{2}{|p{9em}|}{\centering{（中、英文）}} & \multicolumn{4}{c|}{A Lightweight Resugaring Method using PLT Redex} \\
     \hline
-    \multicolumn{6}{|p{35.88em}|}{\center{导师评语}} \\
+    \multicolumn{6}{|c|}{\centering{导师评语}} \\
     \multicolumn{6}{|p{35.88em}|}{\kaiti{（包含对论文的性质、难度、分量、综合训练等是否符合培养目标的目的等评价）}} \\
-    \multicolumn{6}{|c|}{} \\
-    \multicolumn{6}{|c|}{} \\
-    \multicolumn{6}{|c|}{} \\
-    \multicolumn{6}{|c|}{} \\
-    \multicolumn{6}{|c|}{} \\
-    \multicolumn{6}{|c|}{} \\
-    \multicolumn{6}{|c|}{} \\
-    \multicolumn{6}{|c|}{} \\
+    %语法糖作为设计和实现领域特定语言的一个简单而有效的方法正受到越来越多的关注，但是它有一个缺陷，即语法糖表达式被展开成内部语言表达式后，其执行状态变得难以理解。为了解决这个问题，人们提出了重组糖的概念，将嵌入在内部语言的语法糖表达式执行序列尽可能地反映到带有语法糖的表面语言上，从而得到在语法糖层面的执行序列。杨子毅同学在本科毕业设计的研究中，提出了一个新的重组糖方法，并在PLT Redex的基础上实现了一套重组糖工具。新的重组糖方法不仅比原来的方法简单直接，而且能解决原来的方法难以解决的递归糖、高阶糖的重组糖问题，对卫生宏的处理也更简单和自然。 杨子毅同学的本科毕业设计论文写作规范，逻辑性强，是一篇优秀的本科毕业论文。
+    \multicolumn{6}{|l|}{\qquad 语法糖作为设计和实现领域特定语言的一个简单而有效的方法正受到越来越多的关注，} \\
+    \multicolumn{6}{|l|}{但是它有一个缺陷，即语法糖表达式被展开成内部语言表达式后，其执行状态变得难以理解} \\
+    \multicolumn{6}{|l|}{。为了解决这个问题，人们提出了重组糖的概念，将嵌入在内部语言的语法糖表达式执行序} \\
+    \multicolumn{6}{|l|}{列尽可能地反映到带有语法糖的表面语言上，从而得到在语法糖层面的执行序列。杨子毅同} \\
+    \multicolumn{6}{|l|}{学在本科毕业设计的研究中，提出了一个新的重组糖方法，并在PLT Redex的基础实现了以} \\
+    \multicolumn{6}{|l|}{重组糖工具。新的重组糖方法不仅比原来的方法简单直接，而且能解决原来的方法难以解决} \\
+    \multicolumn{6}{|l|}{的递归糖、高阶糖的重组糖问题，对卫生宏的处理也更简单和自然。} \\
+    \multicolumn{6}{|l|}{\qquad 杨子毅同学的本科毕业设计论文写作规范，逻辑性强，是一篇优秀的本科毕业论文。} \\
     \multicolumn{6}{|r|}{} \\
     \multicolumn{6}{|r|}{} \\
     \multicolumn{6}{|r|}{} \\
