@@ -2,7 +2,7 @@
 %%% Do NOT edit. File created by BibTeX with style
 %%% ACM-Reference-Format-Journals [18-Jan-2012].
 
-\begin{thebibliography}{4}
+\begin{thebibliography}{5}
 
 %%% ====================================================================
 %%% NOTE TO THE USER: you can override these defaults by providing
@@ -36,6 +36,19 @@
 \providecommand\bibinfo[2]{#2}
 \providecommand\natexlab[1]{#1}
 \providecommand\showeprint[2][]{arXiv:#2}
+
+\bibitem[\protect\citeauthoryear{Felleisen, Findler, and Flatt}{Felleisen
+  et~al\mbox{.}}{2009}]%
+        {SEwPR}
+\bibfield{author}{\bibinfo{person}{Matthias Felleisen},
+  \bibinfo{person}{Robert~Bruce Findler}, {and} \bibinfo{person}{Matthew
+  Flatt}.} \bibinfo{year}{2009}\natexlab{}.
+\newblock \bibinfo{booktitle}{\emph{Semantics Engineering with PLT Redex}
+  (\bibinfo{edition}{1st} ed.)}.
+\newblock \bibinfo{publisher}{The MIT Press}.
+\newblock
+\showISBNx{0262062755}
+
 
 \bibitem[\protect\citeauthoryear{Fowler}{Fowler}{2011}]%
         {dsl}

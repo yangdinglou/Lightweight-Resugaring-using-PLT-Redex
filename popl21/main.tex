@@ -1,3 +1,5 @@
+% !TEX program = pdflatex
+%!TEX spellcheck
 %% For double-blind review submission, w/o CCS and ACM Reference (max submission space)
 \documentclass[acmsmall,review,anonymous]{acmart}\settopmatter{printfolios=true,printccs=false,printacmref=false}
 %% For double-blind review submission, w/ CCS and ACM Reference
@@ -55,13 +57,17 @@
 
 \usepackage{algorithm}
 \usepackage{algorithmic}
+
 \renewcommand{\algorithmicrequire}{\textbf{Input:}}
 
 \renewcommand{\algorithmicensure}{\textbf{Output:}}
+
+\newtheorem*{Def}{Defination}
 \begin{document}
 
 %% Title information
-\title[Short Title]{Dynamic and Static Interpreter for Domain-specific Language Based on Syntactic Sugars}         %% [Short Title] is optional;
+\title%[Short Title]
+{A lightweight resugaring method based on reduction semantics}         %% [Short Title] is optional;
                                         %% when present, will be used in
                                         %% header instead of Full Title.
 \titlenote{with title note}             %% \titlenote is optional;
@@ -133,9 +139,10 @@
 %% Note: \begin{abstract}...\end{abstract} environment must come
 %% before \maketitle command
 \begin{abstract}
-With the rapid development of computer science, domain-specific language (DSL) is quite useful in our daily life, not only for programmers or computer scientists, but for people from all walks of life. Syntactic sugar is a good way to implement embedded DSLs, because it can make good use of existing general-purposed language's feature. However, it's regerttable that DSL based on syntactic sugars cannot be called "programming language"--- it does not even have its own interpreter. Its interpreter, though existed, contains many things about its host language. 
+With the rapid development of computer science, domain-specific language (DSL) is quite useful in our daily life, not only for programmers or computer scientists, but for people from all walks of life. Syntactic sugar is a good way to implement embedded DSLs, because it can make good use of existing general-purposed language's feature. However, the evaluation sequences became unrecognizable after the sugar expression desugared. 
 
-In this paper, we focus on get a better interpreter for DSL based on syntactic sugars, from two different approachs---dynamic, which get evaluation sequences of DSL's expression within DSL itself; static, which get evaluation rules of DSL's expression within DSL itself. We also build a tool to test our approach with some interesting applications.
+
+Resugaring is an approach to solve the problem above. In this paper, we purposed a lightweight mothod of resugaring based on reduction semantics---getting evaluation sequences without fully desugaring the whole syntactic sugar expression. We implement a tool based on our method using PLT Redex and test our approach on some applications. The results show that our lightweight approach can even deal with more syntactic sugar's feature.
 \end{abstract}
 
 

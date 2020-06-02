@@ -1,5 +1,6 @@
 %!TEX root = ./main.tex
-\section{Dynamic Approach}
+\section{Algorithm}
+\label{sec3}
 
 The goals of our dynamic approach is similar with Resugaring\cite{resugaring}\cite{hygienic}, that is, get evaluation sequences of surface language's expression using surface expression's syntax. However, their approach make it by converting evaluation sequences of desugared expressions into surface language's expression, using match and substitution on syntactic sugars' rule. We do this by{\bfseries not expanding syntactic sugar until necessary}. Our approach shows some better properties for implementing DSL.
 
@@ -61,7 +62,7 @@ The goals of our dynamic approach is similar with Resugaring\cite{resugaring}\ci
 	}
 \end{center}
 
-\subsection{Algorithm}
+\subsection{Algorithm defination}
 
 \begin{algorithm}
 	\caption{Core-algorithm f}

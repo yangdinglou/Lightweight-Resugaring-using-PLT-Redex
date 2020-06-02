@@ -15,15 +15,20 @@ The rest of the paper is organized as follows. ...
 
 Domain-specific language\cite{dsl} is becoming useful for people's daily tasks. For example, the IFTTT app and IOS's shortcuts designed DSLs describing some tasks to make our lives more convenient. So the users of DSL are no longer limited to programmers, but people from all walks of life.(to be completed)
 
-Syntactic sugar\cite{syntacticsugar}, as a simple ways design DSL, has a obvious problem. DSL based on syntactic sugars contains many components of its host language. Then its interpretation will be outside the DSL itself. It will be better if we can get interpreter of DSL without host language's components, when given host language's interpreter and DSL's rewriting rules. It's important for DSL becoming a real programming language---its interpreter should not depend on something outside itself. Then the real language will be more concise during execution, or some program analysis, optimization tasks.
+Syntactic sugar\cite{syntacticsugar}, as a simple ways design DSL, has a obvious problem. DSL based on syntactic sugars contains many components of its host language. Then its interpretation will be outside the DSL itself. The evaluation sequences of syntactic sugar expression will contain many terms of the host language, which may confuse the users of DSL.
 
-There is an existing work---resugaring\cite{resugaring}\cite{hygienic}, which partially solved the problem upon. It lifts the evaluation sequences of desugared expression to sugar's syntax. The evaluation sequences shown by resugaring will not contain components of host language. But we found the resugaring method using match and substitution is kind of redundant. Resugaring also cannot perfectly solve some syntactic sugar's feature, such as recursive sugar, higher-order sugar.  (todo: static approachs' advantages)
+There is an existing work---resugaring\cite{resugaring}\cite{hygienic}, which aimed to solve the problem upon. It lifts the evaluation sequences of desugared expression to sugar's syntax. The evaluation sequences shown by resugaring will not contain components of host language. But we found the resugaring method using match and substitution is kind of redundant. The biggest deficiency of existing resugaring method is that the syntactic sugars in an expression have to fully desugar before evaluation. This limits the processing ability of the method. Moreover, it limits the complexity of getting the resugaring sequences. If we need to resugar a very huge expression, the match and substitution processes will cost so much. Also, processing of hygienic macros is complex due to the extra data structure.
 
-(challenge)
+In this paper, We propose a lightweight approach to get resugaring sequences based on syntactic sugars. The key idea of our approach is---syntactic sugar expression only desugars at the point that it have to desugar. We guess that we don't have to desugar the whole expression at the initial time of evaluation under the premise of keeping the properties of expression. 
 
+Initially, our work focused on improving current resugaring method. After finishing that, we found our lightweight resugaring approach could process some syntactic sugars' feature that current approach cannot do. Finally, we implement our algorithm using PLT Redex\cite{SEwPR} and test our approach on some applications. The result shows that our approach does handle more features of syntactic sugar.
 
-We propose two diffenent approachs to get better interpreters for DSLs based on syntactic sugars. Initially, our work focused on improving current resugaring method(dynamic approach). After finishing that, we found the dynamic approach could be abstracted to evalation rules of DSL(static approach). 
+In the rest of this paper, we present the technical details of our approach together with the proof of correctness. In details, the rest of our paper is organized as follow:
 
-The key idea of the dynamic approach is---syntactic sugar expression only desugars at the point that it have to desugar. We guess that we don't have to desugar the whole expression at the initial time of evaluation under the premise of keeping the properties of expression. (todo: static approach insight)
-
-2
+\begin{itemize}
+\item An overview of our approach with some background knowledge.\ref{sec2}
+\item The algorithm defination and proof of correctness.\ref{sec3}
+\item The implementation of our lightweight resugaring algorithm using PLT Redex.\ref{sec4}
+\item sth else?\ref{sec5}
+\item Evalation of our lightweight resugaring approach.\ref{sec6}
+\end{itemize}

@@ -11,46 +11,47 @@ Reallocated glb_str_ptr (elt_size=4) to 20 items from 10.
 Reallocated global_strs (elt_size=20001) to 20 items from 10.
 Reallocated glb_str_end (elt_size=4) to 20 items from 10.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
+Warning--empty address in SEwPR
 Warning--empty address in dsl
-You've used 4 entries,
+You've used 5 entries,
             5901 wiz_defined-function locations,
-            1356 strings with 15384 characters,
-and the built_in function-call counts, 4687 in all, are:
-= -- 694
-> -- 116
+            1364 strings with 15524 characters,
+and the built_in function-call counts, 5557 in all, are:
+= -- 776
+> -- 157
 < -- 0
-+ -- 36
-- -- 48
-* -- 285
-:= -- 441
-add.period$ -- 21
-call.type$ -- 4
-change.case$ -- 22
-chr.to.int$ -- 4
-cite$ -- 5
-duplicate$ -- 406
-empty$ -- 274
-format.name$ -- 56
-if$ -- 1168
++ -- 49
+- -- 60
+* -- 363
+:= -- 546
+add.period$ -- 27
+call.type$ -- 5
+change.case$ -- 30
+chr.to.int$ -- 5
+cite$ -- 7
+duplicate$ -- 483
+empty$ -- 328
+format.name$ -- 72
+if$ -- 1353
 int.to.chr$ -- 2
 int.to.str$ -- 1
-missing$ -- 14
-newline$ -- 90
-num.names$ -- 32
-pop$ -- 117
+missing$ -- 16
+newline$ -- 99
+num.names$ -- 40
+pop$ -- 146
 preamble$ -- 1
-purify$ -- 58
+purify$ -- 74
 quote$ -- 0
-skip$ -- 160
+skip$ -- 185
 stack$ -- 0
-substring$ -- 345
-swap$ -- 62
+substring$ -- 400
+swap$ -- 69
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 63
-warning$ -- 1
-while$ -- 36
+type$ -- 78
+warning$ -- 2
+while$ -- 40
 width$ -- 0
-write$ -- 125
-(There was 1 warning)
+write$ -- 143
+(There were 2 warnings)
