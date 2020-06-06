@@ -57,17 +57,19 @@
 
 \usepackage{algorithm}
 \usepackage{algorithmic}
+\usepackage{proof}
 
 \renewcommand{\algorithmicrequire}{\textbf{Input:}}
 
 \renewcommand{\algorithmicensure}{\textbf{Output:}}
 
-\newtheorem*{Def}{Defination}
+\newtheorem{Def}{Defination}[section]
+\newtheorem{mythm}{Theorem}[section]
 \begin{document}
 
 %% Title information
 \title%[Short Title]
-{A lightweight resugaring method based on reduction semantics}         %% [Short Title] is optional;
+{A lightweight resugaring approach based on reduction semantics}         %% [Short Title] is optional;
                                         %% when present, will be used in
                                         %% header instead of Full Title.
 \titlenote{with title note}             %% \titlenote is optional;
@@ -142,7 +144,7 @@
 With the rapid development of computer science, domain-specific language (DSL) is quite useful in our daily life, not only for programmers or computer scientists, but for people from all walks of life. Syntactic sugar is a good way to implement embedded DSLs, because it can make good use of existing general-purposed language's feature. However, the evaluation sequences became unrecognizable after the sugar expression desugared. 
 
 
-Resugaring is an approach to solve the problem above. In this paper, we purposed a lightweight mothod of resugaring based on reduction semantics---getting evaluation sequences without fully desugaring the whole syntactic sugar expression. We implement a tool based on our method using PLT Redex and test our approach on some applications. The results show that our lightweight approach can even deal with more syntactic sugar's feature.
+Resugaring is an method to solve the problem above. In this paper, we purposed a lightweight approach of resugaring based on reduction semantics---getting evaluation sequences without fully desugaring the whole syntactic sugar expression. We implement a tool based on our method using PLT Redex and test our approach on some applications. The results show that our lightweight approach can even deal with more syntactic sugar's feature.
 \end{abstract}
 
 

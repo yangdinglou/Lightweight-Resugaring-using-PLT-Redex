@@ -39,4 +39,26 @@ The evaluation rules of {\bfseries if} is:
 	}% 
 \end{center}
 
-Then for SurfLang's expression
+Then for SurfLang's expression $\mbox{and}(\mbox{or}(\#f, \#t), \mbox{and}(\#t, \#f))$ should get resugaring sequences as fig\ref{fig:example}.todo:why
+
+\begin{figure}[ht]
+\parbox[t]{\textwidth}{
+			\begin{center}  
+				and(or(\#f, \#t), and(\#t, \#f))\\
+				↓\\
+				and(\#t, and(\#t, \#f))\\
+				↓\\
+				and(\#t, \#f)\\
+				↓\\
+				\#f
+			\end{center}  
+		}
+\caption{resugaring example}
+\label{fig:example}
+\end{figure}
+\subsection{Idea origin}
+Church–Rosser theorem\cite{churchrosser} gives theoretical support for full-$\beta$ reduction, which is a nondeterministic evaluation strategy of lambda caculus. 
+
+Reduction semantics
+
+Our original idea is similiar to full-$\beta$ reduction. When not restricting the context rules of reduction semantics, the reduction paths of a expression will become a full graph like full-$\beta$ reduction.

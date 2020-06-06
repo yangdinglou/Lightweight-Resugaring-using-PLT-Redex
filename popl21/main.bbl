@@ -2,7 +2,7 @@
 %%% Do NOT edit. File created by BibTeX with style
 %%% ACM-Reference-Format-Journals [18-Jan-2012].
 
-\begin{thebibliography}{5}
+\begin{thebibliography}{6}
 
 %%% ====================================================================
 %%% NOTE TO THE USER: you can override these defaults by providing
@@ -36,6 +36,22 @@
 \providecommand\bibinfo[2]{#2}
 \providecommand\natexlab[1]{#1}
 \providecommand\showeprint[2][]{arXiv:#2}
+
+\bibitem[\protect\citeauthoryear{Church and Rosser}{Church and Rosser}{1936}]%
+        {churchrosser}
+\bibfield{author}{\bibinfo{person}{Alonzo Church} {and} \bibinfo{person}{J.~B.
+  Rosser}.} \bibinfo{year}{1936}\natexlab{}.
+\newblock \showarticletitle{Some Properties of Conversion}.
+\newblock \bibinfo{journal}{\emph{Trans. Amer. Math. Soc.}}
+  \bibinfo{volume}{39}, \bibinfo{number}{3} (\bibinfo{year}{1936}),
+  \bibinfo{pages}{472--482}.
+\newblock
+\showISSN{00029947}
+\urldef\tempurl%
+\url{http://www.jstor.org/stable/1989762}
+\showURL{%
+\tempurl}
+
 
 \bibitem[\protect\citeauthoryear{Felleisen, Findler, and Flatt}{Felleisen
   et~al\mbox{.}}{2009}]%

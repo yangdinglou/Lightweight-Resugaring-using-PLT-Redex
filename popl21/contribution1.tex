@@ -1,11 +1,21 @@
 %!TEX root = ./main.tex
-\section{Algorithm}
+\section{Lightweight Algorithm}
 \label{sec3}
-
-The goals of our dynamic approach is similar with Resugaring\cite{resugaring}\cite{hygienic}, that is, get evaluation sequences of surface language's expression using surface expression's syntax. However, their approach make it by converting evaluation sequences of desugared expressions into surface language's expression, using match and substitution on syntactic sugars' rule. We do this by{\bfseries not expanding syntactic sugar until necessary}. Our approach shows some better properties for implementing DSL.
 
 \subsection{Language setting}
 
+\subsubsection{Grammatical restrictions}
+\hfill\\
+Firstly, the whole language should restrict to tree-structured disjoint expression.
+
+\begin{Def}[disjoint]
+For every sub-expression in a expression, its reduction rule is decided by itself.
+\end{Def}
+
+This restriction limits the scope of language. Every sub-expression must have no side effect. We will discuss more on side effect in ...
+
+\begin{Def}[tree-structured]
+The grammar of the whole language is defined as follow.
 \[
 \begin{array}{rcl}
 \mbox{Exp} &::=& (\mbox{Headid}~\mbox{Exp}*)\\
@@ -13,15 +23,54 @@ The goals of our dynamic approach is similar with Resugaring\cite{resugaring}\ci
 &|& \mbox{Variable}
 \end{array}
 \]
+\end{Def}
 
-\begin{center}
-	\framebox[35em][l]{
-		\parbox[t]{35em}{
+The grammatical restrictions give our language a similiar property as church-rosser theorem for lambda calculus. 
+
+todo:church-rosser?
+
+\subsubsection{Context restrictions}
+\hfill\\
+For expressions in CoreLang, the context rule should restrict it to have only one reduction path. The context rules can limit the order of evaluation. This restriction is normal, because a program in general-purposed language should have only one execution path.\label{mark:ctx}
+
+For expressions in SurfLang, context rules should allow every sub-expressions reduced. It's the same as full-$\beta$ reduction.
+
+\subsubsection{Restriction of syntactic sugar}
+\hfill\\
+The form of syntactic sugar is as follow.
+\fbox{
+$(\mbox{Surfid}\;e_{1}\;e_{2}\;\ldots)$ ~→~ $(\mbox{Headid}\; \ldots)$
+}
+
+An counter example of this restriction is $(\mbox{Surfid}\;\ldots\;(e1\;e2)\ldots))$ in LHS. It's for simpler algorithm form, and the expression ability of syntactic sugar will not be changed.
+
+\begin{Def}[Unambiguous]
+For every syntactic sugar expression, it can only desugar to one expression in CoreLang.
+\end{Def}
+
+\subsubsection{Grammar Description}
+\hfill\\
+In our language setting, we regard SurfLang and CoreLang as a whole language. The whole language is under restrictions above, and its grammar is defined as follow.
+
+\begin{centering}
+	\framebox[38em][c]{
+		\parbox[t]{38em}{
 			\[
 			\begin{array}{rcl}
-			\mbox{Exp} &::=& \mbox{Coreexp}\\
-			&|& \mbox{Surfexp}\\
-			&|& \mbox{Commonexp}\\
+			\mbox{Exp} &::=& \mbox{DisplayableExp}\\
+			&|& \mbox{UndisplayableExp}\\
+			\end{array}
+			\]
+			\[
+			\begin{array}{rcl}
+			\mbox{DisplayableExp} &::=& \mbox{Surfexp}\\
+			&|& \mbox{Commonexp}
+			\end{array}
+			\]
+
+			\[
+			\begin{array}{rcl}
+			\mbox{UndisplayableExp} &::=& \mbox{Coreexp}\\
 			&|& \mbox{OtherSurfexp}\\
 			&|& \mbox{OtherCommonexp}
 			\end{array}
@@ -35,13 +84,13 @@ The goals of our dynamic approach is similar with Resugaring\cite{resugaring}\ci
 			
 			\[
 			\begin{array}{rcl}
-			\mbox{Surfexp} &::=& (\mbox{SurfHead}~(\mbox{Surfexp}~|~\mbox{Commonexp})*)
+			\mbox{Surfexp} &::=& (\mbox{SurfHead}~\mbox{DisplayableExp}*)
 			\end{array}
 			\]
 			
 			\[
 			\begin{array}{rcl}
-			\mbox{Commonexp} &::=& (\mbox{CommonHead}~(\mbox{Surfexp}~|~\mbox{Commonexp})*)\\
+			\mbox{Commonexp} &::=& (\mbox{CommonHead}~\mbox{DisplayableExp}*)\\
 			&|& \mbox{Value}\\
 			&|& \mbox{Variable}
 			\end{array}
@@ -49,21 +98,24 @@ The goals of our dynamic approach is similar with Resugaring\cite{resugaring}\ci
 			
 			\[
 			\begin{array}{rcl}
-			\mbox{OtherSurfexp} &::=& (\mbox{SurfHead}~\mbox{Exp}*~\mbox{Coreexp}~\mbox{Exp}*)
+			\mbox{OtherSurfexp} &::=& (\mbox{SurfHead}~\mbox{Exp}*~\mbox{UndisplayableExp}~\mbox{Exp}*)
 			\end{array}
 			\]
 			
 			\[
 			\begin{array}{rcl}
-			\mbox{OtherCommonexp} &::=& (\mbox{CommonHead}~\mbox{Exp}*~\mbox{Coreexp}~\mbox{Exp}*)
+			\mbox{OtherCommonexp} &::=& (\mbox{CommonHead}~\mbox{Exp}*~\mbox{UndisplayableExp}~\mbox{Exp}*)
 			\end{array}
 			\]
 		}
 	}
-\end{center}
+\end{centering}
+
+The difference between CoreLang and SurfLang is identified by $Headid$. But there are some terms in CoreLang should be displayed during evaluation. Or we need some terms to help us getting better resugaring sequences. So we defined {\bfseries Commonexp}, which origin from CoreLang, but can be displayed in resugaring sequences. The {\bfseries Coreexp} terms are terms with undisplayable CoreLang's Headid. The {\bfseries Surfexp} terms are terms with SurfLang's Headid and all sub-expressions are displayable. The {\bfseries Commonexp} terms are terms with displayable CoreLang's Headid, together with displayable sub-expressions. There exists some other expression during our resugaring process. They have Headid which can be displayed, but one or more subexpressions can't. They are UndisplayableExp.
 
 \subsection{Algorithm defination}
 
+Our lightweight resugaring algorithm is based on a core algorithm f. For every expression during resugaring process, it may have one or more reduction rules. The core algorithm f chooses the one that satisfies three properties of resugaring, then applies it on the given expression. The core algorithm f is defined as \ref{alg:f}.
 \begin{algorithm}
 	\caption{Core-algorithm f}
 	\label{alg:f}     % 给算法一个标签，以便其它地方引用该算法
@@ -85,17 +137,55 @@ The goals of our dynamic approach is similar with Resugaring\cite{resugaring}\ci
 		\IF {$Exp$ have to be desugared}
 		\RETURN desugarsurf($Exp$); //\hfill Rule2.1
 		\ELSE
-		\STATE Let $DesugarExp'$ = desugarsurf(Exp)
-		\IF {$Subexp_{i}$ is reduced to $Subexp'_{i}$ during $f(DesugarExp')$}
+		\STATE Let $DesugarExp$ = desugarsurf(Exp)
+		\IF {$Subexp_{i}$ is reduced to $Subexp'_{i}$ during $f(DesugarExp)$}
 		\RETURN $Exp'_{i}$ = $(Headid~Subexp_{1}~\ldots~Subexp'_{i}~\ldots)$; //\hfill Rule2.2.1
 		\ELSE
-		\RETURN desugarsurf($Exp$); //\hfill Rule2.2.2
+		\RETURN $DesugarExp$; //\hfill Rule2.2.2
 		\ENDIF
 		\ENDIF
 		\ENDIF
 		
 	\end{algorithmic}
 \end{algorithm}
+
+We briefly describe the core algorithm f in words.
+
+For Exp in language defined as last section, try all reduction rules in the language, get a list of possible expressions ListofExp'=\{$Exp'_{1}$,$Exp'_{2}$,$\ldots$\}. 
+
+Line 2-9 deal with the case when Exp has a CoreLang's Headid. When Exp is value or variable (line 3-4), ListofExp' won't have any element (not reducible). When Exp is of Coreexp or Commonexp (line 5-6, due to the context restriction of CoreLang, only one reduction rule can be applied. When Exp is OtherCommonexp (line 7-8), due to the context restriction of CoreLang, only one sub-expression can be reduced, then just apply core algorithm recursively on the sub-expression.
+
+Line 10-21 deal with the case then Exp has a SurfLang's Headid. When Exp only has one reduction rule (line 11-12), the syntactic sugar has to desugar. If not, we should expand outermost sugar and find the sub-expression which should be reduced (line 14-16), or the sugar has to desugar (line 17-18).
+
+\begin{flushleft}
+	\large{\bfseries{
+			If Exp is Coreexp or Commonexp or OtherCommonexp, then
+		}	
+	}	
+\end{flushleft}
+\begin{itemize}
+	\item ListofExp' may be empty, the Exp is not reducible. Return Empty then.\hfill $Rule1.1$
+	\item ListofExp' may contain only one element. Just return it because no more reduction available.\hfill $Rule1.2$
+	\item ListofExp' may contain more than one elements. Due to context restriction of CoreLang\ref{mark:ctx}, only one sub-expression {\bfseries $Subexp_{i}$} can be reduced. Now we apply core language f on {\bfseries $Subexp_{i}$} recursively to get {\bfseries $Subexp'_{i}$}, and return the expression in which {\bfseries $Subexp_{i}$} is reduced to {\bfseries $Subexp'_{i}$}.\hfill $Rule1.3$
+	
+\end{itemize}
+
+\begin{flushleft}
+	\large{\bfseries{
+			If Exp is Surfexp or OtherSurfexp, then
+		}
+	}
+\end{flushleft}
+\begin{itemize}
+	\item ListofExp' may contain only one element. Just return it because no sub-expression can be reduced, The syntactic sugar of Headid have to desugar.\hfill $Rule2.1$
+	\item ListofExp' may contain more than one elements. Due to unambiguous restriction of syntactic sugar, there must exist sub-expression which can be reduced. Firstly, we desugar {\bfseries Exp}'s outermost syntactic sugar to {\bfseries DesugarExp}. Then apply core algorithm f on {\bfseries DesugarExp}. (named one-step try)
+	\begin{itemize}
+		\item If f(DesugarExp) reduces sub-expression of DesugarExp, since the sub-expression is composed by sub-expressions of {\bfseries Exp}, it is necessary to detect which sub-expression {\bfseries $Subexp_{i}$} is first reduced to approximately {\bfseries $Subexp'_{i}$}. Return the expression in which {\bfseries $Subexp_{i}$} is reduced to {\bfseries $Subexp'_{i}$}.\hfill $Rule2.2.1$
+		\item If f(DesugarExp) doesn't reduce sub-expression of DesugarExp, then the outermost sugar won't resugar. Return {\bfseries DesugarExp} then.\hfill $Rule2.2.2$ 
+	\end{itemize}
+\end{itemize}
+
+Then, our lightweight-resugaring algorithm is defined as \ref{alg:lwresugar}.
 
 \begin{algorithm}
 	\caption{Lightweight-resugaring}
@@ -118,3 +208,44 @@ The goals of our dynamic approach is similar with Resugaring\cite{resugaring}\ci
 		
 	\end{algorithmic}
 \end{algorithm}
+
+\subsection{Proof of correctness}
+
+First of all, because the difference between our lightweight resugaring algorithm and the existing one is that we only desugar the syntactic sugar when needed, and in the existing approach, all syntactic sugar desugars firstly and then executes on CoreLang.
+
+Second, to prove convenience, define some terms.
+
+$Exp~=~(Headid\;Subexp_{1}\;Subexp_{\ldots} \ldots)$ is any reducible expression in our language.
+
+If we use the reduction rule that desugar Exp's outermost syntactic sugar, then the reduction process is called {\bfseries Outer Reduction}.
+
+If the reduction rule we use reduce $Subexp_{i}$, where $Subexp_{i}$ is $(Headid_{i}~Subexp_{i1}~Subexp_{i\ldots} \ldots)$
+\begin{itemize}
+	\item If the reduction process is Outer Reduction of $Subexp_{i}$ = $(Headid_{i}~Subexp_{i1}~Subexp_{i\ldots} \ldots)$, then it is called {\bfseries Surface Reduction}.
+	\item If the reduction process reduces $Subexp_{ij}$, then it is called {\bfseries Inner Reduction}.
+\end{itemize}
+
+{\bfseries Example:}
+
+$(\mbox{if}\; \#t\; Exp_{1}\; Exp_{2})$ → $Exp1$ \hfill Outer Reduction
+
+$(\mbox{if}\; (\mbox{And}\; \#t\; \#f)\; Exp_{1}\; Exp_{2})$ → $(\mbox{if}\; (\mbox{if}\; \#t\; \#f\; \#f)\; Exp_{1}\; Exp_{2})$ \hfill Surface Reduction
+
+$(\mbox{if}\; (\mbox{And}\; (\mbox{And}\; \#t\; \#t)\; \#t)\; \#f)\; Exp_{1}\; Exp_{2})$ → $(\mbox{if}\; (\mbox{And}\; \#t\; \#t)\; Exp_{1}\; Exp_{2})$ \hfill Inner Reduction
+
+\begin{Def}[Upper and lower expression]
+For $Exp$=$(Headid\;Subexp_{1}\;Subexp_{\ldots} \ldots)$, $Exp$is called {\bfseries upper expression}$,Subexp_{i}$is called {\bfseries lower expression}.
+\end{Def}
+
+\begin{proof}[Proof of Emulation]
+\hfill\\
+
+\end{proof}
+
+\begin{proof}[Proof of Abstraction]
+2
+\end{proof}
+
+\begin{proof}[Proof of Coverage]
+3
+\end{proof}
