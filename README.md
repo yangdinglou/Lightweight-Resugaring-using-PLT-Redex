@@ -1,11 +1,15 @@
 # Lightweight-Resugaring-using-PLT-Redex
+## To run the example
+Run the code/finalversion/resugar.rkt
 
-Run the Test.rkt (toy examples)
+## To write sugar (in code/finalversion folder)
 
-# To write sugar
-1. Add Rule in Lang.rkt(Some examples in the function).
-2. Add identifier to SurfHead? function.
-3. Add Context(E) of Language Test in Lang.rkt.
+First, modify language model in model.rkt
+1. Add Grammar rule(Some examples in the function).
+2. Add Reduction rule.
+3. Add Context rule.
 
-# todolist
-1. SKI combinator upon lazy lambda sugar.
+Then add expression to resugar.rkt
+
+## todolist
+1. call/cc sugar
