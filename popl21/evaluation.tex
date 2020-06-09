@@ -2,4 +2,227 @@
 \section{Evaluation}
 \label{sec6}
 
-Explain how your system is implemented and how the experiment is performed to evaluate your approach.
+We test some applications on the tool implemented using PLT Redex. Note that we set CBV's lambda calculus as terms in commonexp, because we need to output some intermediate sequences including lambda expressions in some examples. It's easy if we want to skip them.
+
+\subsection{simple sugar}
+
+We construct some simple syntactic sugar and try it on our tool. Some sugar is inspired by the first work of resugaring\cite{resugaring}. The result shows that our approach can process all sugar features of their first work.
+
+We take a SKI combinator syntactic sugar as an example. We will show why our approach is lightweight.
+
+\begin{flushleft}
+	$S$ → $(\lambda _{N}~(x_{1}~x_{2}~x_{3})~(x_{1}~x_{2}~(x_{1}~x_{3})))$
+	
+	$K$ → $(\lambda _{N}~(x_{1}~x_{2})~x_{1})$
+	
+	$I$ → $(\lambda _{N}~(x)~x)$
+\end{flushleft}
+
+Althought SKI combinator calculus is a reduced version of lambda calculus, we can construct combinators' sugar based on call-by-need lambda calculus in our CoreLang. For expression $(S~(K~(S~I))~K~xx~yy)$, we get the following resugaring sequences as Fig \ref{fig:SKI}.
+
+\begin{figure}[ht]
+	\begin{center}
+		\framebox[35em][l]{
+			\parbox[t]{\textwidth}{
+				\begin{center}
+				{
+					\small\selectfont
+					(S (K (S I)) K xx yy)\\
+					↓\\
+					(((K (S I)) xx (K xx)) yy)\\
+					↓\\
+					(((S I) (K xx)) yy)\\
+					↓\\
+					(I yy ((K xx) yy))\\
+					↓\\
+					(yy ((K xx) yy))\\
+					↓\\
+					(yy xx)
+				}
+				\end{center}
+				
+			}
+		}
+	\end{center}
+	\caption{SKI's resugaring sequences}
+	\label{fig:SKI}
+\end{figure}
+
+For existing approach, the sugar expression should firstly desugar to
+\begin{flushleft}
+$((\lambda _{N}
+   (x_{1} x_{2} x_{3})
+   (x_{1} x_{3} (x_{2} x_{3})))
+  ((\lambda _{N} (x_{1} x_{2}) x_{1})
+   ((\lambda _{N}
+     (x_{1} x_{2} x_{3})
+     (x_{1} x_{3} (x_{2} x_{3})))
+    (\lambda _{N} (x) x)))
+  (\lambda _{N} (x_{1} x_{2}) x_{1})
+  xx
+  yy)$
+\end{flushleft}
+
+And in our CoreLang, the execution of expanded expression will contain 33 steps. For each step, there will be many attempts to match and substitute the syntactic sugars. We will omit more steps for a larger expression. So the unidirectional resugaring algorithm makes our approach lightweight.
+
+\subsection{hygienic macro}
+
+The second work\cite{hygienic} mainly processes hygienic macro compared to first work. We try a $Let$ sugar , which is a common hygienic sugar example, on our tool. Our algorithm can easily process hygienic macro without special data structure. The $Let$ sugar is define as follow
+
+$(Let\;x\;v\;exp)$ → $(Apply\;(\lambda\;(x)\;exp)\;v)$
+
+Take $(Let~x~1~(+~x~(Let~x~2~(+~x~1))))$ for an example. First, a temp expression
+
+$(Apply\;(\lambda\;(x)\;(+~x~(Let~x~2~(+~x~1))))\;1)$
+
+is needed. (case 5 or 6)Then one-step try on the temp expression, we will get
+
+$(+~1~(Let~1~2~(+~1~1)))$ which is out of the whole language's grammar. In this case, it is not a good choice to desugar the outermost $Let$ sugar. Then we just apply the core-algo f on the sub-expression where the error occurs ($(+~x~(Let~x~2~(+~x~1)))$ in this example). So the right intermediate sequence $(Let~x~1~(+~x~3))$ will be get.
+
+In practical application, we think resugaring for a unhygienic rewriting system is not interesting at all, because hygienic macro can be easily processed by rewriting system. So in the finally implementation of our tool, we just use PLT Redex's binding forms to deal with hygienic macros. But we did try it on the version without hygienic rewriting system.
+
+\subsection{recursive sugar}
+Recursive sugar is a kind of syntactic sugars where call itself or each other during the expanding. For example,
+
+$(Odd\;e)$ → $(if\;(>\;e\;0)\;(Even\;(-\;e\;1)\;\#f))$
+
+$(Even\;e)$ → $(if\;(>\;e\;0)\;(Odd\;(-\;e\;1)\;\#t))$
+
+are typical recursive sugars. The previous works can process this kind of syntactic sugar easily, because boundary conditions are in the sugar itself.
+
+Take $(Odd~2)$ as an example. The previous work will firstly desugar the expression using the rewriting system. Then the rewriting system will never start resugaring as Fig\ref{fig:odd} shows.
+
+\begin{figure}[ht]
+	\centering
+	\parbox[t]{\textwidth}{
+				\begin{center}
+				{
+					\small\selectfont
+					(Odd 2)\\
+					↓\\
+					(if (> 2 0) (Even (- 2 1) \#f))\\
+					↓\\
+					(if (> (- 2 1) 0) (Odd (- (- 2 1) 1) \#t))\\
+					↓\\
+					(if (> (- (- 2 1) 1) 0) (Even (- (- (- 2 1) 1) 1) \#f))\\
+					↓\\
+					{\ldots}
+				}
+				\end{center}
+				
+			}
+	\caption{Odd2's desugaring process}
+\label{fig:odd}
+\end{figure}
+
+Then the advantage of our approach is embodied. Our lightweight approach doesn't require a whole expanding of sugar expression, which gives the framework chances to judge boundary conditions in sugars themselves, and showing more intermediate sequences. We get the resugaring sequences as Fig \ref{fig:rec} of the former example using our tool.
+
+\begin{figure}[ht]
+	\centering
+	\parbox[t]{\textwidth}{
+				\begin{center}
+				{
+					\small\selectfont
+					(Odd 2)\\
+					↓\\
+					(Even (- 2 1))\\
+					↓\\
+					(Even 1)\\
+					↓\\
+					(Odd (- 1 1))\\
+					↓\\
+					(Odd 0)\\
+					↓\\
+					\#f
+				}
+				\end{center}
+				
+			}
+	\caption{Odd2's resugaring sequences}
+\label{fig:rec}
+\end{figure}
+
+We also construct some higher-order syntactic sugars and test them. The higher-order feature is important for constructing practical syntactic sugar. And for syntactic sugar's feature, it is of recursive sugar. Giving the following two higher-order syntactic sugar as examples.
+
+\begin{flushleft}
+	$(map\;e\;(list\;v_1\ldots))$→
+	
+	$(if\;(empty\;(list\;v_1\ldots))\;(list)\;(cons\;(e\;(first\;(list\;v_1\ldots)))\;(map\;e\;(rest\;(list\;v_1\ldots)))))$
+\end{flushleft}
+
+\begin{flushleft}
+	$(filter\;e\;(list\;v_1\;v_2\ldots))$→
+	
+	$(if\;(e\;v_1)\;(cons\;v_1\;(filter\;e\;(list\;v_2\ldots)))\;(filter\;e\;(list\;v_2\ldots)))$
+	
+	$(filter\;e\;(list))$ → $(list)$
+\end{flushleft}
+These two syntactic sugars use different sugar forms to implement. For $Map$ sugar, we use if expression in CoreLang to constrain the boundary conditions. For $Filter$ sugar, we use two different parameters' form, which is another easy way for constructing syntactic sugar. The testing results show as Fig\ref{fig:map} \ref{fig:filter}.
+
+\begin{figure}[ht]
+	\centering
+	\parbox[t]{\textwidth}{
+				\begin{center}
+				{
+					\small\selectfont
+					(map (λ (x) (+ 1 x)) (list 1 2 3))\\
+					↓\\
+					(cons 2 (map (λ (x) (+ 1 x)) (list 2 3)))\\
+					↓\\
+					(cons 2 (cons 3 (map (λ (x) (+ 1 x)) (list 3))))\\
+					↓\\
+					(cons 2 (cons 3 (cons 4 (map (λ (x) (+ 1 x)) (list)))))\\
+					↓\\
+					(cons 2 (cons 3 (cons 4 (list))))\\
+					↓\\
+					(cons 2 (cons 3 (list 4)))\\
+					↓\\
+					(cons 2 (list 3 4))\\
+					↓\\
+					(list 2 3 4)
+				}
+				\end{center}
+				
+			}
+	\caption{Map's resugaring sequences}
+\label{fig:map}
+\end{figure}
+
+\begin{figure}[ht]
+	\centering
+	\parbox[t]{\textwidth}{
+	
+				\begin{center}
+				{
+					\small\selectfont
+					(filter (λ (x) (and (> x 3) (< x 6))) (list 1 2 3 4 5 6 7))\\
+					↓\\
+					(filter (λ (x) (and (> x 3) (< x 6))) (list 2 3 4 5 6 7))\\
+					↓\\
+					(filter (λ (x) (and (> x 3) (< x 6))) (list 3 4 5 6 7))\\
+					↓\\
+					(filter (λ (x) (and (> x 3) (< x 6))) (list 4 5 6 7))\\
+					↓\\
+					(cons 4 (filter (λ (x) (and (> x 3) (< x 6))) (list 5 6 7)))\\
+					↓\\
+					(cons 4 (cons 5 (filter (λ (x) (and (> x 3) (< x 6))) (list 6 7))))\\
+					↓\\
+					(cons 4 (cons 5 (filter (λ (x) (and (> x 3) (< x 6))) (list 7))))\\
+					↓\\
+					(cons 4 (cons 5 (filter (λ (x) (and (> x 3) (< x 6))) (list))))\\
+					↓\\
+					(cons 4 (cons 5 (list)))\\
+					↓\\
+					(cons 4 (list 5))\\
+					↓\\
+					(list 4 5)
+				}
+					
+				\end{center}
+				
+			}
+	\caption{Filter's resugaring sequences}
+\label{fig:filter}
+\end{figure}
+
+111

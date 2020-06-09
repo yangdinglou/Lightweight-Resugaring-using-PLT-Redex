@@ -2,7 +2,7 @@
 %%% Do NOT edit. File created by BibTeX with style
 %%% ACM-Reference-Format-Journals [18-Jan-2012].
 
-\begin{thebibliography}{6}
+\begin{thebibliography}{8}
 
 %%% ====================================================================
 %%% NOTE TO THE USER: you can override these defaults by providing
@@ -66,6 +66,23 @@
 \showISBNx{0262062755}
 
 
+\bibitem[\protect\citeauthoryear{Felleisen and Hieb}{Felleisen and
+  Hieb}{1992}]%
+        {reduction}
+\bibfield{author}{\bibinfo{person}{Matthias Felleisen} {and}
+  \bibinfo{person}{Robert Hieb}.} \bibinfo{year}{1992}\natexlab{}.
+\newblock \showarticletitle{The Revised Report on the Syntactic Theories of
+  Sequential Control and State}.
+\newblock \bibinfo{journal}{\emph{Theor. Comput. Sci.}} \bibinfo{volume}{103},
+  \bibinfo{number}{2} (\bibinfo{date}{Sept.} \bibinfo{year}{1992}),
+  \bibinfo{pages}{235–271}.
+\newblock
+\showISSN{0304-3975}
+\urldef\tempurl%
+\url{https://doi.org/10.1016/0304-3975(92)90014-7}
+\showDOI{\tempurl}
+
+
 \bibitem[\protect\citeauthoryear{Fowler}{Fowler}{2011}]%
         {dsl}
 \bibfield{author}{\bibinfo{person}{Martin Fowler}.}
@@ -94,6 +111,21 @@
 \url{https://doi.org/10.1093/comjnl/6.4.308}
 \showDOI{\tempurl}
 \showeprint{https://academic.oup.com/comjnl/article-pdf/6/4/308/1067901/6-4-308.pdf}
+
+
+\bibitem[\protect\citeauthoryear{Plotkin}{Plotkin}{1975}]%
+        {PLOTKIN}
+\bibfield{author}{\bibinfo{person}{G.D. Plotkin}.}
+  \bibinfo{year}{1975}\natexlab{}.
+\newblock \showarticletitle{Call-by-name, call-by-value and the λ-calculus}.
+\newblock \bibinfo{journal}{\emph{Theoretical Computer Science}}
+  \bibinfo{volume}{1}, \bibinfo{number}{2} (\bibinfo{year}{1975}),
+  \bibinfo{pages}{125 -- 159}.
+\newblock
+\showISSN{0304-3975}
+\urldef\tempurl%
+\url{https://doi.org/10.1016/0304-3975(75)90017-1}
+\showDOI{\tempurl}
 
 
 \bibitem[\protect\citeauthoryear{Pombrio and Krishnamurthi}{Pombrio and

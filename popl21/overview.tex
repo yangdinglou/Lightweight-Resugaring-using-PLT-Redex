@@ -4,61 +4,28 @@
 
 Use a simple but sharp example to give an overview of your approach.
 
-\subsection{Defination of resugaring}
-This subsection is partially similiar to original defination in\cite{resugaring}.
-\begin{Def}[Resugaring]
-Given core language (named {\bfseries CoreLang}) and its evalation rules, together with surface language based on syntactic sugars of CoreLang (named {\bfseries Surflang}). For any expression of Surflang, getting the evaluation sequences of the expression in terms of SurfLang. 
-\end{Def}
-For correctness of the resugaring, the evaluation sequences should maintain the following three properties:
-\begin{enumerate}
-\item {\bfseries Emulation} Each term in the generated surface evaluation sequence desugars into the core term which it is meant to represent.
-\item {\bfseries Abstraction} The resugaring sequences should only contains terms in SurfLang, and each term of SurfLang should originate from initial expression.
-\item {\bfseries Coverage} No sequence is skipped during the process.
-\end{enumerate}
-
-Given an example below.
-
-For syntactic sugar {\bfseries and} and {\bfseries or}, the sugar rules are:
-\begin{center}
-	\parbox[t]{\textwidth}{%
-		\begin{center}  
-			and(e1, e2) → if(e1, e2, \#f)\\
-			or(e1, e2) → if(e1, \#t, e2)
-		\end{center}  
-	}%  
-\end{center}
-which forms a simple SurfLang.
-
-The evaluation rules of {\bfseries if} is:
-\begin{center}
-	\parbox[t]{\textwidth}{%
-		\begin{center}  
-			if(\#t, e1, e2) → e1\\
-			if(\#f, e1, e2) → e2
-		\end{center}  
-	}% 
-\end{center}
-
-Then for SurfLang's expression $\mbox{and}(\mbox{or}(\#f, \#t), \mbox{and}(\#t, \#f))$ should get resugaring sequences as fig\ref{fig:example}.todo:why
+The key idea of our lightweight resugaring approach, is that, we won't expand a syntactic sugar until we must desugar it. We design a core algorithm to choose the right reduction rule for any expression during the execution. Take the example $\mbox{and}(\mbox{or}(\#f, \#t), \mbox{and}(\#t, \#f))$ again. We will get the sequence as ...
 
 \begin{figure}[ht]
 \parbox[t]{\textwidth}{
 			\begin{center}  
-				and(or(\#f, \#t), and(\#t, \#f))\\
-				↓\\
-				and(\#t, and(\#t, \#f))\\
-				↓\\
-				and(\#t, \#f)\\
-				↓\\
+				(and (or \#f \#t) (and \#t \#f))\\
+				~~~~~↓step1\\
+				(and (if \#f \#t \#t) (and \#t \#f))\\
+				~~~~~↓step2\\
+				(and \#t (and \#t \#f))\\
+				~~~~~↓step3\\
+				(if \#t (and \#t \#f) \#f)\\
+				~~~~~↓step4\\
+				(and \#t \#f)\\
+				~~~~~↓step5\\
+				(if \#t \#f \#f)\\
+				~~~~~↓step6\\
 				\#f
 			\end{center}  
 		}
-\caption{resugaring example}
-\label{fig:example}
+\caption{core-algo example}
+\label{fig:core-algo}
 \end{figure}
-\subsection{Idea origin}
-Church–Rosser theorem\cite{churchrosser} gives theoretical support for full-$\beta$ reduction, which is a nondeterministic evaluation strategy of lambda caculus. 
 
-Reduction semantics
-
-Our original idea is similiar to full-$\beta$ reduction. When not restricting the context rules of reduction semantics, the reduction paths of a expression will become a full graph like full-$\beta$ reduction.
+At step 1, we found the outermost $and$ sugar don't have to expand, because its first sub-expression will reduce earlier. At step 2, the same as step 1. At step 3, the outermost $and$ sugar have to expand, because no sub-expression will reduce after the whole expression desugar. At step 4, the inner $and$ sugar don't have to expand either. At step 5, the sugar have to desugar to CoreLang. Finally at step 6, er get the final result.

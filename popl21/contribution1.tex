@@ -127,21 +127,21 @@ Our lightweight resugaring algorithm is based on a core algorithm f. For every e
 		\STATE     Let $ListofExp'$ = $\{Exp'_{1}\;,Exp'_{2}~\ldots\}$
 		\IF {$Exp$ is Coreexp or  Commonexp or OtherCommonexp}
 		\IF {Lengthof($ListofExp'$)==0}
-		\RETURN null; //\hfill Rule1.1
+		\RETURN null; \hfill Case1
 		\ELSIF {Lengthof($ListofExp'$)==1}
-		\RETURN first($ListofExp'$); //\hfill Rule1.2
+		\RETURN first($ListofExp'$); \hfill Case2
 		\ELSE 
-		\RETURN $Exp'_{i}$ = $(Headid~Subexp_{1}~\ldots~Subexp'_{i}~\ldots)$; //where i is the index of subexp which have to be reduced. \hfill Rule1.3
+		\RETURN $Exp'_{i}$ = $(Headid~Subexp_{1}~\ldots~Subexp'_{i}~\ldots)$; //where i is the index of subexp which have to be reduced. \hfill Case3
 		\ENDIF
 		\ELSE 
 		\IF {$Exp$ have to be desugared}
-		\RETURN desugarsurf($Exp$); //\hfill Rule2.1
+		\RETURN desugarsurf($Exp$); \hfill Case4
 		\ELSE
 		\STATE Let $DesugarExp$ = desugarsurf(Exp)
 		\IF {$Subexp_{i}$ is reduced to $Subexp'_{i}$ during $f(DesugarExp)$}
-		\RETURN $Exp'_{i}$ = $(Headid~Subexp_{1}~\ldots~Subexp'_{i}~\ldots)$; //\hfill Rule2.2.1
+		\RETURN $Exp'_{i}$ = $(Headid~Subexp_{1}~\ldots~Subexp'_{i}~\ldots)$; \hfill Case5
 		\ELSE
-		\RETURN $DesugarExp$; //\hfill Rule2.2.2
+		\RETURN $DesugarExp$; \hfill Case6
 		\ENDIF
 		\ENDIF
 		\ENDIF
@@ -157,33 +157,6 @@ Line 2-9 deal with the case when Exp has a CoreLang's Headid. When Exp is value 
 
 Line 10-21 deal with the case then Exp has a SurfLang's Headid. When Exp only has one reduction rule (line 11-12), the syntactic sugar has to desugar. If not, we should expand outermost sugar and find the sub-expression which should be reduced (line 14-16), or the sugar has to desugar (line 17-18).
 
-\begin{flushleft}
-	\large{\bfseries{
-			If Exp is Coreexp or Commonexp or OtherCommonexp, then
-		}	
-	}	
-\end{flushleft}
-\begin{itemize}
-	\item ListofExp' may be empty, the Exp is not reducible. Return Empty then.\hfill $Rule1.1$
-	\item ListofExp' may contain only one element. Just return it because no more reduction available.\hfill $Rule1.2$
-	\item ListofExp' may contain more than one elements. Due to context restriction of CoreLang\ref{mark:ctx}, only one sub-expression {\bfseries $Subexp_{i}$} can be reduced. Now we apply core language f on {\bfseries $Subexp_{i}$} recursively to get {\bfseries $Subexp'_{i}$}, and return the expression in which {\bfseries $Subexp_{i}$} is reduced to {\bfseries $Subexp'_{i}$}.\hfill $Rule1.3$
-	
-\end{itemize}
-
-\begin{flushleft}
-	\large{\bfseries{
-			If Exp is Surfexp or OtherSurfexp, then
-		}
-	}
-\end{flushleft}
-\begin{itemize}
-	\item ListofExp' may contain only one element. Just return it because no sub-expression can be reduced, The syntactic sugar of Headid have to desugar.\hfill $Rule2.1$
-	\item ListofExp' may contain more than one elements. Due to unambiguous restriction of syntactic sugar, there must exist sub-expression which can be reduced. Firstly, we desugar {\bfseries Exp}'s outermost syntactic sugar to {\bfseries DesugarExp}. Then apply core algorithm f on {\bfseries DesugarExp}. (named one-step try)
-	\begin{itemize}
-		\item If f(DesugarExp) reduces sub-expression of DesugarExp, since the sub-expression is composed by sub-expressions of {\bfseries Exp}, it is necessary to detect which sub-expression {\bfseries $Subexp_{i}$} is first reduced to approximately {\bfseries $Subexp'_{i}$}. Return the expression in which {\bfseries $Subexp_{i}$} is reduced to {\bfseries $Subexp'_{i}$}.\hfill $Rule2.2.1$
-		\item If f(DesugarExp) doesn't reduce sub-expression of DesugarExp, then the outermost sugar won't resugar. Return {\bfseries DesugarExp} then.\hfill $Rule2.2.2$ 
-	\end{itemize}
-\end{itemize}
 
 Then, our lightweight-resugaring algorithm is defined as \ref{alg:lwresugar}.
 
@@ -208,6 +181,8 @@ Then, our lightweight-resugaring algorithm is defined as \ref{alg:lwresugar}.
 		
 	\end{algorithmic}
 \end{algorithm}
+
+The whole process executes core algorithm f, and output sequences which is of Surfexp or Commonexp.
 
 \subsection{Proof of correctness}
 
@@ -234,18 +209,53 @@ $(\mbox{if}\; (\mbox{And}\; \#t\; \#f)\; Exp_{1}\; Exp_{2})$ → $(\mbox{if}\; (
 $(\mbox{if}\; (\mbox{And}\; (\mbox{And}\; \#t\; \#t)\; \#t)\; \#f)\; Exp_{1}\; Exp_{2})$ → $(\mbox{if}\; (\mbox{And}\; \#t\; \#t)\; Exp_{1}\; Exp_{2})$ \hfill Inner Reduction
 
 \begin{Def}[Upper and lower expression]
-For $Exp$=$(Headid\;Subexp_{1}\;Subexp_{\ldots} \ldots)$, $Exp$is called {\bfseries upper expression}$,Subexp_{i}$is called {\bfseries lower expression}.
+For $Exp$=$(Headid\;Subexp_{1}\;Subexp_{\ldots} \ldots)$, $Exp$ is called {\bfseries upper expression}$,Subexp_{i}$is called {\bfseries lower expression}.
 \end{Def}
+
+We only need to prove that all the 6 cases of core algorithm f won't effect its properties. Case 1 and case 3 won't effect any properties, because it does what CoreLang should do.
 
 \begin{proof}[Proof of Emulation]
 \hfill\\
+For case 4 and 6, desugaring won't change Emulation property, because desugaring and resugaring are interconvertible.
 
+For case 2 and 5, our core algorithm reduces the sub-expression which should be reduced. So if applying core algorithm f on the subexpression satisfies emulation property, then this two cases satisfy. A recursive proof it is.
+todo:case5
 \end{proof}
 
 \begin{proof}[Proof of Abstraction]
-2
+\hfill\\
+It's true, because we only display the sequence which satisfies abstraction property.
+\end{proof}
+
+\begin{lemma}
+If no syntactic sugar desugared before it has to, then coverage property is satisfied.
+\end{lemma}
+
+\begin{proof}[Proof of Lemma]
+Assume that no syntactic sugar not necessarily expanded desugars too early, existing an expression in CoreLang
+
+$Exp$ = $(Headid\;Subexp_{1}\;Subexp_{\ldots} \ldots)$ which can be resugared to
+
+$ResugarExp'$ = $(Surfid\;Subexp'_{1}\;Subexp'_{\ldots}\ldots)$, and $ResugarExp'$ is not displayed during lightweight-resugaring. Then
+
+\begin{itemize}
+	\item Or existing
+	
+	$ResugarExp$=$(Surfid\;Subexp'_{1}\;\ldots\;Subexp_{i}\;Subexp'_{\ldots}\ldots)$ in resugaring sequences, such that the expression after $ResugarExp$ desugaring reduces to $Exp$, and the reduction reduces $ResugarExp$'s sub-expression $Subexp_{i}$. If so, outermost syntactic sugar of $ResugarExp$ is not expanded. So if $ResugarExp'$ is not displayed, then the sugar not necessarily expanded desugars too early, which is contrary to assumption.
+	
+	
+	\item Or existing
+	
+	$ResugarExp$=$(Surfid'\;\ldots\;ResugarExp'\;\ldots)$ in resugaring sequences, such that the expression after $ResugarExp$ desugaring reduces to $Exp$, and $Exp$ is desugared from $ResugarExp'$'s sub-expression. If $ResugarExp'$ is not displayed, then the outermost syntactic sugar is expanded early, which is contrary to assumption.
+	todo
+	%使得$ResugarExp$解糖后得到的表达式单步规约得到$Exp$，且该$Exp$是从$ResugarExp$中的子表达式$ResugarExp'$解糖得到，说明此步单步规约不涉及$ResugarExp'$的规约。而如果不能展示$ResugarExp'$，则说明该语法糖在执行前面的序列被提前破坏了，也与假设矛盾。
+
+\end{itemize}
 \end{proof}
 
 \begin{proof}[Proof of Coverage]
-3
+\hfill\\
+For case 4 and 6, the syntactic sugar has to desugar.
+
+For case 2 and 5, the reduction occurs in sub-expression of $Exp$. So if applying core algorithm f on the subexpression doesn't desugar syntactic sugars not necessarily expanded, then this two cases don't. A recursive proof it is.
 \end{proof}
