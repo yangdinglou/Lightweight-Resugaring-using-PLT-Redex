@@ -116,6 +116,7 @@
   
   #:binding-forms
   (λ (x ...) e #:refers-to (shadow x ...))
+  (λN (x ...) e #:refers-to (shadow x ...))
   (Let x e e_body #:refers-to (shadow x))
   (let ([x e_x] ...) e_body #:refers-to (shadow x ...)))
 
@@ -332,7 +333,17 @@
     (term
      ((SS comb) (II comb) ((KK comb) xx) yy)
      ))
-
+#;(run (term ((λN
+   (x_1 x_2 x_3)
+   (x_1 x_3 (x_2 x_3)))
+  ((λN (x_1 x_2) x_1)
+   ((λN
+     (x_1 x_2 x_3)
+     (x_1 x_3 (x_2 x_3)))
+    (λN (x) x)))
+  (λN (x_1 x_2) x_1)
+  xx
+  yy)))
 #;(run
     (term
      ((S comb) (I comb) ((K comb) xx) yy)
