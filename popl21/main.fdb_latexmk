@@ -1,22 +1,21 @@
 # Fdb version 3
-["bibtex main"] 1591705180 "main.aux" "main.bbl" "main" 1591705185
+["bibtex main"] 1592130668 "main.aux" "main.bbl" "main" 1592134087
   "./ACM-Reference-Format.bst" 1588229812 87806 cdf46f74ac483d72585084276eb3e09d ""
-  "main.aux" 1591705183 8017 be0174fa044c66008159371e03c592c7 "xelatex"
-  "reference.bib" 1591553161 3644 a531e699e1636175dea3dd9888b987c4 ""
+  "main.aux" 1592134085 9506 d3b9f8797790ceb3cf6b5d9a6adee482 "xelatex"
+  "reference.bib" 1591856860 5800 558ac52af11bb05a2ed39333d205097c ""
   (generated)
   "main.blg"
   "main.bbl"
-["xdvipdfmx"] 1591705184 "main.xdv" "main.pdf" "main" 1591705185
-  "main.xdv" 1591705183 322056 0a09b004a5bae5a082ff7249e217f5e2 "xelatex"
+["xdvipdfmx"] 1592134086 "main.xdv" "main.pdf" "main" 1592134087
+  "main.xdv" 1592134085 384360 42d00e650c7166f144bb5da9276f7832 "xelatex"
   (generated)
   "main.pdf"
-["xelatex"] 1591705181 "main.tex" "main.xdv" "main" 1591705185
+["xelatex"] 1592134082 "main.tex" "main.xdv" "main" 1592134087
   "acmart.cls" 1588229812 99865 22aab88eb4450dc97aba90abe39b216c ""
-  "background.tex" 1591558366 3592 e70f97615343441335563b2c65ea3983 ""
+  "background.tex" 1592126339 4438 620f175f68335eef4505a73cd23b3127 ""
   "conclusion.tex" 1591114098 170 3c37d0e4b33fe130f980c9f6d0b05540 ""
-  "contribution1.tex" 1591517296 12509 a913be8b647c10ddb9789c2496846adb ""
+  "contribution1.tex" 1592134081 12471 986d601471d38c2db67a6441d66faa4b ""
   "contribution2.tex" 1591523767 1118 03e389ecd65dcc297a633b1fba4db00d ""
-  "contribution3.tex" 1591115819 112 94957d0c66c62e3bc11503994179d61e ""
   "d:/texlive/2019/texmf-dist/fonts/map/fontname/texfonts.map" 1586368236 3332 103109f5612ad95229751940c61aada0 ""
   "d:/texlive/2019/texmf-dist/fonts/tfm/adobe/zapfding/pzdr.tfm" 1586370653 1528 7e12f4c0fcf5a072cebdcfbfc610f54c ""
   "d:/texlive/2019/texmf-dist/fonts/tfm/public/amsfonts/symbols/msam10.tfm" 1586367262 916 f87d7c45f9c908e672703b83b72241a3 ""
@@ -148,19 +147,21 @@
   "d:/texlive/2019/texmf-dist/web2c/texmf.cnf" 1586368589 35430 ca24fb44b873d21ac4c63d01600decd4 ""
   "d:/texlive/2019/texmf-var/web2c/xetex/xelatex.fmt" 1586370788 3750156 8f240d38b3887dbbac6451055f0ce51b ""
   "d:/texlive/2019/texmf.cnf" 1586370686 673 4ae7b2f49cee444c5343a45b5d0f169c ""
-  "evaluation.tex" 1591705176 8110 2de78cc338d59afbf57de8f92b27a6f8 ""
+  "discussion.tex" 1592130663 2673 953008874da226437f13960133da96bb ""
+  "evaluation.tex" 1592129991 8103 8e174d37637a713161c8629de787eeeb ""
   "images/frame.PNG" 1591701178 23575 1894abd1db70fd76075b1ddd36a6abfb ""
   "images/frame.png" 1591701178 23575 1894abd1db70fd76075b1ddd36a6abfb ""
-  "introduction.tex" 1591435921 3320 f288a6ec61eb279c5bf1866e34ff5b11 ""
-  "main.aux" 1591705183 8017 be0174fa044c66008159371e03c592c7 "xelatex"
-  "main.bbl" 1591705180 6259 46fbe5ff0fe93ac59fcf180bcb66f810 "bibtex main"
-  "main.out" 1591705183 2700 fd2f0d3eaa4b425de5e23bd65dabe76f "xelatex"
-  "main.tex" 1591524044 9151 cf23d17c3e36db407323ebf3181b9846 ""
+  "images/fullreduction.png" 1589184169 126052 98a304a9b84203c9c390f9246e3dae9b ""
+  "introduction.tex" 1591721040 3332 270f12a46404e9ee81b16a04b6ee3d31 ""
+  "main.aux" 1592134085 9506 d3b9f8797790ceb3cf6b5d9a6adee482 "xelatex"
+  "main.bbl" 1592130669 8900 ff52faac8b49b14b4d008a13d7ad12e5 "bibtex main"
+  "main.out" 1592134085 3069 a83991c6ae896b317901bdfcf985987a "xelatex"
+  "main.tex" 1591813304 9172 cd1266e8ee178525de663f5e73e1afa0 ""
   "nul" 0 0 d41d8cd98f00b204e9800998ecf8427e ""
   "overview.tex" 1591560700 1395 ae326f4bc7d4fda70e5df22f51beea2b ""
-  "relatedWork.tex" 1588240227 110 3e19c6e8afff252d82f1594ade8cf74c ""
+  "relatedWork.tex" 1591861615 1104 d21e606d1f9e9c45d687bebf34413718 ""
   (generated)
-  "main.log"
-  "main.xdv"
-  "main.aux"
   "main.out"
+  "main.log"
+  "main.aux"
+  "main.xdv"

@@ -326,6 +326,7 @@ INPUT introduction.tex
 OUTPUT main.xdv
 INPUT background.tex
 INPUT background.tex
+INPUT images/fullreduction.png
 INPUT overview.tex
 INPUT overview.tex
 INPUT contribution1.tex
@@ -333,10 +334,10 @@ INPUT contribution1.tex
 INPUT contribution2.tex
 INPUT contribution2.tex
 INPUT images/frame.PNG
-INPUT contribution3.tex
-INPUT contribution3.tex
 INPUT evaluation.tex
 INPUT evaluation.tex
+INPUT discussion.tex
+INPUT discussion.tex
 INPUT relatedWork.tex
 INPUT relatedWork.tex
 INPUT conclusion.tex

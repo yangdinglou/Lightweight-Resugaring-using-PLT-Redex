@@ -5,7 +5,6 @@
 \subsection{Language setting}
 
 \subsubsection{Grammatical restrictions}
-\hfill\\
 Firstly, the whole language should restrict to tree-structured disjoint expression.
 
 \begin{Def}[disjoint]
@@ -30,14 +29,13 @@ The grammatical restrictions give our language a similiar property as church-ros
 todo:church-rosser?
 
 \subsubsection{Context restrictions}
-\hfill\\
 For expressions in CoreLang, the context rule should restrict it to have only one reduction path. The context rules can limit the order of evaluation. This restriction is normal, because a program in general-purposed language should have only one execution path.\label{mark:ctx}
 
 For expressions in SurfLang, context rules should allow every sub-expressions reduced. It's the same as full-$\beta$ reduction.
 
 \subsubsection{Restriction of syntactic sugar}
-\hfill\\
 The form of syntactic sugar is as follow.
+
 \fbox{
 $(\mbox{Surfid}\;e_{1}\;e_{2}\;\ldots)$ ~→~ $(\mbox{Headid}\; \ldots)$
 }
@@ -49,7 +47,6 @@ For every syntactic sugar expression, it can only desugar to one expression in C
 \end{Def}
 
 \subsubsection{Grammar Description}
-\hfill\\
 In our language setting, we regard SurfLang and CoreLang as a whole language. The whole language is under restrictions above, and its grammar is defined as follow.
 
 \begin{centering}

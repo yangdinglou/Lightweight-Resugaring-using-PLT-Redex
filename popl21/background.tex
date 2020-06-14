@@ -37,7 +37,7 @@ The evaluation rules of {\bfseries if} is:
 	}% 
 \end{center}
 
-Then for SurfLang's expression $\mbox{and}(\mbox{or}(\#f, \#t), \mbox{and}(\#t, \#f))$ should get resugaring sequences as fig\ref{fig:example}.todo:why
+Then for SurfLang's expression $\mbox{and}(\mbox{or}(\#f, \#t), \mbox{and}(\#t, \#f))$ should get resugaring sequences as fig\ref{fig:example}.
 
 \begin{figure}[ht]
 \parbox[t]{\textwidth}{
@@ -73,11 +73,11 @@ The reason we should get the sequences above is because $(\mbox{and}~(\mbox{or}~
 \label{fig:coreseq}
 \end{figure}
 
-The second item in the sequences can be desugared from $(\mbox{and}~\#t~(\mbox{and}~\#t~\#f))$, so resugars to it.
+The second item in the sequences can be desugared from $(\mbox{and}~\#t~(\mbox{and}~\#t~\#f))$, so resugars to it. So as the third item.
 \subsection{Idea origin}
 Church–Rosser theorem\cite{churchrosser} gives theoretical support for full-$\beta$ reduction, which is a nondeterministic evaluation strategy of lambda caculus. 
 
-Reduction semantics\cite{reduction} is an optimized version of structured operational semantics\cite{PLOTKIN}. The different
+Reduction semantics\cite{reduction} is an alternate presentation of structured operational semantics\cite{PLOTKIN}. The difference is that it use context rules uniquely to restrict evaluation order, instead of hidden in inference rules. The holes (E) in the context rules is where reductions can take place.
 
 \begin{figure}[ht]
 	\centering
@@ -96,4 +96,15 @@ Reduction semantics\cite{reduction} is an optimized version of structured operat
 	\label{fig:felleisen}
 \end{figure} 
 
-Our original idea is similiar to full-$\beta$ reduction. When not restricting the context rules of reduction semantics, the reduction paths of a expression will become a full graph like full-$\beta$ reduction.
+Our original idea is similiar to full-$\beta$ reduction. When not restricting the context rules of reduction semantics, the reduction paths of a expression will become a full graph like full-$\beta$ reduction. For the $\mbox{and}(\mbox{or}(\#f, \#t), \mbox{and}(\#t, \#f))$ example, we allow all expressions reducible. Then we can get the following full reduction graph as Fig\ref{fig:fullreduction}.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=12cm]{images/fullreduction.png}
+	\caption{full reduction's example}
+	\label{fig:fullreduction}
+\end{figure}
+
+We could find that the subsequences marked by red are the evaluation sequences after the syntactic sugar expression desugared. The subsequences marked by blue are which can be resugared. The subsequences marked by green are the resugaring sequences we want to get.
+
+(zc's approach)

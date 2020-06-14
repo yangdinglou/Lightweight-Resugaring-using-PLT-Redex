@@ -5,6 +5,7 @@
 We test some applications on the tool implemented using PLT Redex. Note that we set CBV's lambda calculus as terms in commonexp, because we need to output some intermediate sequences including lambda expressions in some examples. It's easy if we want to skip them.
 
 \subsection{simple sugar}
+\label{mark:simple}
 
 We construct some simple syntactic sugar and try it on our tool. Some sugar is inspired by the first work of resugaring\cite{resugaring}. The result shows that our approach can process all sugar features of their first work.
 
@@ -18,12 +19,13 @@ We take a SKI combinator syntactic sugar as an example. We will show why our app
 	$I$ → $(\lambda _{N}~(x)~x)$
 \end{flushleft}
 
-Althought SKI combinator calculus is a reduced version of lambda calculus, we can construct combinators' sugar based on call-by-need lambda calculus in our CoreLang. For expression $(S~(K~(S~I))~K~xx~yy)$, we get the following resugaring sequences as Fig \ref{fig:SKI}.
+Althought SKI combinator calculus is a reduced version of lambda calculus, we can construct combinators' sugar based on call-by-need lambda calculus in our CoreLang. For expression
+
+ $(S~(K~(S~I))~K~xx~yy)$, we get the following resugaring sequences as Fig \ref{fig:SKI}.
 
 \begin{figure}[ht]
-	\begin{center}
-		\framebox[35em][l]{
-			\parbox[t]{\textwidth}{
+	\centering
+	\parbox[t]{\textwidth}{
 				\begin{center}
 				{
 					\small\selectfont
@@ -40,10 +42,7 @@ Althought SKI combinator calculus is a reduced version of lambda calculus, we ca
 					(yy xx)
 				}
 				\end{center}
-				
 			}
-		}
-	\end{center}
 	\caption{SKI's resugaring sequences}
 	\label{fig:SKI}
 \end{figure}
@@ -66,6 +65,7 @@ $((\lambda _{N}
 And in our CoreLang, the execution of expanded expression will contain 33 steps. For each step, there will be many attempts to match and substitute the syntactic sugars. We will omit more steps for a larger expression. So the unidirectional resugaring algorithm makes our approach lightweight.
 
 \subsection{hygienic macro}
+\label{mark:hygienic}
 
 The second work\cite{hygienic} mainly processes hygienic macro compared to first work. We try a $Let$ sugar , which is a common hygienic sugar example, on our tool. Our algorithm can easily process hygienic macro without special data structure. The $Let$ sugar is define as follow
 

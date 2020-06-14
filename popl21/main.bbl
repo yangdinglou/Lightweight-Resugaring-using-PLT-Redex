@@ -2,7 +2,7 @@
 %%% Do NOT edit. File created by BibTeX with style
 %%% ACM-Reference-Format-Journals [18-Jan-2012].
 
-\begin{thebibliography}{8}
+\begin{thebibliography}{12}
 
 %%% ====================================================================
 %%% NOTE TO THE USER: you can override these defaults by providing
@@ -159,6 +159,70 @@
 \urldef\tempurl%
 \url{https://doi.org/10.1145/2858949.2784755}
 \showDOI{\tempurl}
+
+
+\bibitem[\protect\citeauthoryear{Pombrio and Krishnamurthi}{Pombrio and
+  Krishnamurthi}{2018}]%
+        {resugaringtype}
+\bibfield{author}{\bibinfo{person}{Justin Pombrio} {and}
+  \bibinfo{person}{Shriram Krishnamurthi}.} \bibinfo{year}{2018}\natexlab{}.
+\newblock \showarticletitle{Inferring Type Rules for Syntactic Sugar}.
+\newblock \bibinfo{journal}{\emph{SIGPLAN Not.}} \bibinfo{volume}{53},
+  \bibinfo{number}{4} (\bibinfo{date}{June} \bibinfo{year}{2018}),
+  \bibinfo{pages}{812–825}.
+\newblock
+\showISSN{0362-1340}
+\urldef\tempurl%
+\url{https://doi.org/10.1145/3296979.3192398}
+\showDOI{\tempurl}
+
+
+\bibitem[\protect\citeauthoryear{Pombrio, Krishnamurthi, and Wand}{Pombrio
+  et~al\mbox{.}}{2017}]%
+        {resugaringscope}
+\bibfield{author}{\bibinfo{person}{Justin Pombrio}, \bibinfo{person}{Shriram
+  Krishnamurthi}, {and} \bibinfo{person}{Mitchell Wand}.}
+  \bibinfo{year}{2017}\natexlab{}.
+\newblock \showarticletitle{Inferring Scope through Syntactic Sugar}.
+\newblock \bibinfo{journal}{\emph{Proc. ACM Program. Lang.}}
+  \bibinfo{volume}{1}, \bibinfo{number}{ICFP}, Article \bibinfo{articleno}{44}
+  (\bibinfo{date}{Aug.} \bibinfo{year}{2017}), \bibinfo{numpages}{28}~pages.
+\newblock
+\urldef\tempurl%
+\url{https://doi.org/10.1145/3110288}
+\showDOI{\tempurl}
+
+
+\bibitem[\protect\citeauthoryear{Ricciotti, Stolarek, Perera, and
+  Cheney}{Ricciotti et~al\mbox{.}}{2017}]%
+        {slicing}
+\bibfield{author}{\bibinfo{person}{Wilmer Ricciotti}, \bibinfo{person}{Jan
+  Stolarek}, \bibinfo{person}{Roly Perera}, {and} \bibinfo{person}{James
+  Cheney}.} \bibinfo{year}{2017}\natexlab{}.
+\newblock \showarticletitle{Imperative Functional Programs That Explain Their
+  Work}.
+\newblock \bibinfo{journal}{\emph{Proc. ACM Program. Lang.}}
+  \bibinfo{volume}{1}, \bibinfo{number}{ICFP}, Article \bibinfo{articleno}{14}
+  (\bibinfo{date}{Aug.} \bibinfo{year}{2017}), \bibinfo{numpages}{28}~pages.
+\newblock
+\urldef\tempurl%
+\url{https://doi.org/10.1145/3110258}
+\showDOI{\tempurl}
+
+
+\bibitem[\protect\citeauthoryear{Schuster, Disney, and Flanagan}{Schuster
+  et~al\mbox{.}}{2016}]%
+        {Macrofication}
+\bibfield{author}{\bibinfo{person}{Christopher Schuster}, \bibinfo{person}{Tim
+  Disney}, {and} \bibinfo{person}{Cormac Flanagan}.}
+  \bibinfo{year}{2016}\natexlab{}.
+\newblock \showarticletitle{Macrofication: Refactoring by Reverse Macro
+  Expansion}. In \bibinfo{booktitle}{\emph{Proceedings of the 25th European
+  Symposium on Programming Languages and Systems - Volume 9632}}.
+  \bibinfo{publisher}{Springer-Verlag}, \bibinfo{address}{Berlin, Heidelberg},
+  \bibinfo{pages}{644–671}.
+\newblock
+\showISBNx{9783662494974}
 
 
 \end{thebibliography}
