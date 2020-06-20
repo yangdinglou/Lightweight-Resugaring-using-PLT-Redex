@@ -74,10 +74,11 @@ The reason we should get the sequences above is because $(\mbox{and}~(\mbox{or}~
 \end{figure}
 
 The second item in the sequences can be desugared from $(\mbox{and}~\#t~(\mbox{and}~\#t~\#f))$, so resugars to it. So as the third item.
-\subsection{Idea origin}
-Church–Rosser theorem\cite{churchrosser} gives theoretical support for full-$\beta$ reduction, which is a nondeterministic evaluation strategy of lambda caculus. 
 
-Reduction semantics\cite{reduction} is an alternate presentation of structured operational semantics\cite{PLOTKIN}. The difference is that it use context rules uniquely to restrict evaluation order, instead of hidden in inference rules. The holes (E) in the context rules is where reductions can take place.
+\subsection{Background}
+{\bfseries Church–Rosser theorem}\cite{churchrosser} gives theoretical support for full-$\beta$ reduction, which is a nondeterministic evaluation strategy of lambda caculus. 
+
+{\bfseries Reduction semantics}\cite{reduction} is an alternate presentation of structured operational semantics\cite{PLOTKIN}. The difference is that it use context rules uniquely to restrict evaluation order, instead of hidden in inference rules. The holes (E) in the context rules is where reductions can take place.
 
 \begin{figure}[ht]
 	\centering
@@ -108,3 +109,6 @@ Our original idea is similiar to full-$\beta$ reduction. When not restricting th
 We could find that the subsequences marked by red are the evaluation sequences after the syntactic sugar expression desugared. The subsequences marked by blue are which can be resugared. The subsequences marked by green are the resugaring sequences we want to get.
 
 (zc's approach)
+
+In this paper, we use reduction semantics as theoretical basis. PLT Redex is a semantic engineering tool based on reduction semantics. We use the tool for implementing our approaches.
+

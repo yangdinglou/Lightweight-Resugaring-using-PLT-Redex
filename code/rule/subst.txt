@@ -1,0 +1,6 @@
+(subst x v id x) --> v
+(subst x v id x') --> x' where x =!= x'
+(subst x v head P e_1 e_2 ...) --> (P (subst x v e_1) (subst x v e_2) ...) where P =!= λ
+(subst x v λ x e) --> e
+(subst x v λ x' e) --> (λ x' (subst x v e)) where x =!= x'
+
