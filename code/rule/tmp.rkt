@@ -116,6 +116,7 @@
                      (set! tmp (merge-IFA tmp (+ i 1) (list-ref (list-ref rule 2) (+ i 1))))
                      (set! tmp (modify-IFA tmp (+ i 1) (list-ref (list-ref rule 2) (+ i 1))))))
                tmp))])))
+
 (define (merge-hash old_term old-IFA subIFA)
   (if (member old_term (IFA-F old-IFA))
       (let ((tmphash (modify-hash (IFA-δ old-IFA) old_term (car (IFA-s subIFA)))))
@@ -154,18 +155,17 @@
                                                   (index-of (car tmpΣ) ali-term)
                                                   tmpnew_term);todo
                                       )
+                                (set! tmplength (+ tmplength 1))
                                 (hash-set! tmpalias dup_term (append (hash-ref tmpalias dup_term) (list tmpnew_term)))
                                 ))))
-                      
                       (let ((copyalias (hash-copy (IFA-alias subIFA))))
-                        ;(set-IFA-alias! subIFA (hash-remove copyalias dup_term))
                         (begin
                           (hash-remove! copyalias dup_term)
                           (set-IFA-alias! subIFA copyalias))
                         )
-                      ;(hash-remove! subIFA dup_term)
                       )
                     (void))
+                (set! tmplength (if (hash-has-key? tmpalias (check-duplicates tmpQ)) (length (hash-ref tmpalias (check-duplicates tmpQ))) 0))
                 (let ((tmpnew_term (string->symbol (string-append (symbol->string dup_term) "_a" (number->string tmplength)))))
                   (begin
                     (set! subIFA
@@ -175,12 +175,9 @@
                           )
                     (hash-set! tmpalias dup_term (append (hash-ref tmpalias dup_term) (list tmpnew_term)))
                     ))
+                (set! tmpQ (remove-duplicates tmpQ))
                 ))
             (void))
-        (displayln tmpδ)
-        (displayln old_term)
-        (displayln old-IFA)
-        (displayln subIFA)
         (set! tmpδ (merge-hash old_term old-IFA subIFA))
         (if (member old_term tmps)
             (set! tmps (IFA-s subIFA))
