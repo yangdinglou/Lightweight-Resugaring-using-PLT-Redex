@@ -1,6 +1,8 @@
-*.bak
-*.1
-*.2
-*.3
-*.dep
-*.zo
+**/popl21/
+
+!**/LateX/*.tex
+!**/LateX/*.bst
+!**/LateX/*.cls
+!**/LateX/*.bib
+!**/LateX/*.pdf
+!**/LateX/images/
