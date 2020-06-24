@@ -1,8 +1,9 @@
-**/popl21/
-
-!*/popl21/*.tex
-!*/popl21/*.bst
-!*/popl21/*.cls
-!*/popl21/*.bib
-!*/popl21/*.pdf
-!*/popl21/images/
+popl21/main.aux
+popl21/main.bbl
+popl21/main.blg
+popl21/main.fdb_latexmk
+popl21/main.fls
+popl21/main.log
+popl21/main.out
+popl21/main.synctex.gz
+popl21/main.xdv
