@@ -1,9 +1,6 @@
-popl21/main.aux
-popl21/main.bbl
-popl21/main.blg
-popl21/main.fdb_latexmk
-popl21/main.fls
-popl21/main.log
-popl21/main.out
-popl21/main.synctex.gz
-popl21/main.xdv
+*.bak
+*.1
+*.2
+*.3
+*.dep
+*.zo

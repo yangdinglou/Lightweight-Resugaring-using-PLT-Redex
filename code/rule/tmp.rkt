@@ -15,40 +15,39 @@
   (cond 
     [(equal? head 'let) IFA-LET]
     [(equal? head 'if) IFA-IF]))
+;use symbol to present value
+(define (cannot-equal term1 term2)
+  (cond
+    ((and (equal? term1 'booltrue) (equal? term2 'boolfalse)) #t)
+    ((and (equal? term1 'boolfalse) (equal? term2 'booltrue)) #t)
+    (else #f)))
 (define IFA-IF 
   (IFA (list (term oe_1) (term oe_2) (term oe_3))
-       (list (term (if oe_1 oe_2 oe_3)) (term (if #t oe_2 oe_3)) (term (if #f oe_2 oe_3)))
-       (hash (term oe_1) (hash 'void (term oe_1) #t (term oe_2) #f (term oe_3)))
+       (list (term (if oe_1 oe_2 oe_3)) (term (if booltrue oe_2 oe_3)) (term (if boolfalse oe_2 oe_3)))
+       (hash (term oe_1) (hash 'void (term oe_1) 'booltrue (term oe_2) 'boolfalse (term oe_3)))
        (list (term oe_1))
        (list (term oe_2) (term oe_3))
        (hash)
        (hash)
        ))
+
 ;(hash-ref (hash-ref (IFA-δ IFA-IF) 'oe_1) 'void)
 
 ;(let x e1 e2)-->(let x e1' e2)
 ;(let x v1 e2)-->(subst x v1 e2)
 (define subst-cnt 0)
 (define IFA-LET 
-  (IFA (list (term ox) (term oe_1) (term v_subst)
+  (IFA (list (term ox) (term oe_1) #;(term v_subst)
              (term oe_2))
-       (list (term (let ox oe_1 oe_2)) (term (leto x v_subst oe_2)))
-       (hash (term oe_1) (hash 'void (term oe_1) (term v_subst) (term v_subst)) (term v_subst) (hash 'v_subst 'oe_2))
+       (list (term (let ox oe_1 oe_2)) #;(term (leto x v_subst oe_2)))
+       (hash (term oe_1) (hash 'void (term oe_1) (term v_subst) (term oe_2)))
        (list (term oe_1))
        (list 'oe_2)
        (hash 'oe_2 (hash 'ox 'v_subst) 'ox (hash 'ox 'ox))
        (hash)
        ))
 
-(define IFA-TMP
-  (IFA (list (term oe_1) (term oe_2) '#t '#f)
-       (list (term (TMP oe_1 oe_2)))
-       (hash (term oe_1) (hash '#t (term oe_2) '#f '#f) (term oe_2) (hash '#t '#f '#f '#t))
-       (list (term oe_1))
-       (list '#t '#f)
-       (hash)
-       (hash)
-       ))
+
 ;(or e1 e2)-->(let x e1 (if x x e2))
 ;(map f e)-->(if (null? e) (list) (cons (f (first e)) (map f (rest e))))
 
@@ -84,7 +83,7 @@
                                (tmpsubst (IFA-subst old-IFA)) (tmpalias (IFA-alias old-IFA)))
     (let ((tmp_term new_term))
       (begin (set! tmpQ (modify-term tmpQ old_term new_term))
-             (if (check-duplicates tmpQ)
+             (if (member (check-duplicates tmpQ) tmpQ);term may be #f
                  (let ((tmplength (if (hash-has-key? tmpalias tmp_term) (length (hash-ref tmpalias new_term)) 0) ))
                    (begin
                      (set! new_term (string->symbol (string-append (symbol->string new_term) "_a" (number->string tmplength))))
@@ -117,6 +116,7 @@
                  (if (pair? (list-ref (list-ref rule 2) (+ i 1)))
                      (set! tmp (merge-IFA tmp (list-ref (car (IFA-Σ tmp)) (+ i 1)) (list-ref (list-ref rule 2) (+ i 1))))
                      (set! tmp (modify-IFA tmp (list-ref (car (IFA-Σ tmp)) (+ i 1)) (list-ref (list-ref rule 2) (+ i 1)))))
+                     
                  )
                  
                (if (empty? (list-ref rule 1))
@@ -127,14 +127,14 @@
                      (set! tmp (modify-IFA tmp tmpkeys (hash-ref (hash-ref (IFA-subst tmp) tmpkeys) (original-id tmpkeys))))
                      (void)))
                tmp
-                ))])))
+               ))])))
 
 (define (merge-hash old_term old-IFA subIFA)
   (if (member old_term (IFA-F old-IFA))
       (let ((tmphash (modify-hash (IFA-δ old-IFA) old_term (car (IFA-s subIFA)))))
         (begin (hash-union! tmphash (IFA-δ subIFA))tmphash))
       
-      (let ((tmphash (IFA-δ old-IFA)) (old_trans (hash-ref (IFA-δ old-IFA) old_term)))
+      (let ((tmphash (hash-copy (IFA-δ old-IFA))) (old_trans (hash-ref (IFA-δ old-IFA) old_term)))
         (begin
           (for ((tmpkey (IFA-F subIFA)))
             (hash-set! tmphash tmpkey old_trans))
@@ -152,46 +152,46 @@
       (begin
         (set! tmpQ (append tmpQ (IFA-Q subIFA)))
         (while (not (equal? (check-duplicates tmpQ) #f))
-            (let ((dup_term (check-duplicates tmpQ))
-                  (tmplength (if (hash-has-key? tmpalias (check-duplicates tmpQ)) (length (hash-ref tmpalias (check-duplicates tmpQ))) 0)))
-              (begin
-                (if (hash-has-key? (IFA-alias subIFA) dup_term)
-                    (begin
-                      (if (eq? tmplength 0)
-                          (hash-set! tmpalias dup_term (hash-ref (IFA-alias subIFA) dup_term))
-                          (for ((ali-term (hash-ref (IFA-alias subIFA) dup_term)))
-                            (let ((tmpnew_term (string->symbol (string-append (symbol->string dup_term) "_a" (number->string tmplength)))))
-                              (begin
-                                (set! subIFA
-                                      (modify-IFA subIFA
-                                                  ali-term
-                                                  tmpnew_term)
-                                      )
-                                (set! tmplength (+ tmplength 1))
-                                (hash-set! tmpalias dup_term (append (hash-ref tmpalias dup_term) (list tmpnew_term)))
-                                ))))
-                      (let ((copyalias (hash-copy (IFA-alias subIFA))))
-                        (begin
-                          (hash-remove! copyalias dup_term)
-                          (set-IFA-alias! subIFA copyalias))
-                        )
-                      )
-                    (void))
-                (set! tmplength (if (hash-has-key? tmpalias (check-duplicates tmpQ)) (length (hash-ref tmpalias (check-duplicates tmpQ))) 0))
-                (let ((tmpnew_term (string->symbol (string-append (symbol->string dup_term) "_a" (number->string tmplength)))))
-                  (begin
-                    (set! subIFA
-                          (modify-IFA subIFA
-                                      dup_term
-                                      tmpnew_term)
-                          )
-                    (hash-set! tmpalias dup_term (if (hash-has-key? tmpalias dup_term)
-                                                     (append (hash-ref tmpalias dup_term) (list tmpnew_term))
-                                                     (list tmpnew_term)))
-                    (set! tmpQ (list-set tmpQ (last (indexes-of tmpQ dup_term)) tmpnew_term))
-                    ))
-                ))
-            (void))
+               (let ((dup_term (check-duplicates tmpQ))
+                     (tmplength (if (hash-has-key? tmpalias (check-duplicates tmpQ)) (length (hash-ref tmpalias (check-duplicates tmpQ))) 0)))
+                 (begin
+                   (if (hash-has-key? (IFA-alias subIFA) dup_term)
+                       (begin
+                         (if (eq? tmplength 0)
+                             (hash-set! tmpalias dup_term (hash-ref (IFA-alias subIFA) dup_term))
+                             (for ((ali-term (hash-ref (IFA-alias subIFA) dup_term)))
+                               (let ((tmpnew_term (string->symbol (string-append (symbol->string dup_term) "_a" (number->string tmplength)))))
+                                 (begin
+                                   (set! subIFA
+                                         (modify-IFA subIFA
+                                                     ali-term
+                                                     tmpnew_term)
+                                         )
+                                   (set! tmplength (+ tmplength 1))
+                                   (hash-set! tmpalias dup_term (append (hash-ref tmpalias dup_term) (list tmpnew_term)))
+                                   ))))
+                         (let ((copyalias (hash-copy (IFA-alias subIFA))))
+                           (begin
+                             (hash-remove! copyalias dup_term)
+                             (set-IFA-alias! subIFA copyalias))
+                           )
+                         )
+                       (void))
+                   (set! tmplength (if (hash-has-key? tmpalias (check-duplicates tmpQ)) (length (hash-ref tmpalias (check-duplicates tmpQ))) 0))
+                   (let ((tmpnew_term (string->symbol (string-append (symbol->string dup_term) "_a" (number->string tmplength)))))
+                     (begin
+                       (set! subIFA
+                             (modify-IFA subIFA
+                                         dup_term
+                                         tmpnew_term)
+                             )
+                       (hash-set! tmpalias dup_term (if (hash-has-key? tmpalias dup_term)
+                                                        (append (hash-ref tmpalias dup_term) (list tmpnew_term))
+                                                        (list tmpnew_term)))
+                       (set! tmpQ (list-set tmpQ (last (indexes-of tmpQ dup_term)) tmpnew_term))
+                       ))
+                   ))
+               (void))
         (set! tmpQ (remove old_term tmpQ))
         (set! tmpδ (merge-hash old_term old-IFA subIFA))
         (if (member old_term tmps)
@@ -227,12 +227,46 @@
 ;(build-IFA '(1 (Or e_1 e_2) (let x e_1 (if x x e_2))))
 
 (define (make-context-rule tmppattern tmpnode subst-hash)
-  (let ((tmprule (list "context rule" tmppattern tmpnode)))
-    (if (string-prefix? (symbol->string tmpnode) "v_subst")
-        empty
-        tmprule)))
+  (let ((flag #f))
+    (begin
+      (for ((tmpkey (hash-keys subst-hash)))
+        (if (cannot-equal tmpkey (hash-ref subst-hash tmpkey))
+            (set! flag #t)
+            (void)))
+      (if flag
+          empty
+          (begin
+            (for ((tmpkey (hash-keys subst-hash)))
+              (set! tmppattern (map (λ (e) (if (equal? (original-id e) tmpkey) (hash-ref subst-hash tmpkey) e)) tmppattern)))
+            (for ((tmpkey (hash-keys subst-hash)))
+              (set! tmppattern (map (λ (e) (if (equal? (original-id e) tmpkey) (hash-ref subst-hash tmpkey) e)) tmppattern)))
+    
+            (let ((tmprule (list "context rule" tmppattern tmpnode #;(hash-copy subst-hash))))
+              (if (or (string-prefix? (symbol->string tmpnode) "v_subst") (string-prefix? (symbol->string tmpnode) "bool"))
+                  empty
+                  tmprule)))))))
+
+;should be modified if tmpnode is not a term
 (define (make-reduction-rule tmppattern tmpnode subst-hash)
-  (list "reduction rule" tmppattern tmpnode (hash-copy subst-hash)))
+  (let ((flag #f))
+    (begin
+      (for ((tmpkey (hash-keys subst-hash)))
+        (if (cannot-equal tmpkey (hash-ref subst-hash tmpkey))
+            (set! flag #t)
+            (void)))
+      (if flag
+          empty
+          (begin
+            (for ((tmpkey (hash-keys subst-hash)))
+              (begin
+                (set! tmppattern (map (λ (e) (if (equal? (original-id e) tmpkey) (hash-ref subst-hash tmpkey) e)) tmppattern))
+                (set! tmpnode (if (equal? (original-id tmpnode) tmpkey) (hash-ref subst-hash tmpkey) tmpnode))))
+            (for ((tmpkey (hash-keys subst-hash)))
+              (begin
+                (set! tmppattern (map (λ (e) (if (equal? (original-id e) tmpkey) (hash-ref subst-hash tmpkey) e)) tmppattern))
+                (set! tmpnode (if (equal? (original-id tmpnode) tmpkey) (hash-ref subst-hash tmpkey) tmpnode))))
+            (list "reduction rule" tmppattern (original-id tmpnode) #;(hash-copy subst-hash))))
+    )))
 
 (define (original-id name)
   (define (string-index hay needle)
@@ -253,8 +287,10 @@
         (pattern (car (IFA-Σ the-IFA)))
         (pattern-hash (make-hash))
         (subst-hash (make-hash))
+        
         )
     (begin (hash-set! pattern-hash (last tmpnode-list) pattern)
+           
            (while (not (empty? tmpnode-list))
                   (if (member (last tmpnode-list) used-list)
                       (void)
@@ -265,52 +301,58 @@
                                                                   (list (make-context-rule tmppattern (last tmpnode-list) subst-hash)))
                                                     ))
                             (void))
-                        (set! used-list (append used-list (list (last tmpnode-list))))))
+                        (set! used-list (append used-list (list (last tmpnode-list))))
+                        ))
                   (let ((flag #f) (tmphash (hash-ref (IFA-δ the-IFA) (last tmpnode-list))))
                     (begin
                       (for ((tmpkey (hash-keys tmphash)))
-                        ;(display "1")
-                        ;(displayln tmpkey)
-                        ;(display "2")
-                        ;(displayln tmphash)
                         (if flag
                             (void)
-                            (if (or (member (hash-ref tmphash tmpkey) used-list) (equal? tmpkey 'void))
+                            (if (or (if (equal? (member (hash-ref tmphash tmpkey) used-list) #f) #f #t) (equal? tmpkey 'void))
                                 (void)
                                 (begin
-                                  (if (member (original-id (last tmpnode-list)) tmppattern)
+                                  
+                                  #;(if (member (original-id (last tmpnode-list)) tmppattern)
                                       (set! tmppattern (list-set tmppattern
                                                                  (index-of tmppattern (original-id (last tmpnode-list)))
                                                                  tmpkey))
                                       (void))
-                                  (if (string-prefix? (symbol->string (last tmpnode-list)) "v_subst")
+                                  (hash-set! subst-hash (original-id (last tmpnode-list)) tmpkey)
+                                  #;(if (string-prefix? (symbol->string (last tmpnode-list)) "v_subst")
                                       (hash-set! subst-hash (original-id (last tmpnode-list)) tmpkey)
                                       (void))
-                                  ;(display "33")
-                                  ;(displayln (list (hash-ref tmphash tmpkey)))
                                   (set! tmpnode-list (append tmpnode-list (list (hash-ref tmphash tmpkey))))
                                   (hash-set! pattern-hash (last tmpnode-list) tmppattern)
+                                  
                                   (set! flag #t)
                                   (if (member (hash-ref tmphash tmpkey) (IFA-F the-IFA))
                                       (begin
-                                        (set! rule-list (append rule-list (list (make-reduction-rule tmppattern (last tmpnode-list) subst-hash))))
+                                        (set! rule-list (append rule-list (if (empty? (make-reduction-rule tmppattern (last tmpnode-list) subst-hash))
+                                                                              empty
+                                                                              (list (make-reduction-rule tmppattern (last tmpnode-list) subst-hash)))
+                                                                ))
                                         (set! used-list (append used-list (list (last tmpnode-list))))
                                         (set! tmpnode-list (drop-right tmpnode-list 1))
-                                        (if (string-prefix? (symbol->string (last tmpnode-list)) "v_subst")
+                                        #;(if (string-prefix? (symbol->string (last tmpnode-list)) "v_subst")
                                             (hash-remove! subst-hash (original-id (last tmpnode-list)))
                                             (void))
-                                        (set! tmppattern (hash-ref pattern-hash (last tmpnode-list)))
+                                        (hash-remove! subst-hash (original-id (last tmpnode-list)))
+                                        #;(set! tmppattern (hash-ref pattern-hash (last tmpnode-list)))
+                                        
                                         )
-                                      (void))))))
+                                      (void)))))
+                        )
                       (if flag
                           (void)
                           (begin
+                            (set! used-list (take used-list (+ 1 (index-of used-list (last tmpnode-list)))))
                             (set! tmpnode-list (drop-right tmpnode-list 1))
                             (if (empty? tmpnode-list)
                                 (void)
                                 (begin
-                                  (set! tmppattern (hash-ref pattern-hash (last tmpnode-list)))
-                                  (if (string-prefix? (symbol->string (last tmpnode-list)) "v_subst")
+                                  #;(set! tmppattern (hash-ref pattern-hash (last tmpnode-list)))
+                                  (hash-remove! subst-hash (original-id (last tmpnode-list)))
+                                  #;(if (string-prefix? (symbol->string (last tmpnode-list)) "v_subst")
                                       (hash-remove! subst-hash (original-id (last tmpnode-list)))
                                       (void)))
                                 ))))))
@@ -319,14 +361,22 @@
 
 ;(build-IFA '(1 (Or e_1 e_2) (let x e_1 (if x x e_2))))
 
-#;(build-rules (build-IFA '(1 (Or e_1 e_2) (let x e_1 (if x x e_2)))))
+(build-rules (build-IFA '(1 (Or e_1 e_2) (let x e_1 (if x x e_2)))))
 ;(build-IFA '(1 (Sg e_1 e_2 e_3 e_4 e_5) (if e_1 (if e_2 e_3 e_4) (if e_3 e_4 e_5))))
 #;(build-IFA '(1 (Sg e_1 e_2 e_3 e_4 e_5)
-                            (let x e_3 (if e_1 (if e_2 x e_4) (if x x e_5)))
-                            ))
-#;(build-rules (build-IFA '(1 (Sg e_1 e_2 e_3 e_4 e_5)
-                            (let x e_3 (if e_1 (if e_2 x e_4) (if x x e_5)))
-                            )))
-(build-rules (build-IFA '(1 (Sg e_1 e_2 e_3 e_4)
+                 (let x e_3 (if e_1 (if e_2 x e_4) (if x x e_5)))
+                 ))
+(build-rules (build-IFA '(1 (Sg e_1 e_2 e_3 e_4 e_5)
+                              (let x e_3 (if e_1 (if e_2 x e_4) (if x x e_5)))
+                              )))
+(build-rules (build-IFA '(1 (Sg2 e_1 e_2 e_3 e_4)
                             (let x e_1 (if x (let x e_2 e_3) e_4))
+                            )))
+
+#;(build-IFA '(1 (Sg2 e_1 e_2)
+                            (if (if e_1 e_2 boolfalse) boolfalse booltrue)
+                            ))
+
+(build-rules (build-IFA '(1 (Sg2 e_1 e_2)
+                            (if (if e_1 e_2 boolfalse) boolfalse booltrue)
                             )))
