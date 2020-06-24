@@ -28,4 +28,52 @@ The key idea of our lightweight resugaring approach, is that, we won't expand a 
 \label{fig:core-algo}
 \end{figure}
 
-At step 1, we found the outermost $and$ sugar don't have to expand, because its first sub-expression will reduce earlier. At step 2, the same as step 1. At step 3, the outermost $and$ sugar have to expand, because no sub-expression will reduce after the whole expression desugar. At step 4, the inner $and$ sugar don't have to expand either. At step 5, the sugar have to desugar to CoreLang. Finally at step 6, er get the final result.
+At step 1, we found the outermost $and$ sugar don't have to expand, because its first sub-expression will reduce earlier. At step 2, the same as step 1. At step 3, the outermost $and$ sugar have to expand, because no sub-expression will reduce after the whole expression desugar. At step 4, the inner $and$ sugar don't have to expand either. At step 5, the sugar have to desugar to CoreLang. Finally at step 6, we get the final result.
+
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2.8cm,
+semithick]
+\tikzstyle{every state}=[circle,draw,minimum size=16pt]
+ 
+\node[initial,state] (A) {$e_{1}$};
+\node[state,accepting] (B) [above right of=A] {$e_{2}$};
+\node[state,accepting] (C) [below right of=A] {$e_{3}$};
+ 
+\path (A) edge node {\#t} (B)
+edge node {\#f} (C)
+edge [loop above] node {} (A)
+;
+
+\end{tikzpicture}
+
+
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2.8cm,
+semithick]
+\tikzstyle{every state}=[circle,draw,minimum size=16pt]
+\node[initial,state] (A) {$e_{1}$};
+\node[state,accepting](B)[right of=A,align=center ]{$e\_2_{v\_subst}^{x}$}[above];
+%\node at (-0.5,1)[draw, align=center]{example \\ example example};
+
+\path[]
+(A) edge node {$v\_subst$} (B)
+(A) edge [loop above] node {} (2);
+
+\end{tikzpicture}
+
+$(Or~e_1~e_2)$ $\rightarrow$ $(let~x~e_1~(if~x~x~e_2))$
+
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2.8cm,
+semithick]
+\tikzstyle{every state}=[circle,draw,minimum size=16pt]
+
+\node[initial,state] (A) {$e_{1}$};
+\node[state] (D) [right of=A] {$x_{v}^{x}$};
+\node[state,accepting] (B) [above right of=D] {$x_{\#t}^{x}$};
+\node[state,accepting] (C) [below right of=D] {$e\_2_{v}^{x}$};
+
+\path[]
+(A) edge node {$v\_subst$} (D)
+(A) edge [loop above] node {} (A)
+(D) edge node {$\#t$} (B)
+(D) edge node {$\#f$} (C);
+
+\end{tikzpicture}

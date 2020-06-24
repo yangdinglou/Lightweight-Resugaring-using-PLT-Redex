@@ -1,8 +1,8 @@
 **/popl21/
 
-!**/LateX/*.tex
-!**/LateX/*.bst
-!**/LateX/*.cls
-!**/LateX/*.bib
-!**/LateX/*.pdf
-!**/LateX/images/
+!**/popl21/*.tex
+!**/popl21/*.bst
+!**/popl21/*.cls
+!**/popl21/*.bib
+!**/popl21/*.pdf
+!**/popl21/images/
