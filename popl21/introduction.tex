@@ -17,91 +17,28 @@ Domain-specific language\cite{dsl} is becoming useful for people's daily tasks. 
 
 Syntactic sugar\cite{syntacticsugar}, as a simple way of implementing DSL, has an obvious problem. DSL based on syntactic sugars contains many components of its host language. Then its interpretation will be outside the DSL itself. The evaluation sequences of syntactic sugar expressions will contain many terms of the host language, which may confuse the users of DSL.
 
-There is an existing work---resugaring\cite{resugaring}\cite{hygienic}, which aimed to solve the problem upon. It lifts the evaluation sequences of desugared expression to sugar's syntax. The evaluation sequences shown by resugaring will not contain components of host language. But we found the existing resugaring approach using match and substitution is kind of redundant. The biggest deficiency of existing resugaring method is that the syntactic sugars in an expression have to fully desugar before evaluation. This limits the processing ability of the method. Moreover, it limits the complexity of getting the resugaring sequences. If we need to resugar a very huge expression, the match and substitution processes will cost so much. Also, processing of hygienic macros is complex due to the extra data structure.
+There is an existing work---resugaring\cite{resugaring}\cite{hygienic}, which aimed to solve the problem upon. It converted the evaluation sequences of desugared expression (core language) into representative sugar's syntax(surface language). The evaluation sequences shown by resugaring will not contain components of host language. But we found the existing resugaring approach using match and substitution is kind of redundant. The biggest deficiency of existing resugaring method is that the syntactic sugars in an expression have to fully desugar before evaluation. This limits the processing ability of the method. Moreover, it limits the complexity of getting the resugaring sequences. If we need to resugar a very huge expression, the match and substitution processes will cost so much. Also, processing of hygienic macros is complex due to the extra data structure.
 
-In this paper, We propose a lightweight approach to get resugaring sequences based on syntactic sugars. The key idea of our approach is---syntactic sugar expression only desugars at the point that it have to desugar. We guess that we don't have to desugar the whole expression at the initial time of evaluation under the premise of keeping the properties of expression. 
+%In this paper, We propose a lightweight approach to get resugaring sequences based on syntactic sugars. The key idea of our approach is---syntactic sugar expression only desugars at the point that it have to desugar. We guess that we don't have to desugar the whole expression at the initial time of evaluation under the premise of keeping the properties of expression. 
 
-Initially, our work focused on improving current resugaring method on complexity. After designing the algorithm, we found our lightweight resugaring approach could process some syntactic sugars' feature that current approach cannot do. Finally, we implement our algorithm using PLT Redex\cite{SEwPR} and test our approach on some applications. The result shows that our approach does handle more features of syntactic sugar.
+In this paper, we propose an unidirectional resugaring approach by lazy dusugaring mixed with a dynamic approach and a static approach. The key idea of the whole approach is---syntactic sugar expressions only desugar at the point they have to desugar, which is what the word "lazy" means. It would be correct for resugaring if we can prove the whole sugar expression will keep the properties.
 
-\subsection{Defination of resugaring}
-This subsection is partially similiar to original defination in\cite{resugaring}.
-\begin{Def}[Resugaring]
-Given core language (named {\bfseries CoreLang}) and its evalation rules, together with surface language based on syntactic sugars of CoreLang (named {\bfseries Surflang}). For any expression of Surflang, getting the evaluation sequences of the expression in terms of SurfLang. 
-\end{Def}
-For correctness of the resugaring, the evaluation sequences should maintain the following three properties:
-\begin{enumerate}
-\item {\bfseries Emulation} The evaluation sequences reflect the actual execution process.
-\item {\bfseries Abstraction} The resugaring sequences should only contains terms in SurfLang, and each term of SurfLang should originate from initial expression.
-\item {\bfseries Coverage} No sequence is skipped during the process.
-\end{enumerate}
+The dynamic approach use the reduction semantics of core language to decide whether desugaring the sugar. The static approach use the reduction semantics of core language to get reduction semantics of surface language based on sugars' syntax, then execute the syntactic sugar programs on the surface's semantics. The context rules of surface language decide which subexpression can be reduced, or desugaring is necessary because of the reduction rules.
 
-Given an example below.
+Our main contribution is as follow:
+\begin{itemize}
+\item {\bfseries Mixture approach of resugaring.} We introduce an mixture of two different resugaring approachs to combine the advances of following approaches. The lazy dusugaring is common feature of two approaches, which give each approach some good properties.
+\item {\bfseries A lightweight but powerful dynamic approach.} The dynamic approach we proposed is based on core language's reduction semantics. It takes surface language and core language as a whole, then decided whether expanding the sugars or reducing the subexpressions according to properties that make the resugaring correct. Thus, it is lightweight because many match and substitution processes can be omitted. We test the dynamic approach on many applications. The result shows that in addition to processing what existing work can process, the dynamic approach can handle recursive sugar easily, which makes the approach powerful. And the rewriting system based on reduction semantics makes it possible to write syntactic sugar easily.
+\item {\bfseries An independent and efficient static approach.} The static approach we proposed also used core language's reduction semantics. But instead of executing at the level of core language, we turn the core language's semantics into automata. Then for each syntactic sugar, we would generate the surface language's semantics without depending on some rules in core language. (some meta-functions may be necessary.) Thus, it is efficient because many steps in core language can be omitted. todo: complete
+\end{itemize}
 
-For syntactic sugar {\bfseries and} and {\bfseries or}, the sugar rules are:
-\begin{center}
-	\parbox[t]{\textwidth}{%
-		\begin{center}  
-			and(e1, e2) → if(e1, e2, \#f)\\
-			or(e1, e2) → if(e1, \#t, e2)
-		\end{center}  
-	}%  
-\end{center}
-which forms a simple SurfLang.
-
-The evaluation rules of {\bfseries if} is:
-\begin{center}
-	\parbox[t]{\textwidth}{%
-		\begin{center}  
-			if(\#t, e1, e2) → e1\\
-			if(\#f, e1, e2) → e2
-		\end{center}  
-	}% 
-\end{center}
-
-Then for SurfLang's expression $\mbox{and}(\mbox{or}(\#f, \#t), \mbox{and}(\#t, \#f))$ should get resugaring sequences as fig\ref{fig:example}.
-
-\begin{figure}[ht]
-\parbox[t]{\textwidth}{
-			\begin{center}  
-				(and (or \#f \#t) (and \#t \#f))\\
-				↓\\
-				(and \#t (and \#t \#f))\\
-				↓\\
-				(and\#t \#f)\\
-				↓\\
-				\#f
-			\end{center}  
-		}
-\caption{resugaring example}
-\label{fig:example}
-\end{figure}
-
-The reason we should get the sequences above is because $(\mbox{and}~(\mbox{or}~\#f~\#t)~(\mbox{and}~\#t~\#f))$ should desugar to $(\mbox{if}~(\mbox{if}~\#f~\#t~\#f)~(\mbox{if}~\#t~\#f~\#f)~\#f)$. Then in the CoreLang, the evaluation sequences will be as fig\ref{fig:coreseq}.
-
-\begin{figure}[ht]
-\parbox[t]{\textwidth}{
-			\begin{center}  
-				(if (if \#f \#t \#f) (if \#t \#f \#f) \#f)\\
-				↓\\
-				(if \#t (if \#t \#f \#f) \#f)\\
-				↓\\
-				(if \#t \#f \#f)\\
-				↓\\
-				\#f
-			\end{center}  
-		}
-\caption{evaluation sequences}
-\label{fig:coreseq}
-\end{figure}
-
-The second item in the sequences can be desugared from $(\mbox{and}~\#t~(\mbox{and}~\#t~\#f))$, so resugars to it. So as the third item.
 
 In the rest of this paper, we present the technical details of our approach together with the proof of correctness. In details, the rest of our paper is organized as follow: todo:update
 
 \begin{itemize}
-\item An overview of our approach with some background knowledge.[sec \ref{sec2}]
-\item The algorithm defination and proof of correctness.[sec \ref{sec3}]
-\item The implementation of our lightweight resugaring algorithm using PLT Redex.[sec \ref{sec4}]
-\item sth else?[sec \ref{sec5}]
-\item Evaluation of our lightweight resugaring approach.[sec \ref{sec6}]
+\item An overview of our approach with mixture of dynamic and static approach.[sec \ref{sec2}]
+\item The technique of dynamic approach, with algorithm and evaluation.[sec \ref{sec3}]
+\item The technique of dynamic approach, with algorithm and evaluation.[sec \ref{sec4}]
+\item Relative work and discussions.[sec \ref{sec5}]
+\item Conclusion and feature work.[sec \ref{sec6}]
 \end{itemize}
