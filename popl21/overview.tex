@@ -5,7 +5,7 @@
 \subsection{Defination of resugaring}
 This subsection is partially similiar to original defination in\cite{resugaring}.
 \begin{Def}[Resugaring]
-Given core language (named {\bfseries CoreLang}) and its evalation rules, together with surface language based on syntactic sugars of CoreLang (named {\bfseries Surflang}). For any expression of Surflang, getting the evaluation sequences of the expression in terms of SurfLang. 
+Given core language (named {\bfseries CoreLang}) and its evalation rules, together with surface language based on syntactic sugars of CoreLang (named {\bfseries Surflang}). For any expression of Surflang, getting the evaluation sequences of the expression in terms of SurfLang.\footnote{It's not strict, because we could allow some expressions in CoreLang shown.}
 \end{Def}
 For correctness of the resugaring, the evaluation sequences should maintain the following three properties:
 \begin{enumerate}
@@ -38,41 +38,52 @@ The evaluation rules of {\bfseries if} is:
 	}% 
 \end{center}
 
-Then for SurfLang's expression $\mbox{and}(\mbox{or}(\#f, \#t), \mbox{and}(\#t, \#f))$ should get resugaring sequences as fig\ref{fig:example}.
+Then for SurfLang's expression $\mbox{and}(\mbox{or}(\#f, \#t), \mbox{and}(\#t, \#f))$ should get resugaring sequences as follow.
 
-\begin{figure}[ht]
-\parbox[t]{\textwidth}{
-			\begin{center}  
-				(and (or \#f \#t) (and \#t \#f))\\
-				↓\\
-				(and \#t (and \#t \#f))\\
-				↓\\
-				(and \#t \#f)\\
-				↓\\
-				\#f
-			\end{center}  
-		}
-\caption{resugaring example}
-\label{fig:example}
-\end{figure}
+\begin{Codes}
+    (and (or \#f \#t) (and \#t \#f))
+\CoreStep (and \#t (and \#t \#f))
+\CoreStep (and \#t \#f)
+\CoreStep \#f
+\end{Codes}
+% \begin{figure}[ht]
+% \parbox[t]{\textwidth}{
+% 			\begin{center}  
+% 				(and (or \#f \#t) (and \#t \#f))\\
+% 				↓\\
+% 				(and \#t (and \#t \#f))\\
+% 				↓\\
+% 				(and \#t \#f)\\
+% 				↓\\
+% 				\#f
+% 			\end{center}  
+% 		}
+% \caption{resugaring example}
+% \label{fig:example}
+% \end{figure}
 
-The reason we should get the sequences above is because $(\mbox{and}~(\mbox{or}~\#f~\#t)~(\mbox{and}~\#t~\#f))$ should desugar to $(\mbox{if}~(\mbox{if}~\#f~\#t~\#f)~(\mbox{if}~\#t~\#f~\#f)~\#f)$. Then in the CoreLang, the evaluation sequences will be as fig\ref{fig:coreseq}.
-
-\begin{figure}[ht]
-\parbox[t]{\textwidth}{
-			\begin{center}  
-				(if (if \#f \#t \#f) (if \#t \#f \#f) \#f)\\
-				↓\\
-				(if \#t (if \#t \#f \#f) \#f)\\
-				↓\\
-				(if \#t \#f \#f)\\
-				↓\\
-				\#f
-			\end{center}  
-		}
-\caption{evaluation sequences}
-\label{fig:coreseq}
-\end{figure}
+The reason we should get the sequences above is because $(\mbox{and}~(\mbox{or}~\#f~\#t)~(\mbox{and}~\#t~\#f))$ should desugar to $(\mbox{if}~(\mbox{if}~\#f~\#t~\#f)~(\mbox{if}~\#t~\#f~\#f)~\#f)$. Then in the CoreLang, the evaluation sequences will be as follow.
+\begin{Codes}
+    (if (if \#f \#t \#f) (if \#t \#f \#f) \#f)
+\CoreStep (if \#t (if \#t \#f \#f) \#f)
+\CoreStep (if \#t \#f \#f)
+\CoreStep \#f
+\end{Codes}
+% \begin{figure}[ht]
+% \parbox[t]{\textwidth}{
+% 			\begin{center}  
+% 				(if (if \#f \#t \#f) (if \#t \#f \#f) \#f)\\
+% 				↓\\
+% 				(if \#t (if \#t \#f \#f) \#f)\\
+% 				↓\\
+% 				(if \#t \#f \#f)\\
+% 				↓\\
+% 				\#f
+% 			\end{center}  
+% 		}
+% \caption{evaluation sequences}
+% \label{fig:coreseq}
+% \end{figure}
 
 The second item in the sequences can be desugared from $(\mbox{and}~\#t~(\mbox{and}~\#t~\#f))$, so resugars to it. So as the third item.
 
@@ -132,13 +143,14 @@ At step 1, we found the outermost $and$ sugar don't have to expand, because its 
 
 The key idea of our dynamic approach, is that, converting reduction semantics of core language into automata (called {\bfseries IFA}), building IFA for syntactic sugar, converting the IFA of sugars into reduction semantics. It is an abstract of dynamic approach in a sence, we will discuss it in Sec\ref{sec6}. Take another {\bfseries or} sugar for example.
 \begin{flushleft}
-	(or e1 e2) $\rightarrow$ (let x e1 (if x x e2))
+	(or e1 e2) $\rightarrow$ (let x e1 (if x x e2))\\
+	$(Or~e_1~e_2)$ $\rightarrow$ $(let~x~e_1~(if~x~x~e_2))$
 \end{flushleft}  
-The {\bfseries let} and {\bfseries if} expressions' reduction semantics can be represented as follow.
+The {\bfseries let} and {\bfseries if} expressions' reduction semantics can be represented as  the following automata.
 
 \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2.8cm,
 semithick]
-\tikzstyle{every state}=[circle,draw,minimum size=16pt]
+\tikzstyle{every state}=[circle,draw,minimum size=16pt,font=\large]
  
 \node[initial,state] (A) {$e_{1}$};
 \node[state,accepting] (B) [above right of=A] {$e_{2}$};
@@ -154,32 +166,42 @@ edge [loop above] node {} (A)
 
 \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2.8cm,
 semithick]
-\tikzstyle{every state}=[circle,draw,minimum size=16pt]
+\tikzstyle{every state}=[circle,draw,minimum size=16pt,font=\large]
 \node[initial,state] (A) {$e_{1}$};
-\node[state,accepting](B)[right of=A,align=center ]{$e\_2_{v\_subst}^{x}$}[above];
+\node[state,accepting](B)[right of=A,align=center, font=\small ]{$e\_2_{v}^{x}$}[above];
 %\node at (-0.5,1)[draw, align=center]{example \\ example example};
 
 \path[]
-(A) edge node {$v\_subst$} (B)
+(A) edge node {$v$} (B)
 (A) edge [loop above] node {} (2);
 
 \end{tikzpicture}
 
-$(Or~e_1~e_2)$ $\rightarrow$ $(let~x~e_1~(if~x~x~e_2))$
+Then for {\bfseries Or} sugar, we merge the IFA of if expression into node {$e_2$} of let's IFA.
 
 \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2.8cm,
 semithick]
-\tikzstyle{every state}=[circle,draw,minimum size=16pt]
+\tikzstyle{every state}=[circle,draw,minimum size=16pt,font=\large]
 
 \node[initial,state] (A) {$e_{1}$};
-\node[state] (D) [right of=A] {$x_{v}^{x}$};
-\node[state,accepting] (B) [above right of=D] {$x_{\#t}^{x}$};
-\node[state,accepting] (C) [below right of=D] {$e\_2_{v}^{x}$};
+\node[state] (D) [right of=A,font=\small] {$x_{v}^{x}$};
+\node[state,accepting] (B) [above right of=D,font=\small] {$x_{\#t}^{x}$};
+\node[state,accepting] (C) [below right of=D] {$e_2$};
 
 \path[]
-(A) edge node {$v\_subst$} (D)
+(A) edge node {$v$} (D)
 (A) edge [loop above] node {} (A)
 (D) edge node {$\#t$} (B)
 (D) edge node {$\#f$} (C);
 
 \end{tikzpicture}
+
+From the IFA of or expression, we can get the following reduction semantics.
+
+\begin{flushleft}
+\[\infer {(\mbox{Or}~e_1~e_2) \rightarrow (\mbox{Or}~e_1'~e_2)} {e_1~ \rightarrow~e_1'}  \]
+\[(\mbox{Or}~\#t~e2) \rightarrow \#t \]
+\[(\mbox{Or}~\#f~e2) \rightarrow e_2 \]
+\end{flushleft}
+
+Then the resugaring sequences can be get by the reduction semantics.

@@ -107,7 +107,7 @@ In our language setting, we regard SurfLang and CoreLang as a whole language. Th
 	}
 \end{centering}
 
-The difference between CoreLang and SurfLang is identified by $Headid$. But there are some terms in CoreLang should be displayed during evaluation, or we need some terms to help us getting better resugaring sequences. So we defined {\bfseries Commonexp}, which origin from CoreLang, but can be displayed in resugaring sequences. The {\bfseries Coreexp} terms are terms with undisplayable CoreLang's Headid. The {\bfseries Surfexp} terms are terms with SurfLang's Headid and all sub-expressions are displayable. The {\bfseries Commonexp} terms are terms with displayable CoreLang's Headid, together with displayable sub-expressions. There exists some other expression during our resugaring process. They have Headid which can be displayed, but one or more subexpressions can't. They are UndisplayableExp.
+The difference between CoreLang and SurfLang is identified by $Headid$. But there are some terms in CoreLang should be displayed during evaluation, or we need some terms to help us getting better resugaring sequences. So we defined {\bfseries Commonexp}, which origin from CoreLang, but can be displayed in resugaring sequences. The {\bfseries Coreexp} terms are terms with undisplayable CoreLang's Headid. The {\bfseries Surfexp} terms are terms with SurfLang's Headid and all sub-expressions are displayable. The {\bfseries Commonexp} terms are terms with displayable CoreLang's Headid, together with displayable sub-expressions. There exists some other expression during our resugaring process, which have Headid which can be displayed, but one or more subexpressions can't. They are UndisplayableExp.
 
 Take some terms in CoreLang as examples. 
 
@@ -172,9 +172,9 @@ We briefly describe the core algorithm core-algo in words.
 
 For Exp in language defined as last section, try all reduction rules in the language, get a list of possible expressions ListofExp'=\{$Exp'_{1}$,$Exp'_{2}$,$\ldots$\}. 
 
-Line 2-9 deal with the case when Exp has a CoreLang's Headid. When Exp is value or variable (line 3-4), ListofExp' won't have any element (not reducible). When Exp is of Coreexp or Commonexp (line 5-6, due to the context restriction of CoreLang, only one reduction rule can be applied. When Exp is OtherCommonexp (line 7-8), due to the context restriction of CoreLang, only one sub-expression can be reduced, then just apply core algorithm recursively on the sub-expression.
+Line 2-9 deal with the case when Exp has a CoreLang's Headid. When Exp is value or variable (line 3-4), ListofExp' won't have any element (not reducible). When Exp is of Coreexp or Commonexp (line 5-6), due to the context restriction of CoreLang, only one reduction rule can be applied. When Exp is OtherCommonexp (line 7-8), due to the context restriction of CoreLang, only one sub-expression can be reduced, then just apply core algorithm recursively on the sub-expression.
 
-Line 10-21 deal with the case then Exp has a SurfLang's Headid. When Exp only has one reduction rule (line 11-12), the syntactic sugar has to desugar. If not, we should expand outermost sugar and find the sub-expression which should be reduced (line 14-16), or the sugar has to desugar (line 17-18), because it will never be resugared.
+Line 10-21 deal with the case then Exp has a SurfLang's Headid. When Exp only has one reduction rule (line 11-12), the syntactic sugar has to desugar. If not, we should expand outermost sugar and find the sub-expression which should be reduced (line 14-16), or the sugar has to desugar (line 17-18), because it will never be resugared. The steps in line 14 to 16 are the critical part of our algorithm (call {\bfseries one-step try}\label{mark:onesteptry}).
 
 
 Then, our lightweight-resugaring algorithm is defined as \ref{alg:lwresugar}.
@@ -324,31 +324,38 @@ We take a SKI combinator syntactic sugar as an example. We will show why our app
 
 Althought SKI combinator calculus is a reduced version of lambda calculus, we can construct combinators' sugar based on call-by-need lambda calculus in our CoreLang. For expression
 
- $(S~(K~(S~I))~K~xx~yy)$, we get the following resugaring sequences as Fig \ref{fig:SKI}.
-
-\begin{figure}[ht]
-	\centering
-	\parbox[t]{\textwidth}{
-				\begin{center}
-				{
-					\small\selectfont
-					(S (K (S I)) K xx yy)\\
-					↓\\
-					(((K (S I)) xx (K xx)) yy)\\
-					↓\\
-					(((S I) (K xx)) yy)\\
-					↓\\
-					(I yy ((K xx) yy))\\
-					↓\\
-					(yy ((K xx) yy))\\
-					↓\\
-					(yy xx)
-				}
-				\end{center}
-			}
-	\caption{SKI's resugaring sequences}
-	\label{fig:SKI}
-\end{figure}
+ $(S~(K~(S~I))~K~xx~yy)$, we get the following resugaring sequences as following.
+\begin{Codes}
+    (S (K (S I)) K xx yy)
+\CoreStep (((K (S I)) xx (K xx)) yy)
+\CoreStep (((S I) (K xx)) yy)
+\CoreStep (I yy ((K xx) yy))
+\CoreStep (yy ((K xx) yy))
+\CoreStep (yy xx)
+\end{Codes}
+% \begin{figure}[ht]
+% 	\centering
+% 	\parbox[t]{\textwidth}{
+% 				\begin{center}
+% 				{
+% 					\small\selectfont
+% 					(S (K (S I)) K xx yy)\\
+% 					↓\\
+% 					(((K (S I)) xx (K xx)) yy)\\
+% 					↓\\
+% 					(((S I) (K xx)) yy)\\
+% 					↓\\
+% 					(I yy ((K xx) yy))\\
+% 					↓\\
+% 					(yy ((K xx) yy))\\
+% 					↓\\
+% 					(yy xx)
+% 				}
+% 				\end{center}
+% 			}
+% 	\caption{SKI's resugaring sequences}
+% 	\label{fig:SKI}
+% \end{figure}
 
 For existing approach, the sugar expression should firstly desugar to
 \begin{flushleft}

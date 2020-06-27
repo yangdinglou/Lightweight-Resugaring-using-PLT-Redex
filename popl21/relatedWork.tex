@@ -3,13 +3,14 @@
 \label{sec5}
 %Explain the work that are related to your problem, and to your three contributions. 
 
-The most related work is the series of resugaring\cite{resugaring,hygienic,resugaringtype,resugaringscope}. The first two work is about resugaring evaluation sequences, the third one is about resugaring scope rules, and the last one is about resugaring type rules. The whole series is for better syntactic sugar. Our approach considered to implement a method for better DSLs, then regarded core language and surf language as a whole language.
+{\bfseries The series of resugaring\cite{resugaring,hygienic,resugaringtype,resugaringscope} }is the most related work. The first two are about resugaring evaluation sequences, the third one is about resugaring scope rules, and the last one is about resugaring type rules. The whole series is for better syntactic sugar. We have compared our approach with existing sequences resugaring method before. The type resugaring work indicates that it is possible to automatically construct surface language's semantics. But after trying to do this by unification as type resugaring does, we found it impossible because todo.
 
-Macrofiction\cite{Macrofication} is for generating macros for programs automatically to refactor the codes. Our work may try resugaring some macros generated automatically to test the practicality of resugaring method. Since the setup of our tools is simple, it will be easy to intergrate the two tools.
 
-Galois slicing for Imperative Functional Programs\cite{slicing} is a work for analyzing functional programs during execution. Our approach used a similiar idea on slicing programs and processing on sub-programs.
+Galois slicing for Imperative Functional Programs\cite{slicing} is a work for dynamic analyzing functional programs during execution. The forward component of the Galois connection maps a partial input x to the greatest partial output y that can be computed from x; the backward component of the Galois connection maps a partial output y to the least partial input x from which we can compute y. Our approach used a similiar idea on slicing expressions and processing on subexpressions. The dynamic approach is like the forward component, so the method to handle side effects in functional programs may be useful for a better resugaring with side effects.
 
-Dynsem\cite{dynsem} is 
+Macros as Multi-Stage Computations\cite{multistage} is an old research similar to lazy expansion for macros. Some other researches\cite{modularstaging} about multi-stage programming\cite{MSP} indicate that it is an useful idea for implementing domain-specific languages. Macro systems in some language (such as Racket\cite{racket}) have support lazy expansion. Our dynamic approach is a combination of existing resugaring and lazy expansion, which achieves a more powerful approach.
+
+Addition to PLT Redex\cite{SEwPR} we used to engineer the semantics, there are some other semantics engineering tools\cite{dynsem,Ksemantic} which aim to test or verify the semantics of languages. The methods of these researches can be easily combined with our static approach.
 
 \subsection{Comments on resugaring}
 
@@ -17,7 +18,7 @@ Dynsem\cite{dynsem} is
 \label{mark:side}
 The previous resugaring approach used to tried a $Letrec$ sugar and found no useful sequences shown. We explain the reason from the angle of side effects. We also used to try some syntactic sugars which contain side effect. We would say a syntactic sugar including side-effect is bad for resugaring, because after a side effect takes effect, the desugared expression should never resugar to the sugar expression. Thus, we don't think resugaring is useful for syntactic sugars  including side effects, though it can be done by marking any expressions which have a side effect.
 
-\subsubsection{hygienic resugaring}As mentioned in Sec\ref{mark:hygienic}, our approach can deal with hygienic resugaring without much afford (just another case in core algorithm). Compare to existing hygienic resugaring\cite{hygienic}, our approach is a more general approach. As we learned from the existing approach, it will also work if the rewriting system itself is hygienic, so is our approach. During implementing our tools, we found using $\#refers-to$ keyword of PLT Redex would get more concise intermediate process, so we just use it.
+\subsubsection{Hygienic resugaring}As mentioned in Sec\ref{mark:hygienic}, our approaches can deal with hygienic resugaring without much afford as the existing approach\cite{hygienic}. (Of course with the help of core language's semantics, see in next discussion) The dynamic approach uses a trivial, not beautiful tricky to handle the hygienic macros, so that we decide to make the rewriting system hygienic instead. ($\#:binding-forms$ keyword in PLT Redex) But the static approach handle the hygienic macro very easily, by adding a substitution's hash table. The dynamic approach can also use this method, but a hygienic rewriting system is enough.
 
-\subsubsection{assumption on CoreLang's evaluator}
-\label{mark:assumption} As mentioned in Sec , the work "resugaring" originated from has weaker assumption on the core language---it just required a stepper of core languages' expression, when our approach needed the whole reduction semantics. Thus, the intent of our resugaring is not a tool for supporting resugaring for languages, but a tool for implementing DSL better. We will discuss this in feature work for details. 
+\subsubsection{Assumption on CoreLang's evaluator}
+\label{mark:assumption} As mentioned in Sec , the work "resugaring" originated from has weaker assumption on the core language---it just required a stepper of core languages' expression, when our approach needed the whole reduction semantics. Thus, the intent of our resugaring is not a tool for supporting resugaring for languages, but a tool for implementing DSL better. We will discuss this in feature work for details.  

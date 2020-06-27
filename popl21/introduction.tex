@@ -12,33 +12,42 @@
 %What are the three main technical contributions of this paper?
 
 %The rest of the paper is organized as follows. ...
+\begin{Codes}
+    let t = not(true) in
+      if t then t else not(false)
+\CoreStep let t = false in
+      if t then t else not(false)
+\CoreStep if false then false else not(false)
+\CoreStep not(false)
+\CoreStep true
+\end{Codes}
 
 Domain-specific language\cite{dsl} is becoming useful for people's daily tasks. For example, the IFTTT app and IOS's shortcuts designed DSLs describing some tasks to make our lives more convenient. So the users of DSL are no longer limited to programmers, but people from all walks of life.(to be completed)
 
 Syntactic sugar\cite{syntacticsugar}, as a simple way of implementing DSL, has an obvious problem. DSL based on syntactic sugars contains many components of its host language. Then its interpretation will be outside the DSL itself. The evaluation sequences of syntactic sugar expressions will contain many terms of the host language, which may confuse the users of DSL.
 
-There is an existing work---resugaring\cite{resugaring}\cite{hygienic}, which aimed to solve the problem upon. It converted the evaluation sequences of desugared expression (core language) into representative sugar's syntax(surface language). The evaluation sequences shown by resugaring will not contain components of host language. But we found the existing resugaring approach using match and substitution is kind of redundant. The biggest deficiency of existing resugaring method is that the syntactic sugars in an expression have to fully desugar before evaluation. This limits the processing ability of the method. Moreover, it limits the complexity of getting the resugaring sequences. If we need to resugar a very huge expression, the match and substitution processes will cost so much. Also, processing of hygienic macros is complex due to the extra data structure.
+There is an existing work---resugaring\cite{resugaring}\cite{hygienic}, which aimed to solve the problem upon. It converted the evaluation sequences of desugared expression (core language) into representative sugar's syntax (surface language). The evaluation sequences shown by resugaring will not contain components of host language (todo: another express?). But we found the existing resugaring approach using match and substitution is kind of redundant. The biggest deficiency of existing resugaring method is that the syntactic sugars in an expression have to fully desugar before evaluation. This limits the processing ability of the method. Moreover, it limits the complexity of getting the resugaring sequences. If we need to resugar a very huge expression, the match and substitution processes will cost so much. Also, processing of hygienic macros is a little bit complex due to the extra data structure. Finally, we found the existing approach only assumes a stepper for core language, when the semantics of core languages can be got in some cases. We want to figure out how the semantics of core language will help.
 
 %In this paper, We propose a lightweight approach to get resugaring sequences based on syntactic sugars. The key idea of our approach is---syntactic sugar expression only desugars at the point that it have to desugar. We guess that we don't have to desugar the whole expression at the initial time of evaluation under the premise of keeping the properties of expression. 
 
-In this paper, we propose an unidirectional resugaring approach by lazy dusugaring mixed with a dynamic approach and a static approach. The key idea of the whole approach is---syntactic sugar expressions only desugar at the point they have to desugar, which is what the word "lazy" means. It would be correct for resugaring if we can prove the whole sugar expression will keep the properties.
+In this paper, we propose an unidirectional resugaring approach by lazy dusugaring mixed with a dynamic approach and a static approach. The key idea of the whole approach is---syntactic sugar expressions only desugar at the point they have to desugar, which is what the word "lazy" means. It would be correct for resugaring if we can prove the whole sugar expressions will keep the properties.
 
-The dynamic approach use the reduction semantics of core language to decide whether desugaring the sugar. The static approach use the reduction semantics of core language to get reduction semantics of surface language based on sugars' syntax, then execute the syntactic sugar programs on the surface's semantics. The context rules of surface language decide which subexpression can be reduced, or desugaring is necessary because of the reduction rules.
+The dynamic approach use the reduction semantics\cite{reduction} of core language to decide whether desugaring the sugar. The static approach use the reduction semantics of core language to get reduction semantics of surface language based on sugars' syntax, then execute the syntactic sugar programs on the surface's semantics. The context rules of surface language decide which subexpression can be reduced, or desugaring is necessary because of the reduction rules.
 
 Our main contribution is as follow:
 \begin{itemize}
-\item {\bfseries Mixture approach of resugaring.} We introduce an mixture of two different resugaring approachs to combine the advances of following approaches. The lazy dusugaring is common feature of two approaches, which give each approach some good properties.
-\item {\bfseries A lightweight but powerful dynamic approach.} The dynamic approach we proposed is based on core language's reduction semantics. It takes surface language and core language as a whole, then decided whether expanding the sugars or reducing the subexpressions according to properties that make the resugaring correct. Thus, it is lightweight because many match and substitution processes can be omitted. We test the dynamic approach on many applications. The result shows that in addition to processing what existing work can process, the dynamic approach can handle recursive sugar easily, which makes the approach powerful. And the rewriting system based on reduction semantics makes it possible to write syntactic sugar easily.
+\item {\bfseries A mixture approach of resugaring.} We introduce an mixture of two different resugaring approachs to combine the advances of following approaches. The lazy dusugaring is common feature of two approaches, which give each approach some good properties.
+\item {\bfseries A lightweight but powerful dynamic approach.} The dynamic approach we proposed is based on core language's reduction semantics. It takes surface language and core language as a whole, then decided whether expanding the sugars or reducing the subexpressions according to properties that make the resugaring correct. Thus, it is lightweight because many match and substitution processes can be omitted. We test the dynamic approach on many applications. The result shows that in addition to handle what existing work can handle, our dynamic approach can process recursive sugar easily, which makes it powerful. And the rewriting system based on reduction semantics makes it possible to write syntactic sugar easily.
 \item {\bfseries An independent and efficient static approach.} The static approach we proposed also used core language's reduction semantics. But instead of executing at the level of core language, we turn the core language's semantics into automata. Then for each syntactic sugar, we would generate the surface language's semantics without depending on some rules in core language. (some meta-functions may be necessary.) Thus, it is efficient because many steps in core language can be omitted. todo: complete
 \end{itemize}
 
 
-In the rest of this paper, we present the technical details of our approach together with the proof of correctness. In details, the rest of our paper is organized as follow: todo:update
+In the rest of this paper, we present the technical details of our approach together with the proof of correctness. In details, the rest of our paper is organized as follow: 
 
 \begin{itemize}
-\item An overview of our approach with mixture of dynamic and static approach.[sec \ref{sec2}]
+\item An overview of our approach with mixed with dynamic and static approach.[sec \ref{sec2}]
 \item The technique of dynamic approach, with algorithm and evaluation.[sec \ref{sec3}]
-\item The technique of dynamic approach, with algorithm and evaluation.[sec \ref{sec4}]
+\item The technique of static approach, todo.[sec \ref{sec4}]
 \item Relative work and discussions.[sec \ref{sec5}]
 \item Conclusion and feature work.[sec \ref{sec6}]
 \end{itemize}
