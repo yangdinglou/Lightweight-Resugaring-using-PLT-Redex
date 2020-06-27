@@ -4,3 +4,4 @@
 (subst x v λ x e) --> e
 (subst x v λ x' e) --> (λ x' (subst x v e)) where x =!= x'
 
+(let x #t (or #f x))

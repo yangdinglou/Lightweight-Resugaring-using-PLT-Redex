@@ -14,7 +14,8 @@
 (define (get-tmp-IFA head)
   (cond 
     [(equal? head 'let) IFA-LET]
-    [(equal? head 'if) IFA-IF]))
+    [(equal? head 'if) IFA-IF]
+    [(equal? head 'Or) IFA-OR]))
 ;use symbol to present value
 (define (cannot-equal term1 term2)
   (cond
@@ -125,6 +126,13 @@
                (for ((tmpkeys (hash-keys (IFA-subst tmp))))
                  (if (hash-has-key? (hash-ref (IFA-subst tmp) tmpkeys) (original-id tmpkeys))
                      (set! tmp (modify-IFA tmp tmpkeys (hash-ref (hash-ref (IFA-subst tmp) tmpkeys) (original-id tmpkeys))))
+                     (void)))
+               (for ((i (length (car (IFA-Σ tmp)))))
+                 (if (> i 0)
+                     (let ((tmpsubst (hash-copy (IFA-subst tmp))))
+                       (begin
+                         (hash-remove! tmpsubst (list-ref (car (IFA-Σ tmp)) i))
+                         (set-IFA-subst! tmp tmpsubst)))
                      (void)))
                tmp
                ))])))
@@ -241,7 +249,7 @@
             (for ((tmpkey (hash-keys subst-hash)))
               (set! tmppattern (map (λ (e) (if (equal? (original-id e) tmpkey) (hash-ref subst-hash tmpkey) e)) tmppattern)))
     
-            (let ((tmprule (list "context rule" tmppattern tmpnode #;(hash-copy subst-hash))))
+            (let ((tmprule (list "context rule" tmppattern (original-id tmpnode) #;(hash-copy subst-hash))))
               (if (or (string-prefix? (symbol->string tmpnode) "v_subst") (string-prefix? (symbol->string tmpnode) "bool"))
                   empty
                   tmprule)))))))
@@ -359,17 +367,17 @@
            rule-list)
     ))
 
-;(build-IFA '(1 (Or e_1 e_2) (let x e_1 (if x x e_2))))
-
-(build-rules (build-IFA '(1 (Or e_1 e_2) (let x e_1 (if x x e_2)))))
+(define IFA-OR (build-IFA '(1 (Or e_1 e_2) (let x e_1 (if x x e_2)))))
+(build-rules IFA-OR)
+;(build-rules (build-IFA '(1 (Or e_1 e_2) (let x e_1 (if x x e_2)))))
 ;(build-IFA '(1 (Sg e_1 e_2 e_3 e_4 e_5) (if e_1 (if e_2 e_3 e_4) (if e_3 e_4 e_5))))
 #;(build-IFA '(1 (Sg e_1 e_2 e_3 e_4 e_5)
                  (let x e_3 (if e_1 (if e_2 x e_4) (if x x e_5)))
                  ))
-(build-rules (build-IFA '(1 (Sg e_1 e_2 e_3 e_4 e_5)
+#;(build-rules (build-IFA '(1 (Sg e_1 e_2 e_3 e_4 e_5)
                               (let x e_3 (if e_1 (if e_2 x e_4) (if x x e_5)))
                               )))
-(build-rules (build-IFA '(1 (Sg2 e_1 e_2 e_3 e_4)
+#;(build-rules (build-IFA '(1 (Sg2 e_1 e_2 e_3 e_4)
                             (let x e_1 (if x (let x e_2 e_3) e_4))
                             )))
 
@@ -377,6 +385,10 @@
                             (if (if e_1 e_2 boolfalse) boolfalse booltrue)
                             ))
 
-(build-rules (build-IFA '(1 (Sg2 e_1 e_2)
+#;(build-rules (build-IFA '(1 (Sg3 e_1 e_2)
                             (if (if e_1 e_2 boolfalse) boolfalse booltrue)
+                            )))
+
+(build-rules (build-IFA '(1 (Sg4 e_1 e_2)
+                            (let x e_1 (Or e_2 x))
                             )))
