@@ -12,15 +12,6 @@
 %What are the three main technical contributions of this paper?
 
 %The rest of the paper is organized as follows. ...
-\begin{Codes}
-    let t = not(true) in
-      if t then t else not(false)
-\CoreStep let t = false in
-      if t then t else not(false)
-\CoreStep if false then false else not(false)
-\CoreStep not(false)
-\CoreStep true
-\end{Codes}
 
 Domain-specific language\cite{dsl} is becoming useful for people's daily tasks. For example, the IFTTT app and IOS's shortcuts designed DSLs describing some tasks to make our lives more convenient. So the users of DSL are no longer limited to programmers, but people from all walks of life.(to be completed)
 
@@ -30,9 +21,10 @@ There is an existing work---resugaring\cite{resugaring}\cite{hygienic}, which ai
 
 %In this paper, We propose a lightweight approach to get resugaring sequences based on syntactic sugars. The key idea of our approach is---syntactic sugar expression only desugars at the point that it have to desugar. We guess that we don't have to desugar the whole expression at the initial time of evaluation under the premise of keeping the properties of expression. 
 
-In this paper, we propose an unidirectional resugaring approach by lazy dusugaring mixed with a dynamic approach and a static approach. The key idea of the whole approach is---syntactic sugar expressions only desugar at the point they have to desugar, which is what the word "lazy" means. It would be correct for resugaring if we can prove the whole sugar expressions will keep the properties.
+In this paper, we propose an unidirectional resugaring approach by lazy dusugaring mixed with a dynamic approach and a static approach. The key idea of the whole approach is---syntactic sugar expressions only desugar at the point they have to desugar, which is what the word "lazy" means. It would be correct for resugaring if we can prove the whole sugar expressions will keep the properties by such lazy processes.
 
-The dynamic approach use the reduction semantics\cite{reduction} of core language to decide whether desugaring the sugar. The static approach use the reduction semantics of core language to get reduction semantics of surface language based on sugars' syntax, then execute the syntactic sugar programs on the surface's semantics. The context rules of surface language decide which subexpression can be reduced, or desugaring is necessary because of the reduction rules.
+The dynamic approach uses the reduction semantics\cite{reduction} of core language to decide whether desugaring the sugar. The static approach uses the reduction semantics of core language to get reduction semantics of surface language based on sugars' syntax, then execute the syntactic sugar programs on the surface's semantics. 
+% The context rules of surface language decide which subexpression can be reduced, or desugaring is necessary because of the reduction rules.
 
 Our main contribution is as follow:
 \begin{itemize}
@@ -48,6 +40,6 @@ In the rest of this paper, we present the technical details of our approach toge
 \item An overview of our approach with mixed with dynamic and static approach.[sec \ref{sec2}]
 \item The technique of dynamic approach, with algorithm and evaluation.[sec \ref{sec3}]
 \item The technique of static approach, todo.[sec \ref{sec4}]
-\item Relative work and discussions.[sec \ref{sec5}]
+\item Relative work and discussions on resugaring.[sec \ref{sec5}]
 \item Conclusion and feature work.[sec \ref{sec6}]
 \end{itemize}

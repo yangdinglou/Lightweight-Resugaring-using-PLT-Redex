@@ -39,7 +39,7 @@ The form of syntactic sugar is as follow.
 $(\mbox{Surfid}\;e_{1}\;e_{2}\;\ldots)$ ~→~ $(\mbox{Headid}\; \ldots)$
 }
 
-An counter example of this restriction is $(\mbox{Surfid}\;\ldots\;(e1\;e2)\ldots))$ in LHS. It's for simpler algorithm form, and the expression ability of syntactic sugar will not be changed.
+An counter example of this restriction is $(\mbox{Surfid}\;\ldots\;(e1\;e2)\ldots))$ in LHS. It's for simpler algorithm form, and the expression ability of syntactic sugar will not be changed. Any subexpressions can be represented by core language's terms or surface language's term, so the expressiveness is good.
 
 \begin{Def}[Unambiguous]
 For every syntactic sugar expressions, it can only desugar to one expression in CoreLang.
@@ -113,23 +113,23 @@ Take some terms in CoreLang as examples.
 
 \begin{flushleft}
 \begin{tabularx}{\textwidth}%
-{|>{\setlength{\hsize}{.4\hsize}\centering\arraybackslash}X  |>{\setlength{\hsize}{1.6\hsize}\centering\arraybackslash}X|}
+{|>{\setlength{\hsize}{.5\hsize}\centering\arraybackslash}X  |>{\setlength{\hsize}{1.5\hsize}\centering\arraybackslash}X|}
 %{|*{2}{>{\centering\arraybackslash}X|}}
 \hline
 Syntax & Reduction rules \\ \hline
-(if e e e) &\qquad\qquad\qquad(if \#t e2 e3) $\rightarrow$ e2 \newline ~(if \#f e2 e3) $\rightarrow$ e3\\ \hline
-(($\lambda$ (x ...) e) e ...) & (($\lambda$ (x0 x1 ...) e) v0 v1 ...) $\rightarrow$ (let ((x0 v0) (($\lambda$ (x1 ...) e) v1 ...))\\ \hline
-(($\lambda_N$ (x ...) e) e ...) & (($\lambda_N$ (x0 x1 ...) e) e0 e1 ...) $\rightarrow$ (let ((x0 e0) (($\lambda_N$ (x1 ...) e) e1 ...))\\ \hline
-(let ((x e) ...) e) & (let ((x0 e0) (x1 e1) ...) e) $\rightarrow$ (let ((x1 e1) ...) (subst x0 e0 e))\newline (let () e)  $\rightarrow$ e (where subst is a meta function)\\ \hline
-(first e) & (first (list v1 v2 ...)) $\rightarrow$ v1\\ \hline
-(rest e) & (rest (list v1 v2 ...)) $\rightarrow$ (list v2 ...)\\ \hline
-(empty e) & \qquad\qquad\qquad(empty (list)) $\rightarrow$ \#t \newline (empty (list v1 ...)) $\rightarrow$ \#f\\ \hline
-(cons e e) & (cons v1 (list v2 ...)) $\rightarrow$ (list v1 v2 ...)\\ \hline
-(op e e) \newline op=+-*/><== & (op v1 v2) $\rightarrow$ arithmetic result\\ \hline
+(if e e e) &\qquad\qquad\qquad(if \#t e2 e3) $\dashrightarrow$ e2 \newline ~(if \#f e2 e3) $\dashrightarrow$ e3\\ \hline
+((lam (x ...) e) e ...) & ((lam (x0 x1 ...) e) v0 v1 ...) $\dashrightarrow$ (let ((x0 v0) ((lam (x1 ...) e) v1 ...))\\ \hline
+((lamN (x ...) e) e ...) & ((lamN (x0 x1 ...) e) e0 e1 ...) $\dashrightarrow$ (let ((x0 e0) ((lamN (x1 ...) e) e1 ...))\\ \hline
+(let ((x e) ...) e) & (let ((x0 e0) (x1 e1) ...) e) $\dashrightarrow$ (let ((x1 e1) ...) (subst x0 e0 e))\newline (let () e)  $\dashrightarrow$ e (where subst is a meta function)\\ \hline
+(first e) & (first (list v1 v2 ...)) $\dashrightarrow$ v1\\ \hline
+(rest e) & (rest (list v1 v2 ...)) $\dashrightarrow$ (list v2 ...)\\ \hline
+(empty e) & \qquad\qquad\qquad(empty (list)) $\dashrightarrow$ \#t \newline (empty (list v1 ...)) $\dashrightarrow$ \#f\\ \hline
+(cons e e) & (cons v1 (list v2 ...)) $\dashrightarrow$ (list v1 v2 ...)\\ \hline
+(op e e) \newline op=+-*/><== & (op v1 v2) $\dashrightarrow$ arithmetic result\\ \hline
 \end{tabularx}
 \end{flushleft}
 
-We let {\bfseries if}, {\bfseries let}, {\bfseries $\lambda _{N}$}, {\bfseries empty}, {\bfseries first}, {\bfseries rest} as Coreexp's Headid, {\bfseries Op}, {\bfseries $\lambda$}, {\bfseries cons} as Commonexp's Headid. Then we could show some useful intermediate steps.
+We let {\bfseries if}, {\bfseries let}, {\bfseries lamN} (call-by-name lambda calculus), {\bfseries empty}, {\bfseries first}, {\bfseries rest} as Coreexp's Headid, {\bfseries Op}, {\bfseries lam}(call-by-value lambda calculus), {\bfseries cons} as Commonexp's Headid. Then we could show some useful intermediate steps.
 
 
 \subsection{Algorithm defination}
@@ -310,17 +310,15 @@ We test some applications on the tool implemented using PLT Redex. Note that we 
 \subsubsection{simple sugar}
 \label{mark:simple}
 
-We construct some simple syntactic sugar and try it on our tool. Some sugar is inspired by the first work of resugaring\cite{resugaring}. The result shows that our approach can process all sugar features of their first work.
+We construct some simple syntactic sugar and try it on our tool. Some sugar is inspired by the first work of resugaring\cite{resugaring}. The result shows that our approach can handle all sugar features of their first work.
 
 We take a SKI combinator syntactic sugar as an example. We will show why our approach is lightweight.
+\begin{Codes}
+	S \SurfStep{ (lamN (x1 x2 x3) (x1 x2 (x1 x3)))}
+	K \SurfStep{ (lamN (x1 x2) x1)}
+	I \SurfStep{ (lamN (x) x)}
+\end{Codes}
 
-\begin{flushleft}
-	$S$ $\rightarrow$ $(\lambda _{N}~(x_{1}~x_{2}~x_{3})~(x_{1}~x_{2}~(x_{1}~x_{3})))$
-	
-	$K$ $\rightarrow$ $(\lambda _{N}~(x_{1}~x_{2})~x_{1})$
-	
-	$I$ $\rightarrow$ $(\lambda _{N}~(x)~x)$
-\end{flushleft}
 
 Althought SKI combinator calculus is a reduced version of lambda calculus, we can construct combinators' sugar based on call-by-need lambda calculus in our CoreLang. For expression
 
@@ -358,19 +356,18 @@ Althought SKI combinator calculus is a reduced version of lambda calculus, we ca
 % \end{figure}
 
 For existing approach, the sugar expression should firstly desugar to
-\begin{flushleft}
-$((\lambda _{N}
+\begin{Codes}
+((lamN
    (x_{1} x_{2} x_{3})
    (x_{1} x_{3} (x_{2} x_{3})))
-  ((\lambda _{N} (x_{1} x_{2}) x_{1})
-   ((\lambda _{N}
+  ((lamN (x_{1} x_{2}) x_{1})
+   ((lamN
      (x_{1} x_{2} x_{3})
      (x_{1} x_{3} (x_{2} x_{3})))
-    (\lambda _{N} (x) x)))
-  (\lambda _{N} (x_{1} x_{2}) x_{1})
-  xx
-  yy)$
-\end{flushleft}
+    (lamN (x) x)))
+  (lamN (x_{1} x_{2}) x_{1})
+  xx yy)
+\end{Codes}
 
 Then in our CoreLang, the execution of expanded expression will contain 33 steps. For each step, there will be many attempts to match and substitute the syntactic sugars. It will omit more steps for a larger expression. 
 
@@ -379,9 +376,11 @@ So the unidirectional resugaring algorithm makes our approach lightweight, becau
 \subsubsection{hygienic macro}
 \label{mark:hygienic}
 
-The second work\cite{hygienic} mainly processes hygienic macro compared to first work. We try a $Let$ sugar , which is a common hygienic sugar example, on our tool. Our algorithm can easily process hygienic macro without special data structure. The $Let$ sugar is define as follow
-
-$(Let\;x\;v\;exp)$ $\rightarrow$ $(Apply\;(\lambda\;(x)\;exp)\;v)$
+The second work\cite{hygienic} mainly processes hygienic macro compared to first work. We try a $Let$ sugar (similar to the one in core language) , which is a complex hygienic sugar example, on our tool. Our algorithm can easily process hygienic macro without special data structure. The $Let$ sugar is define as follow
+\begin{Codes}
+	(Let x e exp) \SurfStep{ ((lambda (x) exp) e)}
+\end{Codes}
+% $(Let\;x\;v\;exp)$ $\rightarrow$ $(Apply\;(\lambda\;(x)\;exp)\;v)$
 
 Take $(Let~x~1~(+~x~(Let~x~2~(+~x~1))))$ for an example. First, a temp expression
 
@@ -391,151 +390,159 @@ is needed. (case 5 or 6)Then one-step try on the temp expression, we will get
 
 $(+~1~(Let~1~2~(+~1~1)))$ which is out of the whole language's grammar. In this case, it is not a good choice to desugar the outermost $Let$ sugar. Then we just apply the core-algo f on the sub-expression where the error occurs ($(+~x~(Let~x~2~(+~x~1)))$ in this example). So the right intermediate sequence $(Let~x~1~(+~x~3))$ will be get.
 
-In practical application, we think resugaring for a unhygienic rewriting system is not interesting at all, because hygienic macro can be easily processed by rewriting system. So in the finally implementation of our tool, we just use PLT Redex's binding forms to deal with hygienic macros. But we did try it on the version without hygienic rewriting system.
+Another hygienic example is as the example origined from Hygienic resugaring\cite{hygienic}. We simplify the example to the following one.
+\begin{Codes}
+	(Hygienicadd e1 e2) \SurfStep{ (let x e1 (+ x e2))}
+\end{Codes}
+
+When executing a program as (let ((x 1)) (Hygienicadd x 2)), the lazy desugaring allows the expression reduced to (Hygienicadd 1 2) directly, so it's a more flexible approach to handle hygienic problems in resugaring.
+In practical application, we think hygienic resugaring can be easily processed by rewriting system. So in the finally implementation of our tool, we just use PLT Redex's binding forms to deal with hygienic macros. But we did try it on the version without hygienic rewriting system. Moreover, we use a more concise way to handle hygienic resugaring.
 
 \subsubsection{recursive sugar}
 Recursive sugar is a kind of syntactic sugars where call itself or each other during the expanding. For example,
+\begin{Codes}
+(Odd e) \SurfStep{ (if (> e 0) (Even (- e 1)) \#f)}
+(Even e) \SurfStep{ (if (> e 0) (Odd (- e 1)) \#t)}
+\end{Codes}
+are typical recursive sugars. The existing resugaring approach can't process this kind of syntactic sugar easily, because boundary conditions are in the sugar itself.
 
-$(Odd\;e)$ $\rightarrow$ $(if\;(>\;e\;0)\;(Even\;(-\;e\;1)\;\#f))$
-
-$(Even\;e)$ $\rightarrow$ $(if\;(>\;e\;0)\;(Odd\;(-\;e\;1)\;\#t))$
-
-are typical recursive sugars. The previous works can process this kind of syntactic sugar easily, because boundary conditions are in the sugar itself.
-
-Take $(Odd~2)$ as an example. The previous work will firstly desugar the expression using the rewriting system. Then the rewriting system will never start resugaring as Fig\ref{fig:odd} shows.
-
-\begin{figure}[ht]
-	\centering
-	\parbox[t]{\textwidth}{
-				\begin{center}
-				{
-					\small\selectfont
-					(Odd 2)\\
-					↓\\
-					(if (> 2 0) (Even (- 2 1) \#f))\\
-					↓\\
-					(if (> (- 2 1) 0) (Odd (- (- 2 1) 1) \#t))\\
-					↓\\
-					(if (> (- (- 2 1) 1) 0) (Even (- (- (- 2 1) 1) 1) \#f))\\
-					↓\\
-					{\ldots}
-				}
-				\end{center}
+Take $(Odd~2)$ as an example. The previous work will firstly desugar the expression using the rewriting system. Then the rewriting system will never terminate as following shows.
+\begin{Codes}
+   (Odd 2)
+\SurfStep{ (if (> 2 0) (Even (- 2 1) \#f))}
+\SurfStep{ (if (> (- 2 1) 0) (Odd (- (- 2 1) 1) \#t))}
+\SurfStep{ (if (> (- (- 2 1) 1) 0) (Even (- (- (- 2 1) 1) 1) \#f))}
+\SurfStep{ ...}
+\end{Codes}
+% \begin{figure}[ht]
+% 	\centering
+% 	\parbox[t]{\textwidth}{
+% 				\begin{center}
+% 				{
+% 					\small\selectfont
+% 					(Odd 2)\\
+% 					↓\\
+% 					(if (> 2 0) (Even (- 2 1) \#f))\\
+% 					↓\\
+% 					(if (> (- 2 1) 0) (Odd (- (- 2 1) 1) \#t))\\
+% 					↓\\
+% 					(if (> (- (- 2 1) 1) 0) (Even (- (- (- 2 1) 1) 1) \#f))\\
+% 					↓\\
+% 					{\ldots}
+% 				}
+% 				\end{center}
 				
-			}
-	\caption{Odd2's desugaring process}
-\label{fig:odd}
-\end{figure}
+% 			}
+% 	\caption{Odd2's desugaring process}
+% \label{fig:odd}
+% \end{figure}
 
-Then the advantage of our approach is embodied. Our lightweight approach doesn't require a whole expanding of sugar expression, which gives the framework chances to judge boundary conditions in sugars themselves, and showing more intermediate sequences. We get the resugaring sequences as Fig \ref{fig:rec} of the former example using our tool.
-
-\begin{figure}[ht]
-	\centering
-	\parbox[t]{\textwidth}{
-				\begin{center}
-				{
-					\small\selectfont
-					(Odd 2)\\
-					↓\\
-					(Even (- 2 1))\\
-					↓\\
-					(Even 1)\\
-					↓\\
-					(Odd (- 1 1))\\
-					↓\\
-					(Odd 0)\\
-					↓\\
-					\#f
-				}
-				\end{center}
+Then the advantage of our approach is embodied. Our lightweight approach doesn't require a whole expanding of sugar expression, which gives the framework chances to judge boundary conditions in sugars themselves, and showing more intermediate sequences. We get the resugaring sequences of the former example using our tool.
+\begin{Codes}
+    (Odd 2)
+\CoreStep{ (Even (- 2 1))}
+\CoreStep{ (Even 1)}
+\CoreStep{ (Odd (- 1 1))}
+\CoreStep{ (Odd 0)}
+\CoreStep{ \#f}
+\end{Codes}
+% \begin{figure}[ht]
+% 	\centering
+% 	\parbox[t]{\textwidth}{
+% 				\begin{center}
+% 				{
+% 					\small\selectfont
+% 					(Odd 2)\\
+% 					↓\\
+% 					(Even (- 2 1))\\
+% 					↓\\
+% 					(Even 1)\\
+% 					↓\\
+% 					(Odd (- 1 1))\\
+% 					↓\\
+% 					(Odd 0)\\
+% 					↓\\
+% 					\#f
+% 				}
+% 				\end{center}
 				
-			}
-	\caption{Odd2's resugaring sequences}
-\label{fig:rec}
-\end{figure}
+% 			}
+% 	\caption{Odd2's resugaring sequences}
+% \label{fig:rec}
+% \end{figure}
 
-We also construct some higher-order syntactic sugars and test them. The higher-order feature is important for constructing practical syntactic sugar. And for syntactic sugar's feature, it is of recursive sugar. Giving the following two higher-order syntactic sugar as examples.
+We also construct some higher-order syntactic sugars and test them. The higher-order feature is important for constructing practical syntactic sugar. And many higher-order sugars should be constructed by recursive defination. Giving the following two higher-order syntactic sugar as examples.
+\begin{Codes}
+    (map e lst)
+\SurfStep{ (if (empty? lst) (list) (cons (e (first lst)) (map e (rest lst))))}
+\end{Codes}
+Get following resugaring sequences.
+\begin{Codes}
+    (map (lam (x) (+ x 1)) (list 1 2))
+\CoreStep{ (cons 2 (map (lam (x) (+ 1 x)) (list 2)))}
+\CoreStep{ (cons 2 (cons 3 (map (lam (x) (+ 1 x)) (list))))}
+\CoreStep{ (cons 2 (cons 3 (list)))}
+\CoreStep{ (cons 2 (list 3))}
+\CoreStep{ (list 2 3)}
+\end{Codes}
+filter
+\begin{Codes}
+   (filter e (list v1 v2 ...))
+\SurfStep{ (if (e v1) (cons v1 (filter e (list v2 ...)))\ (filter e (list v2 ...)))}
+   (filter e (list)) \SurfStep{ (list)}
+\end{Codes}
+result
 
-\begin{flushleft}
-	$(map\;e\;(list\;v_1\ldots))$→
+\begin{Codes}
+    (filter (lam (x) (and (> x 1) (< x 4))) (list 1 2 3 4))
+\CoreStep{ (filter (lam (x) (and (> x 1) (< x 4))) (list 2 3 4))}
+\CoreStep{ (cons 2 (filter (lam (x) (and (> x 1) (< x 4))) (list 3 4)))}
+\CoreStep{ (cons 2 (cons 3 (filter (lam (x) (and (> x 1) (< x 4))) (list 4))))}
+\CoreStep{ (cons 2 (cons 3 (filter (lam (x) (and (> x 1) (< x 4))) (list))))}
+\CoreStep{ (cons 2 (cons 3 (list)))}
+\CoreStep{ (cons 2 (list 3))}
+\CoreStep{ (list 2 3)}
+\end{Codes}
+
+These two syntactic sugars use different sugar forms to implement. For $Map$ sugar, we use if expression in CoreLang to constrain the boundary conditions. For $Filter$ sugar, we use two different parameters' form, which is another easy way for constructing syntactic sugar. The testing results show as .
+
+
+% \begin{figure}[ht]
+% 	\centering
+% 	\parbox[t]{\textwidth}{
 	
-	$(if\;(empty\;(list\;v_1\ldots))\;(list)\;(cons\;(e\;(first\;(list\;v_1\ldots)))\;(map\;e\;(rest\;(list\;v_1\ldots)))))$
-\end{flushleft}
-
-\begin{flushleft}
-	$(filter\;e\;(list\;v_1\;v_2\ldots))$→
-	
-	$(if\;(e\;v_1)\;(cons\;v_1\;(filter\;e\;(list\;v_2\ldots)))\;(filter\;e\;(list\;v_2\ldots)))$
-	
-	$(filter\;e\;(list))$ → $(list)$
-\end{flushleft}
-These two syntactic sugars use different sugar forms to implement. For $Map$ sugar, we use if expression in CoreLang to constrain the boundary conditions. For $Filter$ sugar, we use two different parameters' form, which is another easy way for constructing syntactic sugar. The testing results show as Fig\ref{fig:map} \ref{fig:filter}.
-
-\begin{figure}[ht]
-	\centering
-	\parbox[t]{\textwidth}{
-				\begin{center}
-				{
-					\small\selectfont
-					(map (λ (x) (+ 1 x)) (list 1 2 3))\\
-					↓\\
-					(cons 2 (map (λ (x) (+ 1 x)) (list 2 3)))\\
-					↓\\
-					(cons 2 (cons 3 (map (λ (x) (+ 1 x)) (list 3))))\\
-					↓\\
-					(cons 2 (cons 3 (cons 4 (map (λ (x) (+ 1 x)) (list)))))\\
-					↓\\
-					(cons 2 (cons 3 (cons 4 (list))))\\
-					↓\\
-					(cons 2 (cons 3 (list 4)))\\
-					↓\\
-					(cons 2 (list 3 4))\\
-					↓\\
-					(list 2 3 4)
-				}
-				\end{center}
-				
-			}
-	\caption{Map's resugaring sequences}
-\label{fig:map}
-\end{figure}
-
-\begin{figure}[ht]
-	\centering
-	\parbox[t]{\textwidth}{
-	
-				\begin{center}
-				{
-					\small\selectfont
-					(filter (λ (x) (and (> x 3) (< x 6))) (list 1 2 3 4 5 6 7))\\
-					↓\\
-					(filter (λ (x) (and (> x 3) (< x 6))) (list 2 3 4 5 6 7))\\
-					↓\\
-					(filter (λ (x) (and (> x 3) (< x 6))) (list 3 4 5 6 7))\\
-					↓\\
-					(filter (λ (x) (and (> x 3) (< x 6))) (list 4 5 6 7))\\
-					↓\\
-					(cons 4 (filter (λ (x) (and (> x 3) (< x 6))) (list 5 6 7)))\\
-					↓\\
-					(cons 4 (cons 5 (filter (λ (x) (and (> x 3) (< x 6))) (list 6 7))))\\
-					↓\\
-					(cons 4 (cons 5 (filter (λ (x) (and (> x 3) (< x 6))) (list 7))))\\
-					↓\\
-					(cons 4 (cons 5 (filter (λ (x) (and (> x 3) (< x 6))) (list))))\\
-					↓\\
-					(cons 4 (cons 5 (list)))\\
-					↓\\
-					(cons 4 (list 5))\\
-					↓\\
-					(list 4 5)
-				}
+% 				\begin{center}
+% 				{
+% 					\small\selectfont
+% 					(filter (λ (x) (and (> x 3) (< x 6))) (list 1 2 3 4 5 6 7))\\
+% 					↓\\
+% 					(filter (λ (x) (and (> x 3) (< x 6))) (list 2 3 4 5 6 7))\\
+% 					↓\\
+% 					(filter (λ (x) (and (> x 3) (< x 6))) (list 3 4 5 6 7))\\
+% 					↓\\
+% 					(filter (λ (x) (and (> x 3) (< x 6))) (list 4 5 6 7))\\
+% 					↓\\
+% 					(cons 4 (filter (λ (x) (and (> x 3) (< x 6))) (list 5 6 7)))\\
+% 					↓\\
+% 					(cons 4 (cons 5 (filter (λ (x) (and (> x 3) (< x 6))) (list 6 7))))\\
+% 					↓\\
+% 					(cons 4 (cons 5 (filter (λ (x) (and (> x 3) (< x 6))) (list 7))))\\
+% 					↓\\
+% 					(cons 4 (cons 5 (filter (λ (x) (and (> x 3) (< x 6))) (list))))\\
+% 					↓\\
+% 					(cons 4 (cons 5 (list)))\\
+% 					↓\\
+% 					(cons 4 (list 5))\\
+% 					↓\\
+% 					(list 4 5)
+% 				}
 					
-				\end{center}
+% 				\end{center}
 				
-			}
-	\caption{Filter's resugaring sequences}
-\label{fig:filter}
-\end{figure}
+% 			}
+% 	\caption{Filter's resugaring sequences}
+% \label{fig:filter}
+% \end{figure}
 \subsection{Compare to previous work}
 
 As mentioned many times before, the biggest difference between previous resugaring approach and our approach, is that our approach doesn't need to desugar the sugar expresssion totally. Thus, our approach has the following advantages compared to previous work.

@@ -13,3 +13,5 @@ Then add expression to resugar.rkt
 
 ## todolist
 1. call/cc sugar
+2. better discusstion in chapter3
+3. content of conclusion?
