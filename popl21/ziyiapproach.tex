@@ -39,15 +39,15 @@ An expression of the core language is defined in Figure \ref{fig:expression}. It
 %{|*{2}{>{\centering\arraybackslash}X|}}
 \hline
 Syntax & Reduction rules \\ \hline
-(if e e e) &\qquad\qquad\qquad(if \#t e2 e3) $\rightarrow$ e2 \newline ~(if \#f e2 e3) $\rightarrow$ e3\\ \hline
-(($\lambda$ (x ...) e) e ...) & (($\lambda$ (x0 x1 ...) e) v0 v1 ...) $\rightarrow$ (let ((x0 v0) (($\lambda$ (x1 ...) e) v1 ...))\\ \hline
-(($\lambda_N$ (x ...) e) e ...) & (($\lambda_N$ (x0 x1 ...) e) e0 e1 ...) $\rightarrow$ (let ((x0 e0) (($\lambda_N$ (x1 ...) e) e1 ...))\\ \hline
-(let ((x e) ...) e) & (let ((x0 e0) (x1 e1) ...) e) $\rightarrow$ (let ((x1 e1) ...) (subst x0 e0 e))\newline (let () e)  $\rightarrow$ e (where subst is a meta function)\\ \hline
-(first e) & (first (list v1 v2 ...)) $\rightarrow$ v1\\ \hline
-(rest e) & (rest (list v1 v2 ...)) $\rightarrow$ (list v2 ...)\\ \hline
-(empty e) & \qquad\qquad\qquad(empty (list)) $\rightarrow$ \#t \newline (empty (list v1 ...)) $\rightarrow$ \#f\\ \hline
-(cons e e) & (cons v1 (list v2 ...)) $\rightarrow$ (list v1 v2 ...)\\ \hline
-(op e e) \newline op=+-*/><== & (op v1 v2) $\rightarrow$ arithmetic result\\ \hline
+(if e e e) &\qquad\qquad\qquad(if \#t e2 e3) $\dashrightarrow$ e2 \newline ~(if \#f e2 e3) $\dashrightarrow$ e3\\ \hline
+((lam (x ...) e) e ...) & ((lam (x0 x1 ...) e) v0 v1 ...) $\dashrightarrow$ (let ((x0 v0) ((lam (x1 ...) e) v1 ...))\\ \hline
+((lamN (x ...) e) e ...) & ((lamN (x0 x1 ...) e) e0 e1 ...) $\dashrightarrow$ (let ((x0 e0) ((lamN (x1 ...) e) e1 ...))\\ \hline
+(let ((x e) ...) e) & (let ((x0 e0) (x1 e1) ...) e) $\dashrightarrow$ (let ((x1 e1) ...) (subst x0 e0 e))\newline (let () e)  $\dashrightarrow$ e (where subst is a meta function)\\ \hline
+(first e) & (first (list v1 v2 ...)) $\dashrightarrow$ v1\\ \hline
+(rest e) & (rest (list v1 v2 ...)) $\dashrightarrow$ (list v2 ...)\\ \hline
+(empty e) & \qquad\qquad\qquad(empty (list)) $\dashrightarrow$ \#t \newline (empty (list v1 ...)) $\dashrightarrow$ \#f\\ \hline
+(cons e e) & (cons v1 (list v2 ...)) $\dashrightarrow$ (list v1 v2 ...)\\ \hline
+(op e e) \newline op=+-*/><== & (op v1 v2) $\dashrightarrow$ arithmetic result\\ \hline
 \end{tabularx}
 \end{center}
 \caption{An Core Language Example}
@@ -158,14 +158,14 @@ Our mixed language for resugaring combines the surface language and the core lan
 The difference between our core language (CoreLang) and our surface language (SurfLang) is identified by $\m{HeadId}$. But there are some terms in the core language should be displayed during evaluation, or we need some terms to help us getting better resugaring sequences. So we defined \m{CommonExp}, which origin from CoreLang, but can be displayed in resugaring sequences. The \m{CoreExp} terms are terms with undisplayable CoreLang's \m{Headid}. The \m{SurfExp} terms are terms with SurfLang's \m{Headid} and all sub-expressions are displayable. The \m{CommonExp} terms are terms with displayable CoreLang's Headid, together with displayable sub-expressions. There exists some other expression during our resugaring process, which have \m{Headid} which can be displayed, but one or more subexpressions cannot. They are \m{UndisplayableExp}.
 
 Take some terms in the core language in Figure \ref{fig:core} as examples.
-We may assume {\bfseries if}, {\bfseries let}, {\bfseries $\lambda _{N}$}, {\bfseries empty}, {\bfseries first}, {\bfseries rest} as \m{CoreExp}'s \m{Headid}, {\bfseries Op}, {\bfseries $\lambda$}, {\bfseries cons} as \m{CommonExp}'s \m{Headid}. Then we could show some useful intermediate steps.
+We may assume {\bfseries if}, {\bfseries let}, {\bfseries lamN} (call-by-name lambda calculus), {\bfseries empty}, {\bfseries first}, {\bfseries rest} as \m{CoreExp}'s \m{Headid}, {\bfseries Op}, {\bfseries lam} (call-by-value lambda calculus), {\bfseries cons} as \m{CommonExp}'s \m{Headid}. Then we could show some useful intermediate steps.
 
 
 \subsection{Resugaring Algorithm}
 
-Our resugaring algorithm is based on a core algorithm f. For every expression during resugaring process, it may have one or more reduction rules. The core algorithm f chooses the one that satisfies three properties of resugaring, then applies it on the given expression. The core algorithm f is defined as \ref{alg:f}.
+Our resugaring algorithm is based on a core algorithm core-algo. For every expression during resugaring process, it may have one or more reduction rules. The core algorithm core-algo chooses the one that satisfies three properties of resugaring, then applies it on the given expression. The core algorithm core-algo is defined as \ref{alg:f}.
 \begin{algorithm}
-	\caption{Core-algorithm f}
+	\caption{Core-algorithm core-algo}
 	\label{alg:f}     % 给算法一个标签，以便其它地方引用该算法
 	\begin{algorithmic}[1]       % 数字 "1" 表示为算法显示行号的时候，每几行显示一个行号，如："1" 表示每行都显示行号，"2" 表示每两行显示一个行号，也是为了方便其它地方的引用
 		\REQUIRE ~~\\      % 算法的输入参数说明部分
@@ -182,7 +182,7 @@ Our resugaring algorithm is based on a core algorithm f. For every expression du
 		\RETURN $Exp'_{i}$ = $(Headid~Subexp_{1}~\ldots~Subexp'_{i}~\ldots)$; //where i is the index of subexp which have to be reduced. \hfill Case3
 		\ENDIF
 		\ELSE
-		\IF {$Exp$ have to be desugared}
+		\IF {Lengthof($ListofExp'$)==1}
 		\RETURN desugarsurf($Exp$); \hfill Case4
 		\ELSE
 		\STATE Let $DesugarExp$ = desugarsurf(Exp)
@@ -197,7 +197,7 @@ Our resugaring algorithm is based on a core algorithm f. For every expression du
 	\end{algorithmic}
 \end{algorithm}
 
-We briefly describe the core algorithm f in words.
+We briefly describe the core algorithm core-algo in words.
 
 For Exp in language defined as last section, try all reduction rules in the language, get a list of possible expressions ListofExp'=\{$Exp'_{1}$,$Exp'_{2}$,$\ldots$\}.
 
@@ -230,13 +230,13 @@ Then, our lightweight-resugaring algorithm is defined as \ref{alg:lwresugar}.
 	\end{algorithmic}
 \end{algorithm}
 
-The whole process of the lightweight resugaring executes core algorithm f, and output sequences which is of Surfexp or Commonexp.
+The whole process of the lightweight resugaring executes core algorithm core-algo, and output sequences which is of Surfexp or Commonexp.
 
 \subsection{Proof of correctness}
 
 First of all, because the difference between our lightweight resugaring algorithm and the existing one is that we only desugar the syntactic sugar when needed, and in the existing approach, all syntactic sugar desugars firstly and then executes on CoreLang.
 
-Second, to prove convenience, define some terms.
+Then, to prove convenience, define some terms.
 
 $Exp~=~(Headid\;Subexp_{1}\;Subexp_{\ldots} \ldots)$ is any reducible expression in our language.
 
@@ -254,20 +254,20 @@ $(\mbox{if}\; \#t\; Exp_{1}\; Exp_{2})$ → $Exp1$ \hfill Outer Reduction
 
 $(\mbox{if}\; (\mbox{And}\; \#t\; \#f)\; Exp_{1}\; Exp_{2})$ → $(\mbox{if}\; (\mbox{if}\; \#t\; \#f\; \#f)\; Exp_{1}\; Exp_{2})$ \hfill Surface Reduction
 
-$(\mbox{if}\; (\mbox{And}\; (\mbox{And}\; \#t\; \#t)\; \#t)\; \#f)\; Exp_{1}\; Exp_{2})$ → $(\mbox{if}\; (\mbox{And}\; \#t\; \#t)\; Exp_{1}\; Exp_{2})$ \hfill Inner Reduction
+$(\mbox{if}\; (\mbox{And}\; (\mbox{And}\; \#t\; \#t)\; \#t) \; Exp_{1}\; Exp_{2})$ → $(\mbox{if}\; (\mbox{And}\; \#t\; \#t)\; Exp_{1}\; Exp_{2})$ \hfill Inner Reduction
 
 \begin{Def}[Upper and lower expression]
 For $Exp$=$(Headid\;Subexp_{1}\;Subexp_{\ldots} \ldots)$, $Exp$ is called {\bfseries upper expression}$,Subexp_{i}$is called {\bfseries lower expression}.
 \end{Def}
 
-We only need to prove that all the 6 cases of core algorithm f won't effect its properties. Case 1 and case 3 won't effect any properties, because it does what CoreLang should do.
+Case 2, 4, 6 in the core algorithm are of outer reduction. And case 3 or 5 are of surface reduction if the reduced subexpression is processed by outer reduction, or they are of inner reduction.
+What we need to prove is that all the 6 cases of core algorithm core-algo satisfy the properties. Case 1 and case 2 won't effect any properties, because it does what CoreLang should do.
 
 \begin{proof}[Proof of Emulation]
 \hfill\\
-For case 4 and 6, desugaring won't change Emulation property, because desugaring and resugaring are interconvertible.
+For case 4 or 6, desugaring won't change Emulation property, because desugaring and resugaring are interconvertible.
 
-For case 2 and 5, our core algorithm reduces the sub-expression which should be reduced. So if applying core algorithm f on the subexpression satisfies emulation property, then this two cases satisfy. A recursive proof it is.
-todo:case5
+For case 3 or 5, our core algorithm reduces the sub-expression which should be reduced. So if applying core algorithm core-algo on the subexpression satisfies emulation property, then this two cases satisfy. As we mentioned above, if the reduction is surface reduction, the subexpression is processed by case 2, 4 or 6, which have been proved to satisfy the emulation property; if the reduction is inner reduction, the subexpression is processed by case 3 or 5, which can be proved recursively, because the depth of expressions is finite, the subexpression will finally be reduced by an outer reduction. Thus, the reduction of the subexpression satisfies the emulation property, so it is for case 3 or 5.
 \end{proof}
 
 \begin{proof}[Proof of Abstraction]
@@ -284,7 +284,7 @@ Assume that no syntactic sugar not necessarily expanded desugars too early, exis
 
 $Exp$ = $(Headid\;Subexp_{1}\;Subexp_{\ldots} \ldots)$ which can be resugared to
 
-$ResugarExp'$ = $(Surfid\;Subexp'_{1}\;Subexp'_{\ldots}\ldots)$, and $ResugarExp'$ is not displayed during lightweight-resugaring. Then
+$ResugarExp'$ = $(Surfid\;Subexp'_{1}\;Subexp'_{\ldots}\ldots)$, and $ResugarExp'$ is not displayed during lightweight-resugaring process. Then
 
 \begin{itemize}
 	\item Or existing
@@ -295,8 +295,7 @@ $ResugarExp'$ = $(Surfid\;Subexp'_{1}\;Subexp'_{\ldots}\ldots)$, and $ResugarExp
 	\item Or existing
 
 	$ResugarExp$=$(Surfid'\;\ldots\;ResugarExp'\;\ldots)$ in resugaring sequences, such that the expression after $ResugarExp$ desugaring reduces to $Exp$, and $Exp$ is desugared from $ResugarExp'$'s sub-expression. If $ResugarExp'$ is not displayed, then the outermost syntactic sugar is expanded early, which is contrary to assumption.
-	todo
-	%使得$ResugarExp$解糖后得到的表达式单步规约得到$Exp$，且该$Exp$是从$ResugarExp$中的子表达式$ResugarExp'$解糖得到，说明此步单步规约不涉及$ResugarExp'$的规约。而如果不能展示$ResugarExp'$，则说明该语法糖在执行前面的序列被提前破坏了，也与假设矛盾。
+	\item Or though the $Exp$ exists, it doesn't from $ResugarExp$.
 
 \end{itemize}
 \end{proof}
@@ -305,12 +304,12 @@ $ResugarExp'$ = $(Surfid\;Subexp'_{1}\;Subexp'_{\ldots}\ldots)$, and $ResugarExp
 \hfill\\
 For case 4 and 6, the syntactic sugar has to desugar.
 
-For case 2 and 5, the reduction occurs in sub-expression of $Exp$. So if applying core algorithm f on the subexpression doesn't desugar syntactic sugars not necessarily expanded, then this two cases don't. A recursive proof it is.
+For case 3 and 5, the reduction occurs in sub-expression of $Exp$. So if applying core algorithm core-algo on the subexpression doesn't desugar syntactic sugars not necessarily expanded, then this two cases don't. If the reduction is surface reduction, then the reduction of the subexpression is processed by case 2, 4 or 6, which don't desugar sugars not necessarily expanded; if the reduction is inner reduction, then it's another recursive proof as emulation. So in these two cases, the core-algo only desugar the sugar which has to be desugared.
 \end{proof}
 
 \subsection{Implementation}
 
-Our lightweight approach of resugaring is implemented using PLT Redex\cite{SEwPR}, which is an semantic engineering tool based one reduction semantics. The whole framework is as Fig\ref{fig:frame}.
+Our lightweight resugaring approach  is implemented using PLT Redex\cite{SEwPR}, which is an semantic engineering tool based one reduction semantics\cite{reduction}. The whole framework is as Fig\ref{fig:frame}.
 
 \begin{figure}[h]
 	\centering
@@ -396,8 +395,9 @@ For existing approach, the sugar expression should firstly desugar to
   xx yy)
 \end{Codes}
 
-Then in our CoreLang, the execution of expanded expression will contain 33 steps. For each step, there will be many attempts to match and substitute the syntactic sugars. We will omit more steps for a larger expression. So the unidirectional resugaring algorithm makes our approach lightweight.todo
+Then in our CoreLang, the execution of expanded expression will contain 33 steps. For each step, there will be many attempts to match and substitute the syntactic sugars. It will omit more steps for a larger expression. 
 
+So the unidirectional resugaring algorithm makes our approach lightweight, because no attempts for resugaring the expression take place.
 \subsubsection{hygienic macro}
 \label{mark:hygienic}
 
@@ -420,11 +420,17 @@ Another hygienic example is as the example origined from Hygienic resugaring\cit
 	(Hygienicadd e1 e2) \SurfStep{ (let x e1 (+ x e2))}
 \end{Codes}
 
-When executing a program as (let ((x 1)) (Hygienicadd x 2)), the lazy desugaring allows the expression reduced to (Hygienicadd 1 2) directly, so it's a more flexible approach to handle hygienic problems in resugaring.
+When executing a program as (let ((x 1)) (Hygienicadd x 2)), the lazy desugaring allows the expression reduced to (Hygienicadd 1 2) directly (as it should be), so it's a more flexible approach to handle hygienic problems in resugaring.
 In practical application, we think hygienic resugaring can be easily processed by rewriting system. So in the finally implementation of our tool, we just use PLT Redex's binding forms to deal with hygienic macros. But we did try it on the version without hygienic rewriting system. Moreover, we use a more concise way to handle hygienic resugaring.
 
 \subsubsection{recursive sugar}
 Recursive sugar is a kind of syntactic sugars where call itself or each other during the expanding. For example,
+
+\begin{Codes}	
+(Odd e) \SurfStep{ (if (> e 0) (Even (- e 1)) \#f)}	
+(Even e) \SurfStep{ (if (> e 0) (Odd (- e 1)) \#t)}	
+\end{Codes}	
+are typical recursive sugars. The existing resugaring approach can't process this kind of syntactic sugar easily, because boundary conditions are in the sugar itself.
 
 Take $(Odd~2)$ as an example. The previous work will firstly desugar the expression using the rewriting system. Then the rewriting system will never terminate as following shows.
 \begin{Codes}
@@ -573,3 +579,5 @@ As mentioned many times before, the biggest difference between previous resugari
 	\item {\bfseries More syntactic sugar features} The ability of processing recursive sugar is a superiority compared to previous work. The key point is that recursive syntactic sugar must handle boundary conditions. Our approach handle them easily by not necessarily desugaring all syntactic sugars. Higher-order functions, as an important feature of functional programming, was supported by many daily programming languages. So the ability on higher-order sugar is important.
 	\item {\bfseries Rewriting rules based on reduction semantics} Any syntactic sugar that can expressed by reduction semantics can be used in our approach. It will give more possible forms for constructing syntactic sugars. todo:example?
 \end{itemize}
+
+The most obvious shortage compared to existing approach is that our approach needs a whole semantic of core languages. The reason is because in case 5 and 6, we need to expand the outermost syntactic sugar and try one step, which may contain unexpanded sugars. Theoretically, our dynamic approach would also work with only a core language's stepper, by totally expand all sugar expressions and marked where each term is originated from. Simple modifications are needed in core-algo. But we did not try it, because of the intent we would discussed in Sec\ref{mark:assumption}.
