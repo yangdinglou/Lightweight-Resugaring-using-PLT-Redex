@@ -59,6 +59,7 @@
 \usepackage{tabularx}
 \usepackage{algorithmic}
 \usepackage{proof}
+\usepackage{alltt}
 \usepackage{pgf}
 \usepackage{tikz}
 \usetikzlibrary{arrows,automata}
@@ -71,6 +72,24 @@
 \newtheorem{Def}{Defination}[section]
 \newtheorem{mythm}{Theorem}[section]
 \newtheorem{lemma}{Lemma}[section]
+
+\newcommand{\Code}[1]{\texttt{#1}}
+\newenvironment{Codes}
+  {\begin{alltt}\leftskip=1.5em} % \small
+  {\end{alltt}}
+
+\newcommand{\CoreStep}{{\rule{0pt}{1.2\baselineskip}{\ensuremath\longrightarrow}}}
+\newcommand{\SurfStep}{{\rule{0pt}{1.2\baselineskip}{\ensuremath\dashrightarrow}}}
+
+\newcommand\m[1]{\mbox{\rm #1}}
+\newcommand\drule[2]{#1 ~\Rightarrow~ #2}
+\newcommand\note[1]{\mbox{{\small #1}}}
+\newcommand\ignore[1]{}
+
+\def\coreId{\m{cId}}
+\def\surfId{\m{sId}}
+\def\headId{\m{hId}}
+
 \begin{document}
 
 %% Title information
@@ -180,7 +199,7 @@ Resugaring is an method to solve the problem above. In this paper, we purposed a
 
 %% Keywords
 %% comma separated list
-\keywords{Domain-specific Language, Syntactic Sugar, Interpreter}  %% \keywords are mandatory in final camera-ready submission
+\keywords{Domain-specific Language, Syntactic Sugar, Interpreter, Reduction Semantics}  %% \keywords are mandatory in final camera-ready submission
 
 
 %% \maketitle

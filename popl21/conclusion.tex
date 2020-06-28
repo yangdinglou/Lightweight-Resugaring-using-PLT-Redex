@@ -1,4 +1,7 @@
 %!TEX root = ./main.tex
-\label{sec7}\section{Conclusion}
+\section{Conclusion}
+\label{sec6}
 
-Summarize the paper, explaining what you have shown, what results you have achieved, and what future work is.
+%Summarize the paper, explaining what you have shown, what results you have achieved, and what future work is.
+
+In this paper, we purpose a new approach (see Fig \ref{fig:mixture}) or resugaring mixed with a dynamic apporach and static approach, which has some advances compared to existing approaches. The two approaches are seemingly similar in lazy desugaring. Essentially, we would see the static approach is the abstract(todo:another express?) of dynamic approach. In the dynamic approach, the most important part is {\bfseries one-step try} (see in sec \ref{mark:onesteptry}), which decides whether reducing the subexpression or desugaring the outermost sugar. Reducing subexpressions are just the same as context rules in static approach; desugaring the outermost sugar is similar to reduction rules in static approach. However, the reduction rules is more convinent and efficent than dynamic resugaring, because the static approach evolves a process like abstract interpretation\cite{AbstractInterpretation}, then reduces many steps executed in core language. Moreover, the semantics got by static approach make it possible to do some optimization at the surface language level, which is important for implementing a DSL. In contrast, the dynamic approach is more powerful by supporting recursive sugars' resugaring. Actually, the rewriting based on reduction semantics makes the sugar represented in many ways.

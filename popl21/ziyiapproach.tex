@@ -1,10 +1,77 @@
 %!TEX root = ./main.tex
 
-\section{Lazy Desugaring}
+\section{Resugaring by Lazy Desugaring}
 \label{sec3}
 
-\subsection{Language setting}
+In this section, we present our new approach to resugaring. Different from the traditional approach that clearly separates the surface and the core languages, we combine them together as one mixed language, allowing users to freely use the language constructs in both languages. We will show that any expression in the mixed language can be evaluated in such a smart way that a sequence of all expressions that are necessarily to be resugared by the traditional approach can be correctly produced.
 
+\subsection{Mixed Language}
+
+\begin{figure}[t]
+	\[
+	\begin{array}{lllll}
+	 &\m{CoreExp} &::=& x  & \note{variable}\\
+	       &&~|~& c  & \note{constant}\\
+				 &&~|~& (\m{CoreHead}~\m{CoreExp}_1~\ldots~\m{CoreExp}_n) & \note{constructor}\\
+	\\
+	 &\m{SurfExp} &::=& x  & \note{variable}\\
+	       &&~|~& c  & \note{constant}\\
+				 &&~|~& (\m{CoreHead}~\m{SurfExp}_1~\ldots~\m{SurfExp}_n) & \note{selected core constructor}\\
+					 &&~|~& (\m{SurfHead}~\m{SurfExp}_1~\ldots~\m{SurfExp}_n) & \note{sugar expression}\\
+	\end{array}
+	\]
+	\caption{Core and Surface Expressions}
+	\label{fig:expression}
+\end{figure}
+
+
+We will define a mixed language for a given core language and a surface language defined over the core language.
+
+\subsubsection{Core Language}
+
+For our host language, we consider its evaluator as a blackbox but with two natural assumptions. First, there is a deterministic stepper in the evaluator which, given an expression in the host language, can deterministically reduce the expression to a new expression. Second, the evaluation of any sub-expression has no side-effect on other parts of the whole expression.
+
+An expression of the core language is defined in Figure \ref{fig:expression}. It is a variable, a constant, or a (language) constructor expression. Here, $\m{cId}$ stands for a language constructor such as $\m{if}$ and $\m{let}$. To be concrete, we will use the core language defined in Figure \ref{fig:core} to demonstrate our approach.
+
+\begin{figure}[t]
+\begin{center}
+\begin{tabularx}{.9\textwidth}%
+{|>{\setlength{\hsize}{.4\hsize}\centering\arraybackslash}X  |>{\setlength{\hsize}{1.6\hsize}\centering\arraybackslash}X|}
+%{|*{2}{>{\centering\arraybackslash}X|}}
+\hline
+Syntax & Reduction rules \\ \hline
+(if e e e) &\qquad\qquad\qquad(if \#t e2 e3) $\rightarrow$ e2 \newline ~(if \#f e2 e3) $\rightarrow$ e3\\ \hline
+(($\lambda$ (x ...) e) e ...) & (($\lambda$ (x0 x1 ...) e) v0 v1 ...) $\rightarrow$ (let ((x0 v0) (($\lambda$ (x1 ...) e) v1 ...))\\ \hline
+(($\lambda_N$ (x ...) e) e ...) & (($\lambda_N$ (x0 x1 ...) e) e0 e1 ...) $\rightarrow$ (let ((x0 e0) (($\lambda_N$ (x1 ...) e) e1 ...))\\ \hline
+(let ((x e) ...) e) & (let ((x0 e0) (x1 e1) ...) e) $\rightarrow$ (let ((x1 e1) ...) (subst x0 e0 e))\newline (let () e)  $\rightarrow$ e (where subst is a meta function)\\ \hline
+(first e) & (first (list v1 v2 ...)) $\rightarrow$ v1\\ \hline
+(rest e) & (rest (list v1 v2 ...)) $\rightarrow$ (list v2 ...)\\ \hline
+(empty e) & \qquad\qquad\qquad(empty (list)) $\rightarrow$ \#t \newline (empty (list v1 ...)) $\rightarrow$ \#f\\ \hline
+(cons e e) & (cons v1 (list v2 ...)) $\rightarrow$ (list v1 v2 ...)\\ \hline
+(op e e) \newline op=+-*/><== & (op v1 v2) $\rightarrow$ arithmetic result\\ \hline
+\end{tabularx}
+\end{center}
+\caption{An Core Language Example}
+\label{fig:core}
+\end{figure}
+
+
+%For simplicity, we use the prefix notation. For instance, we write $\m{if-then-else}~e_1~e_2~e_3$, which would be more readable if we write $\m{if}~e_1~\m{then}~e_2~\m{else}~e_3$. In this paper, we may write both if it is clear from the context.
+
+\subsubsection{Surface Language}
+
+Our surface language is defined by a set of syntactic sugars, together with some language constructs in the core language. So an expression of the surface language is some core constructor expressions with sugar expressions, as defined in Figure \ref{fig:expression}.
+
+A syntactic sugar is defined by a desugaring rule in the following form:
+\[
+\drule{(\m{SurfHead}~x_1~x_2~\ldots~x_n)}{\m{SurfExp}}
+\]
+where its LHS is a simple pattern (unnested) and its RHS is a surface expression. Note that if the pattern is nested, we can introduce a new syntactic sugar to flatten it.
+One may wonder why not restricting the RHS to be a core expression $\m{ce}$, which sounds more natural. We use $\m{se}$ to be able to allow definition of recursive syntactic sugars, which will be seen later.
+
+We assume that all desugaring rules are not overlapped in the sense that for a syntactic sugar expression, only one desugaring rule is applicable.
+
+\ignore{
 \subsubsection{Grammatical restrictions}
 Firstly, the whole language should be restricted to tree-structured disjoint expression.
 
@@ -47,69 +114,53 @@ An counter example of this restriction is $(\mbox{Surfid}\;\ldots\;(e1\;e2)\ldot
 For every syntactic sugar expressions, it can only desugar to one expression in CoreLang.
 \end{Def}
 
-\subsubsection{Grammar Description}
-In our language setting, we regard SurfLang and CoreLang as a whole language. The whole language is under restrictions above, and its grammar is defined as follow.
+}
 
+\subsubsection{Mixed Language}
+
+\begin{figure}[t]
 \begin{centering}
-	\framebox[38em][c]{
-		\parbox[t]{38em}{
+	\framebox[36em][c]{
+		\parbox[t]{33em}{
 			\[
-			\begin{array}{rcl}
+			\begin{array}{lcl}
 			\mbox{Exp} &::=& \mbox{DisplayableExp}\\
 			&|& \mbox{UndisplayableExp}\\
-			\end{array}
-			\]
-			\[
-			\begin{array}{rcl}
-			\mbox{DisplayableExp} &::=& \mbox{Surfexp}\\
-			&|& \mbox{Commonexp}
-			\end{array}
-			\]
-
-			\[
-			\begin{array}{rcl}
-			\mbox{UndisplayableExp} &::=& \mbox{Coreexp}\\
-			&|& \mbox{OtherSurfexp}\\
-			&|& \mbox{OtherCommonexp}
-			\end{array}
-			\]
-
-			\[
-			\begin{array}{rcl}
-			\mbox{Coreexp} &::=& (\mbox{CoreHead}~\mbox{Exp}*)
-			\end{array}
-			\]
-
-			\[
-			\begin{array}{rcl}
-			\mbox{Surfexp} &::=& (\mbox{SurfHead}~\mbox{DisplayableExp}*)
-			\end{array}
-			\]
-
-			\[
-			\begin{array}{rcl}
-			\mbox{Commonexp} &::=& (\mbox{CommonHead}~\mbox{DisplayableExp}*)\\
-			&|& \mbox{Value}\\
-			&|& \mbox{Variable}
-			\end{array}
-			\]
-
-			\[
-			\begin{array}{rcl}
-			\mbox{OtherSurfexp} &::=& (\mbox{SurfHead}~\mbox{Exp}*~\mbox{UndisplayableExp}~\mbox{Exp}*)
-			\end{array}
-			\]
-
-			\[
-			\begin{array}{rcl}
-			\mbox{OtherCommonexp} &::=& (\mbox{CommonHead}~\mbox{Exp}*~\mbox{UndisplayableExp}~\mbox{Exp}*)
+\\
+			\mbox{DisplayableExp} &::=& \mbox{SurfExp}\\
+			&|& \mbox{CommonExp}
+\\
+			\mbox{UndisplayableExp} &::=& \mbox{CoreExp}\\
+			&|& \mbox{OtherSurfExp}\\
+			&|& \mbox{OtherCommonExp}\\
+\\
+			\mbox{CoreExp} &::=& (\mbox{CoreHead}~\mbox{Exp}*)\\
+\\
+			\mbox{SurfExp} &::=& (\mbox{SurfHead}~\mbox{DisplayableExp}*)\\
+\\
+			\mbox{CommonExp} &::=& (\mbox{CommonHead}~\mbox{DisplayableExp}*)\\
+			&|& c \qquad \note{// constant value}\\
+			&|& x \qquad \note{// variable} \\
+\\
+			\mbox{OtherSurfExp} &::=& (\mbox{SurfHead}~\mbox{Exp}*~\mbox{UndisplayableExp}~\mbox{Exp}*)\\
+\\
+			\mbox{OtherCommonExp} &::=& (\mbox{CommonHead}~\mbox{Exp}*~\mbox{UndisplayableExp}~\mbox{Exp}*)
 			\end{array}
 			\]
 		}
 	}
 \end{centering}
+\caption{Our Mixed Language}
+\label{fig:mix}
+\end{figure}
 
-The difference between CoreLang and SurfLang is identified by $Headid$. But there are some terms in CoreLang should be displayed during evaluation. Or we need some terms to help us getting better resugaring sequences. So we defined {\bfseries Commonexp}, which origin from CoreLang, but can be displayed in resugaring sequences. The {\bfseries Coreexp} terms are terms with undisplayable CoreLang's Headid. The {\bfseries Surfexp} terms are terms with SurfLang's Headid and all sub-expressions are displayable. The {\bfseries Commonexp} terms are terms with displayable CoreLang's Headid, together with displayable sub-expressions. There exists some other expression during our resugaring process. They have Headid which can be displayed, but one or more subexpressions can't. They are UndisplayableExp.
+Our mixed language for resugaring combines the surface language and the core language. An expression in this language will be reduced step by step by the reduction rules for the core language and the desugaring rules for defining the syntactic sugars in the surface language.
+
+The difference between CoreLang and SurfLang is identified by $Headid$. But there are some terms in CoreLang should be displayed during evaluation, or we need some terms to help us getting better resugaring sequences. So we defined {\bfseries Commonexp}, which origin from CoreLang, but can be displayed in resugaring sequences. The {\bfseries Coreexp} terms are terms with undisplayable CoreLang's Headid. The {\bfseries Surfexp} terms are terms with SurfLang's Headid and all sub-expressions are displayable. The {\bfseries Commonexp} terms are terms with displayable CoreLang's Headid, together with displayable sub-expressions. There exists some other expression during our resugaring process, which have Headid which can be displayed, but one or more subexpressions can't. They are UndisplayableExp.
+
+Take some terms in the core language in Figure \ref{fig:core} as examples.
+We let {\bfseries if}, {\bfseries let}, {\bfseries $\lambda _{N}$}, {\bfseries empty}, {\bfseries first}, {\bfseries rest} as Coreexp's Headid, {\bfseries Op}, {\bfseries $\lambda$}, {\bfseries cons} as Commonexp's Headid. Then we could show some useful intermediate steps.
+
 
 \subsection{Algorithm defination}
 
@@ -151,9 +202,9 @@ We briefly describe the core algorithm f in words.
 
 For Exp in language defined as last section, try all reduction rules in the language, get a list of possible expressions ListofExp'=\{$Exp'_{1}$,$Exp'_{2}$,$\ldots$\}.
 
-Line 2-9 deal with the case when Exp has a CoreLang's Headid. When Exp is value or variable (line 3-4), ListofExp' won't have any element (not reducible). When Exp is of Coreexp or Commonexp (line 5-6, due to the context restriction of CoreLang, only one reduction rule can be applied. When Exp is OtherCommonexp (line 7-8), due to the context restriction of CoreLang, only one sub-expression can be reduced, then just apply core algorithm recursively on the sub-expression.
+Line 2-9 deal with the case when Exp has a CoreLang's Headid. When Exp is value or variable (line 3-4), ListofExp' won't have any element (not reducible). When Exp is of Coreexp or Commonexp (line 5-6), due to the context restriction of CoreLang, only one reduction rule can be applied. When Exp is OtherCommonexp (line 7-8), due to the context restriction of CoreLang, only one sub-expression can be reduced, then just apply core algorithm recursively on the sub-expression.
 
-Line 10-21 deal with the case then Exp has a SurfLang's Headid. When Exp only has one reduction rule (line 11-12), the syntactic sugar has to desugar. If not, we should expand outermost sugar and find the sub-expression which should be reduced (line 14-16), or the sugar has to desugar (line 17-18).
+Line 10-21 deal with the case then Exp has a SurfLang's Headid. When Exp only has one reduction rule (line 11-12), the syntactic sugar has to desugar. If not, we should expand outermost sugar and find the sub-expression which should be reduced (line 14-16), or the sugar has to desugar (line 17-18), because it will never be resugared. The steps in line 14 to 16 are the critical part of our algorithm (call {\bfseries one-step try}\label{mark:onesteptry}).
 
 
 Then, our lightweight-resugaring algorithm is defined as \ref{alg:lwresugar}.
@@ -280,7 +331,6 @@ The grammar of the whole language contains Coreexp, Surfexp and Commonexp as the
 Then inputting an expression of the syntactic sugar to lightweight-resugaring will get the resugaring sequences.
 
 \subsection{Evaluation}
-\label{sec6}
 
 We test some applications on the tool implemented using PLT Redex. Note that we set CBV's lambda calculus as terms in commonexp, because we need to output some intermediate sequences including lambda expressions in some examples. It's easy if we want to skip them.
 
@@ -299,33 +349,40 @@ We take a SKI combinator syntactic sugar as an example. We will show why our app
 	$I$ $\rightarrow$ $(\lambda _{N}~(x)~x)$
 \end{flushleft}
 
-Althought SKI combinator calculus is a reduced version of lambda calculus, we can construct combinators' sugar based on call-by-need lambda calculus in our CoreLang. For expression
+Although SKI combinator calculus is a reduced version of lambda calculus, we can construct combinators' sugar based on call-by-need lambda calculus in our CoreLang. For expression
 
- $(S~(K~(S~I))~K~xx~yy)$, we get the following resugaring sequences as Fig \ref{fig:SKI}.
-
-\begin{figure}[ht]
-	\centering
-	\parbox[t]{\textwidth}{
-				\begin{center}
-				{
-					\small\selectfont
-					(S (K (S I)) K xx yy)\\
-					↓\\
-					(((K (S I)) xx (K xx)) yy)\\
-					↓\\
-					(((S I) (K xx)) yy)\\
-					↓\\
-					(I yy ((K xx) yy))\\
-					↓\\
-					(yy ((K xx) yy))\\
-					↓\\
-					(yy xx)
-				}
-				\end{center}
-			}
-	\caption{SKI's resugaring sequences}
-	\label{fig:SKI}
-\end{figure}
+ $(S~(K~(S~I))~K~xx~yy)$, we get the following resugaring sequences as following.
+\begin{Codes}
+    (S (K (S I)) K xx yy)
+\CoreStep (((K (S I)) xx (K xx)) yy)
+\CoreStep (((S I) (K xx)) yy)
+\CoreStep (I yy ((K xx) yy))
+\CoreStep (yy ((K xx) yy))
+\CoreStep (yy xx)
+\end{Codes}
+% \begin{figure}[ht]
+% 	\centering
+% 	\parbox[t]{\textwidth}{
+% 				\begin{center}
+% 				{
+% 					\small\selectfont
+% 					(S (K (S I)) K xx yy)\\
+% 					↓\\
+% 					(((K (S I)) xx (K xx)) yy)\\
+% 					↓\\
+% 					(((S I) (K xx)) yy)\\
+% 					↓\\
+% 					(I yy ((K xx) yy))\\
+% 					↓\\
+% 					(yy ((K xx) yy))\\
+% 					↓\\
+% 					(yy xx)
+% 				}
+% 				\end{center}
+% 			}
+% 	\caption{SKI's resugaring sequences}
+% 	\label{fig:SKI}
+% \end{figure}
 
 For existing approach, the sugar expression should firstly desugar to
 \begin{flushleft}

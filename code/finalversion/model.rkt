@@ -30,6 +30,7 @@
            (not e)
            (Let x e e)
            (Sg e e e)
+           (Hygienicadd e e)
 
            (S comb) (K comb) (I comb)
            (SS comb) (KK comb) (II comb)
@@ -102,6 +103,8 @@
      (Sg e e E)
      (Sg e E e)
      (Sg E e e)
+     (Hygienicadd E e)
+     (Hygienicadd e E)
      (Odd E)
      (Even E)
 
@@ -123,11 +126,11 @@
 (define reductions
   (reduction-relation
    lang ;#:domain p
-   (--> (in-hole P_1 (begin v e_1 e_2 ...))
+   #;(--> (in-hole P_1 (begin v e_1 e_2 ...))
         (in-hole P_1 (begin e_1 e_2 ...))
         "begin many")
 
-   (--> (in-hole P_1 (begin e_1))
+   #;(--> (in-hole P_1 (begin e_1))
         (in-hole P_1 e_1)
         "begin one")
 
@@ -243,6 +246,9 @@
    (--> (in-hole P (Sg e_1 e_2 e_3))
         (in-hole P (and (or e_1 e_2) (not e_3)))
         "Sg")
+   (--> (in-hole P (Hygienicadd e_1 e_2))
+        (in-hole P (let ((x e_1)) (+ x e_2)))
+        "Hygienic add")
    (--> (in-hole P (Odd v))
         (in-hole P (if (> v 0) (Even (- v 1)) #f))
         "Odd")
@@ -347,4 +353,8 @@
 #;(run
     (term
      ((S comb) (I comb) ((K comb) xx) yy)
+     ))
+#;(run
+    (term
+     (let ((x 2)) (Hygienicadd 1 x))
      ))
