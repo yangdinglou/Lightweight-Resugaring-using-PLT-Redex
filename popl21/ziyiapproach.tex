@@ -5,7 +5,7 @@
 
 In this section, we present our new approach to resugaring. Different from the traditional approach that clearly separates the surface and the core languages, we combine them together as one mixed language, allowing users to freely use the language constructs in both languages. We will show that any expression in the mixed language can be evaluated in such a smart way that a sequence of all expressions that are necessarily to be resugared by the traditional approach can be correctly produced.
 
-\subsection{Mixed Language}
+\subsection{Mixed Language for Resugaring}
 
 \begin{figure}[t]
 	\[
@@ -24,8 +24,7 @@ In this section, we present our new approach to resugaring. Different from the t
 	\label{fig:expression}
 \end{figure}
 
-
-We will define a mixed language for a given core language and a surface language defined over the core language.
+We will define a mixed language for a given core language and a surface language defined over the core language. An expression in this language will be reduced step by step by the reduction rules for the core language and the desugaring rules for defining the syntactic sugars in the surface language.
 
 \subsubsection{Core Language}
 
@@ -124,27 +123,27 @@ For every syntactic sugar expressions, it can only desugar to one expression in 
 		\parbox[t]{33em}{
 			\[
 			\begin{array}{lcl}
-			\mbox{Exp} &::=& \mbox{DisplayableExp}\\
-			&|& \mbox{UndisplayableExp}\\
+			\m{Exp} &::=& \m{DisplayableExp}\\
+			&|& \m{UndisplayableExp}\\
 \\
-			\mbox{DisplayableExp} &::=& \mbox{SurfExp}\\
-			&|& \mbox{CommonExp}
+			\m{DisplayableExp} &::=& \m{SurfExp}\\
+			&|& \m{CommonExp}
 \\
-			\mbox{UndisplayableExp} &::=& \mbox{CoreExp}\\
-			&|& \mbox{OtherSurfExp}\\
-			&|& \mbox{OtherCommonExp}\\
+			\m{UndisplayableExp} &::=& \m{CoreExp}\\
+			&|& \m{OtherSurfExp}\\
+			&|& \m{OtherCommonExp}\\
 \\
-			\mbox{CoreExp} &::=& (\mbox{CoreHead}~\mbox{Exp}*)\\
+			\m{CoreExp} &::=& (\m{CoreHead}~\m{Exp}*)\\
 \\
-			\mbox{SurfExp} &::=& (\mbox{SurfHead}~\mbox{DisplayableExp}*)\\
+			\m{SurfExp} &::=& (\m{SurfHead}~\m{DisplayableExp}*)\\
 \\
-			\mbox{CommonExp} &::=& (\mbox{CommonHead}~\mbox{DisplayableExp}*)\\
+			\m{CommonExp} &::=& (\m{CommonHead}~\m{DisplayableExp}*)\\
 			&|& c \qquad \note{// constant value}\\
 			&|& x \qquad \note{// variable} \\
 \\
-			\mbox{OtherSurfExp} &::=& (\mbox{SurfHead}~\mbox{Exp}*~\mbox{UndisplayableExp}~\mbox{Exp}*)\\
+			\m{OtherSurfExp} &::=& (\m{SurfHead}~\m{Exp}*~\m{UndisplayableExp}~\m{Exp}*)\\
 \\
-			\mbox{OtherCommonExp} &::=& (\mbox{CommonHead}~\mbox{Exp}*~\mbox{UndisplayableExp}~\mbox{Exp}*)
+			\m{OtherCommonExp} &::=& (\m{CommonHead}~\m{Exp}*~\m{UndisplayableExp}~\m{Exp}*)
 			\end{array}
 			\]
 		}
@@ -154,17 +153,17 @@ For every syntactic sugar expressions, it can only desugar to one expression in 
 \label{fig:mix}
 \end{figure}
 
-Our mixed language for resugaring combines the surface language and the core language. An expression in this language will be reduced step by step by the reduction rules for the core language and the desugaring rules for defining the syntactic sugars in the surface language.
-
-The difference between CoreLang and SurfLang is identified by $Headid$. But there are some terms in CoreLang should be displayed during evaluation, or we need some terms to help us getting better resugaring sequences. So we defined {\bfseries Commonexp}, which origin from CoreLang, but can be displayed in resugaring sequences. The {\bfseries Coreexp} terms are terms with undisplayable CoreLang's Headid. The {\bfseries Surfexp} terms are terms with SurfLang's Headid and all sub-expressions are displayable. The {\bfseries Commonexp} terms are terms with displayable CoreLang's Headid, together with displayable sub-expressions. There exists some other expression during our resugaring process, which have Headid which can be displayed, but one or more subexpressions can't. They are UndisplayableExp.
+Our mixed language for resugaring combines the surface language and the core language.
+%
+The difference between our core language (CoreLang) and our surface language (SurfLang) is identified by $\m{HeadId}$. But there are some terms in the core language should be displayed during evaluation, or we need some terms to help us getting better resugaring sequences. So we defined \m{CommonExp}, which origin from CoreLang, but can be displayed in resugaring sequences. The \m{CoreExp} terms are terms with undisplayable CoreLang's \m{Headid}. The \m{SurfExp} terms are terms with SurfLang's \m{Headid} and all sub-expressions are displayable. The \m{CommonExp} terms are terms with displayable CoreLang's Headid, together with displayable sub-expressions. There exists some other expression during our resugaring process, which have \m{Headid} which can be displayed, but one or more subexpressions cannot. They are \m{UndisplayableExp}.
 
 Take some terms in the core language in Figure \ref{fig:core} as examples.
-We let {\bfseries if}, {\bfseries let}, {\bfseries $\lambda _{N}$}, {\bfseries empty}, {\bfseries first}, {\bfseries rest} as Coreexp's Headid, {\bfseries Op}, {\bfseries $\lambda$}, {\bfseries cons} as Commonexp's Headid. Then we could show some useful intermediate steps.
+We may assume {\bfseries if}, {\bfseries let}, {\bfseries $\lambda _{N}$}, {\bfseries empty}, {\bfseries first}, {\bfseries rest} as \m{CoreExp}'s \m{Headid}, {\bfseries Op}, {\bfseries $\lambda$}, {\bfseries cons} as \m{CommonExp}'s \m{Headid}. Then we could show some useful intermediate steps.
 
 
-\subsection{Algorithm defination}
+\subsection{Resugaring Algorithm}
 
-Our lightweight resugaring algorithm is based on a core algorithm f. For every expression during resugaring process, it may have one or more reduction rules. The core algorithm f chooses the one that satisfies three properties of resugaring, then applies it on the given expression. The core algorithm f is defined as \ref{alg:f}.
+Our resugaring algorithm is based on a core algorithm f. For every expression during resugaring process, it may have one or more reduction rules. The core algorithm f chooses the one that satisfies three properties of resugaring, then applies it on the given expression. The core algorithm f is defined as \ref{alg:f}.
 \begin{algorithm}
 	\caption{Core-algorithm f}
 	\label{alg:f}     % 给算法一个标签，以便其它地方引用该算法
