@@ -63,6 +63,7 @@
 \usepackage{pgf}
 \usepackage{tikz}
 \usetikzlibrary{arrows,automata}
+\usepackage{bcproof}
 
 
 \renewcommand{\algorithmicrequire}{\textbf{Input:}}
@@ -82,13 +83,33 @@
 \newcommand{\SurfStep}{{\rule{0pt}{1.2\baselineskip}{\ensuremath\dashrightarrow}}}
 
 \newcommand\m[1]{\mbox{\sc #1}}
-\newcommand\drule[2]{#1 ~\Rightarrow~ #2}
+\newcommand\drule[2]{#1 ~\rightarrow_d~ #2}
+\newcommand\redc[2]{#1 ~\rightarrow_c~#2}
+\newcommand\redm[2]{#1 ~\rightarrow_m~#2}
 \newcommand\note[1]{\mbox{{\small #1}}}
 \newcommand\ignore[1]{}
 
 \def\coreId{\m{cId}}
 \def\surfId{\m{sId}}
 \def\headId{\m{hId}}
+
+\def\true{\#t}
+\def\false{\#f}
+
+% some macros for editing/commenting the paper
+
+\def\modify#1#2#3{{\small\underline{\sf{#1}}:} {\color{red}{\small #2}}
+{{\color{red}\mbox{$\Rightarrow$}}} {\color{blue}{#3}}}
+
+\newcommand{\hmodify}[2]{\modify{Hu}{#1}{#2}}
+\newcommand\mymargin[1]{\marginpar{{\flushleft\textsc\footnotesize {#1}}}}
+\newcommand\hmargin[1]{\mymargin{Hu:\;#1}}
+
+\newcommand{\hmodifyok}[2]{#2}
+
+\newcommand{\mycomment}[2]{{\small\color{magenta}\underline{\sf{#1}}:} {\color{magenta}{\small #2}}}
+\newcommand{\hcomment}[1]{\mycomment{Hu}{#1}}
+\newcommand{\todo}[1]{\mycomment{Todo}{#1}}
 
 \begin{document}
 
