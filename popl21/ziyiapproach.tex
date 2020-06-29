@@ -174,18 +174,36 @@ We may assume \m{if}, \m{let}, \m{$\lambda _{N}$} (call-by-name lambda calculus)
 
 \subsection{Resugaring Algorithm}
 
-Our resugaring algorithm works on our mixed language, based on the reduction rules of the core language and the desugaring rules for defining the surface language. Let $\redc{}{}$ denote a one-step reduction of the core language, and $\drule{}{}$ a one-step desugaring by a desuaring rule. We define $\redm{}{}$, a one-step reduction of our mixed language, as follows.
+Our resugaring algorithm works on our mixed language, based on the reduction rules of the core language and the desugaring rules for defining the surface language. Let $\redc{}{}$ denote the one-step reduction of the core language, and $\drule{}{}$ the one-step desugaring by a desuaring rule. We define $\redm{}{}$, the one-step reduction of our mixed language, as follows.
 
 \infrule[CoreRed]
 {\redc{(\m{CoreHead}~e_1~\ldots~e_n)}{e'}}
 {\redm{(\m{CoreHead}~e_1~\ldots~e_n)}{e'}}
 
-\infrule[SurfaceRed]
+\infrule[SurfRed1]
 {\drule{(\m{SurfHead}~x_1~\ldots~x_i~\ldots~x_n)}{e}\\
- \redm{e[e_1/x,\ldots,e_i/x_i,\ldots,e_n/x_n]}{e[e_1/x,\ldots,e_i'/x_i,\ldots,e_n/x_n]}
+\exists i.\, \redm{e[e_1/x,\ldots,e_i/x_i,\ldots,e_n/x_n]}{e[e_1/x,\ldots,e_i'/x_i,\ldots,e_n/x_n]}
 }
 {\redm{(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)}{(\m{SurfHead}~e_1~\ldots~e_i'~\ldots~e_n)}}
 
+\infrule[SurfRed2]
+{\drule{(\m{SurfHead}~x_1~\ldots~x_i~\ldots~x_n)}{e}\\
+\neg \exists i.\, \redm{e[e_1/x,\ldots,e_i/x_i,\ldots,e_n/x_n]}{e[e_1/x,\ldots,e_i'/x_i,\ldots,e_n/x_n]}
+}
+{\redm{(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)}{e[e_1/x,\ldots,e_i'/x_i,\ldots,e_n/x_n]}
+}
+\todo{Add explanantion of the above rule.}
+
+Our desugaring algorithm is defined based on $\redm{}{}$.
+
+\[
+\begin{array}{llll}
+\m{desugar} (e) &=& \key{if}~\m{isNormal}(e)~\key{then}~e\\
+              & & \key{else}~\\
+							& & \qquad \key{let}~\redm{e}{e'}~\key{in}\\
+							& & \qquad \key{if}~e' \in~\m{...}
+\end{array}
+\]
 
 Our resugaring algorithm is based on a core algorithm f. For every expression during resugaring process, it may have one or more reduction rules. The core algorithm f chooses the one that satisfies three properties of resugaring, then applies it on the given expression. The core algorithm f is defined as \ref{alg:f}.
 \begin{algorithm}
