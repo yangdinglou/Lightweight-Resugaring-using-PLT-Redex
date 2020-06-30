@@ -34,8 +34,8 @@ An expression of the core language is defined in Figure \ref{fig:expression}. It
 
 \begin{figure}[t]
 \begin{center}
-\begin{tabularx}{.9\textwidth}%
-{|>{\setlength{\hsize}{.4\hsize}\centering\arraybackslash}X  |>{\setlength{\hsize}{1.6\hsize}\centering\arraybackslash}X|}
+\begin{tabularx}{.96\textwidth}%
+{|>{\setlength{\hsize}{.5\hsize}\centering\arraybackslash}X  |>{\setlength{\hsize}{1.5\hsize}\centering\arraybackslash}X|}
 %{|*{2}{>{\centering\arraybackslash}X|}}
 \hline
 Syntax & Reduction rules \\ \hline
@@ -67,7 +67,7 @@ A syntactic sugar is defined by a desugaring rule in the following form:
 \]
 where its LHS is a simple pattern (unnested) and its RHS is a surface expression. For instance, we may define syntactic sugar \m{And} by
 \[
-\drule{(\m{And}~x~y)}{\m{if}~x~y~\false}.
+\drule{(\m{And}~x~y)}{(\m{if}~x~y~\false)}.
 \]
 Note that if the pattern is nested, we can introduce a new syntactic sugar to flatten it.
 One may wonder why not restricting the RHS to be a core expression $\m{CoreExp}$, which sounds more natural. We use $\m{surfExp}$ to be able to allow definition of recursive syntactic sugars, as seen in the following example.
@@ -80,50 +80,6 @@ One may wonder why not restricting the RHS to be a core expression $\m{CoreExp}$
 
 We assume that all desugaring rules are not overlapped in the sense that for a syntactic sugar expression, only one desugaring rule is applicable.
 
-\ignore{
-\subsubsection{Grammatical restrictions}
-Firstly, the whole language should be restricted to tree-structured disjoint expression.
-
-\begin{Def}[disjoint]
-For every sub-expression in a expression, its reduction rule is decided by itself.
-\end{Def}
-
-This restriction limits the scope of language. Every sub-expression must have no side effect. We will discuss more on side effect in ...
-
-\begin{Def}[tree-structured]
-The grammar of the whole language is defined as follow.
-\[
-\begin{array}{rcl}
-\mbox{Exp} &::=& (\mbox{Headid}~\mbox{Exp}*)\\
-&|& \mbox{Value}\\
-&|& \mbox{Variable}
-\end{array}
-\]
-\end{Def}
-
-The grammatical restrictions give our language a similiar property as church-rosser theorem for lambda calculus.
-
-todo:church-rosser?
-
-\subsubsection{Context restrictions}
-For expressions in CoreLang, the context rules should restrict it to have only one reduction path. The context rules can limit the order of evaluation. This restriction is normal, because a program in general-purposed language should have only one execution path.\label{mark:ctx}
-
-For expressions in SurfLang, context rules should allow every sub-expressions reduced. It's the same as full-$\beta$ reduction.
-
-\subsubsection{Restriction of syntactic sugar}
-The form of syntactic sugar is as follow.
-
-\fbox{
-$(\mbox{Surfid}\;e_{1}\;e_{2}\;\ldots)$ ~→~ $(\mbox{Headid}\; \ldots)$
-}
-
-An counter example of this restriction is $(\mbox{Surfid}\;\ldots\;(e1\;e2)\ldots))$ in LHS. It's for simpler algorithm form, and the expression ability of syntactic sugar will not be changed. Any subexpressions can be represented by core language's terms or surface language's term, so the expressiveness is good.
-
-\begin{Def}[Unambiguous]
-For every syntactic sugar expressions, it can only desugar to one expression in CoreLang.
-\end{Def}
-
-}
 
 \subsubsection{Mixed Language}
 
@@ -174,7 +130,7 @@ We may assume \m{if}, \m{let}, \m{$\lambda _{N}$} (call-by-name lambda calculus)
 
 \subsection{Resugaring Algorithm}
 
-Our resugaring algorithm works on our mixed language, based on the reduction rules of the core language and the desugaring rules for defining the surface language. Let $\redc{}{}$ denote the one-step reduction of the core language, and $\drule{}{}$ the one-step desugaring by a desuaring rule. We define $\redm{}{}$, the one-step reduction of our mixed language, as follows.
+Our resugaring algorithm works on our mixed language, based on the reduction rules of the core language and the desugaring rules for defining the surface language. Let $\redc{}{}$ denote the one-step reduction of the core language, and $\drule{}{}$ the one-step desugaring by a desugaring rule. We define $\redm{}{}$, the one-step reduction of our mixed language, as follows.
 
 \infrule[CoreRed]
 {\redc{(\m{CoreHead}~e_1~\ldots~e_n)}{e'}}
@@ -205,7 +161,7 @@ Our desugaring algorithm is defined based on $\redm{}{}$.
 \end{array}
 \]
 
-Our resugaring algorithm is based on a core algorithm f. For every expression during resugaring process, it may have one or more reduction rules. The core algorithm f chooses the one that satisfies three properties of resugaring, then applies it on the given expression. The core algorithm f is defined as \ref{alg:f}.
+Our resugaring algorithm is based on a core algorithm core-algo. For every expression during resugaring process, it may have one or more reduction rules. The core algorithm core-algo chooses the one that satisfies three properties of resugaring, then applies it on the given expression. The core algorithm core-algo is defined as \ref{alg:f}.
 \begin{algorithm}
 	\caption{Core-algorithm core-algo}
 	\label{alg:f}     % 给算法一个标签，以便其它地方引用该算法
@@ -228,7 +184,7 @@ Our resugaring algorithm is based on a core algorithm f. For every expression du
 		\RETURN desugarsurf($Exp$); \hfill Case4
 		\ELSE
 		\STATE Let $DesugarExp$ = desugarsurf(Exp)
-		\IF {$Subexp_{i}$ is reduced to $Subexp'_{i}$ during $f(DesugarExp)$}
+		\IF {$Subexp_{i}$ is reduced to $Subexp'_{i}$ during core-algo(DesugarExp)}
 		\RETURN $Exp'_{i}$ = $(Headid~Subexp_{1}~\ldots~Subexp'_{i}~\ldots)$; \hfill Case5
 		\ELSE
 		\RETURN $DesugarExp$; \hfill Case6
@@ -258,7 +214,7 @@ Then, our lightweight-resugaring algorithm is defined as \ref{alg:lwresugar}.
 		Surfexp $Exp$
 		\ENSURE ~~\\     % 算法的输出说明
 		$Exp$'s evaluation sequences within DSL
-		\WHILE {$tmpExp$ = f($Exp$)}
+		\WHILE {$tmpExp$ = core-algo($Exp$)}
 		\IF {$tmpExp$ is empty}
 		\RETURN
 		\ELSIF {$tmpExp$ is Surfexp or Commonexp}
@@ -399,29 +355,7 @@ Although SKI combinator calculus is a reduced version of lambda calculus, we can
 \CoreStep (yy ((K xx) yy))
 \CoreStep (yy xx)
 \end{Codes}
-% \begin{figure}[ht]
-% 	\centering
-% 	\parbox[t]{\textwidth}{
-% 				\begin{center}
-% 				{
-% 					\small\selectfont
-% 					(S (K (S I)) K xx yy)\\
-% 					↓\\
-% 					(((K (S I)) xx (K xx)) yy)\\
-% 					↓\\
-% 					(((S I) (K xx)) yy)\\
-% 					↓\\
-% 					(I yy ((K xx) yy))\\
-% 					↓\\
-% 					(yy ((K xx) yy))\\
-% 					↓\\
-% 					(yy xx)
-% 				}
-% 				\end{center}
-% 			}
-% 	\caption{SKI's resugaring sequences}
-% 	\label{fig:SKI}
-% \end{figure}
+
 
 For existing approach, the sugar expression should firstly desugar to
 \begin{Codes}
@@ -455,7 +389,7 @@ $(Apply\;(\lambda\;(x)\;(+~x~(Let~x~2~(+~x~1))))\;1)$
 
 is needed. (case 5 or 6)Then one-step try on the temp expression, we will get
 
-$(+~1~(Let~1~2~(+~1~1)))$ which is out of the whole language's grammar. In this case, it is not a good choice to desugar the outermost $Let$ sugar. Then we just apply the core-algo f on the sub-expression where the error occurs ($(+~x~(Let~x~2~(+~x~1)))$ in this example). So the right intermediate sequence $(Let~x~1~(+~x~3))$ will be get.
+$(+~1~(Let~1~2~(+~1~1)))$ which is out of the whole language's grammar. In this case, it is not a good choice to desugar the outermost $Let$ sugar. Then we just apply the core-algo on the sub-expression where the error occurs ($(+~x~(Let~x~2~(+~x~1)))$ in this example). So the right intermediate sequence $(Let~x~1~(+~x~3))$ will be get.
 
 Another hygienic example is as the example origined from Hygienic resugaring\cite{hygienic}. We simplify the example to the following one.
 \begin{Codes}
@@ -482,28 +416,7 @@ Take $(Odd~2)$ as an example. The previous work will firstly desugar the express
 \SurfStep{ (if (> (- (- 2 1) 1) 0) (Even (- (- (- 2 1) 1) 1) \#f))}
 \SurfStep{ ...}
 \end{Codes}
-% \begin{figure}[ht]
-% 	\centering
-% 	\parbox[t]{\textwidth}{
-% 				\begin{center}
-% 				{
-% 					\small\selectfont
-% 					(Odd 2)\\
-% 					↓\\
-% 					(if (> 2 0) (Even (- 2 1) \#f))\\
-% 					↓\\
-% 					(if (> (- 2 1) 0) (Odd (- (- 2 1) 1) \#t))\\
-% 					↓\\
-% 					(if (> (- (- 2 1) 1) 0) (Even (- (- (- 2 1) 1) 1) \#f))\\
-% 					↓\\
-% 					{\ldots}
-% 				}
-% 				\end{center}
 
-% 			}
-% 	\caption{Odd2's desugaring process}
-% \label{fig:odd}
-% \end{figure}
 
 Then the advantage of our approach is embodied. Our lightweight approach doesn't require a whole expanding of sugar expression, which gives the framework chances to judge boundary conditions in sugars themselves, and showing more intermediate sequences. We get the resugaring sequences of the former example using our tool.
 \begin{Codes}
@@ -514,30 +427,7 @@ Then the advantage of our approach is embodied. Our lightweight approach doesn't
 \CoreStep{ (Odd 0)}
 \CoreStep{ \#f}
 \end{Codes}
-% \begin{figure}[ht]
-% 	\centering
-% 	\parbox[t]{\textwidth}{
-% 				\begin{center}
-% 				{
-% 					\small\selectfont
-% 					(Odd 2)\\
-% 					↓\\
-% 					(Even (- 2 1))\\
-% 					↓\\
-% 					(Even 1)\\
-% 					↓\\
-% 					(Odd (- 1 1))\\
-% 					↓\\
-% 					(Odd 0)\\
-% 					↓\\
-% 					\#f
-% 				}
-% 				\end{center}
 
-% 			}
-% 	\caption{Odd2's resugaring sequences}
-% \label{fig:rec}
-% \end{figure}
 
 We also construct some higher-order syntactic sugars and test them. The higher-order feature is important for constructing practical syntactic sugar. And many higher-order sugars should be constructed by recursive defination. Giving the following two higher-order syntactic sugar as examples.
 \begin{Codes}
@@ -575,42 +465,6 @@ result
 These two syntactic sugars use different sugar forms to implement. For $Map$ sugar, we use if expression in CoreLang to constrain the boundary conditions. For $Filter$ sugar, we use two different parameters' form, which is another easy way for constructing syntactic sugar. The testing results show as .
 
 
-% \begin{figure}[ht]
-% 	\centering
-% 	\parbox[t]{\textwidth}{
-
-% 				\begin{center}
-% 				{
-% 					\small\selectfont
-% 					(filter (λ (x) (and (> x 3) (< x 6))) (list 1 2 3 4 5 6 7))\\
-% 					↓\\
-% 					(filter (λ (x) (and (> x 3) (< x 6))) (list 2 3 4 5 6 7))\\
-% 					↓\\
-% 					(filter (λ (x) (and (> x 3) (< x 6))) (list 3 4 5 6 7))\\
-% 					↓\\
-% 					(filter (λ (x) (and (> x 3) (< x 6))) (list 4 5 6 7))\\
-% 					↓\\
-% 					(cons 4 (filter (λ (x) (and (> x 3) (< x 6))) (list 5 6 7)))\\
-% 					↓\\
-% 					(cons 4 (cons 5 (filter (λ (x) (and (> x 3) (< x 6))) (list 6 7))))\\
-% 					↓\\
-% 					(cons 4 (cons 5 (filter (λ (x) (and (> x 3) (< x 6))) (list 7))))\\
-% 					↓\\
-% 					(cons 4 (cons 5 (filter (λ (x) (and (> x 3) (< x 6))) (list))))\\
-% 					↓\\
-% 					(cons 4 (cons 5 (list)))\\
-% 					↓\\
-% 					(cons 4 (list 5))\\
-% 					↓\\
-% 					(list 4 5)
-% 				}
-
-% 				\end{center}
-
-% 			}
-% 	\caption{Filter's resugaring sequences}
-% \label{fig:filter}
-% \end{figure}
 \subsection{Compare to previous work}
 
 As mentioned many times before, the biggest difference between previous resugaring approach and our approach, is that our approach doesn't need to desugar the sugar expresssion totally. Thus, our approach has the following advantages compared to previous work.

@@ -1,33 +1,24 @@
 %!TEX root = ./main.tex
 \section{Overview}
 \label{sec2}
-
-\subsection{Defination of resugaring}
-This subsection is partially similiar to original defination in\cite{resugaring}.
+In this section, we firstly show an example of traditional resugaring approach. Then we will describe the framework of our whole approach, with two different approaches which work together and their separate examples.
+\subsection{existing resugaring method}
+This subsection is original from \cite{resugaring} and \cite{hygienic}. But their original idea is from the first one, and the second one is a optimized version on hygienic macros and rewriting system.
 \begin{Def}[Resugaring]
-Given core language (named {\bfseries CoreLang}) and its evalation rules, together with surface language based on syntactic sugars of CoreLang (named {\bfseries Surflang}). For any expression of Surflang, getting the evaluation sequences of the expression in terms of SurfLang.\footnote{It's not strict, because we could allow some expressions in CoreLang shown.}
+Given core language (named {\bfseries CoreLang}) and its evaluator, together with surface language based on syntactic sugars of CoreLang (named {\bfseries Surflang}). For any syntactic sugar, getting the evaluation sequences of the expression in SurfLang's syntax.It's not strict, so they use three properties for defining correctness.
 \end{Def}
 For correctness of the resugaring, the evaluation sequences should maintain the following three properties:
 \begin{enumerate}
-\item {\bfseries Emulation} The evaluation sequences reflect the actual execution process.
-\item {\bfseries Abstraction} The resugaring sequences should only contains terms in SurfLang, and each term of SurfLang should originate from initial expression.
-\item {\bfseries Coverage} No sequence is skipped during the process.
+\item \emph{Emulation} Every surface term desugars to (a termisomorphic to) the core term it purports to represent.
+\item \emph{Abstraction} If a term is shown in the reconstructedsurface evaluation sequence, then each non-atomic part of it orig-inated from the original program and has honest tags.
+\item \emph{Coverage}  A sugar with good coverage shows many steps in the reconstructed surface evaluation sequence.
 \end{enumerate}
+It is a good summary for resugaring's properties, so we also use similar properties in our approach (using our domain).
 
-Given an example below.
-
-For syntactic sugar {\bfseries and} and {\bfseries or}, the sugar rules are:
+Given an example to show how existing approach works. For syntactic sugar {\bfseries and} and {\bfseries or}, the sugar rules are:
 \begin{Codes}
 (and e1 e2) \SurfStep{ (if e1 e2 \#f)}    \hfill (or e1 e2) \SurfStep{ (if e1 \#t e2)} 
 \end{Codes}
-% \begin{center}
-% 	\parbox[t]{\textwidth}{%
-% 		\begin{flushleft}  
-% 			(and e1 e2) $\rightarrow$ (if e1 e2 \#f)\\
-% 			(or e1 e2) $\rightarrow$ (if e1 \#t e2)
-% 		\end{flushleft}  
-% 	}%  
-% \end{center}
 which forms a simple SurfLang.
 
 The evaluation rules of {\bfseries if} is:
@@ -35,14 +26,6 @@ The evaluation rules of {\bfseries if} is:
 (if \#t e1 e2) \SurfStep{ e1} \\
 (if \#f e1 e2) \SurfStep{ e2} 
 \end{Codes}
-% \begin{center}
-% 	\parbox[t]{\textwidth}{%
-% 		\begin{center}  
-% 			if(\#t, e1, e2) → e1\\
-% 			if(\#f, e1, e2) → e2
-% 		\end{center}  
-% 	}% 
-% \end{center}
 
 Then for SurfLang's expression $\mbox{and}(\mbox{or}(\#f, \#t), \mbox{and}(\#t, \#f))$ should get resugaring sequences as follow.
 
@@ -52,21 +35,6 @@ Then for SurfLang's expression $\mbox{and}(\mbox{or}(\#f, \#t), \mbox{and}(\#t, 
 \CoreStep (and \#t \#f)
 \CoreStep \#f
 \end{Codes}
-% \begin{figure}[ht]
-% \parbox[t]{\textwidth}{
-% 			\begin{center}  
-% 				(and (or \#f \#t) (and \#t \#f))\\
-% 				↓\\
-% 				(and \#t (and \#t \#f))\\
-% 				↓\\
-% 				(and \#t \#f)\\
-% 				↓\\
-% 				\#f
-% 			\end{center}  
-% 		}
-% \caption{resugaring example}
-% \label{fig:example}
-% \end{figure}
 
 The reason we should get the sequences above is because $(\mbox{and}~(\mbox{or}~\#f~\#t)~(\mbox{and}~\#t~\#f))$ should desugar to $(\mbox{if}~(\mbox{if}~\#f~\#t~\#f)~(\mbox{if}~\#t~\#f~\#f)~\#f)$. Then in the CoreLang, the evaluation sequences will be as follow.
 \begin{Codes}
@@ -75,23 +43,8 @@ The reason we should get the sequences above is because $(\mbox{and}~(\mbox{or}~
 \CoreStep (if \#t \#f \#f)
 \CoreStep \#f
 \end{Codes}
-% \begin{figure}[ht]
-% \parbox[t]{\textwidth}{
-% 			\begin{center}  
-% 				(if (if \#f \#t \#f) (if \#t \#f \#f) \#f)\\
-% 				↓\\
-% 				(if \#t (if \#t \#f \#f) \#f)\\
-% 				↓\\
-% 				(if \#t \#f \#f)\\
-% 				↓\\
-% 				\#f
-% 			\end{center}  
-% 		}
-% \caption{evaluation sequences}
-% \label{fig:coreseq}
-% \end{figure}
 
-The second item in the sequences can be desugared from $(\mbox{and}~\#t~(\mbox{and}~\#t~\#f))$, so resugars to it. So as the third item.
+The second item in the sequences can be desugared from $(\mbox{and}~\#t~(\mbox{and}~\#t~\#f))$, so resugars to it. So as the third item. In summary, the traditional approach firstly desugars the whole expression, then trys to transform the core sequences into surface sequences by match and substitution.
 
 %Use a simple but sharp example to give an overview of your approach.
 \subsection{Mixture Approach Framework}
