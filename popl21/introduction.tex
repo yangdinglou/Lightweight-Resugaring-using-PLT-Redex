@@ -33,7 +33,7 @@ the key idea in this resugaring is "tagging" and "reverse desugaring": it tags e
 
 While it is natural to do resugaring by reverse desugaring of tagged core terms, it introduces complexity and inefficiency.
 \begin{itemize}
-\item {\em Tricky to handle reursive sugar}. While tagging is used to remember the position of desugaring so that reverse desugaring can be done at correct position when desugared core expression is evaluated, it  becomes very tricky and complex when recursive sugars are considered \cite{resugaring}.
+\item {\em Tricky to handle reursive sugar}. While tagging is used to remember the position of desugaring so that reverse desugaring can be done at correct position when desugared core expression is evaluated, it  becomes very tricky and complex when recursive sugars are considered \cite{resugaring}.\todo{pattern-based?}
 
 \item {\em Complicated to handle hygienic sugar}. For reverse desugaring, we need to match part of the core expression on the RHS of the desugar rule and to get the surface term by substitution. This match-and-substitute turns out to be very complex if we consider local bindings (hygienic sugars) \cite{hygienic}.
 

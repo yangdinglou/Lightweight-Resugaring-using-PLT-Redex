@@ -41,7 +41,7 @@ Then for SurfLang's expression $(\mbox{and}~(\mbox{or}~\#f~\#t)~(\mbox{and}~\#t~
 \OneStep \#f
 \end{Codes}
 
-The reason we should get the sequences above is because $(\mbox{and}~(\mbox{or}~\#f~\#t)~(\mbox{and}~\#t~\#f))$ should desugar to $(\mbox{if}~(\mbox{if}~\#f~\#t~\#f)~(\mbox{if}~\#t~\#f~\#f)~\#f)$. Then in the CoreLang, the evaluation sequences will be as follow.
+The reason we should get the sequences above is because \Code{(and~(or~\#f~\#t)~(and~\#t~\#f))} should desugar to \Code{(if~(if~\#f~\#t~\#f)~(\mbox{if}~\#t~\#f~\#f)~\#f)}. Then in the CoreLang, the evaluation sequences will be as follow.
 \begin{Codes}
     (if (if \#f \#t \#f) (if \#t \#f \#f) \#f)
 \OneStep (if \#t (if \#t \#f \#f) \#f)
@@ -96,7 +96,7 @@ Note that there are some steps should not be displayed, we define the common exp
 
 
 The key idea of our dynamic approach, is that, regarding surface language and core language as a whole under the strategy of lazy desugaring. We design a core algorithm to choose the right reduction rule for any expression during the execution. Take the example
-(and (or \#f \#t) (and \#t \#f)) again. We will get the sequence as Fig\ref{fig:core-algo}.
+\Code{(and (or \#f \#t) (and \#t \#f))} again. We will get the sequence as Fig\ref{fig:core-algo}.
 
 \begin{figure}[ht]
 \parbox[t]{\textwidth}{
