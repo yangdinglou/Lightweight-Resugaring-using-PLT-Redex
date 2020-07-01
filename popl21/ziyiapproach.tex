@@ -363,29 +363,47 @@ So the unidirectional resugaring algorithm makes our approach lightweight, becau
 \label{mark:hygienic}
 
 
-The second work\cite{hygienic} mainly processes hygienic macro compared to first work. We try a $Let$ sugar (similar to the one in core language) , which is a complex hygienic sugar example, on our tool. Our algorithm can easily process hygienic macro without special data structure. The $Let$ sugar is define as follow
+The second work\cite{hygienic} mainly processes hygienic macro compared to first work. It use a DAG to represent the expression. However, hygiene is not hard to handle by our lazy desugaring strategy. Our algorithm can easily process hygienic macro without special data structure. 
+% The $Let$ sugar is define as follow
+% \begin{Codes}
+% 	(Let x e exp) \DeStep{ ((lambda (x) exp) e)}
+% \end{Codes}
+% % $(Let\;x\;v\;exp)$ $\rightarrow$ $(Apply\;(\lambda\;(x)\;exp)\;v)$
+
+% Take $(Let~x~1~(+~x~(Let~x~2~(+~x~1))))$ for an example. First, a temp expression
+
+% $(Apply\;(\lambda\;(x)\;(+~x~(Let~x~2~(+~x~1))))\;1)$
+
+% is needed. (case 5 or 6)Then one-step try on the temp expression, we will get
+
+% $(+~1~(Let~1~2~(+~1~1)))$ which is out of the whole language's grammar. In this case, it is not a good choice to desugar the outermost $Let$ sugar. Then we just apply the core-algo on the sub-expression where the error occurs ($(+~x~(Let~x~2~(+~x~1)))$ in this example). So the right intermediate sequence $(Let~x~1~(+~x~3))$ will be get.
+
+A typical hygienic example is as the example origined from Hygienic resugaring\cite{hygienic}. We simplify the example to the following one. 
 \begin{Codes}
-	(Let x e exp) \DeStep{ ((lambda (x) exp) e)}
+	(Hygienicadd e1 e2) \DeStep{ (let ((x e1)) (+ x e2))}
 \end{Codes}
-% $(Let\;x\;v\;exp)$ $\rightarrow$ $(Apply\;(\lambda\;(x)\;exp)\;v)$
 
-Take $(Let~x~1~(+~x~(Let~x~2~(+~x~1))))$ for an example. First, a temp expression
+For existing resugaring approach, if we want to get sequences of \Code{(let ((x 2)) (Hygienicadd 1 x))}, it will firstly desugar to \Code{(let ((x 2)) (let ((x 1)) (+ x x)))}, but it is awful because the two $x$ in \Code{(+ x x)} should be bind to different value. But for our lazy desugaring, the \m{hygienicadd} sugar does not have to desugar until necessary, so, getting following sequences.
 
-$(Apply\;(\lambda\;(x)\;(+~x~(Let~x~2~(+~x~1))))\;1)$
-
-is needed. (case 5 or 6)Then one-step try on the temp expression, we will get
-
-$(+~1~(Let~1~2~(+~1~1)))$ which is out of the whole language's grammar. In this case, it is not a good choice to desugar the outermost $Let$ sugar. Then we just apply the core-algo on the sub-expression where the error occurs ($(+~x~(Let~x~2~(+~x~1)))$ in this example). So the right intermediate sequence $(Let~x~1~(+~x~3))$ will be get.
-
-Another hygienic example is as the example origined from Hygienic resugaring\cite{hygienic}. We simplify the example to the following one.
 \begin{Codes}
-	(Hygienicadd e1 e2) \DeStep{ (let x e1 (+ x e2))}
+    (let ((x 2)) (Hygienicadd 1 x)
+\OneStep{ (Hygienicadd 1 2)}
+\OneStep{ (+ 1 2)}
+\OneStep{ 3}
 \end{Codes}
 
-\todo{clearly example}
+The lazy desugaring is also comvinent for hygienic resugaring for non-hygienic core language. For example, \Code{(let ((x 1)) (+ x (let ((x 2)) (+ x 1))))} may be reduced to \Code{(+ 1 (let ((1 2)) (+ 1 1)))} by a simple core language whose \Code{let} expression does not handle cases like that. But by writing a simple sugar Let,
+\[\drule{(Let~e_1~e_2~e_3)}{(let~((e_1~e_2))~e_3)}\]
+and some simple modifies in the reduction of mixed language, we will get the following sequences in our system.
+\begin{Codes}
+    (Let x 1 (+ x (Let x 2 (+ x 1))))
+\OneStep{(Let x 1 (+ x (+ 2 1)))}
+\OneStep{(Let x 1 (+ x 3))}
+\OneStep{(+ 1 3)}
+\OneStep{4}
+\end{Codes}
 
-When executing a program as (let ((x 1)) (Hygienicadd x 2)), the lazy desugaring allows the expression reduced to (Hygienicadd 1 2) directly (as it should be), so it's a more flexible approach to handle hygienic problems in resugaring.
-In practical application, we think hygienic resugaring can be easily processed by rewriting system. So in the finally implementation of our tool, we just use PLT Redex's binding forms to deal with hygienic macros. But we did try it on the version without hygienic rewriting system. Moreover, we use a more concise way to handle hygienic resugaring.
+In practical application, we think hygiene can be easily processed by rewriting system. But our result shows lazy desugaring is really a good way to handle hygienic macro in any systems.
 
 \subsubsection{recursive sugar}
 Recursive sugar is a kind of syntactic sugars where call itself or each other during the expanding. For example,
@@ -417,27 +435,14 @@ Then the advantage of our approach is embodied. Our lightweight approach doesn't
 \end{Codes}
 
 
-We also construct some higher-order syntactic sugars and test them. The higher-order feature is important for constructing practical syntactic sugar. And many higher-order sugars should be constructed by recursive defination. Giving the following two higher-order syntactic sugar as examples.
-\begin{Codes}
-    (map e lst)
-\DeStep{ (if (empty? lst) (list) (cons (e (first lst)) (map e (rest lst))))}
-\end{Codes}
-Get following resugaring sequences.
-\begin{Codes}
-    (map (lam (x) (+ x 1)) (list 1 2))
-\OneStep{ (cons 2 (map (lam (x) (+ 1 x)) (list 2)))}
-\OneStep{ (cons 2 (cons 3 (map (lam (x) (+ 1 x)) (list))))}
-\OneStep{ (cons 2 (cons 3 (list)))}
-\OneStep{ (cons 2 (list 3))}
-\OneStep{ (list 2 3)}
-\end{Codes}
-filter
+We also construct some higher-order syntactic sugars and test them. The higher-order feature is important for constructing practical syntactic sugar. And many higher-order sugars should be constructed by recursive defination. The first sugar is \m{filter}, implemented by pattern matching term rewriting.
+
 \begin{Codes}
    (filter e (list v1 v2 ...))
 \DeStep{ (if (e v1) (cons v1 (filter e (list v2 ...)))\ (filter e (list v2 ...)))}
    (filter e (list)) \DeStep{ (list)}
 \end{Codes}
-result
+and getting the following result. (by making \Code{(lam ...)} \m{CommonExp} )
 
 \begin{Codes}
     (filter (lam (x) (and (> x 1) (< x 4))) (list 1 2 3 4))
@@ -450,18 +455,35 @@ result
 \OneStep{ (list 2 3)}
 \end{Codes}
 
-These two syntactic sugars use different sugar forms to implement. For $Map$ sugar, we use if expression in CoreLang to constrain the boundary conditions. For $Filter$ sugar, we use two different parameters' form, which is another easy way for constructing syntactic sugar. The testing results show as .
+Here, although the sugar can be processed by existing resugaring approach, it will be rebundant. The reason is that, a filter for a list of length $n$ will match to find possible resugaring $n*(n-1)/2$ times. Thus, lazy desugaring is really important to reduce the resugaring complexity of recursive sugar.
 
+Moreover, just like the \emph{Odd and Even} sugar above, there are some simple rewriting systems which do not allow pattern-based rewriting. Or there are some sugars which need to be expressed by the terms in core language as conditions. Take the example of another higher-order sugar \m{map} as an example.
+\begin{Codes}
+    (map e1 e2)
+\DeStep{ (let ((x e2)) (if (empty? x) (list) (cons (e_1 (first x)) (map e_1 (rest x)))))}
+\end{Codes}
+Get following resugaring sequences.
+\begin{Codes}
+    (map (lam (x) (+ x 1)) (cons 1 (list 2)))
+\OneStep{ (map (lam (x) (+ x 1)) (list 1 2))}
+\OneStep{ (cons 2 (map (lam (x) (+ 1 x)) (list 2)))}
+\OneStep{ (cons 2 (cons 3 (map (lam (x) (+ 1 x)) (list))))}
+\OneStep{ (cons 2 (cons 3 (list)))}
+\OneStep{ (cons 2 (list 3))}
+\OneStep{ (list 2 3)}
+\end{Codes}
+
+Note that the \m{let} term is to limit the subexpression only appears once in RHS. In this example, we can find that the list \Code{(cons 1 (list 2))}, though equal to \Code{(list 1 2)}, is represented by core language's term. So it will be difficult to handle the inline boundary conditions by rewriting system. But our approach is easy to handle cases like this.
 
 \subsection{Compare to previous work}
 
 As mentioned many times before, the biggest difference between previous resugaring approach and our approach, is that our approach doesn't need to desugar the sugar expresssion totally. Thus, our approach has the following advantages compared to previous work.
 
 \begin{itemize}
-	\item {\bfseries Lightweight} As the example at sec\ref{mark:simple}, the match and substitution process searchs all intermediate sequences many times. It will cause huge cost for a large program. So out approach---only expanding a syntactic sugar when necessarily, is a lightweight approach.
-	\item {\bfseries Friendly to hygienic macro} Previous hygienic resugaring approach use a new data structure---abstract syntax DAG, to process resugaring of hygienic macros. Our approach simply finds hygienic error after expansion, and gets the correct reduction instead.
-	\item {\bfseries More syntactic sugar features} The ability of processing recursive sugar is a superiority compared to previous work. The key point is that recursive syntactic sugar must handle boundary conditions. Our approach handle them easily by not necessarily desugaring all syntactic sugars. Higher-order functions, as an important feature of functional programming, was supported by many daily programming languages. So the ability on higher-order sugar is important.
-	\item {\bfseries Rewriting rules based on reduction semantics} Any syntactic sugar that can expressed by reduction semantics can be used in our approach. It will give more possible forms for constructing syntactic sugars. todo:example?
+	\item {\emph Lightweight} As the example at sec\ref{mark:simple}, the match and substitution process searchs all intermediate sequences many times. It will cause huge cost for a large program. So out approach---only expanding a syntactic sugar when necessarily, is a lightweight approach.
+	\item {\emph Friendly to hygienic macro} Previous hygienic resugaring approach use a new data structure---abstract syntax DAG, to process resugaring of hygienic macros. Our approach simply finds hygienic error after expansion, and gets the correct reduction instead.
+	\item {\emph More syntactic sugar features} The ability of processing non-pattern-based (\todo{inline?}) recursive sugar is a superiority compared to previous work. The key point is that recursive syntactic sugar must handle boundary conditions. Our approach handle them easily by not necessarily desugaring all syntactic sugars. Higher-order functions, as an important feature of functional programming, was supported by many daily programming languages. Lazy desugaring makes writing higher-order sugars easier.
+	% \item {\emph Rewriting rules based on reduction semantics} Any syntactic sugar that can expressed by reduction semantics can be used in our approach. It will give more possible forms for constructing syntactic sugars. todo:example?
 \end{itemize}
 
-The most obvious shortage compared to existing approach is that our approach needs a whole semantic of core languages. The reason is because in case 5 and 6, we need to expand the outermost syntactic sugar and try one step, which may contain unexpanded sugars. Theoretically, our dynamic approach would also work with only a core language's stepper, by totally expand all sugar expressions and marked where each term is originated from. Simple modifications are needed in core-algo. But we did not try it, because of the intent we would discussed in Sec\ref{mark:assumption}.
+% The most obvious shortage compared to existing approach is that our approach needs a whole semantic of core languages. The reason is because in case 5 and 6, we need to expand the outermost syntactic sugar and try one step, which may contain unexpanded sugars. Theoretically, our dynamic approach would also work with only a core language's stepper, by totally expand all sugar expressions and marked where each term is originated from. Simple modifications are needed in core-algo. But we did not try it, because of the intent we would discussed in Sec\ref{mark:assumption}.

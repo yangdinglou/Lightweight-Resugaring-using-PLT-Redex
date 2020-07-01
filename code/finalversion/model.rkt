@@ -221,8 +221,8 @@
 
 
 
-   (--> (in-hole P (map e (list v_1 ...)))
-        (in-hole P (if (empty (list v_1 ...)) (list) (cons (e (first (list v_1 ...))) (map e (rest (list v_1 ...))))))
+   (--> (in-hole P (map e_1 e_2))
+        (in-hole P (let ((x e_2))(if (empty x) (list) (cons (e_1 (first x)) (map e_1 (rest x))))))
         "map")
    (--> (in-hole P (filter e (list v_1 v_2 ...)))
         (in-hole P (if (e v_1) (cons v_1 (filter e (list v_2 ...))) (filter e (list v_2 ...))))
