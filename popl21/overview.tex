@@ -1,6 +1,7 @@
 %!TEX root = ./main.tex
 \section{Overview}
 \label{sec2}
+
 In this section, we firstly show an example of traditional resugaring approach. Then we will describe the framework of our whole approach, with two different approaches which work together and their separate examples.
 \subsection{Existing resugaring method}
 This subsection is original from \cite{resugaring} and \cite{hygienic}. But their original idea is from the first one, and the second one is a optimized version on hygienic macros and rewriting system.
@@ -64,13 +65,13 @@ We limit the language to s-expressions. Given an expression $\mbox{Exp} = (\mbox
 Given an example based on the former section. Besides sugar {\bfseries and}, {\bfseries or}, we add a recursive sugar {\bfseries mapf} based on another new sugar {\bfseries f}. The recursive sugar can be handled by the dynamic approach, but not for the static one. (Reasons in later sections)
 \begin{Codes}
 \small{(f e1 e2)} \DeStep{ (let x e1 (or x (and e2 x)))}
-\small{(mapf e lst)} \DeStep{ (if (empty? lst) empty (cons (f e (first lst)) (mapf e (rest lst))))} 
+\small{(mapf e lst)} \DeStep{ (if (empty? lst) empty (cons (f e (first lst)) (mapf e (rest lst))))}
 \end{Codes}
 
 In the mapf (map of f) sugar, we use both core language's term (such as {\bfseries if, empty?, cons, let, first, rest}) and existing syntactic sugar ({\bfseries and, or}). The semantics of core language is as common. But to show some exact steps, we set the term {\bfseries cons} as a common expression (belonging to core language, but being displayed as surface language).
 
 
-If we execute 
+If we execute
 \begin{Codes}
 (mapf \#t (list \#f \#t))
 \end{Codes}
@@ -94,7 +95,7 @@ Then the second subexpression should be reduced, which is a recursive process. F
 Note that there are some steps should not be displayed, we define the common expressions above in syntaxs to restrict which intermediate step should be displayed.
 
 
-The key idea of our dynamic approach, is that, regarding surface language and core language as a whole under the strategy of lazy desugaring. We design a core algorithm to choose the right reduction rule for any expression during the execution. Take the example 
+The key idea of our dynamic approach, is that, regarding surface language and core language as a whole under the strategy of lazy desugaring. We design a core algorithm to choose the right reduction rule for any expression during the execution. Take the example
 (and (or \#f \#t) (and \#t \#f)) again. We will get the sequence as Fig\ref{fig:core-algo}.
 
 \begin{figure}[ht]
@@ -136,11 +137,11 @@ The {\bfseries let} and {\bfseries if} expressions' reduction semantics can be r
 \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2.8cm,
 semithick]
 \tikzstyle{every state}=[circle,draw,minimum size=16pt,font=\large]
- 
+
 \node[initial,state] (A) {$e_{1}$};
 \node[state,accepting] (B) [above right of=A] {$e_{2}$};
 \node[state,accepting] (C) [below right of=A] {$e_{3}$};
- 
+
 \path (A) edge node {\#t} (B)
 edge node {\#f} (C)
 edge [loop above] node {} (A)

@@ -192,9 +192,9 @@
 \begin{abstract}
 
 
-Syntactic sugar is a good way of implementing domain-specific languages. However, desugaring of sugar makes some information hidden. Then the programs after desugaring will be unrecognizable for people who is unfamiliar to the host language. It is not good because domain-specific languages are not always used by programmers.
+Syntactic sugars provide an effective way to define and implement domain-specific languages. However, the programs after desugaring to a host language would be unrecognizable for people who are unfamiliar with the host language, which is bad because domain-specific languages are not always used by programmers.
 
-\emph{Resugaring} is an method to solve the problem above. In this paper, we purposed an approach of resugaring mixed with two approachesm, based on lazy desugaring---getting evaluation sequences without fully desugaring the whole syntactic sugar expression. The first approach is lightweight but powerful, which lazy desugaring the sugars in programs. The second approach is efficent, which gets inference rules of sugars, then runs the programs using new inferences rules. 
+\emph{Resugaring} is an method to solve the problem above. In this paper, we purposed an approach of resugaring mixed with two approachesm, based on lazy desugaring---getting evaluation sequences without fully desugaring the whole syntactic sugar expression. The first approach is lightweight but powerful, which lazy desugaring the sugars in programs. The second approach is efficent, which gets inference rules of sugars, then runs the programs using new inferences rules.
 \end{abstract}
 
 
