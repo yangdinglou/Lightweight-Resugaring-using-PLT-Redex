@@ -63,7 +63,7 @@ Our surface language is defined by a set of syntactic sugars, together with some
 
 A syntactic sugar is defined by a desugaring rule in the following form:
 \[
-\drule{(\m{SurfHead}~x_1~x_2~\ldots~x_n)}{\m{SurfExp}}
+\drule{(\m{SurfHead}~x_1~x_2~\ldots~x_n)}{\m{Exp}}
 \]
 where its LHS is a simple pattern (unnested) and its RHS is a surface expression. For instance, we may define syntactic sugar \m{And} by
 \[
@@ -129,7 +129,7 @@ The difference between our core language (CoreLang) and our surface language (Su
 Take some terms in the core language in Figure \ref{fig:core} as examples.
 We may assume \m{if}, \m{let}, \m{$\lambda _{N}$} (call-by-name lambda calculus), \m{empty}, \m{first}, \m{rest} as \m{CoreHead'}, \m{op}, \m{$\lambda$}, \m{cons} as \m{CommonHead}. Then we would show some useful intermediate steps.
 
-Note that some expressions with \m{CoreHead} contains subexpressions with \m{SurfHead}, they are of \m{CoreExp} but not in core language, we need a tricky extension for the core language's evaluator. For expression \Code{(CoreHead $e_1$ ... $e_n$)}, replacing all subexpression not in core language with different reduciable core language's term. Then getting a result after inputting the new expression \Code{exp'} to the original blackbox stepper. If reduction appears at subexpressions after \Code{$e_i$} replaced by, then the stepper with the extension should return \Code{(CoreHead $e_1$ ... $e_i'$ ... $e_n$)}, where $e_i'$ is $e_i$ after desugaring. (an  example in Fig \ref{fig:e1}) Otherwise, stepper should return \Code{exp'}, with all the replaced subexpressions replacing back. (an example in Fig \ref{fig:e2}) The extension will not vialate properties of original core language's evaluator.
+Note that some expressions with \m{CoreHead} contains subexpressions with \m{SurfHead}, they are of \m{CoreExp} but not in core language, we need a tricky extension for the core language's evaluator. For expression \Code{(CoreHead $e_1$ ... $e_n$)}, replacing all subexpression not in core language with different reduciable core language's term. Then getting a result after inputting the new expression \Code{exp'} to the original blackbox stepper. If reduction appears at subexpressions after \Code{$e_i$} replaced by, then the stepper with the extension should return \Code{(CoreHead $e_1$ ... $e_i'$ ... $e_n$)}, where $e_i'$ is $e_i$ after desugaring. (an  example in Fig \ref{fig:e1}) Otherwise, stepper should return \Code{exp'}, with all the replaced subexpressions replacing back. (an example in Fig \ref{fig:e2}) The extension will not vialate properties of original core language's evaluator. It is obvious that the evaluator with the extension will reduce at the subexpression as it needs in core language, if the reduction appears in s subexpression.
 
 \begin{center}
 \begin{figure}[h]
@@ -153,17 +153,17 @@ Note that some expressions with \m{CoreHead} contains subexpressions with \m{Sur
 
 \subsection{Resugaring Algorithm}
 
-Our resugaring algorithm works on our mixed language, based on the reduction rules of the core language and the desugaring rules for defining the surface language. Let $\redc{}{}$ denote the one-step reduction of the core language (based on the blackbox stepper with extension, and $\drule{}{}$ the one-step desugaring by a desugaring rule. We define $\redm{}{}$, the one-step reduction of our mixed language, as follows.
+Our resugaring algorithm works on our mixed language, based on the reduction rules of the core language and the desugaring rules for defining the surface language. Let $\redc{}{}$ denote the one-step reduction of the core language (based on the blackbox stepper with extension, and $\drule{}{}$ the one-step desugaring of outermost sugar. We define $\redm{}{}$, the one-step reduction of our mixed language, as follows.
 
 \infrule[CoreRed]
 {\redc{(\m{CoreHead}~e_1~\ldots~e_n)}{e'}}
 {\redm{(\m{CoreHead}~e_1~\ldots~e_n)}{e'}}
 
 \infrule[SurfRed1]
-{\drule{(\m{SurfHead}~x_1~\ldots~x_i~\ldots~x_n)}{e}\\
+{\drule{(\m{SurfHead}~x_1~\ldots~x_i~\ldots~x_n)}{e},~\redm{e_i}{e_i''}\\
 \exists i.\, \redm{e[e_1/x,\ldots,e_i/x_i,\ldots,e_n/x_n]}{e[e_1/x,\ldots,e_i'/x_i,\ldots,e_n/x_n]}
 }
-{\redm{(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)}{(\m{SurfHead}~e_1~\ldots~e_i'~\ldots~e_n)}}
+{\redm{(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)}{(\m{SurfHead}~e_1~\ldots~e_i''~\ldots~e_n)}}
 
 \infrule[SurfRed2]
 {\drule{(\m{SurfHead}~x_1~\ldots~x_i~\ldots~x_n)}{e}\\
@@ -222,17 +222,35 @@ For $Exp$=$(Headid\;Subexp_{1}\;Subexp_{\ldots} \ldots)$, $Exp$ is called {\bfse
 Case 2, 4, 6 in the core algorithm are of outer reduction. And case 3 or 5 are of surface reduction if the reduced subexpression is processed by outer reduction, or they are of inner reduction.
 What we need to prove is that all the 6 cases of core algorithm core-algo satisfy the properties. Case 1 and case 2 won't effect any properties, because it does what CoreLang should do.
 
-\begin{lemma}[Emulation]
+\begin{Def}[Emulation]
 
-For~\m{Exp}=$(\m{SurfHead}~e_1~\ldots~e_n)$, if~$\redm{Exp}{e}$
+For~\m{Exp}=$(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)$,\\ if~$\redm{\m{Exp}}{\m{Exp'}}$ and \m{Desugar}(\m{Exp})$\not=$$\m{Desugar}(\m{Exp'})$,~then $\redc{\m{Desugar}(\m{Exp})}{\m{Desugar}(Exp')}$
+\end{Def}
 
-then \m{Desugar}($e$)=$e'$,  where $\redc{\m{Desugar(Exp)}{e'}}$
+\begin{lemma}
+
+For~\m{Exp}=$(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)$,\\ if inputting $\m{Desugar}(\m{Exp})$ to core language's evaluator reduces the term original from $e_i$ in one step, then the $\redm{}{}$ will reduce \m{Exp} at $e_i$.
+
+%then $\redc{\m{Desugar}(\m{Exp})}{\m{Desugar}(\m{Exp'})}$
 \end{lemma}
-\begin{proof}[Proof of Emulation]
-\hfill\\
-For case 4 or 6, desugaring won't change Emulation property, because desugaring and resugaring are interconvertible.
 
-For case 3 or 5, our core algorithm reduces the sub-expression which should be reduced. So if applying core algorithm core-algo on the subexpression satisfies emulation property, then this two cases satisfy. As we mentioned above, if the reduction is surface reduction, the subexpression is processed by case 2, 4 or 6, which have been proved to satisfy the emulation property; if the reduction is inner reduction, the subexpression is processed by case 3 or 5, which can be proved recursively, because the depth of expressions is finite, the subexpression will finally be reduced by an outer reduction. Thus, the reduction of the subexpression satisfies the emulation property, so it is for case 3 or 5.
+\begin{proof}
+For $\drule{(\m{SurfHead}~x_1~\ldots~x_i~\ldots~x_n)}{e}$
+
+if $e$ is of normal form, the $\m{Desugar}(\m{Exp})$ will not be reduced by core evaluator.
+
+if $e$ is headed with \m{CoreHead}, then according to the \m{CoreRed} rule, the $\redc{}{}$ will execute on $e$, which will reduce the subexpression $e_i$ according to the blackbox evaluator with extension. Then the \m{SurfRed2} rule will reduce $e_i$. Because of the extension of evaluator reduces the subexpression in correct location, so it is for $\redm{}{}$.
+
+if $e$ is headed with \m{SurfHead}, then the $redm{}{}$ will execute recursively on $e$. If the new one satisfies the lemma, then it is for the former. Because any sugar expression will finally be able to desugar to expression with \m{CoreHead}, it can be proved recursively.
+\end{proof}
+\begin{proof}[Proof of Emulation]
+\hfill
+
+For \m{SurfRed1} rule, $\redm{(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)}{(\m{SurfHead}~e_1~\ldots~e_i''~\ldots~e_n)}$, where $\redm{e_i}{e_i''}$. 
+If $\m{Desugar}(e_i)$=$\m{Desugar}(e_i'')$, then \m{Desugar}(\m{Exp})=\m{Desugar}(\m{Exp'}). If not,  what we need to prove is that, $\redc{\m{Desugar}(\m{Exp})}{\m{Desugar}(\m{Exp'})}$. Note that the only difference between \m{Exp} and \m{Exp'} is the i-th subexpression, and we have proved the lemma that the subexpression is the one to be reduced after the expression desugared totally, it will be also a recursive proof on the subexpression $e_i$.
+
+For \m{SurfRed2} rule, \m{Exp'} is \m{Exp} after the outermost sugar resugared. So \m{Desugar}(\m{Exp})=\m{Desugar}(\m{Exp'}).
+
 \end{proof}
 
 \begin{proof}[Proof of Abstraction]
@@ -241,13 +259,13 @@ It's true, because we only display the sequence which satisfies abstraction prop
 \end{proof}
 
 \begin{lemma}
-If no syntactic sugar desugared before it has to, then coverage property is satisfied.
+If no syntactic sugar desugared before necessary (if the sugar not desugared, the expression of mixed language cannot be reduced after other sugars desugared, then coverage property is satisfied.
 \end{lemma}
 
 \begin{proof}[Proof of Lemma3.2]
 Assume that no syntactic sugar not necessarily expanded desugars too early, existing an expression in CoreLang
 
-$Exp$ = $(Headid\;Subexp_{1}\;Subexp_{\ldots} \ldots)$ which can be resugared to
+$Exp$ = $(\m{Head}~e_1~\ldots~e_i~\ldots~e_n)$ which can be resugared to
 
 $ResugarExp'$ = $(Surfid\;Subexp'_{1}\;Subexp'_{\ldots}\ldots)$, and $ResugarExp'$ is not displayed during lightweight-resugaring process. Then
 
