@@ -28,8 +28,8 @@ which forms a simple SurfLang.
 The evaluation rules of {\bfseries if} is:
 \[
 \begin{array}{l}
-\drule{(\m{if}~\true~e_1~e_2)}{e_1}\\
-\drule{(\m{if}~\true~e_1~e_2)}{e_2}
+(\m{if}~\true~e_1~e_2) \DeStep{e_1}\\
+(\m{if}~\true~e_1~e_2) \DeStep{e_2}
 \end{array}
 \]
 Then for SurfLang's expression $(\mbox{and}~(\mbox{or}~\#f~\#t)~(\mbox{and}~\#t~\#f))$ should get resugaring sequences as follow.
