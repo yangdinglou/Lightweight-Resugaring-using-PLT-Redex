@@ -79,10 +79,10 @@
   {\begin{alltt}\leftskip=1.5em} % \small
   {\end{alltt}}
 
-\newcommand{\CoreStep}{{\rule{0pt}{1.2\baselineskip}{\ensuremath\longrightarrow}}}
-\newcommand{\SurfStep}{{\rule{0pt}{1.2\baselineskip}{\ensuremath\dashrightarrow}}}
+\newcommand{\OneStep}{{\rule{0pt}{1.2\baselineskip}{\ensuremath\longrightarrow}}}
+\newcommand{\DeStep}{{\rule{0pt}{1.2\baselineskip}{\ensuremath\dashrightarrow}}}
 
-\newcommand\m[1]{\mbox{\sc #1}}
+\newcommand\m[1]{\mbox{\tt #1}}
 \newcommand\key[1]{\mbox{\rm \bf #1}}
 \newcommand\drule[2]{#1 ~\rightarrow_d~ #2}
 \newcommand\redc[2]{#1 ~\rightarrow_c~#2}
@@ -190,10 +190,11 @@
 %% Note: \begin{abstract}...\end{abstract} environment must come
 %% before \maketitle command
 \begin{abstract}
-With the rapid development of computer science, domain-specific language (DSL) is quite useful in our daily life, not only for programmers or computer scientists, but for people from all walks of life. Syntactic sugar is a good way to implement embedded DSLs, because it can make good use of existing general-purposed language's feature. However, the evaluation sequences became unrecognizable after the sugar expression desugared.
 
 
-Resugaring is an method to solve the problem above. In this paper, we purposed a lightweight approach of resugaring based on reduction semantics---getting evaluation sequences without fully desugaring the whole syntactic sugar expression. We implement a tool based on our method using PLT Redex and test our approach on some applications. The results show that our lightweight approach can even deal with more syntactic sugar's feature.
+Syntactic sugars provide an effective way to define and implement domain-specific languages. However, the programs after desugaring to a host language would be unrecognizable for people who are unfamiliar with the host language, which is bad because domain-specific languages are not always used by programmers.
+
+\emph{Resugaring} is an method to solve the problem above. In this paper, we purposed an approach of resugaring mixed with two approachesm, based on lazy desugaring---getting evaluation sequences without fully desugaring the whole syntactic sugar expression. The first approach is lightweight but powerful, which lazy desugaring the sugars in programs. The second approach is efficent, which gets inference rules of sugars, then runs the programs using new inferences rules.
 \end{abstract}
 
 
