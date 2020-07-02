@@ -2,64 +2,58 @@
 \section{Overview}
 \label{sec2}
 
-In this section, we firstly show an example of traditional resugaring approach. Then we will describe the framework of our whole approach, with two different approaches which work together and their separate examples.
-\subsection{Existing resugaring method}
-This subsection is original from \cite{resugaring} and \cite{hygienic}. But their original idea is from the first one, and the second one is a optimized version on hygienic macros and rewriting system.
-\begin{Def}[Resugaring]
-Given core language (named {\bfseries CoreLang}) and its evaluator, together with surface language based on syntactic sugars of CoreLang (named {\bfseries Surflang}). For any syntactic sugar, getting the evaluation sequences of the expression in SurfLang's syntax.It's not strict, so they use three properties for defining correctness.
-\end{Def}
-For correctness of the resugaring, the evaluation sequences should maintain the following three properties:
-\begin{enumerate}
-\item \emph{Emulation} Every surface term desugars to (a termisomorphic to) the core term it purports to represent.
-\item \emph{Abstraction} If a term is shown in the reconstructedsurface evaluation sequence, then each non-atomic part of it orig-inated from the original program and has honest tags.
-\item \emph{Coverage}  A sugar with good coverage shows many steps in the reconstructed surface evaluation sequence.
-\end{enumerate}
-It is a good summary for resugaring's properties, so we also use similar properties in our approach (using our domain).
-
-Given an example to show how existing approach works. For syntactic sugar {\bfseries and} and {\bfseries or}, the sugar rules are:
+In this section, we show a simple example processed by existing approach and our approach. Firstly, we define a simple core language with following syntax and semantic.
 \[
-\begin{array}{l}
-\drule{(\m{And}~e_1~e_2)}{(\m{if}~e_1~e_2~\false)}\\
-\drule{(\m{Or}~e_1~e_2)}{(\m{if}~e_1~\true~e_2)}
+\begin{array}{lll}
+\m{e} &::=& \Code{(if~e~e~e)}\\
+& |& \true\\
+& |& \false
 \end{array}
 \]
-which forms a simple SurfLang.
 
-The evaluation rules of {\bfseries if} is:
+\infrule[context rule of if]
+{\m{e}~\rightarrow~\m{e'}}
+{\Code{(if e e1 e2)}\rightarrow\Code{(if e' e1 e2)}}
+\infax[reduction rule of iftrue]
+{\Code{(if \#t e1 e2)}\rightarrow \m{e1}}
+\infax[reduction rule of iffalse]
+{\Code{(if \#f e1 e2)} \rightarrow \m{e2}}
+
+We define two syntactic sugars---\emph{and} sugar and \emph{or} sugar based on the core language.
+
 \[
-\begin{array}{l}
-(\m{if}~\true~e_1~e_2) \DeStep{e_1}\\
-(\m{if}~\true~e_1~e_2) \DeStep{e_2}
-\end{array}
+\drule{\Code{(and e1 e2)}}{\Code{(if e1 e2 \#f)}}
 \]
-Then for SurfLang's expression $(\mbox{and}~(\mbox{or}~\#f~\#t)~(\mbox{and}~\#t~\#f))$ should get resugaring sequences as follow.
+\[
+\drule{\Code{(or e1 e2)}}{\Code{(if e1 \#t e2)}}
+\]
+and execute \Code{(and (or \#t \#f) (and \#f \#t))} as an example.
+
+\subsection{Existing resugaring approach}
+As we mentioned above, the existing approach use "tagging" and "reverse desugaring" to get resugaring sequences. Tags is to show where are terms from, and reverse dusugaring is what resugaring needs.
 
 \begin{Codes}
-    (and (or \#f \#t) (and \#t \#f))
-\OneStep (and \#t (and \#t \#f))
-\OneStep (and \#t \#f)
-\OneStep \#f
+    (and (or \#t \#f) (and \#f \#t))
+\DeStep{  (if-andtag (if-ortag \#t \#t \#f) (if-andtag \#f \#t \#f) \#f)}  \note{//desugar}
+\note{ start evaluating}  
+\OneStep{ (if-andtag \#t (if-andtag \#f \#t \#f) \#f)} \note{//check resugarable}
+\note{ get (and \#t (and \#f \#t)) by reverse desugaring}
+\OneStep{ (if-andtag \#f \#t \#f)} \note{//check resugarable}
+\note{ get (and \#f \#t) by reverse desugaring}
+\OneStep{ #f} \note{end of resugaring}
 \end{Codes}
 
-The reason we should get the sequences above is because \Code{(and~(or~\#f~\#t)~(and~\#t~\#f))} should desugar to \Code{(if~(if~\#f~\#t~\#f)~(\mbox{if}~\#t~\#f~\#f)~\#f)}. Then in the CoreLang, the evaluation sequences will be as follow.
-\begin{Codes}
-    (if (if \#f \#t \#f) (if \#t \#f \#f) \#f)
-\OneStep (if \#t (if \#t \#f \#f) \#f)
-\OneStep (if \#t \#f \#f)
-\OneStep \#f
-\end{Codes}
-
-The second item in the sequences can be desugared from $(\mbox{and}~\#t~(\mbox{and}~\#t~\#f))$, so resugars to it. So as the third item. In summary, the traditional approach firstly desugars the whole expression, then trys to transform the core sequences into surface sequences by match and substitution.
+We can find that the expression fully desugared before resugaring. The subexpression \Code{(and \#f \#t)}, though desugars to \Code{(if-andtag \#f \#t \#f)}, doesn't be reduced in first two steps after desugaring. But the reverse desugaring trys on it in these two steps, which is redundant. Moreover, there will be some intermediate steps which can not be resugared by reverse desugaring during the evaluation in a more complex core language. Many useless resugarings on subexpressions will take place.
 
 %Use a simple but sharp example to give an overview of your approach.
-\subsection{Mixture Approach Framework}
-We limit the language to s-expressions. Given an expression $\mbox{Exp} = (\mbox{Headid}~\mbox{Exp}*)$, the process of mixture approach will as Fig \ref{fig:mixture}.
+\subsection{Resugaring by lazy desugaring}
 
-\begin{figure}[t]
-	\centering
-	\includegraphics[width=12cm]{images/mixture.png}
-	\caption{One step in framework of mixture approach}
-	\label{fig:mixture}
+\ignore{
+    \begin{figure}[t]
+    \centering
+    \includegraphics[width=12cm]{images/mixture.png}
+    \caption{One step in framework of mixture approach}
+    \label{fig:mixture}
 \end{figure}
 
 Given an example based on the former section. Besides sugar {\bfseries and}, {\bfseries or}, we add a recursive sugar {\bfseries mapf} based on another new sugar {\bfseries f}. The recursive sugar can be handled by the dynamic approach, but not for the static one. (Reasons in later sections)
@@ -93,102 +87,44 @@ Then the second subexpression should be reduced, which is a recursive process. F
 \OneStep{ empty}
 \end{Codes}
 Note that there are some steps should not be displayed, we define the common expressions above in syntaxs to restrict which intermediate step should be displayed.
-
-
-The key idea of our dynamic approach, is that, regarding surface language and core language as a whole under the strategy of lazy desugaring. We design a core algorithm to choose the right reduction rule for any expression during the execution. Take the example
-\Code{(and (or \#f \#t) (and \#t \#f))} again. We will get the sequence as Fig\ref{fig:core-algo}.
-
-\begin{figure}[ht]
-\parbox[t]{\textwidth}{
-\begin{Codes}
-    (and (or \#f \#t) (and \#t \#f)) $\dashrightarrow_{step1}$
-(and (if \#f \#t \#t) (and \#t \#f)) $\dashrightarrow_{step2}$\\
-(and \#t (and \#t \#f)) $\dashrightarrow_{step3}$
-(if \#t (and \#t \#f) \#f) $\dashrightarrow_{step4}$
-(and \#t \#f) $\dashrightarrow_{step5}$\\
-(if \#t \#f \#f) $\dashrightarrow_{step6}$
-\#f
-\end{Codes}
-		}
-\caption{core-algo example}
-\label{fig:core-algo}
-\end{figure}
-
-At step 1, we found the outermost $and$ sugar don't have to expand, because its first sub-expression will reduce earlier. At step 2, the same as step 1. At step 3, the outermost $and$ sugar have to expand, because no sub-expression will reduce after the whole expression desugar. At step 4, the inner $and$ sugar don't have to expand either. At step 5, the sugar have to desugar to CoreLang. Finally at step 6, we get the final result. Note that there are some sequences which should not be shown, we use another function to filter them.
-
-The key idea of our static approach, is that, converting reduction semantics of core language into automata (called \emph{IFA}), building IFA for syntactic sugar, converting the IFA of sugars into reduction semantics. It is an abstract of dynamic approach in a sence, we will discuss it in Sec\ref{sec6}. Take another {\bfseries or} sugar for example.
-
-\[
-\begin{array}{l}
-\drule{(\m{or}~e_1~e_2)}{(\m{let}~x~e_1~(\m{if}~x~x~e_2))}
-\end{array}
-\]
-where the rules of \emph{if} and \emph{let} is the same following
-
-\[
-\begin{array}{l}
-\drule{(\m{if}~\true~e_1~e_2)}{e_1}\\
-\drule{(\m{if}~\true~e_1~e_2)}{e_2}
-\end{array}
-\]
-\ignore{
-The {\bfseries let} and {\bfseries if} expressions' reduction semantics can be represented as  the following automata.
-
-\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2.8cm,
-semithick]
-\tikzstyle{every state}=[circle,draw,minimum size=16pt,font=\large]
-
-\node[initial,state] (A) {$e_{1}$};
-\node[state,accepting] (B) [above right of=A] {$e_{2}$};
-\node[state,accepting] (C) [below right of=A] {$e_{3}$};
-
-\path (A) edge node {\#t} (B)
-edge node {\#f} (C)
-edge [loop above] node {} (A)
-;
-
-\end{tikzpicture}
-
-
-\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2.8cm,
-semithick]
-\tikzstyle{every state}=[circle,draw,minimum size=16pt,font=\large]
-\node[initial,state] (A) {$e_{1}$};
-\node[state,accepting](B)[right of=A,align=center, font=\small ]{$e\_2_{v}^{x}$}[above];
-%\node at (-0.5,1)[draw, align=center]{example \\ example example};
-
-\path[]
-(A) edge node {$v$} (B)
-(A) edge [loop above] node {} (2);
-
-\end{tikzpicture}
-
-Then for {\bfseries Or} sugar, we merge the IFA of if expression into node {$e_2$} of let's IFA.
-
-\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2.8cm,
-semithick]
-\tikzstyle{every state}=[circle,draw,minimum size=16pt,font=\large]
-
-\node[initial,state] (A) {$e_{1}$};
-\node[state] (D) [right of=A,font=\small] {$x_{v}^{x}$};
-\node[state,accepting] (B) [above right of=D,font=\small] {$x_{\#t}^{x}$};
-\node[state,accepting] (C) [below right of=D] {$e_2$};
-
-\path[]
-(A) edge node {$v$} (D)
-(A) edge [loop above] node {} (A)
-(D) edge node {$\#t$} (B)
-(D) edge node {$\#f$} (C);
-
-\end{tikzpicture}
 }
-From the IFA of or expression, we can get the following reduction semantics.
+
+To solve the problem in existing resugaring approach, we try "lazy desugaring", which means that a syntactic sugar should only desugar when it has to desugar. We use a one-step try method to judge it.
+\begin{Codes}
+    (resugar (and (or \#t \#f) (and \#f \#t)))
+\DeStep{  (tmp (if (or \#t \#f) (and \#f \#t) \#f))} \note{// should reduce on (or \#t \#f)}
+\OneStep{ (and (resugar (or \#t \#f)) (and \#f \#t))} \note{// no reduction}
+\DeStep{  (and (tmp (if \#t \#t \#f)) (and \#f \#t))} \note{//  (or \#t \#f) has to desugar and reduce}
+\OneStep{ (desugar (and \#t (and \#f \#t)))}
+\DeStep{  (tmp (if \#t (and \#f \#t)))} \note{// the outermost \emph{and} sugar has to desugar and reduce}
+\OneStep{ (desugar (and \#f \#t))}
+\DeStep{  (tmp (if \#f \#t \#f))} \note{// have to desugar and reduce}
+\OneStep{ \#f} \note{// end}
+\end{Codes} 
+
+For each step in the processes above we use one reduction or none. So 7 reduction steps is needed for the whole resugaring, while the existing approach needs 9 (3 in desugaring, 3 in evaluator, 3 reversed reduction in resugaring). Note that reversed reduction is more complex because of the match and substitution, the existing approach will be more reduntant on larger expressions than ours. Also, there is no need for tagging, which makes our approach lightweight.
+
+Moreover, derivation of semantics for syntactic sugar will make our approach more efficent for part of sugars. Both \emph{and} sugar and \emph{or} sugar can be handled by the derivation. We can get the following semantics (consisted of reduction rules and context rules).
 \[
-\begin{array}{l}
-\infer {(\mbox{Or}~e_1~e_2) \rightarrow (\mbox{Or}~e_1'~e_2)} {e_1~ \rightarrow~e_1'}\\
-(\mbox{Or}~\#t~e2) \rightarrow \#t \\
-(\mbox{Or}~\#f~e2) \rightarrow e_2 \\
+\begin{array}{c}
+\infer {(\mbox{and}~e_1~e_2) \rightarrow (\mbox{and}~e_1'~e_2)} {e_1~ \rightarrow~e_1'}\\
+(\mbox{and}~\#t~e2) \rightarrow e_2 \\
+(\mbox{and}~\#f~e2) \rightarrow \#f \\
+\infer {(\mbox{or}~e_1~e_2) \rightarrow (\mbox{or}~e_1'~e_2)} {e_1~ \rightarrow~e_1'}\\
+(\mbox{or}~\#t~e2) \rightarrow \#t \\
+(\mbox{or}~\#f~e2) \rightarrow e_2 \\
 \end{array}
 \]
+Then the resugaring sequences can be got not depending on core language.
+\begin{Codes}
+    (and (or \#t \#f) (and \#f \#t))
+\OneStep{ (and \#t (and \#f \#t))}
+\OneStep{ (and \#f \#t)}
+\OneStep{ \#f}
+\end{Codes}
 
-Then the resugaring sequences can be get by the reduction semantics.
+Only 4 steps is needed by using the rules. Although the derivation of rules cannot work for all syntactic sugars which can be handled by our resugaring approach, it can work together with the resugaring. For example, we have another sugar named \emph{hard} (regardless of its desugar rule) whose reduction rules cannot be derivated.
+Then if we execute \Code{(and (hard (and \#t \#t) ...) ...)}, the \emph{and}'s semantics will let the \emph{hard} sugar execute recursively. Then the sugar \emph{hard} will be processed by our basic resugaring approach because no semantic rules for it. Note that the resugaring process may also recursively execute on inner subexpression (e.g. \Code{(and \#t \#t)}), the subexpression may use the semantic rules again.
+
+In summary, our resugaring approach with lazy desugaring is lightweight and efficent. Following chapters will show that, though lightweight, the approach is more powerful than existing approach in some ways.
+\todo{following chapter will also show lightweight and efficent. but how to express?}
