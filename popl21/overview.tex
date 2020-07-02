@@ -43,7 +43,7 @@ As we mentioned above, the existing approach use "tagging" and "reverse desugari
 \OneStep{ #f} \note{end of resugaring}
 \end{Codes}
 
-We can find that the expression fully desugared before resugaring. The subexpression \Code{(and \#f \#t)}, though desugars to \Code{(if-andtag \#f \#t \#f)}, doesn't be reduced in first two steps after desugaring. But the reverse desugaring trys on it in these two steps, which is redundant. Moreover, there will be some intermediate steps which can not be resugared by reverse desugaring during the evaluation in a more complex core language. Many useless resugarings on subexpressions will take place.
+We can find that the expression fully desugared before resugaring. The subexpression \Code{(and \#f \#t)}, though desugars to \Code{(if-andtag \#f \#t \#f)}, doesn't be reduced in first two steps after desugaring. But the reverse desugaring tries on it in these two steps, which is redundant. Moreover, there will be some intermediate steps which can not be resugared by reverse desugaring during the evaluation in a more complex core language. Many useless resugarings on subexpressions will take place.
 
 %Use a simple but sharp example to give an overview of your approach.
 \subsection{Resugaring by lazy desugaring}
@@ -69,7 +69,7 @@ If we execute
 \begin{Codes}
 (mapf \#t (list \#f \#t))
 \end{Codes}
- the mixture approach will judge whether sugar mapf can be handle by the static approach. No, then we use the dynamic approach in one step and get the intermidiate expression.
+ the mixture approach will judge whether sugar mapf can be handle by the static approach. No, then we use the dynamic approach in one step and get the intermediate expression.
 \begin{Codes}
     (mapf \#t (list \#f \#t))
 \OneStep{ (cons (f \#t (first (list \#f \#t))) (mapf \#t (rest (list \#f \#t))))}
@@ -86,7 +86,7 @@ Then the second subexpression should be reduced, which is a recursive process. F
 \DeStep{ (if (empty? (list)) empty ...)}
 \OneStep{ empty}
 \end{Codes}
-Note that there are some steps should not be displayed, we define the common expressions above in syntaxs to restrict which intermediate step should be displayed.
+Note that there are some steps should not be displayed, we define the common expressions above in syntaxes to restrict which intermediate step should be displayed.
 }
 
 To solve the problem in existing resugaring approach, we try "lazy desugaring", which means that a syntactic sugar should only desugar when it has to desugar. We use a one-step try method to judge it.
@@ -102,9 +102,9 @@ To solve the problem in existing resugaring approach, we try "lazy desugaring", 
 \OneStep{ \#f} \note{// end}
 \end{Codes} 
 
-For each step in the processes above we use one reduction or none. So 7 reduction steps is needed for the whole resugaring, while the existing approach needs 9 (3 in desugaring, 3 in evaluator, 3 reversed reduction in resugaring). Note that reversed reduction is more complex because of the match and substitution, the existing approach will be more reduntant on larger expressions than ours. Also, there is no need for tagging, which makes our approach lightweight.
+For each step in the processes above we use one reduction or none. So 7 reduction steps is needed for the whole resugaring, while the existing approach needs 9 (3 in desugaring, 3 in evaluator, 3 reversed reduction in resugaring). Note that reversed reduction is more complex because of the match and substitution, the existing approach will be more redundant on larger expressions than ours. Also, there is no need for tagging, which makes our approach lightweight.
 
-Moreover, derivation of semantics for syntactic sugar will make our approach more efficent for part of sugars. Both \emph{and} sugar and \emph{or} sugar can be handled by the derivation. We can get the following semantics (consisted of reduction rules and context rules).
+Moreover, derivation of semantics for syntactic sugar will make our approach more efficient for part of sugars. Both \emph{and} sugar and \emph{or} sugar can be handled by the derivation. We can get the following semantics (consisted of reduction rules and context rules).
 \[
 \begin{array}{c}
 \infer {(\mbox{and}~e_1~e_2) \rightarrow (\mbox{and}~e_1'~e_2)} {e_1~ \rightarrow~e_1'}\\
@@ -123,8 +123,8 @@ Then the resugaring sequences can be got not depending on core language.
 \OneStep{ \#f}
 \end{Codes}
 
-Only 4 steps is needed by using the rules. Although the derivation of rules cannot work for all syntactic sugars which can be handled by our resugaring approach, it can work together with the resugaring. For example, we have another sugar named \emph{hard} (regardless of its desugar rule) whose reduction rules cannot be derivated.
+Only 4 steps is needed by using the rules. Although the derivation of rules cannot work for all syntactic sugars which can be handled by our resugaring approach, it can work together with the resugaring. For example, we have another sugar named \emph{hard} (regardless of its desugar rule) whose reduction rules cannot be derivate.
 Then if we execute \Code{(and (hard (and \#t \#t) ...) ...)}, the \emph{and}'s semantics will let the \emph{hard} sugar execute recursively. Then the sugar \emph{hard} will be processed by our basic resugaring approach because no semantic rules for it. Note that the resugaring process may also recursively execute on inner subexpression (e.g. \Code{(and \#t \#t)}), the subexpression may use the semantic rules again.
 
-In summary, our resugaring approach with lazy desugaring is lightweight and efficent. Following chapters will show that, though lightweight, the approach is more powerful than existing approach in some ways.
-\todo{following chapter will also show lightweight and efficent. but how to express?}
+In summary, our resugaring approach with lazy desugaring is lightweight and efficient. Following chapters will show that, though lightweight, the approach is more powerful than existing approach in some ways.
+\todo{following chapter will also show lightweight and efficient. but how to express?}

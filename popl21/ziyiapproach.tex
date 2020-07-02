@@ -32,24 +32,44 @@ For our host language, we consider its evaluator as a blackbox \todo{need to be 
 
 An expression of the core language is defined in Figure \ref{fig:expression}. It is a variable, a constant, or a (language) constructor expression. Here, $\m{CoreHead}$ stands for a language constructor such as $\m{if}$ and $\m{let}$. To be concrete, we will use the core language defined in Figure \ref{fig:core} to demonstrate our approach.
 
+% \begin{figure}[t]
+% \begin{center}
+% \begin{tabularx}{.96\textwidth}%
+% {|>{\setlength{\hsize}{.5\hsize}\centering\arraybackslash}X  |>{\setlength{\hsize}{1.5\hsize}\centering\arraybackslash}X|}
+% %{|*{2}{>{\centering\arraybackslash}X|}}
+% \hline
+% Syntax & Reduction rules \\ \hline
+% (if e e e) &\qquad\qquad\qquad(if \#t e2 e3) $\dashrightarrow$ e2 \newline ~(if \#f e2 e3) $\dashrightarrow$ e3\\ \hline
+% ((lam (x ...) e) e ...) & ((lam (x0 x1 ...) e) v0 v1 ...) $\dashrightarrow$ (let ((x0 v0) ((lam (x1 ...) e) v1 ...))\\ \hline
+% ((lamN (x ...) e) e ...) & ((lamN (x0 x1 ...) e) e0 e1 ...) $\dashrightarrow$ (let ((x0 e0) ((lamN (x1 ...) e) e1 ...))\\ \hline
+% (let ((x e) ...) e) & (let ((x0 e0) (x1 e1) ...) e) $\dashrightarrow$ (let ((x1 e1) ...) (subst x0 e0 e))\newline (let () e)  $\dashrightarrow$ e (where subst is a meta function)\\ \hline
+% (first e) & (first (list v1 v2 ...)) $\dashrightarrow$ v1\\ \hline
+% (rest e) & (rest (list v1 v2 ...)) $\dashrightarrow$ (list v2 ...)\\ \hline
+% (empty e) & \qquad\qquad\qquad(empty (list)) $\dashrightarrow$ \#t \newline (empty (list v1 ...)) $\dashrightarrow$ \#f\\ \hline
+% (cons e e) & (cons v1 (list v2 ...)) $\dashrightarrow$ (list v1 v2 ...)\\ \hline
+% (op e e) \newline op=+-*/><== & (op v1 v2) $\dashrightarrow$ arithmetic result\\ \hline
+% \end{tabularx}
+% \end{center}
+% \caption{An Core Language Example}
+% \label{fig:core}
+% \end{figure}
+
 \begin{figure}[t]
-\begin{center}
-\begin{tabularx}{.96\textwidth}%
-{|>{\setlength{\hsize}{.5\hsize}\centering\arraybackslash}X  |>{\setlength{\hsize}{1.5\hsize}\centering\arraybackslash}X|}
-%{|*{2}{>{\centering\arraybackslash}X|}}
-\hline
-Syntax & Reduction rules \\ \hline
-(if e e e) &\qquad\qquad\qquad(if \#t e2 e3) $\dashrightarrow$ e2 \newline ~(if \#f e2 e3) $\dashrightarrow$ e3\\ \hline
-((lam (x ...) e) e ...) & ((lam (x0 x1 ...) e) v0 v1 ...) $\dashrightarrow$ (let ((x0 v0) ((lam (x1 ...) e) v1 ...))\\ \hline
-((lamN (x ...) e) e ...) & ((lamN (x0 x1 ...) e) e0 e1 ...) $\dashrightarrow$ (let ((x0 e0) ((lamN (x1 ...) e) e1 ...))\\ \hline
-(let ((x e) ...) e) & (let ((x0 e0) (x1 e1) ...) e) $\dashrightarrow$ (let ((x1 e1) ...) (subst x0 e0 e))\newline (let () e)  $\dashrightarrow$ e (where subst is a meta function)\\ \hline
-(first e) & (first (list v1 v2 ...)) $\dashrightarrow$ v1\\ \hline
-(rest e) & (rest (list v1 v2 ...)) $\dashrightarrow$ (list v2 ...)\\ \hline
-(empty e) & \qquad\qquad\qquad(empty (list)) $\dashrightarrow$ \#t \newline (empty (list v1 ...)) $\dashrightarrow$ \#f\\ \hline
-(cons e e) & (cons v1 (list v2 ...)) $\dashrightarrow$ (list v1 v2 ...)\\ \hline
-(op e e) \newline op=+-*/><== & (op v1 v2) $\dashrightarrow$ arithmetic result\\ \hline
-\end{tabularx}
-\end{center}
+\begin{centering}
+	\framebox[36em][c]{
+		\parbox[t]{33em}{
+			\[
+			\begin{array}{lcl}
+			\m{CoreExp} &::=& \Code{(CoreExp~CoreExp)}\\
+			&|& \m{(lambda~(x)~CoreExp)}\\
+			&|& \m{(lambdaN~(x)~CoreExp)}\\
+			&|& \m{(if~CoreExp~CoreExp~CoreExp)}\\
+			&|& \m{}
+			\end{array}
+			\]
+		}
+	}
+\end{centering}
 \caption{An Core Language Example}
 \label{fig:core}
 \end{figure}
@@ -181,12 +201,12 @@ Then our desugaring algorithm is defined based on $\redm{}{}$.
 
 \[
 \begin{array}{llll}
-\m{desugar} (e) &=& \key{if}~\m{isNormal}(e)~\key{then}~return\\
+\m{resugar} (e) &=& \key{if}~\m{isNormal}(e)~\key{then}~return\\
               & & \key{else}~\\
 							& & \qquad \key{let}~\redm{e}{e'}~\key{in}\\
 							& & \qquad \key{if}~e' \in~\m{DisplayableExp} \\
-							& & \qquad \qquad \m{output}(e'),~\m{desugar}(e')\\
-							& & \qquad \key{else}~\m{desugar}(e')
+							& & \qquad \qquad \m{output}(e'),~\m{resugar}(e')\\
+							& & \qquad \key{else}~\m{resugar}(e')
 \end{array}
 \]
 
@@ -194,51 +214,60 @@ We use the \m{DisplayableExp} to restrict immediate sequences to be output or no
 
 \subsection{Correctness}
 
-First of all, because the difference between our lightweight resugaring algorithm and the existing one is that we only desugar the syntactic sugar when needed, and in the existing approach, all syntactic sugar desugars firstly and then executes on CoreLang.
+Existing resugaring works\cite{resugaring,hygienic} defines three properties for correctness of resugaring. We think they are also reasonable to describe correctness of our approach. We describe the following properties in our mixed language's domain, then prove or discuss on them.
 
-Then, to prove convenience, define some terms.
+\emph{Emulation.} For each reduction of an expression in our mixed language, it should reflect on one step reduction of the expression totally desugared in the core language, or one step desugaring on a syntactic sugar.
 
-$Exp~=~(Headid\;Subexp_{1}\;Subexp_{\ldots} \ldots)$ is any reducible expression in our language.
+\emph{Abstraction.} Only displayable expressions defined in our mixed language appear in our resugaring sequences.
 
-If we use the reduction rule that desugar Exp's outermost syntactic sugar, then the reduction process is called {\bfseries Outer Reduction}.
+\emph{Coverage.} No syntactic sugar is desugared before its sugar structure should be destroyed in core language.
 
-If the reduction rule we use reduce $Subexp_{i}$, where $Subexp_{i}$ is $(Headid_{i}~Subexp_{i1}~Subexp_{i\ldots} \ldots)$
-\begin{itemize}
-	\item If the reduction process is Outer Reduction of $Subexp_{i}$ = $(Headid_{i}~Subexp_{i1}~Subexp_{i\ldots} \ldots)$, then it is called {\bfseries Surface Reduction}.
-	\item If the reduction process reduces $Subexp_{ij}$, then it is called {\bfseries Inner Reduction}.
-\end{itemize}
+% First of all, because the difference between our lightweight resugaring algorithm and the existing one is that we only desugar the syntactic sugar when needed, and in the existing approach, all syntactic sugar desugars firstly and then executes on CoreLang.
 
-{\bfseries Example:}
+% Then, to prove convenience, define some terms.
 
-$(\mbox{if}\; \#t\; Exp_{1}\; Exp_{2})$ → $Exp1$ \hfill Outer Reduction
+% $Exp~=~(Headid\;Subexp_{1}\;Subexp_{\ldots} \ldots)$ is any reducible expression in our language.
 
-$(\mbox{if}\; (\mbox{And}\; \#t\; \#f)\; Exp_{1}\; Exp_{2})$ → $(\mbox{if}\; (\mbox{if}\; \#t\; \#f\; \#f)\; Exp_{1}\; Exp_{2})$ \hfill Surface Reduction
+% If we use the reduction rule that desugar Exp's outermost syntactic sugar, then the reduction process is called {\bfseries Outer Reduction}.
 
-$(\mbox{if}\; (\mbox{And}\; (\mbox{And}\; \#t\; \#t)\; \#t) \; Exp_{1}\; Exp_{2})$ → $(\mbox{if}\; (\mbox{And}\; \#t\; \#t)\; Exp_{1}\; Exp_{2})$ \hfill Inner Reduction
+% If the reduction rule we use reduce $Subexp_{i}$, where $Subexp_{i}$ is $(Headid_{i}~Subexp_{i1}~Subexp_{i\ldots} \ldots)$
+% \begin{itemize}
+% 	\item If the reduction process is Outer Reduction of $Subexp_{i}$ = $(Headid_{i}~Subexp_{i1}~Subexp_{i\ldots} \ldots)$, then it is called {\bfseries Surface Reduction}.
+% 	\item If the reduction process reduces $Subexp_{ij}$, then it is called {\bfseries Inner Reduction}.
+% \end{itemize}
 
-\begin{Def}[Upper and lower expression]
-For $Exp$=$(Headid\;Subexp_{1}\;Subexp_{\ldots} \ldots)$, $Exp$ is called {\bfseries upper expression}$,Subexp_{i}$is called {\bfseries lower expression}.
-\end{Def}
+% {\bfseries Example:}
 
-Case 2, 4, 6 in the core algorithm are of outer reduction. And case 3 or 5 are of surface reduction if the reduced subexpression is processed by outer reduction, or they are of inner reduction.
-What we need to prove is that all the 6 cases of core algorithm core-algo satisfy the properties. Case 1 and case 2 won't effect any properties, because it does what CoreLang should do.
+% $(\mbox{if}\; \#t\; Exp_{1}\; Exp_{2})$ → $Exp1$ \hfill Outer Reduction
 
-\begin{Def}[Emulation]
+% $(\mbox{if}\; (\mbox{And}\; \#t\; \#f)\; Exp_{1}\; Exp_{2})$ → $(\mbox{if}\; (\mbox{if}\; \#t\; \#f\; \#f)\; Exp_{1}\; Exp_{2})$ \hfill Surface Reduction
 
-For~\m{Exp}=$(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)$,\\ if~$\redm{\m{Exp}}{\m{Exp'}}$ and \m{Desugar}(\m{Exp})$\not=$$\m{Desugar}(\m{Exp'})$,~then $\redc{\m{Desugar}(\m{Exp})}{\m{Desugar}(Exp')}$
-\end{Def}
+% $(\mbox{if}\; (\mbox{And}\; (\mbox{And}\; \#t\; \#t)\; \#t) \; Exp_{1}\; Exp_{2})$ → $(\mbox{if}\; (\mbox{And}\; \#t\; \#t)\; Exp_{1}\; Exp_{2})$ \hfill Inner Reduction
+
+% \begin{Def}[Upper and lower expression]
+% For $Exp$=$(Headid\;Subexp_{1}\;Subexp_{\ldots} \ldots)$, $Exp$ is called {\bfseries upper expression}$,Subexp_{i}$is called {\bfseries lower expression}.
+% \end{Def}
+
+% Case 2, 4, 6 in the core algorithm are of outer reduction. And case 3 or 5 are of surface reduction if the reduced subexpression is processed by outer reduction, or they are of inner reduction.
+% What we need to prove is that all the 6 cases of core algorithm core-algo satisfy the properties. Case 1 and case 2 won't effect any properties, because it does what CoreLang should do.
+\subsubsection{Emulation} It is a basic property for correctness. Because desugaring won't change an expression after totally desugared, what we need to prove is that a non-desugaring reduction in the mixed language shows the exactly reduction which should appear after the expression totally desugared. We expression it by following lemma.
+
+\begin{lemma}[Emulation]
+
+For~\m{exp}=$(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)\in\m{SurfExp}$, if~$\redm{\m{exp}}{\m{exp'}}$\\ and \m{fulldesugar}(\m{exp})$\not=$$\m{fulldesugar}(\m{exp'})$,~then $\redc{\m{fulldesugar}(\m{exp})}{\m{fulldesugar}(exp')}$
+\end{lemma}
 
 \begin{lemma}
 
-For~\m{Exp}=$(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)$,\\ if inputting $\m{Desugar}(\m{Exp})$ to core language's evaluator reduces the term original from $e_i$ in one step, then the $\redm{}{}$ will reduce \m{Exp} at $e_i$.
+For~\m{exp}=$(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)$,\\ if inputting $\m{fulldesugar}(\m{exp})$ to core language's evaluator reduces the term original from $e_i$ in one step, then the $\redm{}{}$ will reduce \m{exp} at $e_i$.
 
-%then $\redc{\m{Desugar}(\m{Exp})}{\m{Desugar}(\m{Exp'})}$
+%then $\redc{\m{fulldesugar}(\m{Exp})}{\m{fulldesugar}(\m{Exp'})}$
 \end{lemma}
 
 \begin{proof}
 For $\drule{(\m{SurfHead}~x_1~\ldots~x_i~\ldots~x_n)}{e}$
 
-if $e$ is of normal form, the $\m{Desugar}(\m{Exp})$ will not be reduced by core evaluator.
+if $e$ is of normal form, the $\m{fulldesugar}(\m{exp})$ will not be reduced by core evaluator.
 
 if $e$ is headed with \m{CoreHead}, then according to the \m{CoreRed} rule, the $\redc{}{}$ will execute on $e$, which will reduce the subexpression $e_i$ according to the blackbox evaluator with extension. Then the \m{SurfRed2} rule will reduce $e_i$. Because of the extension of evaluator reduces the subexpression in correct location, so it is for $\redm{}{}$.
 
@@ -248,19 +277,24 @@ if $e$ is headed with \m{SurfHead}, then the $redm{}{}$ will execute recursively
 \hfill
 
 For \m{SurfRed1} rule, $\redm{(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)}{(\m{SurfHead}~e_1~\ldots~e_i''~\ldots~e_n)}$, where $\redm{e_i}{e_i''}$. 
-If $\m{Desugar}(e_i)$=$\m{Desugar}(e_i'')$, then \m{Desugar}(\m{Exp})=\m{Desugar}(\m{Exp'}). If not,  what we need to prove is that, $\redc{\m{Desugar}(\m{Exp})}{\m{Desugar}(\m{Exp'})}$. Note that the only difference between \m{Exp} and \m{Exp'} is the i-th subexpression, and we have proved the lemma that the subexpression is the one to be reduced after the expression desugared totally, it will be also a recursive proof on the subexpression $e_i$.
+If $\m{fulldesugar}(e_i)$=$\m{fulldesugar}(e_i'')$, then \m{fulldesugar}(\m{Exp})=\m{fulldesugar}(\m{Exp'}). If not,  what we need to prove is that, $\redc{\m{fulldesugar}(\m{Exp})}{\m{fulldesugar}(\m{Exp'})}$. Note that the only difference between \m{Exp} and \m{Exp'} is the i-th subexpression, and we have proved the lemma that the subexpression is the one to be reduced after the expression desugared totally, it will be also a recursive proof on the subexpression $e_i$.
 
-For \m{SurfRed2} rule, \m{Exp'} is \m{Exp} after the outermost sugar resugared. So \m{Desugar}(\m{Exp})=\m{Desugar}(\m{Exp'}).
+For \m{SurfRed2} rule, \m{Exp'} is \m{Exp} after the outermost sugar resugared. So \m{fulldesugar}(\m{Exp})=
+
+\begin{flushleft}
+\m{fulldesugar}(\m{Exp'}).
+\end{flushleft}
 
 \end{proof}
 
-\begin{proof}[Proof of Abstraction]
-\hfill\\
-It's true, because we only display the sequence which satisfies abstraction property.
-\end{proof}
+\subsubsection{Abstraction}
+Abstraction is not a restrict properties, because each expression has its meaning. Users may choose what they want to output during the process. Existing resugaring approaches use marks to determine whether to display a term generated by desugaring, or only changes on original terms will show.
 
+We define the abstraction by catalog the expression in the mixed language, from the reason why we need resugaring---sugar expressions become unrecognizable after desugaring. So why cannot a recursive sugar's resugaring sequences show the sugars generated by itself? We think the users should be allowed to decide which terms are recognizable. Then during the resugaring process, if no unrecognizable term for the user appears in the whole expression, the expression should be shown as a step in resugaring sequences. Lazy resugaring, as the key idea of our approach, makes any intermediate steps retain as many sugar structures as possible, so the abstraction is easy.
+
+\subsubsection{Coverage}
 \begin{lemma}
-If no syntactic sugar desugared before necessary (if the sugar not desugared, the expression of mixed language cannot be reduced after other sugars desugared, then coverage property is satisfied.
+If no syntactic sugar desugared before necessary (if the sugar not desugared, the expression of mixed language cannot be reduced after other sugars desugared, then coverage property is satisfied.)
 \end{lemma}
 
 \begin{proof}[Proof of Lemma3.2]
