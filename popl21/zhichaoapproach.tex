@@ -1,2 +1,147 @@
 %!TEX root = ./main.tex
-\section{zc}
+\section{Static Approach}
+
+In this section, we introduce a static approach, which is more efficient than the one discussed above.
+
+
+\subsection{Inference Automaton}
+
+Based on the idea of DFA (Deterministic Finite Automaton), we designed inference automaton (IFA). An IFA describes the inference rules of a certain syntactic structure. To help readers better understand it, first we give a few examples, then we give the formal definition of IFA and proofs of theorems.
+
+\subsubsection{IFA of if}
+
+The inference rules of \texttt{if} are shown as AAAR1. We can observe that an if term is first evaluated for e1, and is chosen to be evaluated for e2 and e3 depending on the value of it, then the result of the evaluation of e2 or e3 is the result of the evaluation of the term. Thus, we use AAAP1 to represent the inference rules of if.
+
+The arrow from e1 to e2 indicate that this branch will be selected when the result of the e1 evaluation is \#t. The arrows between e1 and e3 are the same. The double circles of e2 and e3 denotes that their evaluation result is the result of the syntactic structure. When a term with an if syntactic structure needs to be evaluated (for example if (if \#t \#t \#f) \#f \#t)), first evaluating the e1 (if \#t \#t \#f) part. Note that in this process, evaluating a subexpression requires running another automaton based on its syntax, while the outer automaton hold the state at e1. According to the result of e1 (\#f), the IFA selects the branch (e3). Then the result of e3 (\#t) will be the evaluation result of the term.
+
+\subsubsection{IFA of nand}
+
+Sometimes the rules may be more complex, such as being reduced into another syntactic structure, or the term contains other syntactic structures. For example, we can express nand's inference rule in the form of AAAR2. Based on the method discussed above, we can draw nand's IFA as AAAP2.
+
+When the automaton runs to the last node, its evaluation rule is essentially an evaluation of the if syntax structure. Thus we can replace the last node with an IFA\_if and use the IFA\_if termination nodes as the termination nodes of the IFA\_Nand. The results are shown in AAAP3. Further decomposing the intermediate nodes, connecting the terminating node of IFA\_if to the node pointed to by the original output edge, we get AAAP4. 
+
+As can be seen, the nodes of IFA in AAAP4 have only the forms e\_i, v\_i and values, and no other composite syntactic structure.  We call such an IFbA a \textit{standard IFA}.
+
+\subsubsection{IFA of or}
+
+We represent the inference rule of or in a more complex way, as shown in AAAR3. In this case, we use the let binding, which expresses a class of rules containing substitution. At this point, we need to record the term represented by each variable at each node, denoted by Γ. The representation of IFA\_or is shown in AAAP5.
+
+More generally, the handling of substitution tables will be more complex. We will discuss this in more detail in AAAF1.
+
+\subsubsection{Definition of IFA}
+
+\begin{Def}[Inference Automaton]
+
+An inference automaton (IFA) of syntactic structure $(\m{Headid}~e_1 \ldots e_n)$ is a 5-tuple, $(Q, \Sigma, q_0, F, \delta)$, consisting of
+
+\begin{itemize}
+    \item A finite set of nodes $Q$, each node contains a term and a symbol table
+    \item A finite set of pattern $\Sigma$
+    \item A start node $q_0 \in Q$
+    \item A set of terminal nodes $F \subseteq Q$ 
+    \item A transition function $\delta: (Q-F) \times \Sigma' \to Q$ where $\Sigma' \subseteq \Sigma$
+\end{itemize}
+
+and for each node $q$, there is no sequence of pattern $P = (p_1,p_2,\ldots,p_n)\subseteq \Sigma^*$, which makes that after $q$ transfers sequentially according to $P$, it returns $q$.
+
+\end{Def}
+
+The last constraint requires that there be no circles in our IFA. 
+
+In IFA, state transition does not depend on input. The only input IFA accepts is the term to be evaluated with this syntactic structure. The state transition is through pattern matching on the evaluation result of the term in the previous node. Note that IFA is associated with syntactic structure. At Each IFA only represents the current evaluation of a syntactic structure. The state indicates that some 
+sub-expressions of the syntactic structure have been evaluated, and the rest have not.
+
+\begin{Def}[Standard IFA]
+
+If the term of node in $Q$ can only be $e_i$ (where $i \in {1,\ldots,n}$) or a value, we name the IFA standard IFA. 
+
+\end{Def}
+
+If an IFA is standard, it means there are no more composite syntactic structures in it. In the above example, for the syntactic structure of \m{if}, we substituted the IFA of the \m{if} into \m{nand} and converted it into a standard IFA. Below we will prove that it is always feasible to convert IFA to standard IFA, and give the algorithm.
+
+\begin{lemma}
+Considering an IFA of a syntactic structure, if the standard IFAs of all syntactic structures of terms contained in the IFA are known, then the IFA can be transformed into a standard IFA.
+\end{lemma}
+
+\begin{proof}[Proof of Lemma]
+
+\end{proof}
+
+\subsection{Convert inference rules to IFA}
+
+Considering the inference rules in CoreLang, which we have more strict limits on. 
+
+\textit{Assumption 1}. A syntactic structure $Headid$ only contains the following inference rules.
+
+\infrule[E-Head]
+{(\m{Headid}~v_1\ldots v_p~e_1 \ldots e_i \ldots e_q) \to   (\m{Headid}~v_1\ldots v_p~e_1 \ldots e_i' \ldots e_q)}
+{e_i \to e_i'}
+\[(\m{Headid}~v_1 \ldots v_p~e_1 \ldots e_q) \to e \]
+\[(\m{Headid}~v_1 \ldots v_p~e_1 \ldots e_q) \to \key{let}~x= Exp_1~\key{in}~Exp_2 \]
+
+This assumption specifies the form of the inference rules to ensure that IFAs can be generated. The first one is context rule, and the others are reduction rules.
+
+\textit{Assumption 2}. The syntactic structure in CoreLang is finite. Think of all syntactic structures as points in a directed graph. If one of $Headid$'s inference rules can generate a term containing $Headid'$, then construct an edge that points from $Headid$ to $Headid'$. The directed graph generated from this method has no circles.
+
+IFAs are not able to construct syntactic structures that contain recursive rules now. This assumption qualifies that we can find an order for all syntactic structures, and when we construct IFA of $Headid$, IFA of $Headid'$ is known.
+
+\textit{Assumption 3}. The rules satisfy the determinacy of one-step evaluation.
+
+By assumption 3, we can get the following lemma, which points out the feasibility of using a node in IFA to represent the evaluation process of sub-expressions.
+
+\begin{lemma}
+If a term $(\m{Headid}~e_1~\ldots~e_n)$ does a one-step evaluation by rule (E-Head) of $\m{Headid}$, which is a one-step evaluation of $e_i$, then it will continue to use this rule until $e_i$ becomes a value.
+\end{lemma}
+
+\begin{proof}[Proof of Lemma]
+According to Assumption 3, this lemma is trivial.
+\end{proof}
+
+\begin{lemma}
+If all syntactic structures in CoreLang satisfy Assumption 1 and Assumption 2, We can construct standard IFAs for all syntactic structures in CoreLang.
+\end{lemma}
+
+\begin{proof}[Proof of Lemma]
+
+By Assumption 2, we get an order of syntactic structures. We generate the IFA for each structure in turn.
+
+We generate a node for each rule and insert them into $Q$. If the rule is a reduction rule, add them into $F$ as terminal nodes. Next we will connect these nodes.
+
+For a term like $(\m{Headid}~e_1~\ldots~e_n)$, considering that $e_1\cdots e_n$ are not value, According to Assumption 3, we have the unique rule $r$ of $Headid$ for one-step evaluation. Let node $q$ corresponding to $r$ be $q_0$.
+
+If $r$ is a context rule for $e_i$, let the term of $q_0$ be build a new node $q$ and add it into $Q$. The term of $q$ is $e_i$. And the symbol table is set to empty. Assume that the evaluation of $e_i$ results in $v_i$, we get term $(\m{Headid}~e_1 \ldots e_{i-1}~v_i~e_{i+1} \ldots e_n)$. For each possible value of $v_i$, choose the rules that should be used. 
+
+If $r$ is a reduction rule, build a new node $q$ and add it into $Q$ and $F$. The term of $q$ is $e_i$, and the symbol table is set to 
+
+
+
+\end{proof}
+
+\subsection{Convert IFA to Inference Rules}
+
+\begin{lemma}
+For each IFA, it can be converted to inference rules.
+\end{lemma}
+
+\begin{proof}[Proof of Lemma]
+Give an algorithm: convert IFA to inference rules.
+\end{proof}
+
+\subsection{Syntactic Sugar}
+
+With the IFA, we can easily get the inference rules for syntactic sugars.
+
+\begin{Def}
+
+Considering the following syntactic sugar 
+\[
+\drule{(\m{SurfHead}~x_1~\ldots~x_n)}{e},
+\] 
+the IFA of \m{SurfHead} is defined as the IFA of syntactic structure \m{SurfHead'} whose inference rule is
+\[
+(\m{SurfHead'}~x_1~\ldots~x_n)\rightarrow e.
+\]
+
+
+
+\end{Def}
