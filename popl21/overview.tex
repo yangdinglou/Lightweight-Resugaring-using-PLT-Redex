@@ -30,7 +30,7 @@ We define two syntactic sugars---\emph{and} sugar and \emph{or} sugar based on t
 and execute \Code{(and (or \#t \#f) (and \#f \#t))} as an example.
 
 \subsection{Existing resugaring approach}
-As we mentioned above, the existing approach use "tagging" and "reverse desugaring" to get resugaring sequences. Tags is to show where are terms from, and reverse dusugaring is what resugaring needs.
+As we mentioned above, the existing approach use "tagging" and "reverse desugaring" to get resugaring sequences. Tags is to show where are terms from, and reverse dusugaring is what resugaring needs. We simplify the existing resugaring process as follows.
 
 \begin{Codes}
     (and (or \#t \#f) (and \#f \#t))
