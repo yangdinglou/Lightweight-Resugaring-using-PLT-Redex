@@ -28,8 +28,7 @@ We will define a mixed language for a given core language and a surface language
 
 \subsubsection{Core Language}
 
-For our host language, we consider its evaluator as a blackbox %\todo{need to be corrected.}
-but with two natural assumptions. First, there is a deterministic stepper in the evaluator which, given an expression in the host language, can deterministically reduce the expression to a new expression. Second, the evaluation of any sub-expression has no side-effect on other parts of the whole expression.
+For our host language, we consider its evaluation rules (context rules + reduction rules) as the evaluator, with two natural assumptions. First, there is a deterministic evaluator in the evaluator which, given an expression in the host language, can deterministically reduce the expression to a new expression. Second, the evaluation of any sub-expression has no side-effect on other parts of the whole expression. We should point that although we can only use a black-box stepper of core language, giving the evaluation rules as the evaluator makes our approach easier to understand. We will discuss about how to extend our approach to the black-box stepper in Section \ref{mark:blackbox}.
 
 An expression of the core language is defined in Figure \ref{fig:expression}. It is a variable, a constant, or a (language) constructor expression. Here, $\m{CoreHead}$ stands for a language constructor such as $\m{if}$ and $\m{let}$. To be concrete, we will use a simplified core language defined in Figure \ref{fig:core} to demonstrate our approach. \todo{semantic needed?}
 
@@ -71,11 +70,16 @@ A syntactic sugar is defined by a desugaring rule in the following form:
 \[
 \drule{(\m{SurfHead}~e_1~e_2~\ldots~e_n)}{\m{Exp}}
 \]
-where its LHS is a simple pattern (unnested) and its RHS is an expression of surface language or core language, and any subterms (e.g. $e_1$) in LHS only appear once in RHS. For instance, we may define syntactic sugar \m{And} by
+where its LHS is a simple pattern (unnested) and its RHS is an expression of surface language or core language, and any reducible sub-term (e.g. $e_1$) in LHS only appears once in RHS. For instance, we may define syntactic sugar \m{And} by
 \[
 \drule{(\m{And}~e_1~e_2)}{(\m{if}~e_1~e_2~\false)}.
 \]
-Note that if the pattern is nested, we can introduce a new syntactic sugar to flatten it. And if we need a subterm multi times in RHS, a \m{let} binding is needed (a normal way in syntactic sugar).
+Note that if the pattern is nested, we can introduce a new syntactic sugar to flatten it. And if we need a reducible sub-term multi times in RHS, a \m{let} binding is needed (a normal way in syntactic sugar). We take the following sugar as example,
+\[\drule{(\m{Twice}~e_1)}{(+~e_1~e_1)}\]
+If we execute \Code{
+	(Twice (+ 1 1))
+}, the sugar expression will firstly desugar to \Code{(+ (+ 1 1) (+ 1 1))}, then one step reduced to \Code{(+ 2 (+ 1 1))}. The subexpression \Code{(+ 1 1)} has reduced but cannot resugar to the surface, because the other \Code{(+ 1 1)} has not reduced. It will let many intermediate steps omitted, if there are many reduction steps between reduction of them. So we just use a \m{let} binding to resolve it.
+
 One may wonder why \todo{don't understand..} not restricting the RHS to be a core expression $\m{CoreExp}$, which sounds more natural. We use $\m{surfExp}$ to be able to allow definition of recursive syntactic sugars, as seen in the following example.
 \[
 \begin{array}{l}
@@ -135,49 +139,20 @@ The differences between terms in our core language (CoreLang) and those in our s
 Take some terms in the core language in Figure \ref{fig:core} as examples.
 We may assume \m{if}, \m{let}, \m{$\lambda _{N}$} (call-by-name lambda calculus), \m{empty}, \m{first}, \m{rest} as \m{CoreHead'}, \m{op}, \m{$\lambda$}, \m{cons} as \m{CommonHead}. Then we would show some useful intermediate steps.
 
-Note that some expressions with \m{CoreHead} contains subexpressions with \m{SurfHead}, they are of \m{CoreExp} but not in core language, we need a tricky extension for the core language's evaluator.
-We use $\redc{}{}$ to donate a reduction step of core language's expression, and $\rede{}{}$ to donate a step in the extension evaluator for the mixed language. We may use $\redm{}{}$ to donate one-step reduction in our mixed language, defined in the next section.
-\infrule[CoreRed]
-{ \forall~i.~e_i\in \m{CoreExp}\\
-\redc{(\m{CoreHead}~e_1~\ldots~e_n)}{e'}}
-{\rede{(\m{CoreHead}~e_1~\ldots~e_n)}{e'}}
-\infrule[CoreExt1]
-{ \forall~i.~subst_i= (e_i \in \m{SurfExp}~?~\m{tmpexp}~:~e_i),~where~\m{tmpexp}~is~any~reduciable~\m{CoreExp}\\
-\redc{(\m{CoreHead}~subst_1~\ldots~subst_i~\ldots~subst_n)}{(\m{CoreHead}~subst_1~\ldots~subst_i'~\ldots~subst_n)}}
-{\rede{(\m{CoreHead}~e_1~\ldots~e_i~\ldots~e_n)}{(\m{CoreHead}~e_1~\ldots~e_i'~\ldots~e_n)}\\where~\redm{e_i}{e_i'}~if~e_i~\in~\m{SurfExp},~else~\redc{e_i}{e_i'}}
-\infrule[CoreExt2]
-{ \forall~i.~subst_i= (e_i \in \m{SurfExp}~?~\m{tmpexp}~:~e_i),~where~\m{tmpexp}~is~any~reduciable~\m{CoreExp}\\
-\redc{(\m{CoreHead}~subst_1~\ldots~subst_n)}{e'}~\note{// not reduced in subexpressions}}
-{\rede{(\m{CoreHead}~e_1~\ldots~e_n)}{e'[e_1/subst_1~\ldots~e_n/subst_n]}}
-For expression \Code{(CoreHead $e_1$ ... $e_n$)}, replacing all subexpression not in core language with any reducible core language's term \m{tmpexp}. Then getting a result after inputting the new expression \Code{e'} to the original blackbox stepper. If reduction appears at a subexpression at $e_i$ or what the $e_i$ replaced by, then the stepper with the extension should return \Code{(CoreHead $e_1$ ... $e_i'$ ... $e_n$)}, where $e_i'$ is $e_i$ after the mixed language's one-step reduction ($redm{}{}$) or after core language's reduction ($\redc{}{}$) (the rule \m{CoreExt1}, an example in Figure \ref{fig:e1}). Otherwise, stepper should return \Code{e'}, with all the replaced subexpressions replacing back. (the rule \m{CoreExt2}, an example in Figure \ref{fig:e2}) The extension will not violate properties of original core language's evaluator. It is obvious that the evaluator with the extension will reduce at the subexpression as it needs in core language, if the reduction appears in a subexpression. One may notice that the stepper with extension behaves the same as mixing the evaluation rules of core language and surface language. The extension is just to make it works when the evaluator of core language is a blackbox stepper. That's why the extension is tricky.
+Note that some expressions with \m{CoreHead} contains subexpressions with \m{SurfHead}, they are of \m{CoreExp} but not in core language (that is why we need an extension for black-box stepper of core language). In the mixed language, we process these terms by core language's context rule, and the reduction rules of core language and the desugar rules of surface language are mixed as a whole (the $\redc{}{}$ in next section). For example, we have context rule
+\[
+\infer{(\m{if}~e_1~e_2~e_3) \rightarrow (\m{if}~e_1'~e_2~e_3)}{e_1 \rightarrow e_1'}
+\]
+then if $e_1$ is a term in core language, it will reduce by the reduction rule in core language; if $e_1$ is a \m{SurfExp}, it will reduce by the desugar rule of $e_1$'s \m{Head}; if $e_1$ is also a \m{CoreExp} with non-core subexpressions, a recursive reduction by $\redc{}{}$ is needed.
 
-\begin{center}
-\begin{figure}[thb]
-\centering
-\Code{(if (and e1 e2) true false)}\\ $\Downarrow_{replace}$\\ \Code{(if tmpe1 true false)}\\ $\Downarrow_{blackbox}$\\ \Code{(if tmpe1' true false)}\\ $\Downarrow_{desugar}$\\ \Code{(if (if e1 e2 false) true false)}
-\caption{\m{CoreExt1}'s example}
-\label{fig:e1}
-\end{figure}
-
-\begin{figure}[thb]
-\centering
-\Code{(if (if true ture false) (and ...) (or ...))}\\ $\Downarrow_{replace}$ \\\Code{ (if (if true ture false) tmpe2 tmpe3)}\\ $\Downarrow_{blackbox}$\\  \Code{(if true tmpe2 tmpe3)}\\ $\Downarrow_{replaceback}$\\ \Code{(if true (and ...) (or ...))}
-\caption{\m{CoreExt2}'s example}
-\label{fig:e2}
-\end{figure}
-
-
- % \Code{(if true (and ...) (or ...))} $\Rightarrow_{replace}$ \Code{(if true tmpe2 tmpe3)} $\Rightarrow_{blackbox}$ \\ \Code{tmpe2} $\Rightarrow_{replaceback}$ \Code{(and ...)}
-
-\end{center}
 
 \subsection{Resugaring Algorithm}
 
-Our resugaring algorithm works on our mixed language, based on the reduction rules of the core language and the desugaring rules for defining the surface language. Let $\rede{}{}$ denote the one-step reduction of the core language (based on the blackbox stepper with extension), and $\drule{}{}$ the one-step desugaring of outermost sugar. We define $\redm{}{}$, the one-step reduction of our mixed language, as follows.
+Our resugaring algorithm works on our mixed language, based on the evaluator of the core language and the desugaring rules for defining the surface language. Let $\redc{}{}$ denote the one-step reduction of the \m{CoreExp} (described in previous section), and $\drule{}{}$ the one-step desugaring of outermost sugar. We define $\redm{}{}$, the one-step reduction of our mixed language, as follows.
 
 \label{mark:miexedreduction}
-\infrule[ExtRed]
-{\rede{(\m{CoreHead}~e_1~\ldots~e_n)}{e'}}
+\infrule[CoreRed]
+{\redc{(\m{CoreHead}~e_1~\ldots~e_n)}{e'}}
 {\redm{(\m{CoreHead}~e_1~\ldots~e_n)}{e'}}
 
 \infrule[SurfRed1]
@@ -193,7 +168,7 @@ Our resugaring algorithm works on our mixed language, based on the reduction rul
 {\redm{(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)}{e[e_1/x_1,\ldots,e_i/x_i,\ldots,e_n/x_n]}
 }
 
-The \m{CoreRed} rule describes how our mixed language handles expressions with \m{CoreHead}---just leave it to the core language's evaluator with the extension. Then for the expression with \m{SurfHead}, we will firstly desugar the outermost sugar (identified by the \m{SurfHead}), then recursively executing $\redm{}{}$. In the recursive call, if one of original subexpression $e_i$ is reduced (\m{SurfRed1}), then the original sugar is not necessarily desugared, we should only reduce the subexpression $e_i$; if not (\m{SurfRed2}), then the sugar have to desugar.
+The \m{CoreRed} rule describes how our mixed language handles expressions with \m{CoreHead}---just leave it to the core language's evaluation rules with the extension by desugaring rules. Then for the expression with \m{SurfHead}, we will firstly desugar the outermost sugar (identified by the \m{SurfHead}), then recursively executing $\redm{}{}$. In the recursive call, if one of original subexpression $e_i$ is reduced (\m{SurfRed1}), then the original sugar is not necessarily desugared, we should only reduce the subexpression $e_i$; if not (\m{SurfRed2}), then the sugar have to desugar.
 
 %\todo{Add explanantion of the above rule.}
 
@@ -210,12 +185,12 @@ Then our desugaring algorithm is defined based on $\redm{}{}$.
 \end{array}
 \]
 
-During the resugaring, we just call the mixed language's reduction ($\redm{}{}$) on the input expression until the expression becomes a normal form. We use the \m{DisplayableExp} to restrict immediate sequences to be output or not. It is more explicit compared to existing approaches. And because $\redm{}{}$ will be executed recursively on the subexpressions, it can be optimized. (see in \ref{mark:optimize}, because the current description is more easier to understand.)
+During the resugaring, we just call the mixed language's reduction ($\redm{}{}$) on the input expression until the expression becomes a normal form. We use the \m{DisplayableExp} to restrict immediate sequences to be output or not. It is more explicit compared to the traditional approach. And because $\redm{}{}$ will be executed recursively on the subexpressions, it can be optimized. (see in \ref{mark:optimize}, because the current description is more easier to understand.)
 
 \subsection{Correctness}
 \label{mark:correct}
 
-Existing resugaring works\cite{resugaring,hygienic} define three properties for correctness of resugaring. We think they are also reasonable to describe correctness of our approach. We describe the following properties in our mixed language's domain, then prove or discuss on them.
+Traditional resugaring works\cite{resugaring,hygienic} define three properties for correctness of resugaring. We think they are also reasonable to describe correctness of our approach. We describe the following properties in our mixed language's domain, then prove or discuss on them.
 
 \emph{Emulation.} For each reduction of an expression in our mixed language, it should reflect on one step reduction of the expression totally desugared in the core language, or one step desugaring on a syntactic sugar.
 
@@ -251,7 +226,7 @@ if $e$ is of normal form, the $\m{fulldesugar}(\m{exp})$ will not be reduced by 
 
 if $e$ is headed with \m{CoreHead}, then according to the \m{CoreRed} rule, the $\rede{}{}$ will execute on $e$ according to \m{ExtRed}, which will reduce the subexpression $e_i$ according to the blackbox evaluator with extension. Then the \m{SurfRed2} rule will reduce $e_i$. Because of the extension of evaluator reduces the subexpression in correct location, so it is for $\redm{}{}$.
 
-if $e$ is headed with \m{SurfHead}, then the $redm{}{}$ will execute recursively on $e$. If the new one satisfies the lemma, then it is for the former. Because any sugar expression will finally be able to desugar to expression with \m{CoreHead}, it can be proved recursively.
+if $e$ is headed with \m{SurfHead}, then the $\redm{}{}$ will execute recursively on $e$. If the new one satisfies the lemma, then it is for the former. Because any sugar expression will finally be able to desugar to expression with \m{CoreHead}, it can be proved recursively.
 \end{proof}
 \begin{proof}[Proof of Lemma \ref{lemma1}]
 \hfill
@@ -272,7 +247,7 @@ So our resugaring approach satisfies evaluation property.
 \subsubsection{Abstraction}
 \label{mark:abs}
 
-Abstraction is not a restrict properties, because each expression has its meaning. Users may choose what they want to output during the process. Existing resugaring approaches use marks to determine whether to display a term generated by desugaring, or only changes on original terms will show.
+Abstraction is not a restrict properties, because each expression has its meaning. Users may choose what they want to output during the process. Traditional resugaring approaches use marks to determine whether to display a term generated by desugaring, or only changes on original terms will show.
 
 We define the abstraction by catalog the expression in the mixed language, from the reason why we need resugaring---sugar expressions become unrecognizable after desugaring. So why cannot a recursive sugar's resugaring sequences show the sugars generated by itself? We think the users should be allowed to decide which terms are recognizable. Then during the resugaring process, if no unrecognizable term for the user appears in the whole expression, the expression should be shown as a step in resugaring sequences. Lazy resugaring, as the key idea of our approach, makes any intermediate steps retain as many sugar structures as possible, so the abstraction is easy.
 

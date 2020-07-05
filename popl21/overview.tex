@@ -6,17 +6,17 @@ In this section, we give a brief overview of our approach, explaining its differ
 \[
 \begin{array}{lll}
 \m{e} &::=& \Code{(if~e~e~e)}\\
-& |& \true\\
-& |& \false
+& |& \true~\note{//true boolean}\\
+& |& \false~\note{//false boolean}
 \end{array}
 \]
-The semantics of the language is very simple, consisting of the following two context rules defining the computation order:
+The semantics of the language is very simple, consisting of the following context rule defining the computation order:
 \infrule[context rule of if]
 {\m{e}~\rightarrow~\m{e'}}
 {\Code{(if e e1 e2)}\rightarrow\Code{(if e' e1 e2)}}
+and two reduction rules:
 \infax[reduction rule of iftrue]
 {\Code{(if \#t e1 e2)}\rightarrow \m{e1}}
-and one reduction rule:
 \infax[reduction rule of iffalse]
 {\Code{(if \#f e1 e2)} \rightarrow \m{e2}}
 
@@ -40,7 +40,7 @@ Now let us demonstrate how to execute \Code{(and (or \#t \#f) (and \#f \#t))}, a
 
 \subsection{Traditional Approach: Tagging and Reverse Desugaring}
 
-As we discussed in the introduction, the traditional approach uses "tagging" and "reverse desugaring" to get resugaring sequences; tagging is to mark where and how the core terms are from, and reverse desugaring is to resugar core terms back to surface terms. Putting it simply, the existing resugaring process is as follows.
+As we discussed in the introduction, the traditional approach uses "tagging" and "reverse desugaring" to get resugaring sequences; tagging is to mark where and how the core terms are from, and reverse desugaring is to resugar core terms back to surface terms. Putting it simply, the traditional resugaring process is as follows.
 
 \begin{Codes}
     (and (or \#t \#f) (and \#f \#t))
@@ -100,11 +100,11 @@ Then the second subexpression should be reduced, which is a recursive process. F
 Note that there are some steps should not be displayed, we define the common expressions above in syntaxes to restrict which intermediate step should be displayed.
 }
 
-To solve the problem in the traditional approach, we propose a new resugaring approach by eliminating "reverse desugaring" via "lazy desugaring", where a syntactic sugar will be desugared only when it is necessary. We test the necessity of desugaring by a one-step try. We shall first briefly explain our one-step try resugaring method, and then show that how the "one-step try" can be cheaply done by derivation of reduction rules for syntactic sugars.
+To solve the problem in the traditional approach, we propose a new resugaring approach by eliminating "reverse desugaring" via "lazy desugaring", where a syntactic sugar will be desugared only when it is necessary. We test the necessity of desugaring by a one-step try. We shall first briefly explain our one-step try resugaring method, and then show that how the "one-step try" can be cheaply done by derivation of evaluation rules for syntactic sugars.
 
 \begin{Codes}
     (resugar (and (or \#t \#f) (and \#f \#t)))
-\DeStep{\quad \note{ \{ a one-step try on the outmost and \}}
+\DeStep{\quad \note{ \{ a one-step try on the outermost and \}}
     (try (if (or \#t \#f) (and \#f \#t) \#f))}
 \OneStep{\quad \note{\{ should reduce on subexpression (or \#t \#f) of and, delay desugaring of and\} }
     (and (resugar (or \#t \#f)) (and \#f \#t))} \note{// no reduction}
@@ -124,7 +124,7 @@ To solve the problem in the traditional approach, we propose a new resugaring ap
 For each step in the above, we make one reduction step and move resugaring focus if desugaring is unnecessary. So $7$ reduction steps are needed for our whole resugaring, while the traditional approach needs $9$ steps ($3$ in desugaring, $3$ in evaluation, $3$ for reverse resugaring). Note that reverse desugaring is more complex and costive because of match and substitution. Note also that the traditional approach would be more redundant if it works on larger expressions.
 %As there is no need for tagging and reverse desugaring, our approach becomes lightweight.
 
-We can go further to make our approach more efficient. As the purpose of a "one-step try" is to determine the computation order of the syntactic sugar, we should be able to derive this computation order through the desugar rules and the computation orders of the core language, rather than just through runtime computation of the core expression as done in the above. As will be shown in Section \ref{sec:ruleDerivation}, we can automatically derive the context rules and reductions rules for both \emph{and} sugar and \emph{or}.
+We can go further to make our approach more efficient. As the purpose of a "one-step try" is to determine the computation order of the syntactic sugar, we should be able to derive this computation order through the desugar rules and the computation orders of the core language, rather than just through runtime computation of the core expression as done in the above. As will be shown in Section \ref{sec:ruleDerivation}, we can automatically derive evaluation rules (consist of the context rules and reductions rules) for both \emph{and} sugar and \emph{or}.
 \[
 \begin{array}{c}
 \infer {(\mbox{and}~e_1~e_2) \rightarrow (\mbox{and}~e_1'~e_2)} {e_1~ \rightarrow~e_1'}
@@ -148,8 +148,8 @@ Now with these rules, our resugaring will need only $4$ steps.
 \OneStep{ \#f}
 \end{Codes}
 
-Two remarks are worh making here. First, we do not require a complete set of reduction/context rules for all syntactic sugars; if we have these rules, we can elaborate them to remove one-step try, and make a shortcut for a sequence of evaluation steps on core expression.
-For example, suppose that we have another syntactic sugar named \emph{hard} whose reduction rules cannot be derived.
+Two remarks are worth making here. First, we do not require a complete set of reduction/context rules for all syntactic sugars; if we have these rules, we can elaborate them to remove one-step try, and make a shortcut for a sequence of evaluation steps on core expression.
+For example, suppose that we have another syntactic sugar named \emph{hard} whose evaluation rules cannot be derived.
 We can still do resugaring on \Code{(and (hard (and \#t \#t) ...) ...)}, as we do early.
 Second, our example does not show the case when a surface expression contains language constructs of the core expression. This does not introduce any difficulty in our method, as we have no reverse desugaring, so there is no worry about desugaring an original core expression to a syntactic sugar. For instance, we can deal with \Code{(and (if \#t then (and \#f \#t) \#f) \#f)}, without resugaring it to \Code{(and (and \#t (and \#f \#t) \#f)}.
 

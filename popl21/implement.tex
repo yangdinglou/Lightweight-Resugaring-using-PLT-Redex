@@ -1,5 +1,6 @@
 %!TEX root = ./main.tex
 \section{Implementation and Case Studies}
+\label{sec5}
 
 \subsection{Implementation}
 
@@ -12,22 +13,62 @@ Our basic resugaring approach is implemented using PLT Redex\cite{SEwPR}, which 
 	\label{fig:frame}
 \end{figure}
 
-Instead of implementing a blackbox stepper of core language, we just used the core language's reduction semantics, because its behavior is same as the stepper with extension for mixed language. We have proved or discussed the correctness with the assumption that the core language's evaluator is a blackbox stepper. In the language model, desugaring rules are written as reduction rules of \m{SurfExp}. And context rules of \m{SurfExp} have no restrict (every subexpressions is reducible as a hole). Then for each resugaring step, we should choose the exact reduction which satisfies the reduction of mixed language's rule (see in section \ref{mark:miexedreduction}).
+In the language model, desugaring rules are written as reduction rules of \m{SurfExp}. And context rules of \m{SurfExp} have no restrict (every subexpressions is reducible as a hole). Then for each resugaring step, we should choose the exact reduction which satisfies the reduction of mixed language's rule (see in Section \ref{mark:miexedreduction}).
+
+\label{mark:blackbox}
+And one may notice the traditional resugaring approach does not need the whole evaluation rules of core language, a black-box stepper is needed instead. We have proved that our approach can also work by just given a black-box stepper, with a tricky extension.
+We use $\redc{}{}$ to denote a reduction step of core language's expression in the black-box stepper, and $\rede{}{}$ to denote a step in the extension evaluator for the mixed language. We may use $\redm{}{}$ to denote one-step reduction in our mixed language, defined in the next section.
+\infrule[CoreRed]
+{ \forall~i.~e_i\in \m{CoreExp}\\
+\redc{(\m{CoreHead}~e_1~\ldots~e_n)}{e'}}
+{\rede{(\m{CoreHead}~e_1~\ldots~e_n)}{e'}}
+\infrule[CoreExt1]
+{ \forall~i.~subst_i= (e_i \in \m{SurfExp}~?~\m{tmpexp}~:~e_i),~where~\m{tmpexp}~is~any~reduciable~\m{CoreExp}\\
+\redc{(\m{CoreHead}~subst_1~\ldots~subst_i~\ldots~subst_n)}{(\m{CoreHead}~subst_1~\ldots~subst_i'~\ldots~subst_n)}}
+{\rede{(\m{CoreHead}~e_1~\ldots~e_i~\ldots~e_n)}{(\m{CoreHead}~e_1~\ldots~e_i'~\ldots~e_n)}\\where~\redm{e_i}{e_i'}~if~e_i~\in~\m{SurfExp},~else~\redc{e_i}{e_i'}}
+\infrule[CoreExt2]
+{ \forall~i.~subst_i= (e_i \in \m{SurfExp}~?~\m{tmpexp}~:~e_i),~where~\m{tmpexp}~is~any~reduciable~\m{CoreExp}\\
+\redc{(\m{CoreHead}~subst_1~\ldots~subst_n)}{e'}~\note{// not reduced in subexpressions}}
+{\rede{(\m{CoreHead}~e_1~\ldots~e_n)}{e'[e_1/subst_1~\ldots~e_n/subst_n]}}
+For expression \Code{(CoreHead $e_1$ ... $e_n$)}, replacing all subexpression not in core language with any reducible core language's term \m{tmpexp}. Then getting a result after inputting the new expression \Code{e'} to the original blackbox stepper. If reduction appears at a subexpression at $e_i$ or what the $e_i$ replaced by, then the stepper with the extension should return \Code{(CoreHead $e_1$ ... $e_i'$ ... $e_n$)}, where $e_i'$ is $e_i$ after the mixed language's one-step reduction ($\redm{}{}$) or after core language's reduction ($\redc{}{}$) (the rule \m{CoreExt1}, an example in Figure \ref{fig:e1}). Otherwise, stepper should return \Code{e'}, with all the replaced subexpressions replacing back. (the rule \m{CoreExt2}, an example in Figure \ref{fig:e2}) The extension will not violate properties of original core language's evaluator. It is obvious that the evaluator with the extension will reduce at the subexpression as it needs in core language, if the reduction appears in a subexpression. One may notice that the stepper with extension behaves the same as mixing the evaluation rules of core language and surface language. The extension is just to make it works when the evaluator of core language is a blackbox stepper. That's why the extension is tricky.
+\begin{center}
+\begin{figure}[thb]
+\centering
+\Code{(if (and e1 e2) true false)}\\ $\Downarrow_{replace}$\\ \Code{(if tmpe1 true false)}\\ $\Downarrow_{blackbox}$\\ \Code{(if tmpe1' true false)}\\ $\Downarrow_{desugar}$\\ \Code{(if (if e1 e2 false) true false)}
+\caption{\m{CoreExt1}'s example}
+\label{fig:e1}
+\end{figure}
+
+\begin{figure}[thb]
+\centering
+\Code{(if (if true ture false) (and ...) (or ...))}\\ $\Downarrow_{replace}$ \\\Code{ (if (if true ture false) tmpe2 tmpe3)}\\ $\Downarrow_{blackbox}$\\  \Code{(if true tmpe2 tmpe3)}\\ $\Downarrow_{replaceback}$\\ \Code{(if true (and ...) (or ...))}
+\caption{\m{CoreExt2}'s example}
+\label{fig:e2}
+\end{figure}
+
+
+ % \Code{(if true (and ...) (or ...))} $\Rightarrow_{replace}$ \Code{(if true tmpe2 tmpe3)} $\Rightarrow_{blackbox}$ \\ \Code{tmpe2} $\Rightarrow_{replaceback}$ \Code{(and ...)}
+
+\end{center}
+
+
+
+% Instead of implementing a blackbox stepper of core language, we just used the core language's reduction semantics, because its behavior is same as the stepper with extension for mixed language. We have proved or discussed the correctness with the assumption that the core language's evaluator is a blackbox stepper. 
 
 \label{mark:optimize}
-Note that in \m{SurfRed1} rule and \m{CoreExt1} rule, there is a recursive call on $\redm{}{}$. We can optimize the resugaring algorithm by recursively resugaring. For example, \Code{(Sugar1 (Sugar2 e21 e22 ...) e11 e12 ...)} as the input, and find the first subexpression should be reduced. We can firstly get the resugaring sequences of \Code{(Sugar2 e21 e22)}
+Note that in \m{SurfRed1} rule and \m{CoreExt1} rule, there is a recursive call on $\redm{}{}$. We can optimize the resugaring algorithm by recursively resugaring. For example, \Code{(Sugar1 (Sugar2 $e_{21}$ $e_{22}$ ...) $e_{11}$ $e_{12}$ ...)} as the input, and find the first subexpression should be reduced. We can firstly get the resugaring sequences of \Code{(Sugar2 $e_{21}$ $e_{22}$)}
 \begin{Codes}
-    (Sugar2 e21 e22 ...)
+    (Sugar2 e_2_1 e_2_2 ...)
 \OneStep{ exp1}
 \DeStep{  exp...} \note{// may be 0 or more steps}
 \OneStep{ expn}
 \end{Codes}
 Then a resugaring subsequence is got as
 \begin{Codes}
-    (Sugar1 (Sugar2 e21 e22 ...) e11 e12 ...)
-\OneStep{ (Sugar1 exp1 e11 e12 ...)}
-\DeStep{  (Sugar1 exp... e11 e12 ...)} \note{// may be 0 or more steps}
-\OneStep{ (Sugar1 expn e11 e12 ...)}
+    (Sugar1 (Sugar2 e_2_1 e_2_2 ...) e_1_1 e_1_2 ...)
+\OneStep{ (Sugar1 exp1 e_1_1 e_1_2 ...)}
+\DeStep{  (Sugar1 exp... e_1_1 e_1_2 ...)} \note{// may be 0 or more steps}
+\OneStep{ (Sugar1 expn e_1_1 e_1_2 ...)}
 \end{Codes}
 Thus, we will not need to try to expand the outermost sugar for each inner step (recursively resugaring for inner expression).
 
@@ -65,7 +106,7 @@ Although SKI combinator calculus is a reduced version of lambda calculus, we can
 \end{Codes}
 
 
-For the existing approach, the sugar expression should firstly desugar to
+For the traditional approach, the sugar expression should firstly desugar to
 \begin{Codes}
 ((lambdaN
    (x1 x2 x3)
@@ -82,7 +123,7 @@ For the existing approach, the sugar expression should firstly desugar to
 Then in our CoreLang, the execution of expanded expression will contain 33 steps. For each step, there will be many attempts to match and substitute the syntactic sugars to resugar the expression. It will omit more steps for a larger expression.
 
 We have described an example of \m{and} sugar and \m{or} sugar in overview. But what if the \m{or} sugar written like follows?
-\[\drule{\Code{(Or e1 e2)}}{\Code{(let (x e1) (if x x e2))}}\]
+\[\drule{\Code{(Or $e_1$ $e_2$)}}{\Code{(let (x $e_1$) (if x x $e_2$))}}\]
 Of course, we got the same evaluation rules as the example in overview.
 \[
 \begin{array}{c}
@@ -99,18 +140,18 @@ Then for expressions headed with \m{or}, we won't need the one-step try to figur
 \label{mark:hygienic}
 
 
-The second work\cite{hygienic} of existing resugaring approach mainly processes hygienic sugar compared to first work. It use a DAG to represent the expression. However, hygiene is not hard to handle by our lazy desugaring strategy. Our algorithm can easily process hygienic sugar without special data structure.
+The second work\cite{hygienic} of traditional resugaring approach mainly processes hygienic sugar compared to first work. It use a DAG to represent the expression. However, hygiene is not hard to handle by our lazy desugaring strategy. Our algorithm can easily process hygienic sugar without special data structure.
 
 
 A typical hygienic problem is as the following example.
 \[
-\drule{\Code{(Hygienicadd e1 e2)}}{\Code{(let (x e1) (+ x e2))}}
+\drule{\Code{(Hygienicadd $e_1$ $e_2$)}}{\Code{(let (x $e_1$) (+ x $e_2$))}}
 \]
 % \begin{Codes}
 % 	(Hygienicadd e1 e2) \DeStep{ (let ((x e1)) (+ x e2))}
 % \end{Codes}
 
-For existing resugaring approach, if we want to get sequences of \Code{(let ((x 2)) (Hygienicadd 1 x))}, it will firstly desugar to \Code{(let ((x 2)) (let ((x 1)) (+ x x)))}, which is awful because the two $x$ in \Code{(+ x x)} should be bind to different value. So existing hygienic resugaring approach use abstract syntax DAG to distinct different \m{x} in the desugared expression. But for our approach based on lazy desugaring, the \m{hygienicadd} sugar does not have to desugar until necessary, so, getting following sequences based on a  rewriting system which renaming the variables during the rewriting.
+For traditional resugaring approach, if we want to get sequences of \Code{(let ((x 2)) (Hygienicadd 1 x))}, it will firstly desugar to \Code{(let ((x 2)) (let ((x 1)) (+ x x)))}, which is awful because the two $x$ in \Code{(+ x x)} should be bind to different value. So traditional hygienic resugaring approach use abstract syntax DAG to distinct different \m{x} in the desugared expression. But for our approach based on lazy desugaring, the \m{hygienicadd} sugar does not have to desugar until necessary, so, getting following sequences based on a  rewriting system which renaming the variables during the rewriting.
 
 \begin{Codes}
     (let ((x 2)) (Hygienicadd 1 x)
@@ -120,7 +161,7 @@ For existing resugaring approach, if we want to get sequences of \Code{(let ((x 
 \end{Codes}
 
 The lazy desugaring is also convenient for hygienic resugaring for non-hygienic rewriting. For example, \Code{(let ((x 1)) (+ x (let ((x 2)) (+ x 1))))} may be reduced to \Code{(+ 1 (let ((1 2)) (+ 1 1)))} by a simple core language whose \Code{let} expression does not handle cases like that. But by writing a simple sugar Let,
-\[\drule{\Code{(Let~e1~e2~e3)}}{\Code{(let~((e1~e2))~e3)}}\]
+\[\drule{\Code{(Let~$e_1$~$e_2$~$e_3$)}}{\Code{(let~(($e_1$~$e_2$))~$e_3$)}}\]
 and some simple modifies in the reduction of mixed language, we will get the following sequences in our system.
 \begin{Codes}
     (Let x 1 (+ x (Let x 2 (+ x 1))))
@@ -135,8 +176,8 @@ In practical application, we think hygiene can be easily processed by rewriting 
 And for the derivation method, there is no rewriting system at all, but the hygiene is handled more concisely. we build a hygienic sugar \m{Hygienicor} based the \m{or} sugar.
 \[
 \begin{array}{l}
-\drule{\Code{(Or e1 e2)}}{\Code{(let (x e1) (if x x e2))}}\\
-\drule{\Code{(Hygienicor e1 e2)}}{\Code{(let (x e1) (or e2 x))}}
+\drule{\Code{(Or $e_1$ $e_2$)}}{\Code{(let (x $e_1$) (if x x $e_2$))}}\\
+\drule{\Code{(Hygienicor $e_1$ $e_2$)}}{\Code{(let (x $e_1$) (or $e_2$ x))}}
 \end{array}
 \]
 Though no need to write the sugar like that, something wrong may happen without hygienic rewriting system (\Code{(if x x x)} appears). But by the method introduced in \todo{..}, we can easily get the following rules, which will behave as it should be in resugaring.
@@ -160,11 +201,11 @@ Overall, our result shows lazy desugaring is really a good way to handle hygieni
 Recursive sugar is a kind of syntactic sugars where call itself or each other during the expanding. For example,
 \[
 \begin{array}{l}
-\drule{(\m{Odd}~e)~}{\Code{(if (> e 0) (Even (- e 1)) \false)}}\\
-\drule{(\m{Even}~e)}{\Code{(if (> e 0) (Odd (- e 1)) \true)}}
+\drule{(\m{Odd}~$e$)~}{\Code{(if (> $e$ 0) (Even (- $e$ 1)) \false)}}\\
+\drule{(\m{Even}~$e$)}{\Code{(if (> $e$ 0) (Odd (- $e$ 1)) \true)}}
 \end{array}
 \]
-are common recursive sugars. The existing resugaring approach can't process syntactic sugar written as this (non pattern-based) easily, because boundary conditions are in the sugar itself.
+are common recursive sugars. The traditional resugaring approach can't process syntactic sugar written as this (non pattern-based) easily, because boundary conditions are in the sugar itself.
 
 Take $(Odd~2)$ as an example. The previous work will firstly desugar the expression using the rewriting system. Then the rewriting system will never terminate as following shows.
 \begin{Codes}
@@ -188,13 +229,13 @@ Then the advantage of our approach is embodied. Our lightweight approach doesn't
 
 
 We also construct some higher-order syntactic sugars and test them. The higher-order feature is important for constructing practical syntactic sugars. And many higher-order sugars should be constructed by recursive definition. The first sugar is \m{filter}, implemented by pattern matching term rewriting.
-\[\Code{(filter e (list v1 v2 ...))}\]
+\[\Code{(filter $e$ (list $v_1$ $v_2$ ...))}\]
 \[
 \drule{}
-{\Code{(if (e v1) (cons v1 (filter e (list v2 ...)))\ (filter e (list v2 ...)))}}
+{\Code{(if ($e$ $v_1$) (cons $v_1$ (filter $e$ (list $v_2$ ...)))\ (filter $e$ (list $v_2$ ...)))}}
 \]
 \[
-\drule{\Code{(filter e (list))}}{\Code{(list)}}
+\drule{\Code{(filter $e$ (list))}}{\Code{(list)}}
 \]
 and getting the following result.
 
@@ -209,12 +250,12 @@ and getting the following result.
 \OneStep{ (list 2 3)}
 \end{Codes}
 
-Here, although the sugar can be processed by existing resugaring approach, it will be redundant. The reason is that, a filter for a list of length $n$ will match to find possible resugaring $n*(n-1)/2$ times. Thus, lazy desugaring is really important to reduce the resugaring complexity of recursive sugar.
+Here, although the sugar can be processed by traditional resugaring approach, it will be redundant. The reason is that, a filter for a list of length $n$ will match to find possible resugaring $n*(n-1)/2$ times. Thus, lazy desugaring is really important to reduce the resugaring complexity of recursive sugar.
 
 Moreover, just like the \emph{Odd and Even} sugar above, there are some simple rewriting systems which do not allow pattern-based rewriting. Or there are some sugars which need to be expressed by the terms in core language as rewriting conditions. Take the example of another higher-order sugar \m{map} as an example.
 \[
 \begin{array}{l}
-\drule{\Code{(map e1 e2)}}{}\\
+\drule{\Code{(map $e_1$ e2)}}{}\\
 \Code{(let ((x e2)) (if (empty x) (list) (cons (e1 (first x)) (map e1 (rest x)))))}
 \end{array}
 \]
