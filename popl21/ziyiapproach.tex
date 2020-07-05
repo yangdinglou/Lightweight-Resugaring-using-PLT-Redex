@@ -28,7 +28,7 @@ We will define a mixed language for a given core language and a surface language
 
 \subsubsection{Core Language}
 
-For our host language, we consider its evaluator as a blackbox %\todo{need to be corrected.} 
+For our host language, we consider its evaluator as a blackbox %\todo{need to be corrected.}
 but with two natural assumptions. First, there is a deterministic stepper in the evaluator which, given an expression in the host language, can deterministically reduce the expression to a new expression. Second, the evaluation of any sub-expression has no side-effect on other parts of the whole expression.
 
 An expression of the core language is defined in Figure \ref{fig:expression}. It is a variable, a constant, or a (language) constructor expression. Here, $\m{CoreHead}$ stands for a language constructor such as $\m{if}$ and $\m{let}$. To be concrete, we will use a simplified core language defined in Figure \ref{fig:core} to demonstrate our approach. \todo{semantic needed?}
@@ -107,7 +107,7 @@ We assume that all desugaring rules are not overlapped in the sense that for a s
 \\
 			\m{CoreExp} &::=& \m{CoreExp'}\\
 						 &|& \m{CommonExp}\\
-\\						
+\\
 			\m{CoreExp'} &::=& (\m{CoreHead'}~\m{Exp}*)\\
 \\
 			\m{SurfExp} &::=& (\m{SurfHead}~\m{DisplayableExp}*)\\
@@ -256,7 +256,7 @@ if $e$ is headed with \m{SurfHead}, then the $redm{}{}$ will execute recursively
 \begin{proof}[Proof of Lemma \ref{lemma1}]
 \hfill
 
-For \m{SurfRed1} rule, $\redm{(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)}{(\m{SurfHead}~e_1~\ldots~e_i''~\ldots~e_n)}$, where $\redm{e_i}{e_i''}$. 
+For \m{SurfRed1} rule, $\redm{(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)}{(\m{SurfHead}~e_1~\ldots~e_i''~\ldots~e_n)}$, where $\redm{e_i}{e_i''}$.
 If $\m{fulldesugar}(e_i)$=$\m{fulldesugar}(e_i'')$, then \m{fulldesugar}(\m{Exp})=\m{fulldesugar}(\m{Exp'}). If not,  what we need to prove is that, $\redc{\m{fulldesugar}(\m{Exp})}{\m{fulldesugar}(\m{Exp'})}$. Note that the only difference between \m{Exp} and \m{Exp'} is the i-th subexpression, and we have proved the lemma \ref{lemma2} that the subexpression is the one to be reduced after the expression desugared totally, it will be also a recursive proof on the subexpression $e_i$.
 
 For \m{SurfRed2} rule, \m{Exp'} is \m{Exp} after the outermost sugar resugared. So \m{fulldesugar}(\m{Exp})=
@@ -394,7 +394,7 @@ So the unidirectional resugaring algorithm makes our approach lightweight, becau
 \label{mark:hygienic}
 
 
-The second work\cite{hygienic} of existing resugaring approach mainly processes hygienic sugar compared to first work. It use a DAG to represent the expression. However, hygiene is not hard to handle by our lazy desugaring strategy. Our algorithm can easily process hygienic sugar without special data structure. 
+The second work\cite{hygienic} of existing resugaring approach mainly processes hygienic sugar compared to first work. It use a DAG to represent the expression. However, hygiene is not hard to handle by our lazy desugaring strategy. Our algorithm can easily process hygienic sugar without special data structure.
 
 
 A typical hygienic problem is as the following example.
@@ -428,6 +428,8 @@ and some simple modifies in the reduction of mixed language, we will get the fol
 In practical application, we think hygiene can be easily processed by rewriting system, so we just use a rewriting system which can rename variable automatically. But our result shows lazy desugaring is really a good way to handle hygienic sugar in any systems.
 
 \subsubsection{recursive sugar}
+\label{sec:recursiveSugar}
+
 Recursive sugar is a kind of syntactic sugars where call itself or each other during the expanding. For example,
 \[
 \begin{array}{l}
@@ -509,9 +511,8 @@ As mentioned many times before, the biggest difference between previous resugari
 
 \begin{itemize}
 	\item \emph{Lightweight and efficient.} Our approach does not need tags to mark desugaring information as existing approaches, and only unidirectional desugaring is needed, so it is a lightweight approach. As the example at sec\ref{mark:simple}, the match and substitution process searches all intermediate sequences many times. It will cause huge cost for a large program. So out approach---only expanding a syntactic sugar when necessarily, is a efficient approach.
-	\item \emph{Friendly to hygienic sugar} Previous hygienic resugaring approach use a new data structure to process resugaring of hygienic sugar. Our approach simply desugar the sugars 
+	\item \emph{Friendly to hygienic sugar} Previous hygienic resugaring approach use a new data structure to process resugaring of hygienic sugar. Our approach simply desugar the sugars
 	\item \emph{More syntactic sugar features} The ability of processing non-pattern-based (\todo{inline?}) recursive sugar is a superiority compared to previous work. The key point is that recursive syntactic sugar must handle boundary conditions. Our approach handle them easily by not necessarily desugaring all syntactic sugars. Higher-order functions, as an important feature of functional programming, was supported by many daily programming languages. Lazy desugaring makes writing higher-order sugars easier.
 	\item \todo{easier sugar?}
 	% \item {\emph Rewriting rules based on reduction semantics} Any syntactic sugar that can expressed by reduction semantics can be used in our approach. It will give more possible forms for constructing syntactic sugars. todo:example?
 \end{itemize}
-

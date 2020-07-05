@@ -1,5 +1,6 @@
 %!TEX root = ./main.tex
 \section{Static Approach}
+\label{sec:ruleDerivation}
 
 In this section, we introduce a static approach, which is more efficient than the one discussed above.
 
@@ -18,7 +19,7 @@ The arrow from e1 to e2 indicate that this branch will be selected when the resu
 
 Sometimes the rules may be more complex, such as being reduced into another syntactic structure, or the term contains other syntactic structures. For example, we can express nand's inference rule in the form of AAAR2. Based on the method discussed above, we can draw nand's IFA as AAAP2.
 
-When the automaton runs to the last node, its evaluation rule is essentially an evaluation of the if syntax structure. Thus we can replace the last node with an IFA\_if and use the IFA\_if termination nodes as the termination nodes of the IFA\_Nand. The results are shown in AAAP3. Further decomposing the intermediate nodes, connecting the terminating node of IFA\_if to the node pointed to by the original output edge, we get AAAP4. 
+When the automaton runs to the last node, its evaluation rule is essentially an evaluation of the if syntax structure. Thus we can replace the last node with an IFA\_if and use the IFA\_if termination nodes as the termination nodes of the IFA\_Nand. The results are shown in AAAP3. Further decomposing the intermediate nodes, connecting the terminating node of IFA\_if to the node pointed to by the original output edge, we get AAAP4.
 
 As can be seen, the nodes of IFA in AAAP4 have only the forms e\_i, v\_i and values, and no other composite syntactic structure.  We call such an IFbA a \textit{standard IFA}.
 
@@ -38,7 +39,7 @@ An inference automaton (IFA) of syntactic structure $(\m{Headid}~e_1 \ldots e_n)
     \item A finite set of nodes $Q$, each node contains a term and a symbol table
     \item A finite set of pattern $\Sigma$
     \item A start node $q_0 \in Q$
-    \item A set of terminal nodes $F \subseteq Q$ 
+    \item A set of terminal nodes $F \subseteq Q$
     \item A transition function $\delta: (Q-F) \times \Sigma' \to Q$ where $\Sigma' \subseteq \Sigma$
 \end{itemize}
 
@@ -46,14 +47,14 @@ and for each node $q$, there is no sequence of pattern $P = (p_1,p_2,\ldots,p_n)
 
 \end{Def}
 
-The last constraint requires that there be no circles in our IFA. 
+The last constraint requires that there be no circles in our IFA.
 
-In IFA, state transition does not depend on input. The only input IFA accepts is the term to be evaluated with this syntactic structure. The state transition is through pattern matching on the evaluation result of the term in the previous node. Note that IFA is associated with syntactic structure. At Each IFA only represents the current evaluation of a syntactic structure. The state indicates that some 
+In IFA, state transition does not depend on input. The only input IFA accepts is the term to be evaluated with this syntactic structure. The state transition is through pattern matching on the evaluation result of the term in the previous node. Note that IFA is associated with syntactic structure. At Each IFA only represents the current evaluation of a syntactic structure. The state indicates that some
 sub-expressions of the syntactic structure have been evaluated, and the rest have not.
 
 \begin{Def}[Standard IFA]
 
-If the term of node in $Q$ can only be $e_i$ (where $i \in {1,\ldots,n}$) or a value, we name the IFA standard IFA. 
+If the term of node in $Q$ can only be $e_i$ (where $i \in {1,\ldots,n}$) or a value, we name the IFA standard IFA.
 
 \end{Def}
 
@@ -69,7 +70,7 @@ Considering an IFA of a syntactic structure, if the standard IFAs of all syntact
 
 \subsection{Convert inference rules to IFA}
 
-Considering the inference rules in CoreLang, which we have more strict limits on. 
+Considering the inference rules in CoreLang, which we have more strict limits on.
 
 \textit{Assumption 1}. A syntactic structure $Headid$ only contains the following inference rules.
 
@@ -109,9 +110,9 @@ We generate a node for each rule and insert them into $Q$. If the rule is a redu
 
 For a term like $(\m{Headid}~e_1~\ldots~e_n)$, considering that $e_1\cdots e_n$ are not value, According to Assumption 3, we have the unique rule $r$ of $Headid$ for one-step evaluation. Let node $q$ corresponding to $r$ be $q_0$.
 
-If $r$ is a context rule for $e_i$, let the term of $q_0$ be build a new node $q$ and add it into $Q$. The term of $q$ is $e_i$. And the symbol table is set to empty. Assume that the evaluation of $e_i$ results in $v_i$, we get term $(\m{Headid}~e_1 \ldots e_{i-1}~v_i~e_{i+1} \ldots e_n)$. For each possible value of $v_i$, choose the rules that should be used. 
+If $r$ is a context rule for $e_i$, let the term of $q_0$ be build a new node $q$ and add it into $Q$. The term of $q$ is $e_i$. And the symbol table is set to empty. Assume that the evaluation of $e_i$ results in $v_i$, we get term $(\m{Headid}~e_1 \ldots e_{i-1}~v_i~e_{i+1} \ldots e_n)$. For each possible value of $v_i$, choose the rules that should be used.
 
-If $r$ is a reduction rule, build a new node $q$ and add it into $Q$ and $F$. The term of $q$ is $e_i$, and the symbol table is set to 
+If $r$ is a reduction rule, build a new node $q$ and add it into $Q$ and $F$. The term of $q$ is $e_i$, and the symbol table is set to
 
 
 
@@ -133,10 +134,10 @@ With the IFA, we can easily get the inference rules for syntactic sugars.
 
 \begin{Def}
 
-Considering the following syntactic sugar 
+Considering the following syntactic sugar
 \[
 \drule{(\m{SurfHead}~x_1~\ldots~x_n)}{e},
-\] 
+\]
 the IFA of \m{SurfHead} is defined as the IFA of syntactic structure \m{SurfHead'} whose inference rule is
 \[
 (\m{SurfHead'}~x_1~\ldots~x_n)\rightarrow e.
