@@ -194,9 +194,14 @@
 \begin{abstract}
 
 
-Syntactic sugars provide an effective way to define domain-specific languages and extend languages. However, the programs after desugaring to a host language would be unrecognizable  especially for people who are unfamiliar with the host language. Moreover, the programs lose correspondence with the surface language defined by sugars, which is a leaky of abstraction.
+Syntactic sugar, first coined by Peter J. Landin in 1964, has proved to be very useful for defining domain specific languages and extending languages.
+  Unfortunately, when syntactic sugar is eliminated by transformation, it obscures the relationship between the user’s source program and the transformed program.
+Resugaring is a powerful technique to resolve this problem, which automatically converts the evaluation sequences of desugared expression in the core language into representative sugar's syntax in the surface language. However, the existing approach
+relies on reverse application of desugaring rules to desugared core expression whenever possible. When a desugar rule is complex and a desugared expression is large, such reverse desugaring becomes very complex  and costive.
 
-\emph{Resugaring} is an method to solve the problem above. In this paper, we purposed an approach of resugaring  based on lazy desugaring---getting evaluation sequences without fully desugaring the whole syntactic sugar expression. We purposed a automatic derivation method for part of sugar abstracted from the basic resugaring algorithm. They can work together on resugaring tasks. We implement our approach and test on some application. The result show that our resugaring approach is a efficient, powerful and lightweight approach.
+In this paper, we propose a novel approach to resugaring by lazy desugaring, where reverse application of desugaring rules is unnecessary. We recognize a sufficient and necessary condition for a syntactic sugar to be desugared, and propose a reduction strategy, based on reduction rules of the core languages and the desugaring rules, which is sufficient to produce all necessary resugared terms on the surface language. We show that this approach can be made more efficient by automatic derivation of reductions rules for syntactic sugars.
+We have implemented a system based on this new approach. Compared to the traditional systems, the new system is not only more efficient, but also more powerful in that it cannot only deal with all cases (such as hygenic and simple recursive sugars) published so far, but can do more allowing more flexible recursive sugars.
+
 \end{abstract}
 
 
