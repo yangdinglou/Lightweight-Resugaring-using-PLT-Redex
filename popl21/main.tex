@@ -194,9 +194,9 @@
 \begin{abstract}
 
 
-Syntactic sugars provide an effective way to define and implement domain-specific languages. However, the programs after desugaring to a host language would be unrecognizable for people who are unfamiliar with the host language, which is bad because domain-specific languages are not always used by programmers.
+Syntactic sugars provide an effective way to define domain-specific languages and extend languages. However, the programs after desugaring to a host language would be unrecognizable  especially for people who are unfamiliar with the host language. Moreover, the programs lose correspondence with the surface language defined by sugars, which is a leaky of abstraction.
 
-\emph{Resugaring} is an method to solve the problem above. In this paper, we purposed an approach of resugaring mixed with two approachesm, based on lazy desugaring---getting evaluation sequences without fully desugaring the whole syntactic sugar expression. The first approach is lightweight but powerful, which lazy desugaring the sugars in programs. The second approach is efficent, which gets inference rules of sugars, then runs the programs using new inferences rules.
+\emph{Resugaring} is an method to solve the problem above. In this paper, we purposed an approach of resugaring  based on lazy desugaring---getting evaluation sequences without fully desugaring the whole syntactic sugar expression. We purposed a automatic derivation method for part of sugar abstracted from the basic resugaring algorithm. They can work together on resugaring tasks. We implement our approach and test on some application. The result show that our resugaring approach is a efficient, powerful and lightweight approach.
 \end{abstract}
 
 

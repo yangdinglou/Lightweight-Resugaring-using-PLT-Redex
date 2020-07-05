@@ -346,7 +346,7 @@ We test some applications on the tool. Note that we set call-by-value lambda cal
 
 We construct some simple syntactic sugars and try it on our tool. Some sugar is inspired by the first work of resugaring\cite{resugaring}. The result shows that our approach can handle all sugar features of their first work.
 
-We take a SKI combinator syntactic sugar as an example. We will show why our approach is lightweight.
+We take a SKI combinator syntactic sugar as an example. We will show why our approach is efficient.
 \[
 \begin{array}{l}
 \drule{\m{S}}{\Code{(lambdaN (x1 x2 x3) (x1 x2 (x1 x3)))}}\\
@@ -389,7 +389,7 @@ For the existing approach, the sugar expression should firstly desugar to
 \end{Codes}
 
 Then in our CoreLang, the execution of expanded expression will contain 33 steps. For each step, there will be many attempts to match and substitute the syntactic sugars to resugar the expression. It will omit more steps for a larger expression.
-So the unidirectional resugaring algorithm makes our approach lightweight, because no attempts for resugaring the expression are needed.
+So the unidirectional resugaring algorithm makes our approach efficient, because no attempts for resugaring the expression are needed.
 \subsubsection{hygienic sugar}
 \label{mark:hygienic}
 
@@ -505,14 +505,14 @@ Get following resugaring sequences.
 
 Note that the \m{let} term is to limit the subexpression only appears once in RHS. In this example, we can find that the list \Code{(cons 1 (list 2))}, though equal to \Code{(list 1 2)}, is represented by core language's term. So it will be difficult to handle such inline boundary conditions by rewriting system. But our approach is easy to handle cases like this.
 
-\subsection{Compare to previous work}
+% \subsection{Compare to previous work}
 
-As mentioned many times before, the biggest difference between previous resugaring approach and our approach, is that our approach doesn't need to desugar the sugar expression totally. Thus, our approach has the following advantages compared to previous work.
+% As mentioned many times before, the biggest difference between previous resugaring approach and our approach, is that our approach doesn't need to desugar the sugar expression totally. Thus, our approach has the following advantages compared to previous work.
 
-\begin{itemize}
-	\item \emph{Lightweight and efficient.} Our approach does not need tags to mark desugaring information as existing approaches, and only unidirectional desugaring is needed, so it is a lightweight approach. As the example at sec\ref{mark:simple}, the match and substitution process searches all intermediate sequences many times. It will cause huge cost for a large program. So out approach---only expanding a syntactic sugar when necessarily, is a efficient approach.
-	\item \emph{Friendly to hygienic sugar} Previous hygienic resugaring approach use a new data structure to process resugaring of hygienic sugar. Our approach simply desugar the sugars
-	\item \emph{More syntactic sugar features} The ability of processing non-pattern-based (\todo{inline?}) recursive sugar is a superiority compared to previous work. The key point is that recursive syntactic sugar must handle boundary conditions. Our approach handle them easily by not necessarily desugaring all syntactic sugars. Higher-order functions, as an important feature of functional programming, was supported by many daily programming languages. Lazy desugaring makes writing higher-order sugars easier.
-	\item \todo{easier sugar?}
-	% \item {\emph Rewriting rules based on reduction semantics} Any syntactic sugar that can expressed by reduction semantics can be used in our approach. It will give more possible forms for constructing syntactic sugars. todo:example?
-\end{itemize}
+% \begin{itemize}
+% 	\item \emph{Lightweight and efficient.} Our approach does not need tags to mark desugaring information as existing approaches, and only unidirectional desugaring is needed, so it is a lightweight approach. As the example at sec\ref{mark:simple}, the match and substitution process searches all intermediate sequences many times. It will cause huge cost for a large program. So out approach---only expanding a syntactic sugar when necessarily, is a efficient approach.
+% 	\item \emph{Friendly to hygienic sugar} Previous hygienic resugaring approach use a new data structure to process resugaring of hygienic sugar. Our approach simply desugar the sugars
+% 	\item \emph{More syntactic sugar features} The ability of processing non-pattern-based (\todo{inline?}) recursive sugar is a superiority compared to previous work. The key point is that recursive syntactic sugar must handle boundary conditions. Our approach handle them easily by not necessarily desugaring all syntactic sugars. Higher-order functions, as an important feature of functional programming, was supported by many daily programming languages. Lazy desugaring makes writing higher-order sugars easier.
+% 	\item \todo{easier sugar?}
+% 	% \item {\emph Rewriting rules based on reduction semantics} Any syntactic sugar that can expressed by reduction semantics can be used in our approach. It will give more possible forms for constructing syntactic sugars. todo:example?
+% \end{itemize}
