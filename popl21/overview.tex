@@ -150,8 +150,11 @@ Now with these rules, our resugaring will need only $4$ steps.
 Two remarks are worh making here. First, we do not require a complete set of reduction/context rules for all syntactic sugars. If we have these rules, we can use them to remove one-step try, and make a shortcut for a sequence of evaluation steps on core expression.
 For example, suppose that we have another syntactic sugar named \emph{hard} whose reduction rules cannot be derived.
 We can still do resugaring on \Code{(and (hard (and \#t \#t) ...) ...)}, as we do early.
+Second, our example does not show the case when a surface expression contains language constructs of the core expression. This does not introduce any difficulty in our method, as we have no reverse desugaring, so there is no worry about desugaring an original core expression to a syntac sugar. For instance, we can deal with \Code{(and (if \#t then (and \#f \#t) \#f) \#f)}, without resuaring it to \Code{(and (and \#t (and \#f \#t) \#f)}.
 
-\subsection{Features of Our Approach}
+where \Code{if} is used in the surface language. Our method can deal with this without any change.
+
+\subsection{New Features}
 
 As will be seen clearly in the rest of this paper, our approach has the following new features.
 \begin{itemize}
