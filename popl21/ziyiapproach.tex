@@ -17,7 +17,7 @@ In this section, we present our new approach to resugaring. Different from the t
 	\\
 	 &\m{SurfExp} &::=& x  & \note{variable}\\
 	       &&~|~& c  & \note{constant}\\
-				 &&~|~& (\m{SurfHead}~\m{SurfExp}_1~\ldots~\m{SurfExp}_n) & \note{sugar expression}
+				 &&~|~& (\m{SurfHead}~\m{SurfExp}_1~\ldots~\m{SurfExp}_n) & \note{sugar constructor}
 	\end{array}
 	\]
 	\caption{Core and Surface Expressions}
@@ -28,8 +28,7 @@ We will define a mixed language for a given core language and a surface language
 
 \subsubsection{Core Language}
 
-For our host language, we consider its evaluator as a blackbox %\todo{need to be corrected.}
-but with two natural assumptions. First, there is a deterministic stepper in the evaluator which, given an expression in the host language, can deterministically reduce the expression to a new expression. Second, the evaluation of any sub-expression has no side-effect on other parts of the whole expression.
+For our host language, we consider its evaluation rules (context rules + reduction rules) as the evaluator, with two natural assumptions. First, there is a deterministic evaluator in the evaluator which, given an expression in the host language, can deterministically reduce the expression to a new expression. Second, the evaluation of any sub-expression has no side-effect on other parts of the whole expression. We will discuss about how to extend our approach with a black-box stepper as the evaluator in Section \ref{mark:blackbox}.
 
 An expression of the core language is defined in Figure \ref{fig:expression}. It is a variable, a constant, or a (language) constructor expression. Here, $\m{CoreHead}$ stands for a language constructor such as $\m{if}$ and $\m{let}$. To be concrete, we will use a simplified core language defined in Figure \ref{fig:core} to demonstrate our approach. \todo{semantic needed?}
 
@@ -112,6 +111,7 @@ We assume that all desugaring rules are not overlapped in the sense that for a s
 \\
 			\m{CoreExp} &::=& \m{CoreExp'}\\
 						 &|& \m{CommonExp}\\
+						 &|& \m{OtherCommonExp}\\
 \\
 			\m{CoreExp'} &::=& (\m{CoreHead'}~\m{Exp}*)\\
 \\
@@ -133,64 +133,37 @@ We assume that all desugaring rules are not overlapped in the sense that for a s
 \label{fig:mix}
 \end{figure}
 
-Our mixed language for resugaring combines the surface language and the core language.
+Our mixed language for resugaring combines the surface language and the core language, described in Figure \ref{fig:mix}.
 %
 The differences between terms in our core language (CoreLang) and those in our surface language (SurfLang) are identified by their \m{Head}. But there may be some terms in the core language should be displayed during evaluation, or we need some core terms to help us getting better resugaring sequences . So we defined \m{CommonExp}, which origin from CoreLang, but can be displayed in resugaring sequences. The \m{Core'Exp} terms are terms with undisplayable \m{CoreHead} (named \m{CoreHead'}). The \m{SurfExp} terms are terms with \m{SurfHead} and all subexpressions are displayable. The \m{CommonExp} terms are terms with displayable CoreLang's \m{Head} (named \m{CommonHead}), together with displayable subexpressions. There exists some other expressions during our resugaring process, which have displayable \m{Head}, but one or more subexpressions should not display. They are \m{UndisplayableExp}. We distinct the two kinds of expression for \emph{abstraction} property (discussed in Section \ref{mark:abs}).
 
 Take some terms in the core language in Figure \ref{fig:core} as examples.
 We may assume \m{if}, \m{let}, \m{$\lambda _{N}$} (call-by-name lambda calculus), \m{empty}, \m{first}, \m{rest} as \m{CoreHead'}, \m{op}, \m{$\lambda$}, \m{cons} as \m{CommonHead}. Then we would show some useful intermediate steps.
 
-Note that some expressions with \m{CoreHead} contains subexpressions with \m{SurfHead}, they are of \m{CoreExp} but not in core language, we need a tricky extension for the core language's evaluator.
-We use $\redc{}{}$ to denote a reduction step of core language's expression, and $\rede{}{}$ to denote a step in the extension evaluator for the mixed language. We may use $\redm{}{}$ to denote one-step reduction in our mixed language, defined in the next section.
-\infrule[CoreRed]
-{ \forall~i.~e_i\in \m{CoreExp}\\
-\redc{(\m{CoreHead}~e_1~\ldots~e_n)}{e'}}
-{\rede{(\m{CoreHead}~e_1~\ldots~e_n)}{e'}}
-\infrule[CoreExt1]
-{ \forall~i.~subst_i= (e_i \in \m{SurfExp}~?~\m{tmpexp}~:~e_i),~where~\m{tmpexp}~is~any~reduciable~\m{CoreExp}\\
-\redc{(\m{CoreHead}~subst_1~\ldots~subst_i~\ldots~subst_n)}{(\m{CoreHead}~subst_1~\ldots~subst_i'~\ldots~subst_n)}}
-{\rede{(\m{CoreHead}~e_1~\ldots~e_i~\ldots~e_n)}{(\m{CoreHead}~e_1~\ldots~e_i'~\ldots~e_n)}\\where~\redm{e_i}{e_i'}~if~e_i~\in~\m{SurfExp},~else~\redc{e_i}{e_i'}}
-\infrule[CoreExt2]
-{ \forall~i.~subst_i= (e_i \in \m{SurfExp}~?~\m{tmpexp}~:~e_i),~where~\m{tmpexp}~is~any~reduciable~\m{CoreExp}\\
-\redc{(\m{CoreHead}~subst_1~\ldots~subst_n)}{e'}~\note{// not reduced in subexpressions}}
-{\rede{(\m{CoreHead}~e_1~\ldots~e_n)}{e'[e_1/subst_1~\ldots~e_n/subst_n]}}
-For expression \Code{(CoreHead $e_1$ ... $e_n$)}, replacing all subexpression not in core language with any reducible core language's term \m{tmpexp}. Then getting a result after inputting the new expression \Code{e'} to the original blackbox stepper. If reduction appears at a subexpression at $e_i$ or what the $e_i$ replaced by, then the stepper with the extension should return \Code{(CoreHead $e_1$ ... $e_i'$ ... $e_n$)}, where $e_i'$ is $e_i$ after the mixed language's one-step reduction ($\redm{}{}$) or after core language's reduction ($\redc{}{}$) (the rule \m{CoreExt1}, an example in Figure \ref{fig:e1}). Otherwise, stepper should return \Code{e'}, with all the replaced subexpressions replacing back. (the rule \m{CoreExt2}, an example in Figure \ref{fig:e2}) The extension will not violate properties of original core language's evaluator. It is obvious that the evaluator with the extension will reduce at the subexpression as it needs in core language, if the reduction appears in a subexpression. One may notice that the stepper with extension behaves the same as mixing the evaluation rules of core language and surface language. The extension is just to make it works when the evaluator of core language is a blackbox stepper. That's why the extension is tricky.
+Note that some expressions with \m{CoreHead} contains subexpressions with \m{SurfHead}, they are of \m{CoreExp} but not in core language (that is why we need an extension for black-box stepper of core language). In the mixed language, we process these terms by core language's context rule, and the reduction rules of core language and the desugar rules of surface language are mixed as a whole (the $\redc{}{}$ in next section). For example, we have context rule
+\[
+\infer{(\m{if}~e_1~e_2~e_3) \rightarrow (\m{if}~e_1'~e_2~e_3)}{e_1 \rightarrow e_1'}
+\]
+then if $e_1$ is a term in core language, it will reduce by the reduction rule in core language; if $e_1$ is a \m{SurfExp}, it will reduce by the desugar rule of $e_1$'s \m{Head} (how the subexpression reduced does not matter, because it is just to mark the location where should be reduced); if $e_1$ is also a \m{CoreExp} with non-core subexpressions, a recursive reduction by $\redc{}{}$ is needed.
 
-\begin{center}
-\begin{figure}[thb]
-\centering
-\Code{(if (and e1 e2) true false)}\\ $\Downarrow_{replace}$\\ \Code{(if tmpe1 true false)}\\ $\Downarrow_{blackbox}$\\ \Code{(if tmpe1' true false)}\\ $\Downarrow_{desugar}$\\ \Code{(if (if e1 e2 false) true false)}
-\caption{\m{CoreExt1}'s example}
-\label{fig:e1}
-\end{figure}
-
-\begin{figure}[thb]
-\centering
-\Code{(if (if true ture false) (and ...) (or ...))}\\ $\Downarrow_{replace}$ \\\Code{ (if (if true ture false) tmpe2 tmpe3)}\\ $\Downarrow_{blackbox}$\\  \Code{(if true tmpe2 tmpe3)}\\ $\Downarrow_{replaceback}$\\ \Code{(if true (and ...) (or ...))}
-\caption{\m{CoreExt2}'s example}
-\label{fig:e2}
-\end{figure}
-
-
- % \Code{(if true (and ...) (or ...))} $\Rightarrow_{replace}$ \Code{(if true tmpe2 tmpe3)} $\Rightarrow_{blackbox}$ \\ \Code{tmpe2} $\Rightarrow_{replaceback}$ \Code{(and ...)}
-
-\end{center}
 
 \subsection{Resugaring Algorithm}
 
-Our resugaring algorithm works on our mixed language, based on the evaluator of the core language and the desugaring rules for defining the surface language. Let $\rede{}{}$ denote the one-step reduction of the core language (based on the blackbox stepper with extension), and $\drule{}{}$ the one-step desugaring of outermost sugar. We define $\redm{}{}$, the one-step reduction of our mixed language, as follows.
-
-\label{mark:miexedreduction}
-\infrule[ExtRed]
-{\rede{(\m{CoreHead}~e_1~\ldots~e_n)}{e'}}
-{\redm{(\m{CoreHead}~e_1~\ldots~e_n)}{e'}}
-
+Our resugaring algorithm works on our mixed language, based on the evaluator of the core language and the desugaring rules for defining the surface language. Let $\redc{}{}$ denote the one-step reduction of the \m{CoreExp} (described in previous section), and $\drule{}{}$ the one-step desugaring of outermost sugar. We define $\redm{}{}$, the one-step reduction of our mixed language, as follows.
+\label{mark:mixedreduction}
+\infrule[CoreRed1]
+{\redm{e_i}{e_i''}\\
+\exists i.\, \redc{(\m{CoreHead}~e_1~\ldots~e_i~\ldots~e_n)}{(\m{CoreHead}~e_1~\ldots~e_i'~\ldots~e_n)},~and~e_i~is~\m{SurfExp}~term}
+{\redm{(\m{CoreHead}~e_1~\ldots~e_i~\ldots~e_n)}{(\m{CoreHead}~e_1~\ldots~e_i''~\ldots~e_n)}}
+\infrule[CoreRed2]
+{\redc{(\m{CoreHead}~e_1~\ldots~e_n)}{e'}\\
+\neg \exists i.\, \redc{(\m{CoreHead}~e_1~\ldots~e_i~\ldots~e_n)}{(\m{CoreHead}~e_1~\ldots~e_i'~\ldots~e_n)}\,~and~e_i~is~\m{SurfExp}~term}
+{\redm{(\m{CoreHead}~e_1~\ldots~e_i~\ldots~e_n)}{e'}}
 \infrule[SurfRed1]
 {\drule{(\m{SurfHead}~x_1~\ldots~x_i~\ldots~x_n)}{e},~\redm{e_i}{e_i''}\\
 \exists i.\, \redm{e[e_1/x,\ldots,e_i/x_i,\ldots,e_n/x_n]}{e[e_1/x,\ldots,e_i'/x_i,\ldots,e_n/x_n]}
 }
 {\redm{(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)}{(\m{SurfHead}~e_1~\ldots~e_i''~\ldots~e_n)}}
-
 \infrule[SurfRed2]
 {\drule{(\m{SurfHead}~x_1~\ldots~x_i~\ldots~x_n)}{e}\\
 \neg \exists i.\, \redm{e[e_1/x_1,\ldots,e_i/x_i,\ldots,e_n/x_n]}{e[e_1/x_1,\ldots,e_i'/x_i,\ldots,e_n/x_n]}
@@ -198,7 +171,10 @@ Our resugaring algorithm works on our mixed language, based on the evaluator of 
 {\redm{(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)}{e[e_1/x_1,\ldots,e_i/x_i,\ldots,e_n/x_n]}
 }
 
-The \m{CoreRed} rule describes how our mixed language handles expressions with \m{CoreHead}---just leave it to the core language's evaluator with the extension. Then for the expression with \m{SurfHead}, we will firstly desugar the outermost sugar (identified by the \m{SurfHead}), then recursively executing $\redm{}{}$. In the recursive call, if one of original subexpression $e_i$ is reduced (\m{SurfRed1}), then the original sugar is not necessarily desugared, we should only reduce the subexpression $e_i$; if not (\m{SurfRed2}), then the sugar have to desugar.
+For the expression with \m{CoreHead}, we just use the evaluation rules of core language with extension of desugar rules. As describe in previous section, if a \m{SurfExp} subexpression is reduced (\m{CoreRed1}), we should mark the location and apply $\redm{}{}$ on it recursively. Otherwise (\m{CoreRed2}), the expression just reduces by the $\redc{}{}$'s rules.
+Then for the expression with \m{SurfHead}, we will firstly desugar the outermost sugar (identified by the \m{SurfHead}), then recursively executing $\redm{}{}$. In the recursive call, if one of original subexpression $e_i$ is reduced (\m{SurfRed1}), then the original sugar is not necessarily desugared, we should only reduce the subexpression $e_i$; if not (\m{SurfRed2}), then the sugar have to desugar.
+
+%\todo{Add explanantion of the above rule.}
 
 %\todo{Add explanantion of the above rule.}
 
@@ -233,7 +209,7 @@ Traditional resugaring works\cite{resugaring,hygienic} define three properties f
 \begin{lemma}
 \label{lemma1}
 
-For~\m{exp}=$(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)\in\m{SurfExp}$, if~$\redm{\m{exp}}{\m{exp'}}$\\ and \m{fulldesugar}(\m{exp})$\not=$$\m{fulldesugar}(\m{exp'})$,~then $\redc{\m{fulldesugar}(\m{exp})}{\m{fulldesugar}(\m{exp'})}$
+For~\m{exp}=$(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)\in\m{SurfExp}$, if~$\redm{\m{exp}}{\m{exp'}}$ and\\ \m{fulldesugar}(\m{exp}) $\not=$ $\m{fulldesugar}(\m{exp'})$,~then $\redc{\m{fulldesugar}(\m{exp})}{\m{fulldesugar}(\m{exp'})}$
 
 \end{lemma}
 
@@ -254,7 +230,7 @@ For $\drule{(\m{SurfHead}~x_1~\ldots~x_i~\ldots~x_n)}{e}$
 
 if $e$ is of normal form, the $\m{fulldesugar}(\m{exp})$ will not be reduced by core evaluator.
 
-if $e$ is headed with \m{CoreHead}, then according to the \m{CoreRed} rule, the $\rede{}{}$ will execute on $e$ according to \m{ExtRed}, which will reduce the subexpression $e_i$ according to the blackbox evaluator with extension. Then the \m{SurfRed2} rule will reduce $e_i$. Because of the extension of evaluator reduces the subexpression in correct location, so it is for $\redm{}{}$.
+if $e$ is headed with \m{CoreHead}, then according to the \m{CoreRed} rule, the $\rede{}{}$ will execute on $e$ according to \m{CoreRed1} or \m{CoreRed2}, which will reduce the subexpression $e_i$ according to the context rule of core language. Then the \m{SurfRed2} rule will reduce $e_i$. Because of the context rule, reduction of the subexpression is in correct location, so it is for $\redm{}{}$.
 
 if $e$ is headed with \m{SurfHead}, then the $\redm{}{}$ will execute recursively on $e$. If the new one satisfies the lemma, then it is for the former. Because any sugar expression will finally be able to desugar to expression with \m{CoreHead}, it can be proved recursively.
 \end{proof}
@@ -295,7 +271,7 @@ If the reduction of mixed language satisfies Lemma \ref{lemma3}, then the resuga
 
 
 \begin{proof}[Proof sketch of Lemma \ref{lemma3}]
-From Lemma \ref{lemma2}, we know the $\redm{}{}$ recursively reduces a expression at correct subexpression. Or the $\redm{}{}$ will destroy the outermost sugar (of the current expression) in rule \m{SurfRed2}. Note that it is the only rule to desugar sugars directly (other rules only desugar sugars when recursively call \m{SurfRed2}), we can prove the lemma recursively if \m{SurfRed1} is \emph{lazy} enough.
+From Lemma \ref{lemma2}, we know the $\redm{}{}$ recursively reduces a expression at correct subexpression. Or the $\redm{}{}$ will destroy the outermost sugar (of the current expression) in rule \m{SurfRed2}. Note that it is the only rule to desugar sugars directly (other rules only desugar sugars when recursively call \m{SurfRed2}), we can prove the lemma recursively if \m{SurfRed2} is \emph{lazy} enough.
 
 In \m{SurfRed2} rule, we firstly expand the outermost sugar and get a temp expression with structure of the outermost sugar. Then when we recursively call $\redm{}{}$, the reduction result shows the structure has been destroyed, so the outermost sugar has to be desugared. Since the recursive reduction of a terminable (Some bad sugars may never stop which are pointless.) sugar expression will finally terminate, the lemma can be proved recursively.
 \end{proof}
