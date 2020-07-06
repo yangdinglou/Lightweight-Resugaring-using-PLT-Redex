@@ -140,11 +140,11 @@ The differences between terms in our core language (CoreLang) and those in our s
 Take some terms in the core language in Figure \ref{fig:core} as examples.
 We may assume \m{if}, \m{let}, \m{$\lambda _{N}$} (call-by-name lambda calculus), \m{empty}, \m{first}, \m{rest} as \m{CoreHead'}, \m{op}, \m{$\lambda$}, \m{cons} as \m{CommonHead}. Then we would show some useful intermediate steps.
 
-Note that some expressions with \m{CoreHead} contains subexpressions with \m{SurfHead}, they are of \m{CoreExp} but not in core language (that is why we need an extension for black-box stepper of core language). In the mixed language, we process these terms by core language's context rule, and the reduction rules of core language and the desugar rules of surface language are mixed as a whole (the $\redc{}{}$ in next section). For example, we have context rule
+Note that some expressions with \m{CoreHead} contains subexpressions with \m{SurfHead}, they are of \m{CoreExp} but not in core language (that is why we need an extension for black-box stepper of core language). In the mixed language, we process these terms by core language's context rule, and the reduction rules of core language and the desugaring rules of surface language are mixed as a whole (the $\redc{}{}$ in next section). For example, we have context rule
 \[
 \infer{(\m{if}~e_1~e_2~e_3) \rightarrow (\m{if}~e_1'~e_2~e_3)}{e_1 \rightarrow e_1'}
 \]
-then if $e_1$ is a term in core language, it will reduce by the reduction rule in core language; if $e_1$ is a \m{SurfExp}, it will reduce by the desugar rule of $e_1$'s \m{Head} (how the subexpression reduced does not matter, because it is just to mark the location where should be reduced); if $e_1$ is also a \m{CoreExp} with non-core subexpressions, a recursive reduction by $\redc{}{}$ is needed.
+then if $e_1$ is a term in core language, it will reduce by the reduction rule in core language; if $e_1$ is a \m{SurfExp}, it will reduce by the desugaring rule of $e_1$'s \m{Head} (how the subexpression reduced does not matter, because it is just to mark the location where should be reduced); if $e_1$ is also a \m{CoreExp} with non-core subexpressions, a recursive reduction by $\redc{}{}$ is needed.
 
 
 \subsection{Resugaring Algorithm}
@@ -171,7 +171,7 @@ Our resugaring algorithm works on our mixed language, based on the evaluator of 
 {\redm{(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)}{e[e_1/x_1,\ldots,e_i/x_i,\ldots,e_n/x_n]}
 }
 
-For the expression with \m{CoreHead}, we just use the evaluation rules of core language with extension of desugar rules. As describe in previous section, if a \m{SurfExp} subexpression is reduced (\m{CoreRed1}), we should mark the location and apply $\redm{}{}$ on it recursively. Otherwise (\m{CoreRed2}), the expression just reduces by the $\redc{}{}$'s rules.
+For the expression with \m{CoreHead}, we just use the evaluation rules of core language with extension of desugaring rules. As describe in previous section, if a \m{SurfExp} subexpression is reduced (\m{CoreRed1}), we should mark the location and apply $\redm{}{}$ on it recursively. Otherwise (\m{CoreRed2}), the expression just reduces by the $\redc{}{}$'s rules.
 Then for the expression with \m{SurfHead}, we will firstly desugar the outermost sugar (identified by the \m{SurfHead}), then recursively executing $\redm{}{}$. In the recursive call, if one of original subexpression $e_i$ is reduced (\m{SurfRed1}), then the original sugar is not necessarily desugared, we should only reduce the subexpression $e_i$; if not (\m{SurfRed2}), then the sugar have to desugar.
 
 %\todo{Add explanantion of the above rule.}
