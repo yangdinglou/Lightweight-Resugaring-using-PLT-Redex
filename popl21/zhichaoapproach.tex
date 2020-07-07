@@ -3,27 +3,32 @@
 \label{sec:ruleDerivation}
 
 As discussed in the overview, some syntactic sugar may appear multiple times in one evaluation, and it is extremely cumbersome to derive it in CoreLang. This will make the evaluation of this syntactic sugar very inefficient. If we can statically analyze its evaluation rules through the structure of syntactic sugar, this will greatly improve the efficiency of syntactic sugar. In this section, we will give one such method to make resugaring of syntactic sugar more efficient.
+\todo{@ziyi: sugars; 'extremely' too strong?; derive -> desugar? ; If..., it will.; such a}
 
-Considering an easy syntactic sugar
+Considering a simple syntactic sugar
 \[\drule{(\m{not}~e_1)}{(\m{if}~e_1~\m{\#f}~\m{\#t})},\]
 we expect to get the evaluation rules of \m{not}. In fact, we need to \textit{embed} the evaluation rules of \m{if}. So we need a method that can express evaluation rules and is easy to transform. To accomplish these goals, we designed \textit{inference automaton} (IFA), which can be visually described by graphs. Readers do not need to know the definition of IFA now, we will discuss it later.
 
 Assuming that we already know the IFA of all syntactic structures in CoreLang, the method of using IFA to construct the evaluation rules of syntactic sugar is as follows: First, construct the IFA of syntactic sugar according to the desugar rules and IFA of CoreLang. Then, transform and simplify IFA. Finally, generate evaluation rules for syntactic sugar.
+\todo{@ziyi: IFAs?}
 
 In this section, we first give some examples of IFA and its formal definition. Then we will discuss a more strict IFA called standard IFA, which deformed by IFA. Next, we give the algorithm of conversion between evaluation rules and IFA. Finally, we discuss the role of IFA in dealing with syntactic sugar.
 
 \subsection{Inference Automaton}
 
 As mentioned above, IFA intuitively describes the evaluation rules of a certain syntactic structure. To help readers better understand it, first we give some examples, then we give the formal definition of IFA.
+\todo{@ziyi: 'first give' may be replaced by 'start with' to avoid duplicate 'give'}
 
 \subsubsection{IFA of if}
 
 The evaluation rules of \texttt{if} are shown as belows.
+\todo{@ziyi: follows}
 
 \infrule[E-If]{e_1 \to e_1'}{(\m{if}~e_1~e_2~e_3) \to (\m{if}~e_1'~e_2'~e_3')}
 \infax[E-IfTrue]{(\m{if}~\m{\#t}~e_2~e_3) \to e_2}
 \infax[E-IfFalse]{(\m{if}~\m{\#f}~e_2~e_3) \to e_3}
 We can observe that a term with \m{if} is first evaluated for $e_1$, and is chosen to be evaluated for $e_2$ or $e_3$ depending on the value of $e_1$. Then the result of the evaluation of $e_2$ or $e_3$ is the value of the term. Thus, we use Figure \ref{fig:ifa-if} to represent the evaluation rules of \m{if}.
+\todo{@ziyi :headed with, e2' 's superscript? }
 
 \begin{figure}[t]
 	\centering
@@ -33,6 +38,7 @@ We can observe that a term with \m{if} is first evaluated for $e_1$, and is chos
 \end{figure}
 
 A node of IFA indicates that this item needs to be evaluated, and the node before this has been evaluated. The arrow from $q_0$ to $q_1$ indicate that this branch will be selected when the evaluation result of $e_1$ is \m{\#t}. The arrow between $e_1$ and $e_3$ is similar. The double circles of $e_2$ and $e_3$ denotes that their evaluation result is the result of the term with this syntactic structure. When a term with an \m{if} syntactic structure needs to be evaluated (for example \m{(if (if \#t \#t \#f) \#f \#t)}), first evaluating the $e_1$ (\m{(if \#t \#t \#f)}). Note that in this process, evaluating a subexpression requires running another automaton based on its syntax, while the outer automaton hold the state at $q_0$. According to the result of $e_1$ (\m{\#f}), the IFA selects the branch ($e_3$). Then the result of $e_3$ (\m{\#t}) will be the evaluation result of the term.
+\todo{@ziyi: indicates; denote; the result of their own?}
 
 \subsubsection{IFA of nand}
 
@@ -89,9 +95,11 @@ and for each node $q$, there is no sequence of pattern $P = (p_1,p_2,\ldots,p_n)
 \end{Def}
 
 The last constraint requires that there be no circles in our IFA.
+\todo{@ziyi: constraint to restrict?}
 
 In IFA, state transition does not depend on input. The only input IFA accepts is the term to be evaluated with this syntactic structure. The state transition is through pattern matching on the evaluation result of the term in the previous node. Note that IFA is associated with syntactic structure. At Each IFA only represents the current evaluation of a syntactic structure. The state indicates that some
 sub-expressions of the syntactic structure have been evaluated, and the rest have not.
+\todo{@ziyi: miss some articles?; each}
 
 \subsection{Standard IFA}
 
@@ -152,6 +160,7 @@ A syntactic structure $CoreHead$ only contains the following evaluation rules.
 \end{Asm}
 
 This assumption specifies the form of the evaluation rules to ensure that IFAs can be generated. The first one is context rule, and the other one is reduction rule. $e$ could be any value, one of the parameters or a term of another syntactic structure.
+\todo{@ziyi: a .. rule, could to can?}
 
 \begin{Asm}[Orderliness of Syntactic Structure]
 \label{Asm:orderliness}
@@ -164,7 +173,7 @@ IFAs are not able to construct syntactic structures that contain recursive rules
 \label{Asm:determinacy}
 The rules satisfy the determinacy of one-step evaluation.
 \end{Asm}
-
+\todo{@ziyi: may be duplicate to assumptions in previous section?}
 By assumption \ref{Asm:determinacy}, we can get the following lemma, which points out the feasibility of using a node in IFA to represent the evaluation process of sub-expressions.
 
 \begin{lemma}
