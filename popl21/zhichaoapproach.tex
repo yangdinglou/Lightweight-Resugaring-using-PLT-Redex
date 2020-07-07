@@ -1,9 +1,10 @@
 %!TEX root = ./main.tex
 \section{Static Approach}
+\label{sec:ruleDerivation}
 
 As discussed in the overview, some syntactic sugar may appear multiple times in one evaluation, and it is extremely cumbersome to derive it in CoreLang. This will make the evaluation of this syntactic sugar very inefficient. If we can statically analyze its evaluation rules through the structure of syntactic sugar, this will greatly improve the efficiency of syntactic sugar. In this section, we will give one such method to make resugaring of syntactic sugar more efficient.
 
-Considering an easy syntactic sugar 
+Considering an easy syntactic sugar
 \[\drule{(\m{not}~e_1)}{(\m{if}~e_1~\m{\#f}~\m{\#t})},\]
 we expect to get the evaluation rules of \m{not}. In fact, we need to \textit{embed} the evaluation rules of \m{if}. So we need a method that can express evaluation rules and is easy to transform. To accomplish these goals, we designed \textit{inference automaton} (IFA), which can be visually described by graphs. Readers do not need to know the definition of IFA now, we will discuss it later.
 
@@ -19,7 +20,7 @@ As mentioned above, IFA intuitively describes the evaluation rules of a certain 
 
 The evaluation rules of \texttt{if} are shown as belows.
 
-\infrule[E-If]{e_1 \to e_1'}{(\m{if}~e_1~e_2~e_3) \to (\m{if}~e_1'~e_2'~e_3')} 
+\infrule[E-If]{e_1 \to e_1'}{(\m{if}~e_1~e_2~e_3) \to (\m{if}~e_1'~e_2'~e_3')}
 \infax[E-IfTrue]{(\m{if}~\m{\#t}~e_2~e_3) \to e_2}
 \infax[E-IfFalse]{(\m{if}~\m{\#f}~e_2~e_3) \to e_3}
 We can observe that a term with \m{if} is first evaluated for $e_1$, and is chosen to be evaluated for $e_2$ or $e_3$ depending on the value of $e_1$. Then the result of the evaluation of $e_2$ or $e_3$ is the value of the term. Thus, we use Figure \ref{fig:ifa-if} to represent the evaluation rules of \m{if}.
@@ -56,13 +57,13 @@ Sometimes the rules may be more complex, such as being reduced into another synt
 \label{fig:ifa-nand}
 \end{figure}
 
-When the automaton runs to the terminal node of Figure \ref{fig:ifa-nand-a}, it will derive the \m{if} term. In fact, we have known how \m{if} works through the IFA of \m{if}. Thus we can replace the last node with an $\text{IFA}\_\m{if}$ and substitute $e_1$ to $e_3$ of $\text{IFA}\_\m{if}$ with the parameters of the node. Use the termination nodes of $\text{IFA}\_\m{if}$ as the termination nodes of the $\text{IFA}\_\m{nand}$. The results are shown in Figure \ref{fig:ifa-nand-b}. Further decomposing the inner nodes, connecting the terminating node of $\text{IFA}\_\m{nand}$ to the node pointed to by the original output edge, we get Figure \ref{fig:ifa-nand-c}. 
+When the automaton runs to the terminal node of Figure \ref{fig:ifa-nand-a}, it will derive the \m{if} term. In fact, we have known how \m{if} works through the IFA of \m{if}. Thus we can replace the last node with an $\text{IFA}\_\m{if}$ and substitute $e_1$ to $e_3$ of $\text{IFA}\_\m{if}$ with the parameters of the node. Use the termination nodes of $\text{IFA}\_\m{if}$ as the termination nodes of the $\text{IFA}\_\m{nand}$. The results are shown in Figure \ref{fig:ifa-nand-b}. Further decomposing the inner nodes, connecting the terminating node of $\text{IFA}\_\m{nand}$ to the node pointed to by the original output edge, we get Figure \ref{fig:ifa-nand-c}.
 
 As can be seen, the nodes of IFA in Figure \ref{fig:ifa-nand-c} have no other composite syntactic structures. Such an IFA completely expresses the semantics of a syntactic structure, and no longer cares about the evaluation rules of other syntactic structures. In fact, we will do the same steps for syntactic sugar to get IFA, which will be discussed later.
 
 \subsubsection{IFA of or}
 
-We represent the evaluation rule of or in a more complex way, as follows. 
+We represent the evaluation rule of or in a more complex way, as follows.
 
 \infrule[E-Or]{e_1 \to e_1'}{(\m{or}~e_1~e_2) \to (\m{or}~e_1'~e_2)}
 \infax[E-OrV]{(\m{or}~v_1~e_2) \to (\m{let}~x~v_1~(\m{if}~x~x~e_2))}
@@ -78,7 +79,7 @@ An inference automaton (IFA) of syntactic structure \m{CoreHead} is a 5-tuple, $
     \item A finite set of nodes $Q$, each node contains a term and a symbol table
     \item A finite set of pattern $\Sigma$
     \item A start node $q_0 \in Q$
-    \item A set of terminal nodes $F \subseteq Q$ 
+    \item A set of terminal nodes $F \subseteq Q$
     \item A transition function $\delta: (Q-F) \times \Sigma' \to Q$ where $\Sigma' \subseteq \Sigma$
 \end{itemize}
 
@@ -86,9 +87,9 @@ and for each node $q$, there is no sequence of pattern $P = (p_1,p_2,\ldots,p_n)
 
 \end{Def}
 
-The last constraint requires that there be no circles in our IFA. 
+The last constraint requires that there be no circles in our IFA.
 
-In IFA, state transition does not depend on input. The only input IFA accepts is the term to be evaluated with this syntactic structure. The state transition is through pattern matching on the evaluation result of the term in the previous node. Note that IFA is associated with syntactic structure. At Each IFA only represents the current evaluation of a syntactic structure. The state indicates that some 
+In IFA, state transition does not depend on input. The only input IFA accepts is the term to be evaluated with this syntactic structure. The state transition is through pattern matching on the evaluation result of the term in the previous node. Note that IFA is associated with syntactic structure. At Each IFA only represents the current evaluation of a syntactic structure. The state indicates that some
 sub-expressions of the syntactic structure have been evaluated, and the rest have not.
 
 \subsection{Standard IFA}
@@ -101,7 +102,7 @@ If an IFA meets following constraints, we call it a standard IFA.
 \begin{itemize}
     \item The expression of node in $Q$ can only be $e_i$, a value or a pattern variable.
     \item For any $q_1,q_2 \in Q$ and $c_1, c_2 \in \Sigma$, $\delta(q_1, c_1) \neq \delta(q_2, c_2)$.
-    \item On each branch, 
+    \item On each branch,
 \end{itemize}
 \end{Def}
 
@@ -196,7 +197,7 @@ If $r$ is a context rule for $e_i$, let the term of $q$ be $e_i$. Assume that th
 
 \end{proof}
 
-In this way, we got an IFA of \m{CoreHead}. According to the lemma \ref{mythm:stdifa}, we can also get a standard IFA of \m{CoreHead}. 
+In this way, we got an IFA of \m{CoreHead}. According to the lemma \ref{mythm:stdifa}, we can also get a standard IFA of \m{CoreHead}.
 
 %---------------------------------------------------------
 \subsubsection{Example: Construct IFA of \m{xor} by Rules}
@@ -251,7 +252,7 @@ In the evaluation rules of \m{let}, there is a substitution. Therefore, in IFA o
 Next we will try to convert IFA to evaluation rules. Because IFA can be converted into standard IFA by Theorem \ref{mythm:stdifa}, we only need to convert standard IFA into rules. Unfortunately, IFA can express some derivation methods whose evaluation rules are difficult to describe. Therefore, we also need to have stricter constraints on IFA to ensure that evaluation rules can be generated.
 
 \begin{Asm}
-\label{Asm:st} 
+\label{Asm:st}
 In a standard IFA, if $q \notin F$, then the symbol table of $q$ is empty.
 \end{Asm}
 
@@ -269,7 +270,7 @@ For each standard IFA satisfy Assumption \ref{Asm:st}, it can be converted to ev
 
 \begin{proof}[Proof of Theorem \ref{mythm:ifa2rule}]
 
-Suppose that the IFA stands for the syntactic structure $H$, then we will build evaluation rules for $H$. First traverse all nodes to find the set of all terms in nodes, which is the parameters of the syntactic structure $H$ like $(\m{H}~e_1 \ldots e_n)$. 
+Suppose that the IFA stands for the syntactic structure $H$, then we will build evaluation rules for $H$. First traverse all nodes to find the set of all terms in nodes, which is the parameters of the syntactic structure $H$ like $(\m{H}~e_1 \ldots e_n)$.
 
 Begin with $q_0$, traverse the IFA. Let $q$ be $q_0$. Record the conditions by a set $T$.
 
@@ -339,10 +340,10 @@ With the IFA, we can easily get the evaluation rules for syntactic sugars.
 
 \begin{Def}
 
-Considering the following syntactic sugar 
+Considering the following syntactic sugar
 \[
 \drule{(\m{SurfHead}~x_1~\ldots~x_n)}{e},
-\] 
+\]
 the IFA of \m{SurfHead} is defined as the IFA of syntactic structure \m{SurfHead'} whose evaluation rule is
 \[
 (\m{SurfHead'}~x_1~\ldots~x_n)\rightarrow e.
