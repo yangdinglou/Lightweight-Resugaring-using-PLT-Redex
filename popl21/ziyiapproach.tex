@@ -16,7 +16,7 @@ In this section, we present our new approach to resugaring. Different from the t
 	\\
 	 &\m{SurfExp} &::=& x  & \note{variable}\\
 	       &&~|~& c  & \note{constant}\\
-				  &&~|~& (\m{CoreHead}~\m{SurfExp}_1~\ldots~\m{SurfExp}_n) & \note{selected core constructor}\\
+				  % &&~|~& (\m{CoreHead}~\m{SurfExp}_1~\ldots~\m{SurfExp}_n) & \note{selected core constructor}\\
 					 &&~|~& (\m{SurfHead}~\m{SurfExp}_1~\ldots~\m{SurfExp}_n) & \note{sugar expression}\\
 	\end{array}
 	\]
@@ -30,7 +30,7 @@ As a preparation of our resugaring, we define a mixed language that combines a g
 
 For our host language, we consider its evaluation rules (context rules + reduction rules) as the evaluator, with two natural assumptions. First, there is a deterministic evaluator in the evaluator which, given an expression in the host language, can deterministically reduce the expression to a new expression (can be restricted by context rules). Second, the evaluation of any sub-expression has no side-effect on other parts of the whole expression. We will discuss about how to extend our approach with a black-box stepper as the evaluator in Section \ref{mark:blackbox}.
 
-An expression of the core language is defined in Figure \ref{fig:expression}. It is a variable, a constant, or a (language) constructor expression. Here, $\m{CoreHead}$ stands for a language constructor such as $\m{if}$ and $\m{let}$. To be concrete, we will use a simplified core language defined in Figure \ref{fig:core} to demonstrate our approach. \todo{semantic needed?}
+An expression of the core language is defined in Figure \ref{fig:expression}. It is a variable, a constant, or a (language) constructor expression. Here, $\m{CoreHead}$ stands for a language constructor such as $\m{if}$ and $\m{let}$. To be concrete, we will use a simplified core language defined in Figure \ref{fig:core} to demonstrate our approach. \reduce{font size?}
 
 \begin{figure}[thb]
 \begin{centering}
@@ -64,7 +64,7 @@ An expression of the core language is defined in Figure \ref{fig:expression}. It
 
 \subsubsection{Surface Language}
 
-Our surface language is defined by a set of syntactic sugars, together with some basic elements in the core language, such as constant and variable. So an expression of the surface language is some core constructor expressions with sugar expressions, as defined in Figure \ref{fig:expression}.
+Our surface language is defined by a set of syntactic sugars, together with some basic elements in the core language, such as constant, variable. So an expression of the surface language is some core constructor expressions with sugar expressions, as defined in Figure \ref{fig:expression}.
 
 A syntactic sugar is defined by a desugaring rule in the following form:
 \[
@@ -140,7 +140,7 @@ The differences between terms in our core language and those in our surface lang
 Take some terms in the core language in Figure \ref{fig:core} as examples.
 We may assume \m{if}, \m{let}, \m{lambdaN} (call-by-name lambda calculus), \m{empty?}, \m{first}, \m{rest} as \m{CoreHead'}, \m{op}, \m{lambda} (call-by-value lambda calculus), \m{cons} as \m{CommonHead}. Then we would show some useful intermediate steps.
 
-Note that some expressions with \m{CoreHead} contains subexpressions with \m{SurfHead}, they are of \m{CoreExp} but not in core language (that is why we need an extension for black-box stepper of core language). In the mixed language, we process these terms by core language's context rule, and the reduction rules of core language and the desugaring rules of surface language are mixed as a whole (the $\redc{}{}$ in next section). For example, we have context rule
+Note that some expressions with \m{CoreHead} contains subexpressions with \m{SurfHead}, they are of \m{CoreExp} but not in core language (that is why we need an extension for black-box stepper of core language). In the mixed language, we process these terms by core language's context rule, and the reduction rules of core language and the desugaring rules of surface language are mixed as a whole (the $\redc{}{}$ in next section). For example, we have the context rule of \m{if} terms
 \[
 \infer{(\m{if}~e_1~e_2~e_3) \rightarrow (\m{if}~e_1'~e_2~e_3)}{e_1 \rightarrow e_1'}
 \]

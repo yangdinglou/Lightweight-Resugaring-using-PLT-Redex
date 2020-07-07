@@ -77,7 +77,7 @@
 
 \newcommand{\Code}[1]{\texttt{#1}}
 \newenvironment{Codes}
-  {\begin{alltt}\leftskip=1.5em} % \small
+  {\begin{alltt}\leftskip=1.5em} % \tiny
   {\end{alltt}}
 
 \newcommand{\OneStep}{{\rule{0pt}{1.2\baselineskip}{\ensuremath\longrightarrow}}}
@@ -113,6 +113,8 @@
 \newcommand{\mycomment}[2]{{\small\color{magenta}\underline{\sf{#1}}:} {\color{magenta}{\small #2}}}
 \newcommand{\hcomment}[1]{\mycomment{Hu}{#1}}
 \newcommand{\todo}[1]{\mycomment{Todo}{#1}}
+
+\newcommand{\reduce}[1]{{\color{blue}{#1}}}
 
 \begin{document}
 

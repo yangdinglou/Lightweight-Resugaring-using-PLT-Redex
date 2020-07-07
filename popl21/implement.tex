@@ -5,7 +5,7 @@
 \subsection{Implementation}
 
 Our basic resugaring approach is implemented using PLT Redex\cite{SEwPR}, which is an semantic engineering tool based on reduction semantics\cite{reduction}. The framework of the implementation is as Figure \ref{fig:frame}.
-
+\reduce{figure can be removed}
 \begin{figure}[thb]
 	\centering
 	\includegraphics[width=8cm]{images/frame.png}
@@ -36,6 +36,7 @@ Then we should replace the rules \m{CoreRed1} and \m{CoreRed2} by the following 
 {\redm{(\m{CoreHead}~e_1~\ldots~e_n)}{e'}}
 
 Putting them in simple words. For expression \Code{(CoreHead $e_1$ $\ldots$ $e_n$)} whose subexpressions contain \m{SurfExp}, replacing all \m{SurfExp} subexpressions not in core language with any reducible core language's term \m{tmpe}. Then getting a result after inputting the new expression $e'$ to the original black-box stepper. If reduction appears at a subexpression at $e_i$ or what the $e_i$ replaced by, then the stepper with the extension should return \Code{(CoreHead $e_1$ $\ldots$ $e_i'$ $\ldots$ $e_n$)}, where $e_i'$ is $e_i$ after the mixed language's one-step reduction ($\redm{}{}$) or after core language's reduction with extension ($\rede{}{}$) (rule \m{CoreExt1}, an example in Figure \ref{fig:e1}). Otherwise, the stepper should return \Code{$e'$}, with all the replaced subexpressions replacing back (rule \m{CoreExt2}, an example in Figure \ref{fig:e2}). The extension will not violate properties of original core language's evaluator. It is obvious that the evaluator with the extension will reduce at the subexpression as it needs in core language, if the reduction appears in a subexpression. One may notice that the stepper with extension behaves the same as mixing the evaluation rules of core language and desugaring rules of surface language. The extension is just to make it works when the evaluator of core language is a black-box stepper, by getting context rules using the \m{tmpe}. That's why the extension is tricky.
+\reduce{can be simplified}
 
 \begin{center}
 \begin{figure}[thb]
@@ -59,7 +60,7 @@ But something goes wrong when substitution take place during \m{CoreExt2}. Just 
 
 
 \label{mark:optimize}
-Note that in \m{SurfRed1} rule and \m{CoreExt1} rule, there is a recursive call on $\redm{}{}$. We can optimize the resugaring algorithm by recursively resugaring. For example, \Code{(Sugar1 (Sugar2 $e_{21}$ $e_{22}$ ...) $e_{11}$ $e_{12}$ ...)} as the input, and find the first subexpression should be reduced. We can firstly get the resugaring sequences of \Code{(Sugar2 $e_{21}$ $e_{22}$)}
+Note that in \m{SurfRed1} rule and \m{CoreExt1} rule, there is a recursive call on $\redm{}{}$. We can optimize the resugaring algorithm by recursively resugaring. For example, \Code{(Sugar1 (Sugar2 $e_{21}$ $e_{22}$ ...) $e_{11}$ $e_{12}$ ...)} as the input, and find the first subexpression should be reduced. We can firstly get the resugaring sequences of \Code{(Sugar2 $e_{21}$ $e_{22}$)} \todo{better express?}
 \begin{Codes}
     (Sugar2 e_2_1 e_2_2 ...)
 \OneStep{ exp1}
@@ -75,8 +76,8 @@ Then a resugaring subsequence is got as
 \end{Codes}
 Thus, we will not need to try to expand the outermost sugar for each inner step (recursively resugaring for inner expression).
 
-As for the automatic derivation of evaluation rules, it is just like what we describe. Just be careful during a merge on IFAs. 
-
+As for the automatic derivation of evaluation rules, we only implement the \emph{IFA to rules
+}'s algorithm, because it is enough to do some case studies for the resugaring tasks, by writing some core language's IFAs manually.
 \subsection{Case Studies}
 
 We test some applications on the tool as case studies. Note that we set call-by-value lambda calculus as terms in \m{CommonExp}, because we need to output some intermediate sequences including lambda expressions in some examples. It's easy if we want to skip them.
@@ -117,6 +118,7 @@ For the traditional approach, the sugar expression should firstly desugar to
   (lambdaN (x1 x2) x1)
   xx yy)
 \end{Codes}
+\reduce{can be removed}
 
 Then in our CoreLang, the execution of expanded expression will contain 33 reduction steps in our implementation. For each step, there will be many attempts to match and substitute the syntactic sugars to resugar the expression. It will omit more steps for a larger expression.
 
@@ -202,7 +204,7 @@ Recursive sugar is a kind of syntactic sugars where call itself or each other du
 \]
 are common recursive sugars. The traditional resugaring approach can't process syntactic sugar written as this (non pattern-based) easily, because boundary conditions are in the sugar itself.
 
-Take $(Odd~2)$ as an example. The previous work will firstly desugar the expression using the rewriting system. Then the rewriting system will never terminate as following shows.
+Take \Code{(Odd 2)} as an example. The previous work will firstly desugar the expression using the rewriting system. Then the rewriting system will never terminate as following shows.
 \begin{Codes}
    (Odd 2)
 \DeStep{ (if (> 2 0) (Even (- 2 1) \#f))}
@@ -224,10 +226,10 @@ Then the advantage of our approach is embodied. Our lightweight approach doesn't
 
 
 We also construct some higher-order syntactic sugars and test them. The higher-order feature is important for constructing practical syntactic sugars. And many higher-order sugars should be constructed by recursive definition. The first sugar is \m{filter}, implemented by pattern matching term rewriting.
-\[\Code{(filter $e$ (list $v_1$ $v_2$ ...))}\]
+\[\Code{\tiny (filter $e$ (list $v_1$ $v_2$ ...))}\]
 \[
 \drule{}
-{\Code{(if ($e$ $v_1$) (cons $v_1$ (filter $e$ (list $v_2$ ...)))\ (filter $e$ (list $v_2$ ...)))}}
+{\Code{\tiny (if ($e$ $v_1$) (cons $v_1$ (filter $e$ (list $v_2$ ...)))\ (filter $e$ (list $v_2$ ...)))}}
 \]
 \[
 \drule{\Code{(filter $e$ (list))}}{\Code{(list)}}

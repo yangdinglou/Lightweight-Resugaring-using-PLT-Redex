@@ -44,7 +44,7 @@ As we discussed in the introduction, the traditional approach uses "tagging" and
 
 \begin{Codes}
     (and (or \#t \#f) (and \#f \#t))
-\DeStep{\quad \note{\{ fully desugaring and tagging \} }
+\DeStep{ \quad \note{\{ fully desugaring and tagging \} }
     (if-andtag (if-ortag \#t \#t \#f) (if-andtag \#f \#t \#f) \#f)}
 \OneStep{\quad \note{\{ context rule of if, reduction rule of if-false\}}
     (if-andtag \#t (if-andtag \#f \#t \#f) \#f)}
@@ -121,7 +121,7 @@ To solve the problem in the traditional approach, we propose a new resugaring ap
 \OneStep{ \#f}
 \end{Codes}
 
-For each step in the above, we make one reduction step and move resugaring focus if desugaring is unnecessary. So $7$ reduction steps are needed for our whole resugaring, while the traditional approach needs $9$ steps ($3$ in desugaring, $3$ in evaluation, $3$ for reverse resugaring). Note that reverse desugaring is more complex and costive because of match and substitution. Note also that the traditional approach would be more redundant if it works on larger expressions.
+For each step in the above, we make at most one reduction step and move resugaring focus if desugaring is unnecessary. So $7$ reduction steps are needed for our whole resugaring, while the traditional approach needs $9$ steps ($3$ in desugaring, $3$ in evaluation, $3$ for reverse resugaring). Note that reverse desugaring is more complex and costive because of match and substitution. Note also that the traditional approach would be more redundant if it works on larger expressions.
 %As there is no need for tagging and reverse desugaring, our approach becomes lightweight.
 
 We can go further to make our approach more efficient. As the purpose of a "one-step try" is to determine the computation order of the syntactic sugar, we should be able to derive this computation order through the desugaring rules and the computation orders of the core language, rather than just through runtime computation of the core expression as done in the above. As will be shown in Section \ref{sec:ruleDerivation}, we can automatically derive evaluation rules  for both \emph{and} sugar and \emph{or}.
