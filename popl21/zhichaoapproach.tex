@@ -75,12 +75,13 @@ We represent the evaluation rule of or in a more complex way, as follows.
 An inference automaton (IFA) of syntactic structure \m{CoreHead} is a 5-tuple, $(Q, \Sigma, q_0, F, \delta)$, consisting of
 
 \begin{itemize}
-    \item A finite set of nodes $Q$, each node contains a term and a symbol table
-    \item A finite set of pattern $\Sigma$
+    \item A finite set of nodes $Q$, each node contains a expression and a symbol table. The expression can be a term or a pattern variable. The symbol table maps a variable to a node.
+    \item A finite set of conditions $\Sigma$
     \item A start node $q_0 \in Q$
     \item A set of terminal nodes $F \subseteq Q$ 
     \item A transition function $\delta: (Q-F) \times \Sigma' \to Q$ where $\Sigma' \subseteq \Sigma$
 \end{itemize}
+
 
 and for each node $q$, there is no sequence of pattern $P = (p_1,p_2,\ldots,p_n)\subseteq \Sigma^*$, which makes that after $q$ transfers sequentially according to $P$, it returns $q$.
 
@@ -330,22 +331,67 @@ We can judge that \m{\#f} is not \m{\#t}, so we can remove the rule (NandFalse1)
 \infax[E-NandTrueFalse]{(\m{nand}~\m{\#t}~\m{\#f}) \to \m{\#t}}
 \infax[E-NandFalse]{(\m{nand}~\m{\#f}~e_2) \to \m{\#t}}
 
-Obviously, although rules of \m{nand} we used when constructing the IFA included the syntactic structure of \m{if}, the final result does not. For syntactic sugar, we also deal with it through a similar idea, that is, construct the IFA of syntactic sugar, simplify it and convert it into rules.
-
 %===========================
 \subsection{Syntactic Sugar}
 
-With the IFA, we can easily get the evaluation rules for syntactic sugars.
+We can find out that although rules of \m{nand} we used when constructing the IFA included the syntactic structure of \m{if}, the final result does not. For syntactic sugar, we also deal with it with a similar idea, that is, construct the IFA of syntactic sugar, simplify it and convert it into rules. With the IFA, we can easily get the evaluation rules for syntactic sugars.
+
+Similarly, we also need to add some constraints on syntactic sugar.
+
+\begin{Asm}[Orderliness of Syntactic Sugar]
+\label{Asm:orderliness-sugar}
+The definition of each syntactic sugar can only use the syntactic structure in coreLang and the syntactic sugar that has been defined.
+\end{Asm}
 
 \begin{Def}
-
+\label{def:ifa-sugar}
 Considering the following syntactic sugar 
 \[
 \drule{(\m{SurfHead}~x_1~\ldots~x_n)}{e},
 \] 
 the IFA of \m{SurfHead} is defined as the IFA of syntactic structure \m{SurfHead'} whose evaluation rule is
-\[
-(\m{SurfHead'}~x_1~\ldots~x_n)\rightarrow e.
-\]
+\infax[E-SurfHead]{(\m{SurfHead'}~x_1~\ldots~x_n)\rightarrow e}
 
 \end{Def}
+
+\subsubsection{An Example of Syntactic Sugar}
+
+Suppose that there are only \m{if} and \m{let} in our CoreLang, whose IFAs are known. Now we will build rules for syntactic sugar \m{or} and \m{sg}.
+
+\[
+\drule{\m{or}~e_1~e_2}{(\m{let}~x~e_1~(\m{if}~x~x~e_2))} 
+\]
+
+\m{or} syntactic sugar only uses the syntax structure of CoreLang, which meets Assumption \ref{Asm:orderliness-sugar}. Then we will generate evaluation rules for \m{or}.
+
+\begin{figure}[t]
+    \centering
+    \subcaptionbox{Rule of Definition \ref{def:ifa-sugar} \label{fig:ifa-ex-or-1}}[.31\linewidth]{
+        \includegraphics[scale=0.3]{images/ifa-ex-or-1.png}
+    }
+    \subcaptionbox{IFA generated with the algorithm of Theorem \ref{mythm:Rule2IFA} \label{fig:ifa-ex-or-2}}[.31\linewidth]{
+        \includegraphics[scale=0.3]{images/ifa-ex-or-2.png}
+    }
+    \subcaptionbox{Expand syntactic structure of \m{let} \label{fig:ifa-ex-or-3}}[.31\linewidth]{
+        \includegraphics[scale=0.3]{images/ifa-ex-or-3.png}
+    }
+    \subcaptionbox{Expand syntactic structure of \m{if} \label{fig:ifa-ex-or-4}}[.31\linewidth]{
+        \includegraphics[scale=0.3]{images/ifa-ex-or-4.png}
+    }
+    \subcaptionbox{Replace \m{x} with expression according to the symbol table \label{fig:ifa-ex-or-5}}[.31\linewidth]{
+        \includegraphics[scale=0.3]{images/ifa-ex-or-5.png}
+    }
+    \subcaptionbox{Rules generated with the algorithm of Theorem \ref{mythm:ifa2rule} \label{fig:ifa-ex-or-6}}[.31\linewidth]{
+        \includegraphics[scale=0.3]{images/ifa-ex-or-6.png}
+    }
+    \caption{Example: Syntactic Sugar of \m{or}}
+    \label{fig:ifa-nand-std}
+\end{figure}
+
+The IFA of \m{or} is the same as the IFA of \m{or'} whose rule is shown in Figure \ref{fig:ifa-ex-or-1}. Therefore, we can generate an IFA according to the rule as shown in Figure \ref{fig:ifa-ex-or-2}. Next we transform IFA to make it a standard IFA, as shown in Figure \ref{fig:ifa-ex-or-3} to Figure \ref{fig:ifa-ex-or-5}. Finally, according to the structure of IFA, generate or evaluation rules, as shown in Figure \ref{fig:ifa-ex-or-6}.
+
+% \infrule[E-Or]{e_1 \to e_1'}{(\m{or}~e_1~e_2) \to (\m{or}~e_1'~e_2)}
+% \infrule[E-OrTrue]{e_1~\key{is}~\m{\#t}}{(\m{or}~e_1~e_2) \to e_1}
+% \infrule[E-OrFalse]{e_1~\key{is}~\m{\#f}}{(\m{or}~e_1~e_2) \to e_2}
+
+
