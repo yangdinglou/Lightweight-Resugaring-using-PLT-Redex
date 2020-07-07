@@ -12,12 +12,12 @@ In this section, we present our new approach to resugaring. Different from the t
 	\begin{array}{lllll}
 	 &\m{CoreExp} &::=& x  & \note{variable}\\
 	       &&~|~& c  & \note{constant}\\
-				 &&~|~& (\m{CoreHead'}~\m{CoreExp}_1~\ldots~\m{CoreExp}_n) & \note{constructor}\\
-				 &&~|~& (\m{CommonHead}~\m{SurfExp}_1~\ldots~\m{SurfExp}_n) & \note{selected core constructor}\\
+				 &&~|~& (\m{CoreHead}~\m{CoreExp}_1~\ldots~\m{CoreExp}_n) & \note{constructor}\\
 	\\
 	 &\m{SurfExp} &::=& x  & \note{variable}\\
 	       &&~|~& c  & \note{constant}\\
-				 &&~|~& (\m{SurfHead}~\m{SurfExp}_1~\ldots~\m{SurfExp}_n) & \note{sugar constructor}
+				  &&~|~& (\m{CoreHead}~\m{SurfExp}_1~\ldots~\m{SurfExp}_n) & \note{selected core constructor}\\
+					 &&~|~& (\m{SurfHead}~\m{SurfExp}_1~\ldots~\m{SurfExp}_n) & \note{sugar expression}\\
 	\end{array}
 	\]
 	\caption{Core and Surface Expressions}
@@ -68,11 +68,11 @@ Our surface language is defined by a set of syntactic sugars, together with some
 
 A syntactic sugar is defined by a desugaring rule in the following form:
 \[
-\drule{(\m{SurfHead}~e_1~e_2~\ldots~e_n)}{\m{Exp}}
+\drule{(\m{SurfHead}~e_1~e_2~\ldots~e_n)}{\m{exp}}
 \]
-where its LHS is a simple pattern (unnested) and its RHS is an expression of surface language or core language, and any reducible sub-term (e.g. $e_1$) in LHS only appears once in RHS. For instance, we may define syntactic sugar \m{And} by
+where its LHS is a simple pattern (unnested) and its RHS is an expression of surface language or core language, and any reducible sub-term (e.g. $e_1$) in LHS only appears once in RHS. For instance, we may define syntactic sugar \m{and} by
 \[
-\drule{(\m{And}~e_1~e_2)}{(\m{if}~e_1~e_2~\false)}.
+\drule{(\m{and}~e_1~e_2)}{(\m{if}~e_1~e_2~\false)}.
 \]
 Note that if the pattern is nested, we can introduce a new syntactic sugar to flatten it. And if we need a reducible sub-term multi times in RHS, a \m{let} binding is needed (a normal way in syntactic sugar). We take the following sugar as example,
 \[\drule{(\m{Twice}~e_1)}{(+~e_1~e_1)}\]
@@ -135,7 +135,7 @@ We assume that all desugaring rules are not overlapped in the sense that for a s
 
 Our mixed language for resugaring combines the surface language and the core language, described in Figure \ref{fig:mix}.
 %
-The differences between terms in our core language and those in our surface language are identified by their \m{Head}. But there may be some terms in the core language should be displayed during evaluation, or we need some core terms to help us getting better resugaring sequences . So we defined \m{CommonExp} terms, which origin from core language, but can be displayed in resugaring sequences. The \m{Core'Exp} terms are terms with undisplayable \m{CoreHead} (named \m{CoreHead'}). The \m{SurfExp} terms are terms with \m{SurfHead} and all subexpressions are displayable. The \m{CommonExp} terms are terms with displayable CoreLang's \m{Head} (named \m{CommonHead}), together with displayable subexpressions. There exists some other expressions during our resugaring process, which have displayable \m{Head}, but one or more subexpressions should not display. They are \m{UndisplayableExp}. We distinct the two kinds of expression for \emph{abstraction} property (discussed in Section \ref{mark:abs}).
+The differences between terms in our core language and those in our surface language are identified by their \m{Head}. But there may be some terms in the core language which are also used in the surface language for convenient, or we need some core terms to help us getting better resugaring sequences . So we separate \m{CommonHead} from the \m{CoreHead}, which can be displayed in resugaring sequences (the rest of \m{CoreHead} becomes \m{CoreHead'}). The \m{Core'Exp} terms are terms with undisplayable \m{CoreHead} (named \m{CoreHead'}). The \m{SurfExp} terms are terms with \m{SurfHead} and all subexpressions are displayable. The \m{CommonExp} terms are terms with displayable CoreLang's \m{Head} (named \m{CommonHead}), together with displayable subexpressions. There exists some other expressions during our resugaring process, which have displayable \m{Head}, but one or more subexpressions should not display. They are \m{UndisplayableExp}. We distinct the two kinds of expression for \emph{abstraction} property (discussed in Section \ref{mark:abs}).
 
 Take some terms in the core language in Figure \ref{fig:core} as examples.
 We may assume \m{if}, \m{let}, \m{lambdaN} (call-by-name lambda calculus), \m{empty?}, \m{first}, \m{rest} as \m{CoreHead'}, \m{op}, \m{lambda} (call-by-value lambda calculus), \m{cons} as \m{CommonHead}. Then we would show some useful intermediate steps.
@@ -153,11 +153,11 @@ Our resugaring algorithm works on our mixed language, based on the evaluator of 
 \label{mark:mixedreduction}
 \infrule[CoreRed1]
 {\redm{e_i}{e_i''}\\
-\exists i.\, \redc{(\m{CoreHead}~e_1~\ldots~e_i~\ldots~e_n)}{(\m{CoreHead}~e_1~\ldots~e_i'~\ldots~e_n)}~and~e_i~is~a~\m{SurfExp}~term}
+\exists i.\, \redc{(\m{CoreHead}~e_1~\ldots~e_i~\ldots~e_n)}{(\m{CoreHead}~e_1~\ldots~e_i'~\ldots~e_n)}~and~e_i~\in~\m{SurfExp}}
 {\redm{(\m{CoreHead}~e_1~\ldots~e_i~\ldots~e_n)}{(\m{CoreHead}~e_1~\ldots~e_i''~\ldots~e_n)}}
 \infrule[CoreRed2]
 {\redc{(\m{CoreHead}~e_1~\ldots~e_n)}{e'}\\
-\neg \exists i.\, \redc{(\m{CoreHead}~e_1~\ldots~e_i~\ldots~e_n)}{(\m{CoreHead}~e_1~\ldots~e_i'~\ldots~e_n)}~and~e_i~is~a~\m{SurfExp}~term}
+\neg \exists i.\, \redc{(\m{CoreHead}~e_1~\ldots~e_i~\ldots~e_n)}{(\m{CoreHead}~e_1~\ldots~e_i'~\ldots~e_n)}~and~e_i~\in~\m{SurfExp}}
 {\redm{(\m{CoreHead}~e_1~\ldots~e_i~\ldots~e_n)}{e'}}
 \infrule[SurfRed1]
 {\drule{(\m{SurfHead}~x_1~\ldots~x_i~\ldots~x_n)}{e},~\redm{e_i}{e_i''}\\
@@ -239,12 +239,8 @@ If $e$ is headed with \m{SurfHead}, then the $\redm{}{}$ will apply recursively 
 For \m{SurfRed1} rule, $\redm{(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)}{(\m{SurfHead}~e_1~\ldots~e_i''~\ldots~e_n)}$, where $\redm{e_i}{e_i''}$.
 If $\m{fulldesugar}(e_i)$=$\m{fulldesugar}(e_i'')$, then \m{fulldesugar}(\m{Exp})=\m{fulldesugar}(\m{Exp'}). If not,  what we need to prove is that, $\redc{\m{fulldesugar}(\m{Exp})}{\m{fulldesugar}(\m{Exp'})}$. Note that the only difference between \m{Exp} and \m{Exp'} is the i-th subexpression, and we have proved the lemma \ref{lemma2} that the subexpression is the one to be reduced after the expression desugared totally, it will be also a recursive proof on the subexpression $e_i$.
 
-For \m{SurfRed2} rule, \m{Exp'} is \m{Exp} after the outermost sugar resugared. So \m{fulldesugar}(\m{Exp})=
-
-\begin{flushleft}
+For \m{SurfRed2} rule, \m{Exp'} is \m{Exp} after the outermost sugar desugared. So the expressions after totally desugared are equal, \m{fulldesugar}(\m{Exp}) =
 \m{fulldesugar}(\m{Exp'}).
-\end{flushleft}
-
 \end{proof}
 
 In summary, our resugaring approach satisfies emulation property.
