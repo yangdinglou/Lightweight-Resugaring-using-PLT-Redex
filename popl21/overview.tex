@@ -31,13 +31,20 @@ Assume that our surface language is defined by two syntactic sugars---\emph{and}
 \]
 
 
-Now let us demonstrate how to execute \Code{(and (or \#t \#f) (and \#f \#t))}, and get the following resugaring sequence.
+Now let us demonstrate how to execute \Code{(and (or \#t \#f) (and \#f \#t))}, and get the resugaring sequence as Figure \ref{fig:standard}.
+\begin{figure}[t]
+\centering
 \begin{Codes}
     (and (or \#t \#f) (and \#f \#t))
 \OneStep{ (and \#t (and \#f \#t))}
 \OneStep{ (and \#t \#f)}
 \OneStep{ #f}
 \end{Codes}
+
+\caption{A Standard Resugaring Example}
+\label{fig:standard}
+\end{figure}
+
 
 
 
@@ -101,13 +108,7 @@ We can go further to make our approach more efficient. As the purpose of a "one-
 (\mbox{or}~\#f~e_2) \rightarrow e_2 \\
 \end{array}
 \]
-Now with these rules, our resugaring will need only $3$ steps.
-\begin{Codes}
-    (and (or \#t \#f) (and \#f \#t))
-\OneStep{ (and \#t (and \#f \#t))}
-\OneStep{ (and \#f \#t)}
-\OneStep{ \#f}
-\end{Codes}
+Now with these rules, our resugaring will need only $3$ steps as in Figure \ref{fig:standard}.
 
 Two remarks are worth making here. First, we do not require a complete set of reduction/context rules for all syntactic sugars; if we have these rules, we can elaborate them to remove one-step try, and make a shortcut for a sequence of evaluation steps on core expression.
 For example, suppose that we have another syntactic sugar named \emph{hard} whose evaluation rules cannot be derived.

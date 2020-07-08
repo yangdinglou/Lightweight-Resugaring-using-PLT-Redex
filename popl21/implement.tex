@@ -60,7 +60,7 @@ Putting them in simple words. For expression \Code{(CoreHead $e_1$ $\ldots$ $e_n
 
 But something goes wrong when substitution takes place during \m{CoreExt2}. Just as the example we will talk about later in Section \ref{mark:hygienic}, for a expression like \Code{(let (x 2) (Sugar x 1))}, it should reduce to \Code{(Sugar 2 1)} by the \m{CoreRed2} rule, but got \Code{(Sugar x 1)} by the \m{CoreExt2} rule. So when using the extension of black-box stepper's rule (\m{ExtRed2}), we need some other information about in which subexpression a substitution will take place (the substitution can be got by a similar idea as the tricky extension). Then for these subexpressions, we need to do the same substitution before replacing back. 
 }
-\todo{black-box's extension was removed, maybe add in appendix}
+% \todo{black-box's extension was removed, maybe add in appendix}
 
 
 
@@ -329,14 +329,14 @@ We also construct some higher-order syntactic sugars and test them. The higher-o
 and getting resugaring sequences as Figure \ref{fig:Filter}.
 Here, although the sugar can be processed by traditional resugaring approach, it will be redundant. The reason is that, a Filter for a list of length $n$ will match to find possible resugaring $n*(n-1)/2$ times. Thus, lazy desugaring is really important to reduce the resugaring complexity of recursive sugar.
 
-Moreover, just like the \emph{Odd and Even} sugar above, there are some simple rewriting systems which do not allow pattern-based rewriting. Or there are some sugars that need to be expressed by the terms in core language as rewriting conditions. Take the example of another higher-order sugar \m{Map} as an example.
+Moreover, just like the \emph{Odd and Even} sugar above, there are some simple rewriting systems which do not allow pattern-based rewriting. Or there are some sugars that need to be expressed by the terms in core language as rewriting conditions. Take the example of another higher-order sugar \m{Map} as an example, and get resugaring sequences as Figure \ref{fig:Map}.
 \[
 \begin{array}{l}
 \drule{\Code{(Map $e_1$ $e_2$)}}{}\\
 \Code{(let (x $e_2$) (if (empty? x) (list) (cons ($e_1$ (first x)) (Map $e_1$ (rest x)))))}
 \end{array}
 \]
-and get resugaring sequences as Figure \ref{fig:Map}.
+
 
 
 Note that the \m{let} term is to limit the subexpression only appears once in RHS. In this example, we can find that the list \Code{(cons 1 (list 2))}, though equal to \Code{(list 1 2)}, is represented by core language's term. So it will be difficult to handle such inline boundary conditions by rewriting systems. But our approach is easy to handle cases like this. So our resugaring approach by lazy desugaring is powerful.

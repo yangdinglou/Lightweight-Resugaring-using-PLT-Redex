@@ -1,15 +1,15 @@
 %!TEX root = ./main.tex
 \section{Derivation of Evaluation Rules}
 \label{sec:ruleDerivation}
-
+\ignore{
 As discussed in the overview, some syntactic sugar may appear multiple times in one evaluation, and it is cumbersome to desugar it in CoreLang. This will make the evaluation of this syntactic sugar very inefficient. If we can statically analyze its evaluation rules through the structure of syntactic sugar, it can greatly improve the efficiency of syntactic sugar. In this section, we will give one such a method to make the resugaring of syntactic sugar more efficient.\todo{@zhichao: static check whether it is need to expand}
-
+}
 \reducedversion{
 As discussed in the overview, frequent attempts on reverse desugaring during traditional resugaring processes is costive, so that making it inefficient. If we can statically derivate syntactic sugar's evaluation rules through its structure, it will greatly improve the efficiency of resugaring. In this section, we purpose such a method to make the resugaring of syntactic sugar more efficient.
 }
-
+\ignore{
 Considering a simple syntactic sugar \[\drule{(\m{not}~e_1)}{(\m{if}~e_1~\m{\#f}~\m{\#t})},\] we expect to get the evaluation rules of \m{not}. In fact, we need to \textit{embed} the evaluation rules of \m{if}. So we need a method that can express evaluation rules and is easy to transform. To accomplish these goals, we designed \textit{inference automaton} (IFA), which can be visually described by graphs. Readers do not need to know the definition of IFA now, we discuss it later.
-
+}
 \reducedversion{
 Obviously, We need to \textit{embed} the evaluation rules of \m{if} to get those of \m{not}. So we need a method that can express evaluation rules and is easy to transform. To accomplish these goals, we designed \textit{inference automaton} (IFA), which can be visually described by graphs.
 }
@@ -33,11 +33,10 @@ Considering evaluation rules of \m{if} in overview, we can observe that a term h
 	\label{fig:ifa-if}
 \end{figure}
 
-A node of IFA indicates that the term needs to be evaluated, and the nodes before this have been evaluated. The arrow from $q_0$ to $q_1$ indicates that this branch is selected when the evaluation result of $e_1$ is \m{\#t}. The arrow between $e_1$ and $e_3$ is similar. The double circles of $e_2$ and $e_3$ denote that their evaluation result is the result of the term with this syntactic structure. In most cases, the transition condition is that the evaluation result of the previous node is a value or a specific value. To simplify the representation of IFA, in the figures of this article, in the former case, we omit the condition on the transition edge; and in the latter case, we only mark the value on the transition edge.
-
+A node of IFA indicates that the term needs to be evaluated, and the nodes before this have been evaluated. The arrow from $q_0$ to $q_1$ indicates that this branch is selected when the evaluation result of $e_1$ is \m{\#t}. The arrow between $e_1$ and $e_3$ is similar. The double circles of $e_2$ and $e_3$ denote that their evaluation result is the result of the term with this syntactic structure. \ignore{In most cases, the transition condition is that the evaluation result of the previous node is a value or a specific value. To simplify the representation of IFA, in the figures of this article, in the former case, we omit the condition on the transition edge; and in the latter case, we only mark the value on the transition edge.
+}
 \reducedversion{
-...In most cases, the transition condition is the evaluation result (an abstract value) of the previous node or a specific value. To simplify the representation of IFA in the figures of this paper, in the former case, we omit the condition on the transition edge; and in the latter case, we only mark the value on the transition edge.
-
+In most cases, the transition condition is the evaluation result (an abstract value) of the previous node or a specific value. To simplify the representation of IFA in the figures of this paper, in the former case, we omit the condition on the transition edge; and in the latter case, we only mark the value on the transition edge.
 }
 
 When a term headed with \m{if} needs to be evaluated (for example \m{(if (if \#t \#t \#f) \#f \#t)}), first evaluating the $e_1$ (\m{(if \#t \#t \#f)}). Note that in this process, evaluating a subexpression requires running another automaton based on its syntax, while the outer automaton hold the state at $q_0$. According to the result of $e_1$ (\m{\#f}), the IFA selects the branch ($e_3$). Then the result of $e_3$ (\m{\#t}) is the evaluation result of the term.
