@@ -437,33 +437,41 @@ We first discuss the branch of $q_2$. Add $e_1 \key{is} \m{\#t}$ to $T$. Because
 
 Since $q_4$ is a reduction rule, append $e_2 \key{is} \m{\#t}$ to $T$ and add a new reduction rule for $q_4$. Reduction rule for $q_5$ is similar.
 \[
+\begin{array}{c}
 \infer{(\m{nand}~e_1~e_2) \to \m{\#f}}{e_1~\key{is}~\m{\#t}\quad e_2~\key{is}~\m{\#t}}
-\]\[
+\quad
 \infer{(\m{nand}~e_1~e_2) \to \m{\#t}}{e_1~\key{is}~\m{\#t}\quad e_2~\key{is}~\m{\#f}}
+\end{array}
 \]
 % \infrule[E-NandTrueTrue]{e_1~\key{is}~\m{\#t}\quad e_2~\key{is}~\m{\#t}}{(\m{nand}~e_1~e_2) \to \m{\#f}}
 % \infrule[E-NandTrueFalse]{e_1~\key{is}~\m{\#t}\quad e_2~\key{is}~\m{\#f}}{(\m{nand}~e_1~e_2) \to \m{\#t}}
 
 Back to $q_0$, for $q_4'$ and $q_5'$ are also terminal nodes, we can build reduction rules for $q_4'$ and $q_5'$ in the same way.
 \[
+\begin{array}{c}
 \infer{(\m{nand}~e_1~e_2) \to \m{\#f}}{e_1~\key{is}~\m{\#f}\quad \m{\#f}~\key{is}~\m{\#t}}
-\]\[
+\quad
 \infer{(\m{nand}~e_1~e_2) \to \m{\#t}}{e_1~\key{is}~\m{\#f}\quad \m{\#f}~\key{is}~\m{\#f}}
+\end{array}
 \]
 % \infrule[E-NandFalse1]{e_1~\key{is}~\m{\#f}\quad \m{\#f}~\key{is}~\m{\#t}}{(\m{nand}~e_1~e_2) \to \m{\#f}}
 % \infrule[E-NandFalse2]{e_1~\key{is}~\m{\#f}\quad \m{\#f}~\key{is}~\m{\#f}}{(\m{nand}~e_1~e_2) \to \m{\#t}}
 
 We can judge that \m{\#f} is not \m{\#t}, so we can remove the rule (NandFalse1) from the rules, for it contains a condition that is never met. At the same time, we rewrite the remaining rules into a more customary form.
 \[
+\begin{array}{cc}
 \infer{(\m{nand}~e_1~e_2) \to (\m{nand}~e_1'~e_2)}{e_1 \to e_1'}
-\]\[
+&
 \infer{(\m{nand}~\m{\#t}~e_2) \to (\m{nand}~\m{\#t}~e_2')}{e_2 \to e_2'}
+\end{array}
 \]\[
+\begin{array}{ccc}
 (\m{nand}~\m{\#t}~\m{\#t}) \to \m{\#f}
-\]\[
+&
 (\m{nand}~\m{\#t}~\m{\#f}) \to \m{\#t}
-\]\[
+&
 (\m{nand}~\m{\#f}~e_2) \to \m{\#t}
+\end{array}
 \]
 
 % \infrule[E-Nand]{e_1 \to e_1'}{(\m{nand}~e_1~e_2) \to (\m{nand}~e_1'~e_2)}
