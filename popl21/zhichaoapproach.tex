@@ -1,5 +1,6 @@
 %!TEX root = ./main.tex
 \section{Static Approach}
+\label{sec:ruleDerivation}
 
 As discussed in the overview, some syntactic sugar may appear multiple times in one evaluation, and it is extremely cumbersome to derive it in CoreLang. This will make the evaluation of this syntactic sugar very inefficient. If we can statically analyze its evaluation rules through the structure of syntactic sugar, this will greatly improve the efficiency of syntactic sugar. In this section, we will give one such method to make resugaring of syntactic sugar more efficient. \todo{@ziyi: sugars; 'extremely' too strong?; derive -> desugar? ; If..., it will.; such a}
 
@@ -141,7 +142,7 @@ In particular, if we guarantee that a term $e$ does not contain a certain variab
 
 \begin{figure}[t]
     \centering
-    \includegraphics[scale=0.3]{images/nml-ifa-subst.png}
+    \includegraphics[scale=0.3]{images/nmlifa-subst.png}
     \caption{Substitute Sub-Syntactic Structure}
     \label{fig:nmlifa-subst}
 \end{figure}
