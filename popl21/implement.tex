@@ -6,7 +6,7 @@
 
 Our basic resugaring approach is implemented using PLT Redex\cite{SEwPR}, which is an semantic engineering tool based on reduction semantics\cite{reduction}. The framework of the implementation is as Figure \ref{fig:frame}.
 \reduce{figure can be removed}
-\begin{figure}[thb]
+\begin{figure}[t]
 	\centering
 	\includegraphics[width=8cm]{images/frame.png}
 	\caption{framework of implementation}
@@ -60,19 +60,19 @@ But something goes wrong when substitution take place during \m{CoreExt2}. Just 
 
 
 \label{mark:optimize}
-Note that in \m{SurfRed1} rule and \m{CoreExt1} rule, there is a recursive call on $\redm{}{}$. We can optimize the resugaring algorithm by recursively resugaring. For example, \Code{(Sugar1 (Sugar2 $e_{21}$ $e_{22}$ ...) $e_{11}$ $e_{12}$ ...)} as the input, and find the first subexpression should be reduced. We can firstly get the resugaring sequences of \Code{(Sugar2 $e_{21}$ $e_{22}$)} \todo{better express?}
+Note that in \m{SurfRed1} rule and \m{CoreExt1} rule, there is a recursive call on $\redm{}{}$. We can optimize the resugaring algorithm by recursively resugaring. For example, \Code{(Sugar1 (Sugar2  ...) ...)} as the input, and find the first subexpression should be reduced. We can firstly get the resugaring sequences of \Code{(Sugar2 ...)} \todo{better express?}
 \begin{Codes}
-    (Sugar2 e_2_1 e_2_2 ...)
+    (Sugar2 ...)
 \OneStep{ exp1}
 \DeStep{  exp...} \note{// may be 0 or more steps}
 \OneStep{ expn}
 \end{Codes}
 Then a resugaring subsequence is got as
 \begin{Codes}
-    (Sugar1 (Sugar2 e_2_1 e_2_2 ...) e_1_1 e_1_2 ...)
-\OneStep{ (Sugar1 exp1 e_1_1 e_1_2 ...)}
-\DeStep{  (Sugar1 exp... e_1_1 e_1_2 ...)} \note{// may be 0 or more steps}
-\OneStep{ (Sugar1 expn e_1_1 e_1_2 ...)}
+    (Sugar1 (Sugar2 ...) ...)
+\OneStep{ (Sugar1 exp1 ...)}
+\DeStep{  (Sugar1 exp... ...)} \note{// may be 0 or more steps}
+\OneStep{ (Sugar1 expn ...)}
 \end{Codes}
 Thus, we will not need to try to expand the outermost sugar for each inner step (recursively resugaring for inner expression).
 
@@ -98,7 +98,7 @@ Take a SKI combinator syntactic sugar as an example. We will show why our approa
 
 
 
-Although SKI combinator calculus is a reduced version of lambda calculus, we can construct combinators' sugar based on call-by-need lambda calculus in our CoreLang. For sugar expression \Code{(S (K (S I)) K xx yy)}, we get the following resugaring sequences.
+Although SKI combinator calculus is a reduced version of lambda calculus, we can construct combinators' sugar based on call-by-need lambda calculus in our core language. For sugar expression \Code{(S (K (S I)) K xx yy)}, we get the following resugaring sequences.
 \begin{Codes}
     (S (K (S I)) K xx yy)
 \OneStep (((K (S I)) xx (K xx)) yy)
@@ -120,9 +120,9 @@ For the traditional approach, the sugar expression should firstly desugar to
 \end{Codes}
 \reduce{can be removed}
 
-Then in our CoreLang, the execution of expanded expression will contain 33 reduction steps in our implementation. For each step, there will be many attempts to match and substitute the syntactic sugars to resugar the expression. It will omit more steps for a larger expression.
+Then in our core language, the execution of expanded expression will contain 33 reduction steps in our implementation. For each step, there will be many attempts to match and substitute the syntactic sugars to resugar the expression. It will omit more steps for a larger expression.
 
-As for the derivation of syntactic sugar's evaluation rules, we have shown an example of \m{and} sugar and \m{or} sugar in overview. But what if the \m{or} sugar written like follows?
+As for the derivation of syntactic sugar's evaluation rules, we have shown an example of \m{and} sugar and \m{or} sugar in overview. But what if the \m{or} sugar written as follows?
 \[\drule{\Code{(Or $e_1$ $e_2$)}}{\Code{(let (x $e_1$) (if x x $e_2$))}}\]
 Of course, we got the same evaluation rules as the example in overview.
 \[
@@ -140,7 +140,7 @@ Then for expressions headed with \m{or}, we won't need the one-step try to figur
 \label{mark:hygienic}
 
 
-The second work\cite{hygienic} of traditional resugaring approach mainly processes hygienic sugar compared to first work. It use a DAG to represent the expression. However, hygiene is not hard to handle by our lazy desugaring strategy. Our algorithm can easily process hygienic sugar without special data structure.
+The second work\cite{hygienic} of traditional resugaring approach mainly processes hygienic sugar compared to first work. It uses a DAG to represent the expression. However, hygiene is not hard to be handled by our lazy desugaring strategy. Our algorithm can easily process hygienic sugar without special data structure.
 A typical hygienic problem is as the following example.
 \[
 \drule{\Code{(Hygienicadd $e_1$ $e_2$)}}{\Code{(let (x $e_1$) (+ x $e_2$))}}
@@ -148,7 +148,7 @@ A typical hygienic problem is as the following example.
 % \begin{Codes}
 % 	(Hygienicadd e1 e2) \DeStep{ (let ((x e1)) (+ x e2))}
 % \end{Codes}
-For traditional resugaring approach, if we want to get sequences of \Code{(let (x 2) (Hygienicadd 1 x))}, it will firstly desugar to \Code{(let (x 2) (let (x 1) (+ x x)))}, which is awful because the two $x$ in \Code{(+ x x)} should be bind to different value. So traditional hygienic resugaring approach use abstract syntax DAG to distinct different \m{x} in the desugared expression. But for our approach based on lazy desugaring, the \m{hygienicadd} sugar does not have to desugar until necessary, thus, getting following sequences based on a  rewriting system which renaming the variables during the rewriting.
+For traditional resugaring approach, if we want to get sequences of \Code{(let (x 2) (Hygienicadd 1 x))}, it will firstly desugar to \Code{(let (x 2) (let (x 1) (+ x x)))}, which is awful because the two $x$ in \Code{(+ x x)} should be bind to different value. So the traditional hygienic resugaring approach use abstract syntax DAG to distinct different \m{x} in the desugared expression. But for our approach based on lazy desugaring, the \m{hygienicadd} sugar does not have to desugar until necessary, thus, getting following sequences based on a  rewriting system which renaming the variables during the rewriting.
 
 \begin{Codes}
     (let (x 2) (Hygienicadd 1 x))
@@ -159,7 +159,7 @@ For traditional resugaring approach, if we want to get sequences of \Code{(let (
 
 The lazy desugaring is also convenient for hygienic resugaring for non-hygienic rewriting. For example, \Code{(let (x 1) (+ x (let (x 2) (+ x 1))))} may be reduced to \Code{(+ 1 (let (1 2) (+ 1 1)))} by a simple core language whose \Code{let} expression does not handle cases like that. But by writing a simple sugar Let,
 \[\drule{\Code{(Let~$e_1$~$e_2$~$e_3$)}}{\Code{(let~($e_1$~$e_2$)~$e_3$)}}\]
-and some simple modifies in the reduction of mixed language, we will get the following sequences in our system.
+and making some simple modifies in the reduction of mixed language, we will get the following sequences in our system.
 \begin{Codes}
     (Let x 1 (+ x (Let x 2 (+ x 1))))
 \OneStep{ (Let x 1 (+ x (+ 2 1)))}
@@ -168,7 +168,7 @@ and some simple modifies in the reduction of mixed language, we will get the fol
 \OneStep{ 4}
 \end{Codes}
 
-In practical application, we think hygiene can be easily processed by rewriting system, so we just use a rewriting system which can rename variable automatically. 
+In practical application, we think hygiene can be easily processed by rewriting systems, so we just use a rewriting system which can rename variable automatically. 
 
 And for the derivation method, there is no rewriting system at all, but the hygiene is handled more concisely. we build a hygienic sugar \m{Hygienicor} based the \m{or} sugar.
 \[
@@ -226,10 +226,10 @@ Then the advantage of our approach is embodied. Our lightweight approach doesn't
 
 
 We also construct some higher-order syntactic sugars and test them. The higher-order feature is important for constructing practical syntactic sugars. And many higher-order sugars should be constructed by recursive definition. The first sugar is \m{filter}, implemented by pattern matching term rewriting.
-\[\Code{\tiny (filter $e$ (list $v_1$ $v_2$ ...))}\]
+\[\Code{(filter $e$ (list $v_1$ $v_2$ ...))}\]
 \[
 \drule{}
-{\Code{\tiny (if ($e$ $v_1$) (cons $v_1$ (filter $e$ (list $v_2$ ...)))\ (filter $e$ (list $v_2$ ...)))}}
+{\Code{(if ($e$ $v_1$) (cons $v_1$ (filter $e$ (list $v_2$ ...)))\ (filter $e$ (list $v_2$ ...)))}}
 \]
 \[
 \drule{\Code{(filter $e$ (list))}}{\Code{(list)}}
