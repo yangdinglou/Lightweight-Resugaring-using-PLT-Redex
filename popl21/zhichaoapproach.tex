@@ -157,7 +157,7 @@ In particular, if we guarantee that a term $e$ does not contain a certain variab
 %----------------------------------------------------
 \subsubsection{Replace Variables in the Symbol Table}
 
-If the expression of a node $q$ is a pattern variable $x$ and $x$ is in the symbol table of $q$, we can replace $x$ with the expression in the node it points to, then remove $x$ from the symbol table as Figure \ref{fig:nmlifa-replace}. Because $x[e_1/x, e_2/y]=e_1[e_2/y]$, the correctness is obvious.
+If the expression of a node $q$ is a pattern variable $x$ and $x$ is in the symbol table of $q$, we can replace $x$ with the expression of the node it points to, then remove $x$ from the symbol table as Figure \ref{fig:nmlifa-replace}. Because $x[e_1/x, e_2/y]=e_1[e_2/y]$, it is correct.
 
 \begin{figure}[t]
 \centering
@@ -257,7 +257,7 @@ According to Assumption \ref{Asm:determinacy}, this lemma is trivial.
 %------------------------
 \subsubsection{Algorithm}
 
-\begin{mythm}[IFA Can Be Constructed By Evaluation Rules]
+\begin{mythm}[IFA Can Be Constructed by Evaluation Rules]
 \label{mythm:Rule2IFA}
 If all the syntactic structures in CoreLang satisfy these assumptions, we can construct IFAs for all syntactic structures in CoreLang.
 \end{mythm}
@@ -270,9 +270,7 @@ We generate a node for each rule of the syntactic structure \m{CoreHead} and ins
 
 For a term like $(\m{CoreHead}~e_1~\ldots~e_n)$, considering that $e_1\cdots e_n$ are not value, According to Lemma \ref{lemma:one-step}, we have the unique rule $r$ of \m{CoreHead} for one-step evaluation. Let node $q$ corresponding to $r$ be $q_0$.
 
-If $r$ is a context rule for $e_i$, let the term of $q$ be $e_i$. Assume that the evaluation of $e_i$ results in $v_i$, we get term $(\m{CoreHead}~e_1 \ldots e_{i-1}~v_i~e_{i+1} \ldots e_n)$. For each possible value of $v_i$, choose the rules $r'$ that should be used. The node is $q'$. Set a condition as $c=q~\key{is}~v_i$ Let $\delta(q, c)$ be $q'$. For each branch, seem $r'$ as $r$ and keep doing this until $r$ is a reduction rule. If $r$ is a reduction rule, let the term of $q$ be $e$.
-
-\todo{\textbf{@zhichao}: Maybe I have to prove that there is no circles by this way, which means that any rule cannot be used before and after another rule.}
+If $r$ is a context rule for $e_i$, let the term of $q$ be $e_i$. Assume that the evaluation of $e_i$ results in $v_i$, we get term $(\m{CoreHead}~e_1 \ldots e_{i-1}~v_i~e_{i+1} \ldots e_n)$. For each possible value of $v_i$, choose the rules $r'$ that should be used. The node is $q'$. Set a condition as $c=q~\key{is}~v_i$ Let $\delta(q, c)$ be $q'$. For each branch, seem $r'$ as $r$ and keep doing this until $r$ is a reduction rule.
 
 \end{proof}
 
@@ -324,7 +322,7 @@ Suppose $e=(\m{CoreHead}~v_1~\ldots~v_p~e_1~\ldots~e_q)$. We build a term $e_0'=
 
 \begin{lemma}
 \label{lemma:rule2ifa-correct}
-For any syntactic structure \m{CoreHead}, if its evaluation rules meets the above assumptions, the normal IFA obtained according to the algorithm in Theorem \ref{mythm:Rule2IFA} have the same semantics as the rules. 
+For any syntactic structure \m{CoreHead}, if its evaluation rules meets the above assumptions, the normal IFA got by the algorithm in Theorem \ref{mythm:Rule2IFA} has the same semantics as the rules. 
 \end{lemma}
 
 In other words, for any term of syntactic structure \m{CoreHead}, evaluating the term by IFA and evaluating by rule get the same derivation sequence.
