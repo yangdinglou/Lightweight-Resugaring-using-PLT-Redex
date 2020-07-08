@@ -4,7 +4,7 @@
 
 \subsection{Implementation}
 
-Our basic resugaring approach is implemented using PLT Redex\cite{SEwPR}, which is an semantic engineering tool based on reduction semantics\cite{reduction}. The framework of the implementation is as Figure \ref{fig:frame}.
+Our resugaring approach is implemented using PLT Redex\cite{SEwPR}, which is an semantic engineering tool based on reduction semantics\cite{reduction}. The framework of the implementation is as Figure \ref{fig:frame}.
 \reduce{figure can be removed}
 \begin{figure}[t]
 	\centering
@@ -60,24 +60,23 @@ But something goes wrong when substitution take place during \m{CoreExt2}. Just 
 
 
 \label{mark:optimize}
-Note that in \m{SurfRed1} rule and \m{CoreExt1} rule, there is a recursive call on $\redm{}{}$. We can optimize the resugaring algorithm by recursively resugaring. For example, \Code{(Sugar1 (Sugar2  ...) ...)} as the input, and find the first subexpression should be reduced. We can firstly get the resugaring sequences of \Code{(Sugar2 ...)} \todo{better express?}
+Note that in \m{SurfRed1} rule and \m{CoreExt1} rule, there is a recursive call on $\redm{}{}$. We can optimize the resugaring algorithm by recursively resugaring. For example, \Code{(Sugar1 (Sugar2  ...) ...)} as the input, and find the first subexpression should be reduced. We can firstly get the resugaring sequences of \Code{(Sugar2 ...)}
 \begin{Codes}
     (Sugar2 ...)
 \OneStep{ exp1}
-\DeStep{  exp...} \note{// may be 0 or more steps}
+\DeStep{  expi} \note{// may be 0 or more steps}
 \OneStep{ expn}
 \end{Codes}
 Then a resugaring subsequence is got as
 \begin{Codes}
     (Sugar1 (Sugar2 ...) ...)
 \OneStep{ (Sugar1 exp1 ...)}
-\DeStep{  (Sugar1 exp... ...)} \note{// may be 0 or more steps}
+\DeStep{  (Sugar1 expi ...)} \note{// may be 0 or more steps}
 \OneStep{ (Sugar1 expn ...)}
 \end{Codes}
 Thus, we will not need to try to expand the outermost sugar for each inner step (recursively resugaring for inner expression).
 
-As for the automatic derivation of evaluation rules, we only implement the \emph{IFA to rules
-}'s algorithm, because it is enough to do some case studies for the resugaring tasks, by writing some core language's IFAs manually.
+As for the automatic derivation of evaluation rules, we implement a simple demo by writing some core language's IFAs (such as \m{if}, \m{let}) manually, because it is enough to do some case studies for the resugaring tasks.
 \subsection{Case Studies}
 
 We test some applications on the tool as case studies. Note that we set call-by-value lambda calculus as terms in \m{CommonExp}, because we need to output some intermediate sequences including lambda expressions in some examples. It's easy if we want to skip them.
@@ -226,14 +225,12 @@ Then the advantage of our approach is embodied. Our lightweight approach doesn't
 
 
 We also construct some higher-order syntactic sugars and test them. The higher-order feature is important for constructing practical syntactic sugars. And many higher-order sugars should be constructed by recursive definition. The first sugar is \m{filter}, implemented by pattern matching term rewriting.
-\[\Code{(filter $e$ (list $v_1$ $v_2$ ...))}\]
-\[
-\drule{}
-{\Code{(if ($e$ $v_1$) (cons $v_1$ (filter $e$ (list $v_2$ ...)))\ (filter $e$ (list $v_2$ ...)))}}
-\]
-\[
+\[\begin{array}{l}
+\drule{\Code{(filter $e$ (list $v_1$ $v_2$ ...))}}{}\\
+\qquad\Code{(if ($e$ $v_1$) (cons $v_1$ (filter $e$ (list $v_2$ ...)))\ (filter $e$ (list $v_2$ ...)))}\\
 \drule{\Code{(filter $e$ (list))}}{\Code{(list)}}
-\]
+\end{array}\]
+
 and getting the following result.
 
 \begin{Codes}
