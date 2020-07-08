@@ -4,7 +4,15 @@
 
 As discussed in the overview, some syntactic sugar may appear multiple times in one evaluation, and it is cumbersome to desugar it in CoreLang. This will make the evaluation of this syntactic sugar very inefficient. If we can statically analyze its evaluation rules through the structure of syntactic sugar, it can greatly improve the efficiency of syntactic sugar. In this section, we will give one such a method to make the resugaring of syntactic sugar more efficient.\todo{@zhichao: static check whether it is need to expand}
 
+\reducedversion{
+As discussed in the overview, frequent attempts on reverse desugaring during traditional resugaring processes is costive, so that making it inefficient. If we can statically derivate syntactic sugar's evaluation rules through its structure, it will greatly improve the efficiency of resugaring. In this section, we purpose such a method to make the resugaring of syntactic sugar more efficient.
+}
+
 Considering a simple syntactic sugar \[\drule{(\m{not}~e_1)}{(\m{if}~e_1~\m{\#f}~\m{\#t})},\] we expect to get the evaluation rules of \m{not}. In fact, we need to \textit{embed} the evaluation rules of \m{if}. So we need a method that can express evaluation rules and is easy to transform. To accomplish these goals, we designed \textit{inference automaton} (IFA), which can be visually described by graphs. Readers do not need to know the definition of IFA now, we discuss it later.
+
+\reducedversion{
+Obviously, We need to \textit{embed} the evaluation rules of \m{if} to get those of \m{not}. So we need a method that can express evaluation rules and is easy to transform. To accomplish these goals, we designed \textit{inference automaton} (IFA), which can be visually described by graphs.
+}
 
 Assuming that we already know the IFAs of all syntactic structures in CoreLang, the method of using IFA to construct the evaluation rules of syntactic sugar is as follows: First, construct the IFA of syntactic sugar according to the desugar rules. Then, transform and simplify IFA. Finally, generate evaluation rules for syntactic sugar.
 
@@ -26,6 +34,11 @@ Considering evaluation rules of \m{if} in overview, we can observe that a term h
 \end{figure}
 
 A node of IFA indicates that the term needs to be evaluated, and the nodes before this have been evaluated. The arrow from $q_0$ to $q_1$ indicates that this branch is selected when the evaluation result of $e_1$ is \m{\#t}. The arrow between $e_1$ and $e_3$ is similar. The double circles of $e_2$ and $e_3$ denote that their evaluation result is the result of the term with this syntactic structure. In most cases, the transition condition is that the evaluation result of the previous node is a value or a specific value. To simplify the representation of IFA, in the figures of this article, in the former case, we omit the condition on the transition edge; and in the latter case, we only mark the value on the transition edge.
+
+\reducedversion{
+...In most cases, the transition condition is the evaluation result (an abstract value) of the previous node or a specific value. To simplify the representation of IFA in the figures of this paper, in the former case, we omit the condition on the transition edge; and in the latter case, we only mark the value on the transition edge.
+
+}
 
 When a term headed with \m{if} needs to be evaluated (for example \m{(if (if \#t \#t \#f) \#f \#t)}), first evaluating the $e_1$ (\m{(if \#t \#t \#f)}). Note that in this process, evaluating a subexpression requires running another automaton based on its syntax, while the outer automaton hold the state at $q_0$. According to the result of $e_1$ (\m{\#f}), the IFA selects the branch ($e_3$). Then the result of $e_3$ (\m{\#t}) is the evaluation result of the term.
 
@@ -63,6 +76,7 @@ We represent the evaluation rule of \m{and} in a more complex way, as follows.
 In this case, we use the let binding. So we need to record the term represented by each variable at each node called symbol table. The representation of $\text{IFA}_{\m{and}}$ is shown in Figure \ref{fig:ifa-and-a}. 
 
 Further discuss the syntactic structure. We first evaluate $e_1$ and save the result in $x$. When evaluating the term of \m{if}, what is actually evaluated is $(\m{if}~x~e_2~x[e_1/x])$. We represent it in the form of Figure \ref{fig:ifa-and-b}, where node $q_1$ contains a symbol table for recording variables and the nodes that are referred to. This is similar to the context, but since we mapped the variable to the node, we distinguished it. Mapping to nodes is to ensure that the variable data will not be lost when the IFA is deformed.
+\todo{@ziyi: $[e_1/x]$'s location?}
 
 \begin{figure}[t]
 \centering
@@ -146,6 +160,7 @@ When evaluating an term, different branches have no influence on each other. The
 If the node $q$ in the tree IFA contains an term of a syntactic structure \m{H}, we replace this node with the IFA of \m{H}, replace the parameters and pass the symbol table of $q$ into the sub-IFA. Connect all the termination nodes of \m{H} to the original output node $q'$, and then convert it into a tree IFA according to the method described in the previous step as Figure \ref{fig:nmlifa-subst}. Remember to replace the node referenced by the branch with the \textit{new} one in conditions and symbol tables. This step can guarantee correctness, for $(\m{H}~e_1~\ldots~e_n)[e/x] = (\m{H}~e_1[e/x]~\ldots~e_n[e/x])$.
 
 In particular, if we guarantee that a term $e$ does not contain a certain variable $x$, we can remove it from the symbol table. For example, in our problem, each $e_i$ of syntactic sugar cannot contain unbound variables, so we can simply remove all symbol table of nodes with $e_i$.
+\todo{@ziyi: declare handling on hygiene?}
 
 \begin{figure}[t]
     \centering
@@ -175,8 +190,10 @@ If the expression of a node $q$ is a pattern variable $x$ and $x$ is in the symb
 \subsubsection{Remove Evaluated Nodes and Merge Transition Conditions}
 
 If an IFA is a tree, for each branch, remove the non-terminal nodes that have been evaluated with the same symbol table, and merge the conditions on the transition edge as Figure \ref{fig:nmlifa-merge}. Remember to replace the node referenced by the branch with the first-evaluated node in conditions and symbol tables. This step can make an IFA satisfy the third constraint of normal IFA.
+\todo{@ziyi: Remember ... is to verbally}
 
 Since on any branch, when $e_i$ is removed, it must have been evaluated. Therefore, when IFA runs to this node, there is no need to do any evaluation on $e_i$. At the same time, the transfer side ensures that the conditions are not lacking. Correctness is guaranteed.
+\todo{@ziyi: side?}
 
 \begin{figure}[t]
 \centering
@@ -498,6 +515,7 @@ Similarly, if an term can be derived in one step in IFA, then it must be able to
 \subsection{Syntactic Sugar}
 
 We can find out that although rules of \m{nand} we used when constructing the IFA included the syntactic structure of \m{if}, the final result does not. For syntactic sugar, we also deal with it with a similar idea, that is, construct the IFA of syntactic sugar, simplify it and convert it into rules. With the IFA, we can easily get the evaluation rules for syntactic sugars.
+\todo{@ziyi: find out -> find}
 
 Similarly, we also need to add some constraints on syntactic sugar.
 

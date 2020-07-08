@@ -195,7 +195,7 @@ We test some applications on the tool as case studies. Some examples we will dis
 \caption{Resugaring Examples}
 \label{fig:resugaring}
 \end{figure}
-\subsubsection{simple sugar}
+\subsubsection{Simple sugar}
 \label{mark:simple}
 
 We construct some simple syntactic sugars and try it on our tool. Some sugar is inspired by the first work of resugaring\cite{resugaring}. The result shows that our approach can handle all sugar features of their first work.
@@ -245,7 +245,7 @@ Of course, we got the same evaluation rules as the example in overview.
 \]
 
 Then for expressions headed with \m{or}, we won't need the one-step try to figure out whether desugaring or processing on a subexpression, which makes our approach more concise. Overall, the unidirectional resugaring algorithm makes our approach efficient, because no attempts for resugaring the expression are needed.
-\subsubsection{hygienic sugar}
+\subsubsection{Hygienic sugar}
 \label{mark:hygienic}
 
 
@@ -291,7 +291,7 @@ Though no need to write the sugar like that, something wrong may happen without 
 
 Overall, our result shows lazy desugaring is really a good way to handle hygienic sugar in any systems.
 
-\subsubsection{recursive sugar}
+\subsubsection{Recursive sugar}
 \label{sec:recursiveSugar}
 
 Recursive sugar is a kind of syntactic sugars where call itself or each other during the expanding. For example,

@@ -31,9 +31,9 @@ As a preparation of our resugaring, we define a mixed language that combines a g
 
 \subsubsection{Core Language}
 
-For our host language, we consider its evaluation rules (context rules + reduction rules) as the evaluator, with two natural assumptions. First, there is a deterministic evaluator in the evaluator which, given an expression in the host language, can deterministically reduce the expression to a new expression (can be restricted by context rules). Second, the evaluation of any sub-expression has no side-effect on other parts of the whole expression. We will discuss how to extend our approach with a black-box stepper as the evaluator in Section \ref{mark:blackbox}.
+For our host language, we consider its evaluation rules (context rules + reduction rules) as the evaluator, with two natural assumptions. First, there is a deterministic evaluator in the evaluator which, given an expression in the host language, can deterministically reduce the expression to a new expression (can be restricted by context rules). Second, the evaluation of any sub-expression has no side-effect on other parts of the whole expression. We will discuss how to extend our approach with a black-box stepper as the evaluator in Section \ref{mark:blackbox}. \todo{modify}
 
-An expression of the core language is defined in Figure \ref{fig:expression}. It is a variable, a constant, or a (language) constructor expression. Here, $\m{CoreHead}$ stands for a language constructor such as $\m{if}$ and $\m{let}$. To be concrete, we will use a simplified core language defined in Figure \ref{fig:core} to demonstrate our approach. \reduce{font size?}
+An expression of the core language is defined in Figure \ref{fig:expression}. It is a variable, a constant, or a (language) constructor expression. Here, $\m{CoreHead}$ stands for a language constructor such as $\m{if}$ and $\m{let}$. To be concrete, we will use a simplified core language defined in Figure \ref{fig:core} to demonstrate our approach.
 
 \begin{figure}[thb]
 \begin{centering}
@@ -234,7 +234,7 @@ If $e$ is headed with \m{SurfHead}, then the $\redm{}{}$ will apply recursively 
 \hfill
 
 For \m{SurfRed1} rule, $\redm{(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)}{(\m{SurfHead}~e_1~\ldots~e_i''~\ldots~e_n)}$, where $\redm{e_i}{e_i''}$.
-If $\m{fulldesugar}(e_i)$=$\m{fulldesugar}(e_i'')$, then \m{fulldesugar}(\m{Exp})=\m{fulldesugar}(\m{Exp'}). If not,  what we need to prove is that, $\redc{\m{fulldesugar}(\m{Exp})}{\m{fulldesugar}(\m{Exp'})}$. Note that the only difference between \m{Exp} and \m{Exp'} is the i-th subexpression, and we have proved the lemma \ref{lemma2} that the subexpression is the one to be reduced after the expression desugared totally, it will be also a recursive proof on the subexpression $e_i$.
+If $\m{fulldesugar}(e_i)$ = $\m{fulldesugar}(e_i'')$, then \m{fulldesugar}(\m{Exp}) = \m{fulldesugar}(\m{Exp'}). If not,  what we need to prove is that, $\redc{\m{fulldesugar}(\m{Exp})}{\m{fulldesugar}(\m{Exp'})}$. Note that the only difference between \m{Exp} and \m{Exp'} is the i-th subexpression, and we have proved the lemma \ref{lemma2} that the subexpression is the one to be reduced after the expression desugared totally, it will be also a recursive proof on the subexpression $e_i$.
 
 For \m{SurfRed2} rule, \m{Exp'} is \m{Exp} after the outermost sugar desugared. So the expressions after totally desugared are equal, \m{fulldesugar}(\m{Exp}) =
 \m{fulldesugar}(\m{Exp'}).
