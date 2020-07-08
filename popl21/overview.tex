@@ -100,7 +100,7 @@ Then the second subexpression should be reduced, which is a recursive process. F
 Note that there are some steps should not be displayed, we define the common expressions above in syntaxes to restrict which intermediate step should be displayed.
 }
 
-To solve the problem in the traditional approach, we propose a new resugaring approach by eliminating "reverse desugaring" via "lazy desugaring", where a syntactic sugar will be desugared only when it is necessary. We test the necessity of desugaring by a one-step try. We shall first briefly explain our one-step try resugaring method, and then show that how the "one-step try" can be cheaply done by derivation of evaluation rules for syntactic sugars.
+To solve the problem in the traditional approach, we propose a new resugaring approach by eliminating "reverse desugaring" via "lazy desugaring", where a syntactic sugar will be desugared only when it is necessary. We test the necessity of desugaring by a one-step try. We shall first briefly explain our one-step try resugaring method, and then show how the "one-step try" can be cheaply done by derivation of evaluation rules for syntactic sugars.
 
 \begin{Codes}
     (resugar (and (or \#t \#f) (and \#f \#t)))
@@ -162,6 +162,6 @@ As will be seen clearly in the rest of this paper, our approach has the followin
 
   \item {\em Powerful}. As we do not have "reverse desugaring", we can avoid complicated matching when we want to deal with local bindings (hygienic sugars) or more involved recursively defined sugars (see \Code{map} in Section \ref{sec:recursiveSugar}).
 
-  \item {\em Lightweight}. Our approach can be cheaply implemented using the PLT Redex tool \cite{SEwPR}. This is because our "lazy" desugaring is much more simpler than "reverse desugaring" that needs careful design of patterns, and matching/substitution algorithms.
+  \item {\em Lightweight}. Our approach can be cheaply implemented using the PLT Redex tool \cite{SEwPR}. This is because our "lazy" desugaring is much simpler than "reverse desugaring" that needs careful design of patterns, and matching/substitution algorithms.
 
 \end{itemize}

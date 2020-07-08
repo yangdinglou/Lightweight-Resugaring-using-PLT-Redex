@@ -15,32 +15,27 @@
 
 
 
-Syntactic sugar, first coined by Peter J. Landin in 1964 \cite{syntacticsugar}, was introduced to describe the surface syntax of a simple ALGOL-like programming language which was defined semantically in terms of the applicative expressions of the core lambda calculus. It has proved to be very useful for defining domain specific languages (DSLs) and extending languages \cite{FellFFKBMT18,CulpFFK19}.
+Syntactic sugar, first coined by Peter J. Landin in 1964 \cite{syntacticsugar}, was introduced to describe the surface syntax of a simple ALGOL-like programming language which was defined semantically in terms of the applicative expressions of the core lambda calculus. It has proved to be very useful for defining domain-specific languages (DSLs) and extending languages \cite{FellFFKBMT18,CulpFFK19}.
 Unfortunately, when syntactic sugar is eliminated by transformation, it obscures the relationship between the user’s source program and the transformed program.
 
 
 
 Resugaring is a powerful technique to resolve this problem \cite{resugaring,hygienic}. It  can automatically convert the evaluation sequences of desugared expression in the core language into representative sugar's syntax in the surface language.
 As demonstrated in Section \ref{sec2},
-%to guarantee the properties of emulation, %(preserving correctness in semantics),
-%abstraction,
-%(keeping abstraction of syntax sugar),
-%and coverage,
-% (doing conversion as much as possible),
 the key idea in this resugaring is "tagging" and "reverse desugaring": it tags each desugared core term with the corresponding desugared rule, and follows the evaluation steps in the core language but keep applying the desugaring rules reversibly as much as possible to find surface-level representations of the tagged core terms.
 
 While it is natural to do resugaring by reverse desugaring of tagged core terms, it introduces complexity and inefficiency.
 \begin{itemize}
-\item {\em Impractical to handle recursive sugar}. While tagging is used to remember the position of desugaring so that reverse desugaring can be done at correct position when desugared core expression is evaluated, it  becomes very tricky and complex when recursive sugars are considered. Moreover, it can only handle the recursive sugar which can be written by pattern-based desugaring rules \cite{resugaring}.%\todo{pattern-based?}
+\item {\em Impractical to handle recursive sugar}. While tagging is used to remember the position of desugaring so that reverse desugaring can be done at the correct position when a desugared core expression is evaluated, it  becomes very tricky and complex when recursive sugars are considered. Moreover, it can only handle the recursive sugar which can be written by pattern-based desugaring rules \cite{resugaring}.%\todo{pattern-based?}
 
 \item {\em Complicated to handle hygienic sugar}. For reverse desugaring, we need to match part of the core expression on the RHS of the desugaring rule and to get the surface term by substitution. But when a syntactic sugar introduce variable bindings, this match-and-substitute turns out to be very complex if we consider local bindings (hygienic sugars) \cite{hygienic}.
 
-\item {\em Inefficient in reverse desugaring.} It need to keep checking whether reverse desugaring is applicable during evaluation of desugared expression, which is very costive. Moreover, the match-and-substitute for reverse desugaring is costive particularly when the core term is big.
+\item {\em Inefficient in reverse desugaring.} It needs to keep checking whether reverse desugaring is applicable during the evaluation of desugared expressions, which is very costive. Moreover, the match-and-substitute for reverse desugaring is costive particularly when the core term is big.
 
 \end{itemize}
 
 In this paper, we propose a novel approach to resugaring, which does not use tagging and reverse desugaring at all.
-The key idea is "lazy desugaring", in the sense that desugaring is delayed so that the reverse application of desugaring rules become unnecessary.
+The key idea is "lazy desugaring", in the sense that desugaring is delayed so that the reverse application of desugaring rules becomes unnecessary.
 To this end, we consider the surface language and the core language as one language, and reduce expressions in such a smart way that all resugared terms can be fully produced based on the reduction rules in the core language and  the desugaring rules for defining syntactic sugars. To gain more efficiency, we can compress a sequence of core expression reductions into a one-step reduction of the surface language, by automatically deriving evaluation rules of the syntactic sugars based on the syntactic sugar definition and evaluation rules (consist of the context rules and reductions rules) of the core language.
 
 
@@ -50,7 +45,7 @@ Our main technical contributions can be summarized as follow.
 
 
 
-\item We show that evaluation rules for syntactic sugars can be fully derived for a wide  class of desugaring rules and the evaluation rules of the core language. We design an inference automaton to capture relationship between language constructs based on   the evaluation and desugaring rules, and derive evaluation rules for new syntactic sugars from the inference automaton. These evaluation rules, if derivable, can be seamlessly used with lazy desugaring to make resugaring more efficient.
+\item We show that evaluation rules for syntactic sugars can be fully derived for a wide  class of desugaring rules and the evaluation rules of the core language. We design an inference automaton to capture the relationship between language constructs based on   the evaluation and desugaring rules, and derive evaluation rules for new syntactic sugars from the inference automaton. These evaluation rules, if derivable, can be seamlessly used with lazy desugaring to make resugaring more efficient.
 
 
 
@@ -59,4 +54,4 @@ Our main technical contributions can be summarized as follow.
 
 \end{itemize}
 
-The rest of our paper is organized as follow. We start with an overview of our approach in Section \ref{sec2}. We then discuss the core of resugaring by lazy desugaring in Section \ref{sec3}, and automatic derivation of evaluation rules for syntactic sugars in Section \ref{sec:ruleDerivation}. We describe the implementation and show some applications as case studies in Section \ref{sec5}. We discuss related  work in Section \ref{sec6}, and conclude the paper in Section \ref{sec6}.
+The rest of our paper is organized as follows. We start with an overview of our approach in Section \ref{sec2}. We then discuss the core of resugaring by lazy desugaring in Section \ref{sec3}, and automatic derivation of evaluation rules for syntactic sugars in Section \ref{sec:ruleDerivation}. We describe the implementation and show some applications as case studies in Section \ref{sec5}. We discuss related  work in Section \ref{sec6}, and conclude the paper in Section \ref{sec6}.
