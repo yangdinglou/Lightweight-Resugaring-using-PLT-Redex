@@ -20,7 +20,7 @@ Considering evaluation rules of \m{if} in overview, we can observe that a term h
 
 \begin{figure}[t]
 	\centering
-	\includegraphics[scale=0.3]{images/ifa/ifa-if.png}
+	\includegraphics[scale=0.25]{images/ifa/ifa-if.png}
 	\caption{IFA of \m{if}}
 	\label{fig:ifa-if}
 \end{figure}
@@ -38,14 +38,14 @@ Sometimes the rules may be more complex, such as being reduced into another synt
 
 \begin{figure}[t]
 \centering
-\subcaptionbox{IFA obtained directly according to the original rules \label{fig:ifa-nand-a}}[.4\linewidth]{
-    \includegraphics[scale=0.25]{images/ifa/ifa-nand-1.png}
+\subcaptionbox{IFA according to the rules \label{fig:ifa-nand-a}}[.31\linewidth]{
+    \includegraphics[scale=0.25]{images/ifa/ifa-nand-1-small.png}
 }
-\subcaptionbox{After expanding the outer \m{if} \label{fig:ifa-nand-b}}[.4\linewidth]{
-    \includegraphics[scale=0.25]{images/ifa/ifa-nand-2.png}
+\subcaptionbox{After expanding the outer \m{if} \label{fig:ifa-nand-b}}[.31\linewidth]{
+    \includegraphics[scale=0.25]{images/ifa/ifa-nand-2-small.png}
 }
-\subcaptionbox{After expanding the inner \m{if} \label{fig:ifa-nand-c}}[.8\linewidth]{
-    \includegraphics[scale=0.25]{images/ifa/ifa-nand-3.png}
+\subcaptionbox{After expanding the inner \m{if} \label{fig:ifa-nand-c}}[.33\linewidth]{
+    \includegraphics[scale=0.25]{images/ifa/ifa-nand-3-small.png}
 }
 \caption{IFA of \m{nand}}
 \label{fig:ifa-nand}
@@ -66,11 +66,11 @@ Further discuss the syntactic structure. We first evaluate $e_1$ and save the re
 
 \begin{figure}[t]
 \centering
-\subcaptionbox{IFA obtained directly according to the original rules \label{fig:ifa-and-a}}[.4\linewidth]{
-    \includegraphics[scale=0.3]{images/ifa/ifa-and-1.png}
+\subcaptionbox{IFA according to the rules \label{fig:ifa-and-a}}[.4\linewidth]{
+    \includegraphics[scale=0.25]{images/ifa/ifa-and-1.png}
 }
-\subcaptionbox{After expanding the outer \m{if} \label{fig:ifa-and-b}}[.4\linewidth]{
-    \includegraphics[scale=0.3]{images/ifa/ifa-and-2.png}
+\subcaptionbox{After expanding \m{let} \label{fig:ifa-and-b}}[.4\linewidth]{
+    \includegraphics[scale=0.25]{images/ifa/ifa-and-2.png}
 }
 \caption{IFA of \m{and}}
 \label{fig:ifa-and}
@@ -131,10 +131,10 @@ When evaluating an term, different branches have no influence on each other. The
 \begin{figure}[t]
 \centering
 \subcaptionbox{Before\label{fig:nmlifa-tree-1}}[.45\linewidth]{
-    \includegraphics[scale=0.3]{images/nmlifa/nmlifa-tree-1.png}
+    \includegraphics[scale=0.25]{images/nmlifa/nmlifa-tree-1.png}
 }
 \subcaptionbox{After\label{fig:nmlifa-tree-2}}[.45\linewidth]{
-    \includegraphics[scale=0.3]{images/nmlifa/nmlifa-tree-2.png}
+    \includegraphics[scale=0.25]{images/nmlifa/nmlifa-tree-2.png}
 }
 \caption{Transform into a Tree}
 \label{fig:nmlifa-tree}
@@ -149,7 +149,7 @@ In particular, if we guarantee that a term $e$ does not contain a certain variab
 
 \begin{figure}[t]
     \centering
-    \includegraphics[scale=0.3]{images/nmlifa/nmlifa-subst.png}
+    \includegraphics[scale=0.25]{images/nmlifa/nmlifa-subst.png}
     \caption{Substitute Sub-Syntactic Structure}
     \label{fig:nmlifa-subst}
 \end{figure}
@@ -162,10 +162,10 @@ If the expression of a node $q$ is a pattern variable $x$ and $x$ is in the symb
 \begin{figure}[t]
 \centering
 \subcaptionbox{Before\label{fig:nmlifa-replace-1}}[.45\linewidth]{
-    \includegraphics[scale=0.3]{images/nmlifa/nmlifa-replace-1.png}
+    \includegraphics[scale=0.25]{images/nmlifa/nmlifa-replace-1.png}
 }
 \subcaptionbox{After\label{fig:nmlifa-replace-2}}[.45\linewidth]{
-    \includegraphics[scale=0.3]{images/nmlifa/nmlifa-replace-2.png}
+    \includegraphics[scale=0.25]{images/nmlifa/nmlifa-replace-2.png}
 }
 \caption{Replace Variables in the Symbol Table}
 \label{fig:nmlifa-replace}
@@ -181,10 +181,10 @@ Since on any branch, when $e_i$ is removed, it must have been evaluated. Therefo
 \begin{figure}[t]
 \centering
 \subcaptionbox{Before\label{fig:nmlifa-merge-1}}[.45\linewidth]{
-    \includegraphics[scale=0.3]{images/nmlifa/nmlifa-merge-1.png}
+    \includegraphics[scale=0.25]{images/nmlifa/nmlifa-merge-1.png}
 }
 \subcaptionbox{After\label{fig:nmlifa-merge-2}}[.45\linewidth]{
-    \includegraphics[scale=0.3]{images/nmlifa/nmlifa-merge-2.png}
+    \includegraphics[scale=0.25]{images/nmlifa/nmlifa-merge-2.png}
 }
 \caption{Remove Evaluated Nodes and Merge Transition Conditions}
 \label{fig:nmlifa-merge}
@@ -353,7 +353,7 @@ If a certain syntactic structure does not meet the above assumptions, it does no
 
 \begin{figure}[t]
     \centering
-    \includegraphics[scale=0.3]{images/ifa/ifa-let.png}
+    \includegraphics[scale=0.25]{images/ifa/ifa-let.png}
     \caption{IFA of \m{let}}
     \label{fig:ifa-let}
 \end{figure}
