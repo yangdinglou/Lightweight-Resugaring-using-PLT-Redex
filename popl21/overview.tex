@@ -90,15 +90,15 @@ We can go further to make our approach more efficient. As the purpose of a "one-
 \begin{array}{c}
 \infer {(\mbox{and}~e_1~e_2) \rightarrow (\mbox{and}~e_1'~e_2)} {e_1~ \rightarrow~e_1'}
 \qquad
-(\mbox{and}~\#t~e2) \rightarrow e_2
+(\mbox{and}~\#t~e_2) \rightarrow e_2
 \quad
-(\mbox{and}~\#f~e2) \rightarrow \#f \\
+(\mbox{and}~\#f~e_2) \rightarrow \#f \\
 \\
 \infer {(\mbox{or}~e_1~e_2) \rightarrow (\mbox{or}~e_1'~e_2)} {e_1~ \rightarrow~e_1'}
 \qquad
-(\mbox{or}~\#t~e2) \rightarrow \#t
+(\mbox{or}~\#t~e_2) \rightarrow \#t
 \quad
-(\mbox{or}~\#f~e2) \rightarrow e_2 \\
+(\mbox{or}~\#f~e_2) \rightarrow e_2 \\
 \end{array}
 \]
 Now with these rules, our resugaring will need only $3$ steps.
