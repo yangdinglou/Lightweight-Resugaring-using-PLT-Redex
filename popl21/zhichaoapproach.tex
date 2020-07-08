@@ -68,6 +68,7 @@ We represent the evaluation rule of or in a more complex way, as follows.
 \infax[E-OrV]{(\m{or}~v_1~e_2) \to (\m{let}~x~v_1~(\m{if}~x~x~e_2))}
 In this case, we use the let binding, which expresses a class of rules containing substitution. At this point, we need to record the term represented by each variable at each node, denoted by Γ. The representation of IFA\_or is shown in AAAP5.`
 
+%--------------------------------
 \subsubsection{Definition of IFA}
 
 \begin{Def}[Inference Automaton]
@@ -82,7 +83,6 @@ An inference automaton (IFA) of syntactic structure \m{CoreHead} is a 5-tuple, $
     \item A transition function $\delta: (Q-F) \times \Sigma' \to Q$ where $\Sigma' \subseteq \Sigma$
 \end{itemize}
 
-
 and for each node $q$, there is no sequence of pattern $P = (p_1,p_2,\ldots,p_n)\subseteq \Sigma^*$, which makes that after $q$ transfers sequentially according to $P$, it returns $q$.
 
 \end{Def}
@@ -91,53 +91,116 @@ The last constraint requires that there be no circles in our IFA. \todo{@ziyi: c
 
 In IFA, state transition does not depend on input. The only input IFA accepts is the term to be evaluated with this syntactic structure. The state transition is through pattern matching on the evaluation result of the term in the previous node. Note that IFA is associated with syntactic structure. At Each IFA only represents the current evaluation of a syntactic structure. The state indicates that some sub-expressions of the syntactic structure have been evaluated, and the rest have not. \todo{@ziyi: miss some articles?; each}
 
-
+%======================
 \subsection{Normal IFA}
 
-Although IFA can intuitively show the behavior of a syntactic structure for evaluation, IFA itself has a complicated form. For example, the IFA of a syntactic structure may contain other syntactic structures. We expect stricter constraints on IFA to ensure that it has been analyzed and deformed.
+Although IFA can intuitively show the behavior of a syntactic structure for evaluation, IFA itself has a complicated form. For example, the IFA of a syntactic structure may contain other syntactic structures. We try to deform and simplify IFA to make it easier to analyze.
 
 \begin{Def}[Normal IFA]
-\label{def:stdifa}
+\label{def:nmlifa}
 If an IFA meets following constraints, we call it a normal IFA.
 \begin{itemize}
-    \item The expression of node in $Q$ can only be $e_i$, a value or a pattern variable.
+    \item The expression of node $q \in Q$ can only be $e_i$ or a pattern variable. If it is a pattern variable, it cannot be in the symbol table of $q$.
     \item For any $q_1,q_2 \in Q$ and $c_1, c_2 \in \Sigma$, $\delta(q_1, c_1) \neq \delta(q_2, c_2)$.
-    \item On each branch, 
+    \item On each branch, each $e_i$ can only be evaluated once.
 \end{itemize}
 \end{Def}
 
-If an IFA is standard, it means there are no more composite syntactic structures in it. In the above example, for the syntactic structure of \m{if}, we substituted the IFA of the \m{if} into \m{nand} and converted it into a normal IFA. Below we will prove that it is always feasible to convert IFA to normal IFA, and give the algorithm.
+If an IFA is standard, it means there are no more composite syntactic structures in it. In the above example, for the syntactic structure of \m{if}, we substituted the IFA of the \m{if} into \m{nand} and converted it into a normal IFA. We will prove that it is always feasible to convert IFA to normal IFA.
 
-\begin{mythm}[Standardizability of IFA]
-\label{mythm:stdifa}
-Considering an IFA of a syntactic structure, if the normal IFAs of all syntactic structures of terms contained in the IFA are known, then the IFA can be transformed into a normal IFA.
+\begin{mythm}[Normalizability of IFA]
+\label{mythm:nmlifa}
+An IFA can be transformed into a normal IFA, if the normal IFAs of all sub-syntactic structures in the IFA are known.
 \end{mythm}
 
+In order to prove this theorem, we give the following steps and prove their correctness.
 
+%------------------------------------
+\subsubsection{Transform into a Tree}
 
-Before talking about normal IFA, we prove some properties of IFA.
+When evaluating an term, different branches have no influence on each other. Therefore, a node with at least two sources can be cloned and applied to different branches as shown in Figure \ref{fig:nmlifa-tree}. Remember to replace the node referenced by the branch with the cloned node in conditions and symbol tables. The correctness is obvious. In this way, we can transform an IFA into a tree so that it satisfies the second constraint of normal IFA.
 
-\begin{lemma}[Splittablity]
-\label{lemma:splittablity}
-In an IFA $M$, if $\delta(q_1, c_1)=q$ and $\delta(q_2, c_2)=q$, we can build a new node $q'$, whose expression and symbol table are the same as $q$. Let $\delta(q_2, c_2)=q'$. If $q \in F$, let $q' \in F$. Otherwise, for each $c_i$ and $q_i$ that satisfy $\delta(q, c_i)=q_i$, let $\delta(q', c_i)=q_i$. We build a new IFA $N$ in this way. Then $N$ is equivalent to $M$.
-\end{lemma}
+\begin{figure}[t]
+\centering
+\subcaptionbox{Before\label{fig:nmlifa-tree-1}}[.45\linewidth]{
+    \includegraphics[scale=0.3]{images/nmlifa-tree-1.png}
+}
+\subcaptionbox{After\label{fig:nmlifa-tree-2}}[.45\linewidth]{
+    \includegraphics[scale=0.3]{images/nmlifa-tree-2.png}
+}
+\caption{Transform into a Tree}
+\label{fig:nmlifa-tree}
+\end{figure}
 
-\begin{lemma}[]
+%-------------------------------------------------
+\subsubsection{Substitute Sub-Syntactic Structure}
 
-\end{lemma}
+If the node $q$ in the tree IFA contains an term of a syntactic structure \m{H}, we replace this node with the IFA of \m{H}, replace the parameters and pass the symbol table of $q$ into the sub-IFA. Connect all the termination nodes of \m{H} to the original output node $q'$, and then convert it into a tree IFA according to the method described in the previous step as Figure \ref{fig:nmlifa-subst}. Remember to replace the node referenced by the branch with the \textit{new} one in conditions and symbol tables. This step can guarantee correctness, because $(\m{H}~e_1~\ldots~e_n)[e/x] = (\m{H}~e_1[e/x]~\ldots~e_n[e/x])$.
 
+In particular, if we guarantee that a term $e$ does not contain a certain variable $x$, we can remove it from the symbol table. For example, in our problem, each $e_i$ of syntactic sugar cannot contain unbound variables, so we can simply remove all symbol table of nodes with $e_i$.
 
+\begin{figure}[t]
+    \centering
+    \includegraphics[scale=0.3]{images/nml-ifa-subst.png}
+    \caption{Substitute Sub-Syntactic Structure}
+    \label{fig:nmlifa-subst}
+\end{figure}
 
+%----------------------------------------------------
+\subsubsection{Replace Variables in the Symbol Table}
 
+If the expression of a node $q$ is a pattern variable $x$ and $x$ is in the symbol table of $q$, we can replace $x$ with its the expression in the node it points to, then remove $x$ from the symbol table as Figure \ref{fig:nmlifa-replace}. Because $x[e_1/x, e_2/y]=e_1[e_2/y]$, the correctness is obvious.
 
-\begin{proof}[Proof of Theorem \ref{mythm:stdifa}]
+\begin{figure}[t]
+\centering
+\subcaptionbox{Before\label{fig:nmlifa-replace-1}}[.45\linewidth]{
+    \includegraphics[scale=0.3]{images/nmlifa-replace-1.png}
+}
+\subcaptionbox{After\label{fig:nmlifa-replace-2}}[.45\linewidth]{
+    \includegraphics[scale=0.3]{images/nmlifa-replace-2.png}
+}
+\caption{Replace Variables in the Symbol Table}
+\label{fig:nmlifa-replace}
+\end{figure}
 
+%---------------------------------------------------------------------
+\subsubsection{Remove Evaluated Nodes and Merge Transition Conditions}
+
+If an IFA is a tree, for each branch, remove the non-terminal nodes that have been evaluated with the same symbol table, and merge the conditions on the transition edge as Figure \ref{fig:nmlifa-merge}. Remember to replace the node referenced by the branch with the first-evaluated node in conditions and symbol tables. This step can make an IFA satisfy the third constraint of normal IFA.
+
+Since on any branch, when $e_i$ is removed, it must have been evaluated. Therefore, when IFA runs to this node, there is no need to perform any evaluation on $e_i$. At the same time, the transfer side ensures that the conditions are not lacking. Correctness is guaranteed.
+
+\begin{figure}[t]
+\centering
+\subcaptionbox{Before\label{fig:nmlifa-merge-1}}[.45\linewidth]{
+    \includegraphics[scale=0.3]{images/nmlifa-merge-1.png}
+}
+\subcaptionbox{After\label{fig:nmlifa-merge-2}}[.45\linewidth]{
+    \includegraphics[scale=0.3]{images/nmlifa-merge-2.png}
+}
+\caption{Remove Evaluated Nodes and Merge Transition Conditions}
+\label{fig:nmlifa-merge}
+\end{figure}
+
+%------------------------------
+\subsubsection{Remove Constant Value}
+
+If the expression of a node is a constant value, remove the node and merge the conditions on the transition edge just like evaluated value. Because IFA does not do anything in this node, this will not affect the correctness of IFA.
+
+%-------------------------------------
+\subsubsection{Normalizability of IFA}
+
+\begin{proof}[Proof of Theorem \ref{mythm:nmlifa}]
+By repeating the above steps continuously, we can always get normal IFA. And it is equivalent to the original IFA.
 \end{proof}
 
 %===========================================
 \subsection{Convert evaluation rules to IFA}
 
 In the examples at the beginning of this section, we construct IFAs based on their semantics. Now, we will give an algorithm that can automatically convert the evaluation rules to IFA and ensure its correctness. But at the same time, it has stricter requirements on the evaluation rules.
+
+%--------------------------
+\subsubsection{Assumptions}
 
 \begin{Asm}
 \label{Asm:rules}
@@ -163,8 +226,6 @@ IFAs are not able to construct syntactic structures that contain recursive rules
 \label{Asm:determinacy}
 The rules satisfy the determinacy of one-step evaluation.
 \end{Asm}
-
-\todo{@ziyi: may be duplicate to assumptions in previous section?}
 
 By assumption \ref{Asm:determinacy}, we can get the following lemma, which points out the feasibility of using a node in IFA to represent the evaluation process of sub-expressions.
 
@@ -199,7 +260,7 @@ If $r$ is a context rule for $e_i$, let the term of $q$ be $e_i$. Assume that th
 
 \end{proof}
 
-In this way, we got an IFA of \m{CoreHead}. According to the lemma \ref{mythm:stdifa}, we can also get a normal IFA of \m{CoreHead}. 
+In this way, we got an IFA of \m{CoreHead}. According to the lemma \ref{mythm:nmlifa}, we can also get a normal IFA of \m{CoreHead}. 
 
 %---------------------------------------------------------
 \subsubsection{Example: Construct IFA of \m{xor} by Rules}
@@ -284,7 +345,7 @@ In the evaluation rules of \m{let}, there is a substitution. Therefore, in IFA o
 %===========================================
 \subsection{Convert IFA to Evaluation Rules}
 
-Next we will try to convert IFA to evaluation rules. Because IFA can be converted into normal IFA by Theorem \ref{mythm:stdifa}, we only need to convert normal IFA into rules. Unfortunately, IFA can express some derivation methods whose evaluation rules are difficult to describe. Therefore, we also need to have stricter constraints on IFA to ensure that evaluation rules can be generated.
+Next we will try to convert IFA to evaluation rules. Because IFA can be converted into normal IFA by Theorem \ref{mythm:nmlifa}, we only need to convert normal IFA into rules. Unfortunately, IFA can express some derivation methods whose evaluation rules are difficult to describe. Therefore, we also need to have stricter constraints on IFA to ensure that evaluation rules can be generated.
 
 \begin{Asm}
 \label{Asm:st} 
@@ -433,7 +494,7 @@ Suppose that there are only \m{if} and \m{let} in our CoreLang, whose IFAs are k
     \subcaptionbox{Expand syntactic structure of \m{if} \label{fig:ifa-ex-or-4}}[.31\linewidth]{
         \includegraphics[scale=0.3]{images/ifa-ex-or-4.png}
     }
-    \subcaptionbox{Replace \m{x} with expression according to the symbol table \label{fig:ifa-ex-or-5}}[.31\linewidth]{
+    \subcaptionbox{Replace $x$ with expression according to the symbol table \label{fig:ifa-ex-or-5}}[.31\linewidth]{
         \includegraphics[scale=0.3]{images/ifa-ex-or-5.png}
     }
     \subcaptionbox{Rules generated with the algorithm of Theorem \ref{mythm:ifa2rule} \label{fig:ifa-ex-or-6}}[.31\linewidth]{
