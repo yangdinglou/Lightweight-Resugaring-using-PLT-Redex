@@ -14,8 +14,10 @@ For hygienic resugaring, compared with the approach of using DAG to solve the va
 \end{itemize}
 }
 
-Our work on evaluation rule derivation for the surface language was inspired by the work of \emph{Type resugaring} \cite{resugaringtype}, which shows that it is possible to automatically construct the typing rules for the surface language by statically analyzing type inference trees. But the method based on unification is hard to be applied for our evaluation rule derivation, because it has an assumption that there is only one type rule for multi-branches of one syntactic sugar \todo{I don't understand the meaning here.}, which is not the case for evaluation rules.
-\todo{We may explain the key idea about how we deal with this assumption.}
+Our work on evaluation rule derivation for the surface language was inspired by the work of \emph{Type resugaring} \cite{resugaringtype}, which shows that it is possible to automatically construct the typing rules for the surface language by statically analyzing type inference trees. But the method based on unification is hard to be applied for our evaluation rule derivation, because it has an assumption that syntactic sugar always has a unique type. But in our problem, syntactic sugar may evaluate different subexpressions under different conditions. This will make it difficult for us to express the rules by inferring tree.
+
+% there is only one type rule for multi-branches of one syntactic sugar \todo{I don't understand the meaning here.}, which is not the case for evaluation rules.
+% \todo{We may explain the key idea about how we deal with this assumption.}
 
 
 \emph{Macros as multi-stage computations} \cite{multistage} is a work related to our lazy expansion for sugars. Some other researches \cite{modularstaging} about multi-stage programming \cite{MSP} indicate that it is useful for implementing domain-specific languages. However, multi-stage programming is a metaprogramming method, which mainly works for run-time code generation and optimization. In contrast, our lazy resugaring approach treats sugars as part of a mixed language, rather than separate them by staging. Moreover, the lazy desugaring gives us chance to derive evaluation rules of sugars, which is a new good point compared to multi-stage programming.
