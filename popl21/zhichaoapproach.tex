@@ -143,6 +143,7 @@ When evaluating a term, different branches do not influence each other. Therefor
 
 %-------------------------------------------------
 \subsubsection{Substitute Sub-Syntactic Structure}
+\label{mark:hygieneinderive}
 
 If the node $q$ in the tree IFA contains a term of a syntactic structure \m{H}, we replace this node with the normal IFA of \m{H}, replace the parameters and pass the symbol table of $q$ into the sub-IFA. Connect all the termination nodes of \m{H} to the original output node $q'$, and then convert it into a tree IFA according to the method described in the previous step as shown in Figure \ref{fig:nmlifa-subst}. Replace the node referenced by the branch with the \textit{new} one in conditions and symbol tables. This step can guarantee correctness, for $(\m{H}~e_1~\ldots~e_n)[e/x] = (\m{H}~e_1[e/x]~\ldots~e_n[e/x])$.
 

@@ -281,7 +281,7 @@ And for the derivation method, there is no rewriting system at all, but the hygi
 \drule{\Code{(Hygienicor $e_1$ $e_2$)}}{\Code{(let x $e_1$ (or $e_2$ x))}}
 \end{array}
 \]
-Though no need to write the sugar like that, something wrong may happen without hygienic rewriting system (\Code{(if x x x)} appears). But by the method introduced in \todo{ref}, we can easily get the following rules, which will behave as it should be in resugaring.
+Though no need to write the sugar like that, something wrong may happen without hygienic rewriting system (\Code{(if x x x)} appears). But with the step in normalization of IFA introduced in \ref{mark:hygieneinderive}, we can easily get the following rules, which will behave as it should be in resugaring.
 \[
 \begin{array}{c}
 \infer {(\mbox{Hygienicor}~e_1~e_2) \rightarrow (\mbox{Hygienicor}~e_1'~e_2)} {e_1~ \rightarrow~e_1'}
