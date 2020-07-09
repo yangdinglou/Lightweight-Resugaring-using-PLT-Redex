@@ -21,7 +21,7 @@ As mentioned above, IFA intuitively describes the evaluation rules of a certain 
 
 \begin{example}[IFA of~~ \m{if}]
 
-Recall the three evaluation rules of \m{if} in the overview. Given a term \m{if}~$e_1$~$e_2$~$e_3$, from these rules, we can see that $e_1$ should be evaluated first, then $e_2$ or $e_3$ will be chosen to evalute depending on the value of $e_1$. The evaluation result of $e_2$ or $e_3$ will be the value of the term. This evaluation procedure (or the three evaluation rules) for \m{if}~$e_1$~$e_2$~$e_3$ can be represented by the IFA in Figure \ref{fig:ifa-if}.
+Recall the three evaluation rules of \m{if} in the overview. Given a term \Code{(if $e_1$ $e_2$ $e_3$)}, from these rules, we can see that $e_1$ should be evaluated first, then $e_2$ or $e_3$ will be chosen to evaluate depending on the value of $e_1$. The evaluation result of $e_2$ or $e_3$ will be the value of the term. This evaluation procedure (or the three evaluation rules) for \Code{(if $e_1$ $e_2$ $e_3$)} can be represented by the IFA in Figure \ref{fig:ifa-if}.
 
 \begin{figure}[t]
     \centering
