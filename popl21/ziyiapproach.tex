@@ -84,7 +84,7 @@ If we execute \Code{(Twice (+ 1 1))}, it will firstly be desugared to \Code{(+ (
 %This would let many intermediate steps omitted, if there are many reduction steps between reduction of them.
 So we just use a \m{let} binding to resolve this problem.
 
-Note that in the desugaring rule, we do not restrict the RHS to be a $\m{CoreExp}$ term. We can use $\m{surfExp}$ (more precisely, we allow the mixture use of syntactic sugars and core expressions) to define recursive syntactic sugars, as seen in the following example.
+Note that in the desugaring rule, we do not restrict the RHS to be a $\m{CoreExp}$. We can use $\m{SurfExp}$ (more precisely, we allow the mixture use of syntactic sugars and core expressions) to define recursive syntactic sugars, as seen in the following example.
 \[
 \begin{array}{l}
 \drule{(\m{Odd}~e)}{(\m{if}~(>~e~0)~(\m{Even}~(-~e~1))~\false)}\\
@@ -137,16 +137,16 @@ We assume that all desugaring rules are not overlapped in the sense that for a s
 
 Our mixed language for resugaring combines the surface language and the core language, described in Figure \ref{fig:mix}.
 %
-The differences between terms in our core language and those in our surface language are only identified by their \m{Head}. But there may be some expressions in the core language which are also used in the surface language for convenience, or we need some core terms to help us getting better resugaring sequences. So we separate \m{CommonHead} from the \m{CoreHead}, which can be displayed in resugaring sequences (the rest of \m{CoreHead} becomes \m{CoreHead'}). The \m{CoreExp'} terms are terms with undisplayable \m{CoreHead} (named \m{CoreHead'}). The \m{SurfExp} terms are terms with \m{SurfHead} and all subexpressions are displayable. The \m{CommonExp} terms are terms with displayable CoreLang's \m{Head} (named \m{CommonHead}), together with displayable subexpressions. There exists some other expressions during our resugaring process, which have displayable \m{Head}, but one or more subexpressions should not display. They are \m{UndisplayableExp}. We distinct the two kinds of expression for \emph{abstraction} property (discussed in Section \ref{mark:abs}).
+The differences between expressions in our core language and those in our surface language are only identified by their \m{Head}. But there may be some expressions in the core language which are also used in the surface language for convenience, or we need some core language's expressions to help us getting better resugaring sequences. So we separate \m{CommonHead} from the \m{CoreHead}, which can be displayed in resugaring sequences (the rest of \m{CoreHead} becomes \m{CoreHead'}). The \m{CoreExp'} is the expression with undisplayable \m{CoreHead} (named \m{CoreHead'}). The \m{SurfExp} is the expression with \m{SurfHead} and all subexpressions are displayable. The \m{CommonExp} is the expression with displayable CoreLang's \m{Head} (named \m{CommonHead}), together with displayable subexpressions. There exists some other expressions during our resugaring process, which have displayable \m{Head}, but one or more subexpressions should not display. They are of \m{UndisplayableExp}. We distinct the two kinds of expression for \emph{abstraction} property (discussed in Section \ref{mark:abs}).
 
-Take some terms in the core language in Figure \ref{fig:core} as examples.
+Take some expressions in the core language in Figure \ref{fig:core} as examples.
 We may assume \m{if}, \m{let}, \m{lambdaN} (call-by-name lambda calculus), \m{empty?}, \m{first}, \m{rest} as \m{CoreHead'}, \m{op}, \m{lambda} (call-by-value lambda calculus), \m{cons} as \m{CommonHead}. Then we would show some useful intermediate steps.
 
-Note that some expressions with \m{CoreHead} contain subexpressions with \m{SurfHead}, they are of \m{CoreExp} but not in core language. In the mixed language, we process these terms by core language's context rule, and the reduction rules of core language and the desugaring rules of surface language are mixed as a whole (the $\redc{}{}$ in next section). For example, we have the context rule of \m{if} terms
+Note that some expressions with \m{CoreHead} contain subexpressions with \m{SurfHead}, they are of \m{CoreExp} but not in core language. In the mixed language, we process these expression by core language's context rule, and the reduction rules of core language and the desugaring rules of surface language are mixed as a whole (the $\redc{}{}$ in next section). For example, we have the context rule of \m{if} expression
 \[
 \infer{(\m{if}~e_1~e_2~e_3) \rightarrow (\m{if}~e_1'~e_2~e_3)}{e_1 \rightarrow e_1'}
 \]
-then if $e_1$ is a term in core language, it will reduce by the reduction rule in core language; if $e_1$ is a \m{SurfExp}, it will reduce by the desugaring rule of $e_1$'s \m{Head} (how the subexpression reduced does not matter, because it is just to mark the location where should be reduced); if $e_1$ is also a \m{CoreExp} with non-core subexpressions, a recursive reduction by $\redc{}{}$ is needed.
+then if $e_1$ is a expression in core language, it will reduce by the reduction rule in core language; if $e_1$ is a \m{SurfExp}, it will reduce by the desugaring rule of $e_1$'s \m{Head} (how the subexpression reduced does not matter, because it is just to mark the location where should be reduced); if $e_1$ is also a \m{CoreExp} with non-core subexpressions, a recursive reduction by $\redc{}{}$ is needed.
 
 
 \subsection{Resugaring Algorithm}
@@ -174,7 +174,7 @@ Our resugaring algorithm works on our mixed language, based on the evaluator of 
 }
 
 Putting them in simple words. For the expression with \m{CoreHead}, we just use the evaluation rules of core language combined with desugaring rules as reduction rules. As described in the previous section, if a \m{SurfExp} subexpression is reduced (\m{CoreRed1}), we should mark the location and apply $\redm{}{}$ on it recursively. Otherwise (\m{CoreRed2}), the expression just reduces by the $\redc{}{}$'s rules.
-Then for the expression with \m{SurfHead}, we will first expand the outermost sugar (identified by the \m{SurfHead}), then recursively apply $\redm{}{}$ on the partly desugared expression. In the recursive call, if one of the original subexpression $e_i$ is reduced (rule \m{SurfRed1}), then the original sugar is not necessarily desugared, we should only reduce the subexpression $e_i$; if not (rule \m{SurfRed2}), then the sugar have to desugar.
+For the expression with \m{SurfHead}, we will first expand the outermost sugar (identified by the \m{SurfHead}), then recursively apply $\redm{}{}$ on the partly desugared expression. In the recursive call, if one of the original subexpression $e_i$ is reduced (rule \m{SurfRed1}), then the original sugar is not necessarily desugared, we should only reduce the subexpression $e_i$; if not (rule \m{SurfRed2}), then the sugar have to desugar.
 
 
 %\todo{Add explanantion of the above rule.}
@@ -221,7 +221,7 @@ If the mixed language satisfies Lemma \ref{lemma1}, then the resugaring satisfie
 \begin{lemma}
 \label{lemma2}
 
-For~\m{exp} = $(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)$, if inputting $\m{fulldesugar}(\m{exp})$ to core language's evaluator reduces the term original from $e_i$ in one step, then $\redm{}{}$ will reduce \m{exp} at $e_i$.
+For~\m{exp} = $(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)$, if inputting $\m{fulldesugar}(\m{exp})$ to core language's evaluator reduces the expression original from $e_i$ in one step, then $\redm{}{}$ will reduce \m{exp} at $e_i$.
 
 %then $\redc{\m{fulldesugar}(\m{Exp})}{\m{fulldesugar}(\m{Exp'})}$
 \end{lemma}
@@ -233,7 +233,7 @@ If $e$ is of normal form, the $\m{fulldesugar}(\m{exp})$ will not be reduced by 
 
 If $e$ is headed with \m{CoreHead}, then according to the \m{CoreRed} rule, the $\rede{}{}$ will apply on $e$ according to \m{CoreRed1} or \m{CoreRed2}, which will reduce the subexpression $e_i$ according to the context rule of core language. Then the \m{SurfRed2} rule will reduce $e_i$. Because of the context rule, reduction of the subexpression is in correct location, so it is for $\redm{}{}$.
 
-If $e$ is headed with \m{SurfHead}, then the $\redm{}{}$ will apply recursively on $e$. If the new one satisfies the lemma, then it is for the former. Because any sugar expression will finally be able to desugar to expression with \m{CoreHead}, it can be proved recursively.
+If $e$ is headed with \m{SurfHead}, then the $\redm{}{}$ will apply recursively on $e$. If the new one satisfies the lemma, then it is for the former. Because any sugar expression will finally be able to desugar to an expression with \m{CoreHead}, it can be proved recursively.
 \end{proof}
 \begin{proof}[Proof of Lemma \ref{lemma1}]
 We need to prove both \m{SurfRed1} and \m{SurfRed2} satisfy it.
@@ -249,11 +249,11 @@ In summary, our resugaring approach satisfies emulation property.
 \subsubsection{Abstraction}
 \label{mark:abs}
 
-Abstraction is not a restrict properties, because each expression has its meaning. Users may choose what they want to output during the process. Traditional resugaring approaches use marks to determine whether to display a term generated by desugaring, or only changes on original terms will show.
+Abstraction is not a restrict properties, because each expression has its meaning. Users may choose what they want to output during the process. Traditional resugaring approaches use marks to determine whether to display an expression generated by desugaring, or only changes on original expressions will show.
 
-We define the abstraction by catalog the expression in the mixed language, from the reason why we need resugaring---sugar expressions become unrecognizable after desugaring. So why cannot a recursive sugar's resugaring sequences show the sugars generated by itself? We think the users should be allowed to decide which terms are recognizable. Then during the resugaring process, if no unrecognizable term for the user appears in the whole expression, the expression should be shown as a step in resugaring sequences. Lazy resugaring, as the key idea of our approach, makes any intermediate steps retain as many sugar structures as possible, so the abstraction is easy.
+We define the abstraction by catalog the expressions in the mixed language, from the reason why we need resugaring---sugar expressions become unrecognizable after desugaring. So why cannot a recursive sugar's resugaring sequences show the sugars generated by itself? We think the users should be allowed to decide which expressions are recognizable. Then during the resugaring process, if no unrecognizable expression for the user appears in the whole expression, the expression should be shown as a step in resugaring sequences. Lazy resugaring, as the key idea of our approach, makes any intermediate steps retain as many sugar structures as possible, so the abstraction is easy.
 
-One may ask what if we just want to display core language's term originated from the input expression. The solution is that we can write surface mirror terms for core terms. For example, if we want to show resugaring sequences of \Code{(and (if (and \#t \#f) ...) ...)} without displaying \m{if} term produced by \m{and}, we can write a \m{IF} term, with the same evaluation rules as \m{if}. Then just input \Code{(and (IF (and \#t \#f) ...) ...)} to get the resugaring sequences. It is really flexible.
+One may ask what if we just want to display core language's expression originated from the input expression. The solution is that we can write surface mirror term for core expressions. For example, if we want to show resugaring sequences of \Code{(and (if (and \#t \#f) ...) ...)} without displaying \m{if} expression produced by \m{and}, we can write a \m{IF} term, with the same evaluation rules as \m{if}. Then just input \Code{(and (IF (and \#t \#f) ...) ...)} to get the resugaring sequences. It is really flexible.
 
 \subsubsection{Coverage}
 The coverage property is important, because resugaring sequences are useless if losing intermediate steps. By lazy desugaring, it becomes obvious, because there is no chance to lose. In Lemma \ref{lemma3}, we want to show that our reduction rules in the mixed language is \emph{lazy} enough. Because it is obvious, we only give a proof sketch here.
