@@ -135,15 +135,10 @@ In order to prove this theorem, we give the following steps and prove their corr
 When evaluating a term, different branches do not influence each other. Therefore, a node with at least two sources can be cloned and applied to different branches as shown in Figure \ref{fig:nmlifa-tree}. Replace the node referenced by the branch with the cloned node in conditions and symbol tables. The correctness is obvious. In this way, we can transform an IFA into a tree so that it satisfies the second constraint of normal IFA.
 
 \begin{figure}[t]
-\centering
-\subcaptionbox{Before\label{fig:nmlifa-tree-1}}[.45\linewidth]{
-    \includegraphics[scale=0.25]{images/nmlifa/nmlifa-tree-1.png}
-}
-\subcaptionbox{After\label{fig:nmlifa-tree-2}}[.45\linewidth]{
-    \includegraphics[scale=0.25]{images/nmlifa/nmlifa-tree-2.png}
-}
-\caption{Transform into a Tree}
-\label{fig:nmlifa-tree}
+	\centering
+    \includegraphics[scale=0.25]{images/nmlifa/nmlifa-tree.png}
+	\caption{Transform into a Tree}
+	\label{fig:nmlifa-tree}
 \end{figure}
 
 %-------------------------------------------------
@@ -168,15 +163,10 @@ For hygienic sugar, this step of substitution can also guarantee correctness. Be
 If the expression of a node $q$ is a pattern variable $x$ and $x$ is in the symbol table of $q$, we can replace $x$ with the expression of the node it points to, then remove $x$ from the symbol table as Figure \ref{fig:nmlifa-replace}. Because $x[e_1/x, e_2/y]=e_1[e_2/y]$, it is correct.
 
 \begin{figure}[t]
-\centering
-\subcaptionbox{Before\label{fig:nmlifa-replace-1}}[.45\linewidth]{
-    \includegraphics[scale=0.25]{images/nmlifa/nmlifa-replace-1.png}
-}
-\subcaptionbox{After\label{fig:nmlifa-replace-2}}[.45\linewidth]{
-    \includegraphics[scale=0.25]{images/nmlifa/nmlifa-replace-2.png}
-}
-\caption{Replace Variables in the Symbol Table}
-\label{fig:nmlifa-replace}
+	\centering
+    \includegraphics[scale=0.25]{images/nmlifa/nmlifa-replace.png}
+	\caption{Replace Variables in the Symbol Table}
+	\label{fig:nmlifa-replace}
 \end{figure}
 
 %---------------------------------------------------------------------
@@ -187,15 +177,10 @@ If an IFA is a tree, for each branch, remove the non-terminal nodes that have be
 Since on any branch, if $e_i$ is removed, it must have been evaluated. Therefore, when IFA runs to this node, there is no need to do any evaluation on $e_i$. At the same time, the transfer edge ensures that the conditions are not lacking. Correctness is guaranteed.
 
 \begin{figure}[t]
-\centering
-\subcaptionbox{Before\label{fig:nmlifa-merge-1}}[.45\linewidth]{
-    \includegraphics[scale=0.25]{images/nmlifa/nmlifa-merge-1.png}
-}
-\subcaptionbox{After\label{fig:nmlifa-merge-2}}[.45\linewidth]{
-    \includegraphics[scale=0.25]{images/nmlifa/nmlifa-merge-2.png}
-}
-\caption{Remove Evaluated Nodes and Merge Transition Conditions}
-\label{fig:nmlifa-merge}
+	\centering
+	\includegraphics[scale=0.25]{images/nmlifa/nmlifa-merge.png}
+	\caption{Remove Evaluated Nodes and Merge Transition Conditions}
+	\label{fig:nmlifa-merge}
 \end{figure}
 
 %------------------------------------
