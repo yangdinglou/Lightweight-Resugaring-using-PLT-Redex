@@ -58,7 +58,7 @@ Putting them in simple words. For expression \Code{(CoreHead $e_1$ $\ldots$ $e_n
 
 \end{center}
 
-But something goes wrong when substitution takes place during \m{CoreExt2}. Just as the example we will talk about later in Section \ref{mark:hygienic}, for a expression like \Code{(let (x 2) (Sugar x 1))}, it should reduce to \Code{(Sugar 2 1)} by the \m{CoreRed2} rule, but got \Code{(Sugar x 1)} by the \m{CoreExt2} rule. So when using the extension of black-box stepper's rule (\m{ExtRed2}), we need some other information about in which subexpression a substitution will take place (the substitution can be got by a similar idea as the tricky extension). Then for these subexpressions, we need to do the same substitution before replacing back.
+But something goes wrong when substitution takes place during \m{CoreExt2}. Just as the example we will talk about later in Section \ref{mark:hygienic}, for a expression like \Code{(let x 2 (Sugar x 1))}, it should reduce to \Code{(Sugar 2 1)} by the \m{CoreRed2} rule, but got \Code{(Sugar x 1)} by the \m{CoreExt2} rule. So when using the extension of black-box stepper's rule (\m{ExtRed2}), we need some other information about in which subexpression a substitution will take place (the substitution can be got by a similar idea as the tricky extension). Then for these subexpressions, we need to do the same substitution before replacing back.
 }
 % \todo{black-box's extension was removed, maybe add in appendix}
 
@@ -126,7 +126,7 @@ We test some applications on the tool as case studies. Some examples we will dis
 \begin{flushleft}
 {\scriptsize
 \begin{Codes}
-\qquad    (let (x 2) (Hygienicadd 1 x))\\
+\qquad    (let x 2 (Hygienicadd 1 x))\\
 \OneStep{ (Hygienicadd 1 2)}\\
 \OneStep{ (+ 1 2)}\\
 \OneStep{ 3}\\
@@ -239,7 +239,7 @@ Then in our core language, the execution of expanded expression will contain 33 
 }
 
 As for the derivation of syntactic sugar's evaluation rules, we have shown an example of \m{and} sugar and \m{or} sugar in overview. But what if the \m{or} sugar written as follows?
-\[\drule{\Code{(or $e_1$ $e_2$)}}{\Code{(let (x $e_1$) (if x x $e_2$))}}\]
+\[\drule{\Code{(or $e_1$ $e_2$)}}{\Code{(let x $e_1$ (if x x $e_2$))}}\]
 Of course, we got the same evaluation rules as the example in overview.
 \[
 \begin{array}{c}
@@ -259,15 +259,15 @@ Then for expressions headed with \m{or}, we won't need the one-step try to figur
 The second work\cite{hygienic} of traditional resugaring approach mainly processes hygienic sugar compared to first work. It uses a DAG to represent the expression. However, hygiene is not hard to be handled by our lazy desugaring strategy. Our algorithm can easily process hygienic sugar without a special data structure.
 A typical hygienic problem is as the following example.
 \[
-\drule{\Code{(Hygienicadd $e_1$ $e_2$)}}{\Code{(let (x $e_1$) (+ x $e_2$))}}
+\drule{\Code{(Hygienicadd $e_1$ $e_2$)}}{\Code{(let x $e_1$ (+ x $e_2$))}}
 \]
 % \begin{Codes}
 % 	(Hygienicadd e1 e2) \DeStep{ (let ((x e1)) (+ x e2))}
 % \end{Codes}
-For traditional resugaring approach, if we want to get sequences of \Code{(let (x 2) (Hygienicadd 1 x))}, it will firstly desugar to \Code{(let (x 2) (let (x 1) (+ x x)))}, which is awful because the two $x$ in \Code{(+ x x)} should be bind to different value. So the traditional hygienic resugaring approach uses abstract syntax DAG to distinct different \m{x} in the desugared expression. But for our approach based on lazy desugaring, the \m{hygienicadd} sugar does not have to desugar until necessary, thus, getting resugaring sequences as Figure \ref{fig:hygienicadd} based on a  rewriting system which renaming the variables during the rewriting.
+For traditional resugaring approach, if we want to get sequences of \Code{(let x 2 (Hygienicadd 1 x))}, it will firstly desugar to \Code{(let x 2 (let x 1 (+ x x)))}, which is awful because the two $x$ in \Code{(+ x x)} should be bind to different value. So the traditional hygienic resugaring approach uses abstract syntax DAG to distinct different \m{x} in the desugared expression. But for our approach based on lazy desugaring, the \m{hygienicadd} sugar does not have to desugar until necessary, thus, getting resugaring sequences as Figure \ref{fig:hygienicadd} based on a  rewriting system which renaming the variables during the rewriting.
 
 
-The lazy desugaring is also convenient for hygienic resugaring for non-hygienic rewriting. For example, \Code{(let (x 1) (+ x (let (x 2) (+ x 1))))} may be reduced to \Code{(+ 1 (let (1 2) (+ 1 1)))} by a simple core language whose \Code{let} expression does not handle cases like that. But by writing a simple sugar Let,
+The lazy desugaring is also convenient for hygienic resugaring for non-hygienic rewriting. For example, \Code{(let x 1 (+ x (let x 2 (+ x 1))))} may be reduced to \Code{(+ 1 (let 1 2 (+ 1 1)))} by a simple core language whose \Code{let} expression does not handle cases like that. But by writing a simple sugar Let,
 \[\drule{\Code{(Let~$e_1$~$e_2$~$e_3$)}}{\Code{(let~($e_1$~$e_2$)~$e_3$)}}\]
 and making some simple modifies in the reduction of mixed language, we will get the resugaring sequences as Figure \ref{fig:Let} in our tool.
 
@@ -277,8 +277,8 @@ In practical application, we think hygiene can be easily processed by rewriting 
 And for the derivation method, there is no rewriting system at all, but the hygiene is handled more concisely. we build a hygienic sugar \m{Hygienicor} based on the \m{or} sugar.
 \[
 \begin{array}{l}
-\drule{\Code{(Or $e_1$ $e_2$)}}{\Code{(let (x $e_1$) (if x x $e_2$))}}\\
-\drule{\Code{(Hygienicor $e_1$ $e_2$)}}{\Code{(let (x $e_1$) (or $e_2$ x))}}
+\drule{\Code{(Or $e_1$ $e_2$)}}{\Code{(let x $e_1$ (if x x $e_2$))}}\\
+\drule{\Code{(Hygienicor $e_1$ $e_2$)}}{\Code{(let x $e_1$ (or $e_2$ x))}}
 \end{array}
 \]
 Though no need to write the sugar like that, something wrong may happen without hygienic rewriting system (\Code{(if x x x)} appears). But by the method introduced in \todo{ref}, we can easily get the following rules, which will behave as it should be in resugaring.
@@ -340,7 +340,7 @@ Moreover, just like the \emph{Odd and Even} sugar above, there are some simple r
 \[
 \begin{array}{l}
 \drule{\Code{(Map $e_1$ $e_2$)}}{}\\
-\Code{(let (x $e_2$) (if (empty? x) (list) (cons ($e_1$ (first x)) (Map $e_1$ (rest x)))))}
+\Code{(let x $e_2$ (if (empty? x) (list) (cons ($e_1$ (first x)) (Map $e_1$ (rest x)))))}
 \end{array}
 \]
 
