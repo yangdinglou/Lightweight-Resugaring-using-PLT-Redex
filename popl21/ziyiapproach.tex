@@ -137,33 +137,36 @@ We assume that all desugaring rules are not overlapped in the sense that for a s
 
 Our mixed language for resugaring combines the surface language and the core language, described in Figure \ref{fig:mix}.
 %
-The differences between expressions in our core language and those in our surface language are only identified by their \m{Head}. But there may be some expressions in the core language which are also used in the surface language for convenience, or we need some core language's expressions to help us getting better resugaring sequences. So we separate \m{CommonHead} from the \m{CoreHead}, which can be displayed in resugaring sequences (the rest of \m{CoreHead} becomes \m{CoreHead'}). The \m{CoreExp'} is the expression with undisplayable \m{CoreHead} (named \m{CoreHead'}). The \m{SurfExp} is the expression with \m{SurfHead} and all subexpressions are displayable. The \m{CommonExp} is the expression with displayable CoreLang's \m{Head} (named \m{CommonHead}), together with displayable subexpressions. There exists some other expressions during our resugaring process, which have displayable \m{Head}, but one or more subexpressions should not display. They are of \m{UndisplayableExp}. We distinct the two kinds of expression for \emph{abstraction} property (discussed in Section \ref{mark:abs}).
+The differences between expressions in our core language and those in our surface language are identified by their \m{Head}. But there may be some expressions in the core language which are also used in the surface language for convenience, or we need some core language's expressions to help us getting better resugaring sequences. So we take \m{CommonHead} out from the \m{CoreHead}, which can be displayed in resugaring sequences (the rest of \m{CoreHead} becomes \m{CoreHead'}). The \m{CoreExp'} denotes expressions with undisplayable \m{CoreHead} (named \m{CoreHead'}). The \m{SurfExp} denote expressions that have \m{SurfHead} and their subexpressions being displayable. The \m{CommonExp} denotes expressions with displayable \m{Head} (named \m{CommonHead}) in the core language, together with displayable subexpressions. There exist some other expressions during our resugaring process, which have displayable \m{Head}, but one or more of their subexpressions should not be displayed. They are of \m{UndisplayableExp}. We distinguish these two kinds of expressions for the \emph{abstraction} property (discussed in Section \ref{mark:abs}).
 
-Take some expressions in the core language in Figure \ref{fig:core} as examples.
-We may assume \m{if}, \m{let}, \m{lambdaN} (call-by-name lambda calculus), \m{empty?}, \m{first}, \m{rest} as \m{CoreHead'}, \m{op}, \m{lambda} (call-by-value lambda calculus), \m{cons} as \m{CommonHead}. Then we would show some useful intermediate steps.
+As an example, for the core language in Figure \ref{fig:core},
+we may assume \m{if}, \m{let}, \m{lambdaN} (call-by-name lambda calculus), \m{empty?}, \m{first}, \m{rest} as \m{CoreHead'}, \m{op}, \m{lambda} (call-by-value lambda calculus), \m{cons} as \m{CommonHead}. This will allow \m{op}, \m{lambda} and \m{cons} to appear in the surface language, and thus display more intermediate steps during resugaring.
 
-Note that some expressions with \m{CoreHead} contain subexpressions with \m{SurfHead}, they are of \m{CoreExp} but not in core language. In the mixed language, we process these expression by core language's context rule, and the reduction rules of core language and the desugaring rules of surface language are mixed as a whole (the $\redc{}{}$ in next section). For example, we have the context rule of \m{if} expression
+Note that some expressions with \m{CoreHead} contain subexpressions with \m{SurfHead}, they are of \m{CoreExp} but not in the core language. In the mixed language, we process these expressions by the context rules of the core language, so that the reduction rules of core language and the desugaring rules of surface language can be mixed as a whole (the $\redc{}{}$ in next section). For example, suppose we have the context rule of \m{if} expression
 \[
 \infer{(\m{if}~e_1~e_2~e_3) \rightarrow (\m{if}~e_1'~e_2~e_3)}{e_1 \rightarrow e_1'}
 \]
-then if $e_1$ is a expression in core language, it will reduce by the reduction rule in core language; if $e_1$ is a \m{SurfExp}, it will reduce by the desugaring rule of $e_1$'s \m{Head} (how the subexpression reduced does not matter, because it is just to mark the location where should be reduced); if $e_1$ is also a \m{CoreExp} with non-core subexpressions, a recursive reduction by $\redc{}{}$ is needed.
+then if $e_1$ is a expression in the core language, it will be reduced by the reduction rule in the core language; if $e_1$ is a \m{SurfExp}, it will be reduced by the desugaring rule of $e_1$'s \m{Head} (how the subexpression reduced does not matter, because it is just to mark the location where it should be reduced); if $e_1$ is also a \m{CoreExp} with non-core subexpressions, a recursive reduction by $\redc{}{}$ is needed.
 
 
 \subsection{Resugaring Algorithm}
 
-Our resugaring algorithm works on our mixed language, based on the evaluator of the core language and the desugaring rules for defining the surface language. Let $\redc{}{}$ denote the one-step reduction of the \m{CoreExp} (described in previous section), and $\drule{}{}$ the one-step desugaring of outermost sugar. We define $\redm{}{}$, the one-step reduction of our mixed language, as follows.
+Our resugaring algorithm works on the mixed language, based on the evaluation rules of the core language and the desugaring rules for defining the surface language. Let $\redc{}{}$ denote the one-step reduction of the \m{CoreExp} (described in previous section), and $\drule{}{}$ the one-step desugaring of outermost sugar. We define $\redm{}{}$, a one-step reduction of our mixed language, as follows.
 \label{mark:mixedreduction}
 \infrule[CoreRed1]
-{\redm{e_i}{e_i''}\\
-\exists i.\, \redc{(\m{CoreHead}~e_1~\ldots~e_i~\ldots~e_n)}{(\m{CoreHead}~e_1~\ldots~e_i'~\ldots~e_n)}~and~e_i~\in~\m{SurfExp}}
+{
+\exists i.\, \redc{(\m{CoreHead}~e_1~\ldots~e_i~\ldots~e_n)}
+                  {(\m{CoreHead}~e_1~\ldots~e_i'~\ldots~e_n)}\\
+e_i~\in~\m{SurfExp} \andalso \redm{e_i}{e_i''}}
 {\redm{(\m{CoreHead}~e_1~\ldots~e_i~\ldots~e_n)}{(\m{CoreHead}~e_1~\ldots~e_i''~\ldots~e_n)}}
 \infrule[CoreRed2]
-{\redc{(\m{CoreHead}~e_1~\ldots~e_n)}{e'}\\
-\neg \exists i.\, \redc{(\m{CoreHead}~e_1~\ldots~e_i~\ldots~e_n)}{(\m{CoreHead}~e_1~\ldots~e_i'~\ldots~e_n)}~and~e_i~\in~\m{SurfExp}}
+{\mbox{$\redc{(\m{CoreHead}~e_1~\ldots~e_n)}{e'}$ and is a reduction step}}
+%\neg \exists i.\, \redc{(\m{CoreHead}~e_1~\ldots~e_i~\ldots~e_n)}{(\m{CoreHead}~e_1~\ldots~e_i'~\ldots~e_n)}~and~e_i~\in~\m{SurfExp}}
 {\redm{(\m{CoreHead}~e_1~\ldots~e_i~\ldots~e_n)}{e'}}
 \infrule[SurfRed1]
-{\drule{(\m{SurfHead}~x_1~\ldots~x_i~\ldots~x_n)}{e},~\redm{e_i}{e_i''}\\
-\exists i.\, \redm{e[e_1/x,\ldots,e_i/x_i,\ldots,e_n/x_n]}{e[e_1/x,\ldots,e_i'/x_i,\ldots,e_n/x_n]}
+{\drule{(\m{SurfHead}~x_1~\ldots~x_i~\ldots~x_n)}{e},~\\
+\exists i.\, \redm{e[e_1/x,\ldots,e_i/x_i,\ldots,e_n/x_n]}{e[e_1/x,\ldots,e_i'/x_i,\ldots,e_n/x_n]}\\
+\redm{e_i}{e_i''}
 }
 {\redm{(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)}{(\m{SurfHead}~e_1~\ldots~e_i''~\ldots~e_n)}}
 \infrule[SurfRed2]
@@ -173,13 +176,13 @@ Our resugaring algorithm works on our mixed language, based on the evaluator of 
 {\redm{(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)}{e[e_1/x_1,\ldots,e_i/x_i,\ldots,e_n/x_n]}
 }
 
-Putting them in simple words. For the expression with \m{CoreHead}, we just use the evaluation rules of core language combined with desugaring rules as reduction rules. As described in the previous section, if a \m{SurfExp} subexpression is reduced (\m{CoreRed1}), we should mark the location and apply $\redm{}{}$ on it recursively. Otherwise (\m{CoreRed2}), the expression just reduces by the $\redc{}{}$'s rules.
-For the expression with \m{SurfHead}, we will first expand the outermost sugar (identified by the \m{SurfHead}), then recursively apply $\redm{}{}$ on the partly desugared expression. In the recursive call, if one of the original subexpression $e_i$ is reduced (rule \m{SurfRed1}), then the original sugar is not necessarily desugared, we should only reduce the subexpression $e_i$; if not (rule \m{SurfRed2}), then the sugar have to desugar.
+Putting them in simple words, for an expression with \m{CoreHead}, we just use the evaluation rules of core language combined with desugaring rules as reduction rules. As described in the previous section, if a \m{SurfExp} subexpression is to be reduced (\m{CoreRed1}), we should mark the location and apply $\redm{}{}$ on it recursively; otherwise (\m{CoreRed2}), the expression is just reduced by the $\redc{}{}$'s rule.
+For the expression with \m{SurfHead}, we will first expand the outermost sugar (identified by the \m{SurfHead}), then recursively apply $\redm{}{}$ on the partly desugared expression. In the recursive call, if one of the original subexpression $e_i$ is reduced then the original sugar is not necessarily desugared, we should only reduce the subexpression $e_i$ (\m{SurfRed1}); otherwise, the sugar should be desugared (\m{SurfRed2}).
 
 
 %\todo{Add explanantion of the above rule.}
 
-Then our desugaring algorithm is defined based on $\redm{}{}$.
+Now, our desugaring algorithm can be easily defined based on $\redm{}{}$.
 
 \[
 \begin{array}{llll}
@@ -191,26 +194,26 @@ Then our desugaring algorithm is defined based on $\redm{}{}$.
 							& & \qquad \key{else}~\m{resugar}(e')
 \end{array}
 \]
-
-During the resugaring, we just call the mixed language's reduction ($\redm{}{}$) on the input expression until the expression becomes a normal form. We use the \m{DisplayableExp} to restrict immediate sequences to be output or not. It is more explicit compared to the traditional approach. And because $\redm{}{}$ will be executed recursively on the subexpressions, it can be optimized (see in \ref{mark:optimize}, because the current description is easier to understand.)
+During the resugaring, we just apply the reduction ($\redm{}{}$) on the input expression step by step until it becomes a normal form, while outputting those intermediate expressions that belong to \m{DisplayableExp}. This algorithm is more explicit and simpler than the traditional one. Note that $\redm{}{}$ is executed recursively on the subexpressions, which provides rooms for further optimization (see Section \ref{mark:optimize}).
+%, because the current description is easier to understand.)
 
 \subsection{Correctness}
 \label{mark:correct}
 
-Traditional resugaring approach\cite{resugaring,hygienic} define three properties for the correctness of resugaring. We think they are also reasonable to describe the correctness of our approach. We describe the following properties in our mixed language's domain, then prove or discuss them.
+Following the traditional resugaring approach \cite{resugaring,hygienic}, we show that our resugaring algorithm satisfied the following three properties:
+% for our resuarging, then prove or discuss them.
+(1)
+\emph{Emulation}: For each reduction of an expression in our mixed language, it should reflect on one-step reduction of the expression totally desugared in the core language, or one step desugaring on a syntactic sugar;
+(2)
+\emph{Abstraction}: Only displayable expressions defined in our mixed language appear in our resugaring sequences; and
+(3)
+\emph{Coverage}: No syntactic sugar is desugared before its sugar structure should be destroyed in core language.
 
-\emph{Emulation.} For each reduction of an expression in our mixed language, it should reflect on one-step reduction of the expression totally desugared in the core language, or one step desugaring on a syntactic sugar.
-
-\emph{Abstraction.} Only displayable expressions defined in our mixed language appear in our resugaring sequences.
-
-\emph{Coverage.} No syntactic sugar is desugared before its sugar structure should be destroyed in core language.
-
-\subsubsection{Emulation} It is a basic property for correctness. Since desugaring does not change an expression after totally desugared, what we need to prove is that a non-desugaring reduction in the mixed language shows the exact reduction which should appear after the expression totally desugared. Formalize by the following lemma (\m{fulldesugar}(\m{exp}) returns the expression after \m{exp} totally desugared).
+\subsubsection{Emulation} This is the basic property for a correct resugaring. Since our desugaring does not change an expression after it is totally desugared, what we need to show is that a non-desugaring reduction in the mixed language is exactly the same  reduction which should appear after the expression is totally desugared. Formalize by the following lemma (\m{fulldesugar}(\m{exp}) returns the expression after \m{exp} totally desugared).
 
 \begin{lemma}
 \label{lemma1}
-
-For~\m{exp} = $(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)\in\m{SurfExp}$, if~$\redm{\m{exp}}{\m{exp'}}$ and\\ \m{fulldesugar}(\m{exp}) $\not=$ $\m{fulldesugar}(\m{exp'})$,~then $\redc{\m{fulldesugar}(\m{exp})}{\m{fulldesugar}(\m{exp'})}$
+For~\m{exp} = $(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)\in\m{SurfExp}$, if~$\redm{\m{exp}}{\m{exp'}}$ and\\ \m{fulldesugar}(\m{exp}) $\not=$ $\m{fulldesugar}(\m{exp'})$,~then $\redc{\m{fulldesugar}(\m{exp})}{\m{fulldesugar}(\m{exp'})}$.
 
 \end{lemma}
 
@@ -244,7 +247,7 @@ For \m{SurfRed2} rule, \m{Exp'} is \m{Exp} after the outermost sugar desugared. 
 \m{fulldesugar}(\m{Exp'}).
 \end{proof}
 
-In summary, our resugaring approach satisfies emulation property.
+%In summary, our resugaring approach satisfies emulation property.
 
 \subsubsection{Abstraction}
 \label{mark:abs}
