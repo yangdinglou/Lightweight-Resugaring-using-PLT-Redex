@@ -3,7 +3,7 @@
 \section{Resugaring by Lazy Desugaring}
 \label{sec3}
 
-In this section, we present our new approach to resugaring. Different from the traditional approach that clearly separates the surface from the core languages, we combine them as one mixed language, allowing free use of the language constructs in both languages. We will show that any expression in the mixed language can be evaluated in such a smart way that a sequence of all expressions that are necessary to be resugared by the traditional approach can be correctly produced.
+In this section, we present our new approach to resugaring. Different from the traditional approach that clearly separates the surface from the core languages, we intensionally combine them as one mixed language, allowing free use of the language constructs in both languages. We will show that any expression in the mixed language can be evaluated in such a smart way that a sequence of all expressions that are necessary to be resugared by the traditional approach can be correctly produced.
 
 \subsection{Mixed Language for Resugaring}
 
@@ -22,18 +22,19 @@ In this section, we present our new approach to resugaring. Different from the t
 	\end{array}
 	\]
 }
-	
+
 	\caption{Core and Surface Expressions}
 	\label{fig:expression}
 \end{figure}
 
-As a preparation of our resugaring, we define a mixed language that combines a given core language with a surface language defined as syntactic sugars over the core language. An expression in this language is reduced step by step by the evaluation rules for the core language and the desugaring rules for the syntactic sugars in the surface language.
+As a preparation for our resugaring algorithm, we define a mixed language that combines a core language with a surface language (defined by syntactic sugars over the core language). An expression in this language is reduced step by step by the evaluation rules for the core language and the desugaring rules for the syntactic sugars in the surface language.
 
 \subsubsection{Core Language}
 
-For our host language, we consider its evaluation rules (context rules + reduction rules) as the evaluator, with two natural assumptions. First, there is a deterministic evaluator in the evaluator which, given an expression in the host language, can deterministically reduce the expression to a new expression (can be restricted by context rules). Second, the evaluation of any sub-expression has no side-effect on other parts of the whole expression. We discuss how to trickily extend our approach with a black-box stepper as the evaluator in Appendix.
+For our core language,  its evaluator is driven by evaluation rules (context rules and reduction rules), with two natural assumptions. First, the evaluation is deterministic, in the sense that any expression in the core language will be reduced by a unique reduction sequence. Second, evaluation of a sub-expression has no side-effect on other parts of the expression.
+%We discuss how to trickily extend our approach with a black-box stepper as the evaluator in Appendix.
 
-An expression of the core language is defined in Figure \ref{fig:expression}. It is a variable, a constant, or a (language) constructor expression. Here, $\m{CoreHead}$ stands for a language constructor such as $\m{if}$ and $\m{let}$. To be concrete, we will use a simplified core language defined in Figure \ref{fig:core} to demonstrate our approach.
+An expression scheme of the core language is given in Figure \ref{fig:expression}. It is a variable, a constant, or a (language) constructor expression. Here, $\m{CoreHead}$ stands for a language constructor such as $\m{if}$ and $\m{let}$. To be concrete, we will use a simplified core language defined in Figure \ref{fig:core} to demonstrate our approach.
 
 \begin{figure}[thb]
 \begin{centering}
@@ -53,7 +54,7 @@ An expression of the core language is defined in Figure \ref{fig:expression}. It
 			&|& \m{x}\\
 			&|& \m{c} ~~\note{// boolean, number and list}
 			\end{array}
-	}	
+	}
 	\]
 \end{centering}
 \caption{A Core Language Example}
@@ -93,7 +94,7 @@ We assume that all desugaring rules are not overlapped in the sense that for a s
 \subsubsection{Mixed Language}
 \begin{figure}[thb]
 \begin{centering}
-{\footnotesize 
+{\footnotesize
 \[
 			\begin{array}{lcl}
 			\m{Exp} &::=& \m{DisplayableExp}\\
@@ -124,7 +125,7 @@ We assume that all desugaring rules are not overlapped in the sense that for a s
 			\end{array}
 			\]
 }
-	
+
 \end{centering}
 \caption{Our Mixed Language}
 \label{fig:mix}
@@ -222,7 +223,7 @@ For~\m{exp} = $(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)$, if inputting $\m{fulld
 \end{lemma}
 
 \begin{proof}[Proof of Lemma \ref{lemma2}]
-For $\drule{(\m{SurfHead}~x_1~\ldots~x_i~\ldots~x_n)}{e}$, 
+For $\drule{(\m{SurfHead}~x_1~\ldots~x_i~\ldots~x_n)}{e}$,
 
 If $e$ is of normal form, the $\m{fulldesugar}(\m{exp})$ will not be reduced by core evaluator.
 
