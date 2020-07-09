@@ -28,9 +28,9 @@ While it is natural to do resugaring by reverse desugaring of tagged core terms,
 \begin{itemize}
 \item {\em Impractical to handle recursive sugar}. While tagging is used to remember the position of desugaring so that reverse desugaring can be done at the correct position when a desugared core expression is evaluated, it  becomes very tricky and complex when recursive sugars are considered. Moreover, it can only handle the recursive sugar which can be written by pattern-based desugaring rules \cite{resugaring}.%\todo{pattern-based?}
 
-\item {\em Complicated to handle hygienic sugar}. For reverse desugaring, we need to match part of the core expression on the RHS (which could be much bigger than LHS) of the desugaring rule and to get the surface term by substitution. But when a syntactic sugar introduces variable bindings, this match-and-substitute turns out to be very complex if we consider local bindings (hygienic sugars) \cite{hygienic}.
+\item {\em Complicated to handle hygienic sugar}. For reverse desugaring, we need to match part of the core expression on the RHS (which could be much larger than LHS) of the desugaring rule and to get the surface term by substitution. But when a syntactic sugar introduces variable bindings, this match-and-substitute turns out to be very complex if we consider local bindings (hygienic sugars) \cite{hygienic}.
 
-\item {\em Inefficient in reverse desugaring.} It needs to keep checking whether reverse desugaring is applicable during the evaluation of desugared core expressions, which is costive. Moreover, the match-and-substitute for reverse desugaring is expensive particularly when the core term is big.
+\item {\em Inefficient in reverse desugaring.} It needs to keep checking whether reverse desugaring is applicable during the evaluation of desugared core expressions, which is costive. Moreover, the match-and-substitute for reverse desugaring is expensive particularly when the core term is large.
 
 \end{itemize}
 

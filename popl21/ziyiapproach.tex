@@ -156,11 +156,14 @@ Our resugaring algorithm works on the mixed language, based on the evaluation ru
 \infrule[CoreRed1]
 {
 \exists i.\, \redc{(\m{CoreHead}~e_1~\ldots~e_i~\ldots~e_n)}
-                  {(\m{CoreHead}~e_1~\ldots~e_i'~\ldots~e_n)}\\
-e_i~\in~\m{SurfExp} \andalso \redm{e_i}{e_i''}}
+                  {(\m{CoreHead}~e_1~\ldots~e_i'~\ldots~e_n)}~and~e_i~\in~\m{SurfExp}\\
+                  \redm{e_i}{e_i''} }
 {\redm{(\m{CoreHead}~e_1~\ldots~e_i~\ldots~e_n)}{(\m{CoreHead}~e_1~\ldots~e_i''~\ldots~e_n)}}
 \infrule[CoreRed2]
-{\mbox{$\redc{(\m{CoreHead}~e_1~\ldots~e_n)}{e'}$ and is a reduction step}}
+{
+\not \exists i.\, \redc{(\m{CoreHead}~e_1~\ldots~e_i~\ldots~e_n)}
+                  {(\m{CoreHead}~e_1~\ldots~e_i'~\ldots~e_n)}~and~e_i~\in~\m{SurfExp}\\
+\redc{(\m{CoreHead}~e_1~\ldots~e_n)}{e'}}
 %\neg \exists i.\, \redc{(\m{CoreHead}~e_1~\ldots~e_i~\ldots~e_n)}{(\m{CoreHead}~e_1~\ldots~e_i'~\ldots~e_n)}~and~e_i~\in~\m{SurfExp}}
 {\redm{(\m{CoreHead}~e_1~\ldots~e_i~\ldots~e_n)}{e'}}
 \infrule[SurfRed1]
@@ -171,7 +174,7 @@ e_i~\in~\m{SurfExp} \andalso \redm{e_i}{e_i''}}
 {\redm{(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)}{(\m{SurfHead}~e_1~\ldots~e_i''~\ldots~e_n)}}
 \infrule[SurfRed2]
 {\drule{(\m{SurfHead}~x_1~\ldots~x_i~\ldots~x_n)}{e}\\
-\neg \exists i.\, \redm{e[e_1/x_1,\ldots,e_i/x_i,\ldots,e_n/x_n]}{e[e_1/x_1,\ldots,e_i'/x_i,\ldots,e_n/x_n]}
+\not \exists i.\, \redm{e[e_1/x_1,\ldots,e_i/x_i,\ldots,e_n/x_n]}{e[e_1/x_1,\ldots,e_i'/x_i,\ldots,e_n/x_n]}
 }
 {\redm{(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)}{e[e_1/x_1,\ldots,e_i/x_i,\ldots,e_n/x_n]}
 }
@@ -201,7 +204,6 @@ During the resugaring, we just apply the reduction ($\redm{}{}$) on the input ex
 \label{mark:correct}
 
 Following the traditional resugaring approach \cite{resugaring,hygienic}, we show that our resugaring algorithm satisfied the following three properties:
-% for our resuarging, then prove or discuss them.
 (1)
 \emph{Emulation}: For each reduction of an expression in our mixed language, it should reflect on one-step reduction of the expression totally desugared in the core language, or one step desugaring on a syntactic sugar;
 (2)
@@ -209,39 +211,30 @@ Following the traditional resugaring approach \cite{resugaring,hygienic}, we sho
 (3)
 \emph{Coverage}: No syntactic sugar is desugared before its sugar structure should be destroyed in core language.
 
-\subsubsection{Emulation} This is the basic property for a correct resugaring. Since our desugaring does not change an expression after it is totally desugared, what we need to show is that a non-desugaring reduction in the mixed language is exactly the same  reduction which should appear after the expression is totally desugared. Formalize by the following lemma (\m{fulldesugar}(\m{exp}) returns the expression after \m{exp} totally desugared).
+\subsubsection{Emulation} This is the basic property for a correct resugaring. Since our desugaring does not change an expression after it is totally desugared, what we need to show is that a non-desugaring reduction in the mixed language is exactly the same  reduction which should appear after the expression is totally desugared. We use \m{fulldesugar}(\m{exp}) to represent the expression after \m{exp} totally desugared.
 
-\begin{lemma}
+\begin{lemma}[Emulation]
 \label{lemma1}
-For~\m{exp} = $(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)\in\m{SurfExp}$, if~$\redm{\m{exp}}{\m{exp'}}$ and\\ \m{fulldesugar}(\m{exp}) $\not=$ $\m{fulldesugar}(\m{exp'})$,~then $\redc{\m{fulldesugar}(\m{exp})}{\m{fulldesugar}(\m{exp'})}$.
+For~\m{exp} = $(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)\in\m{SurfExp}$, if~$\redm{\m{exp}}{\m{exp'}}$ and \m{fulldesugar}(\m{exp}) $\not=$ $\m{fulldesugar}(\m{exp'})$,~then $\redc{\m{fulldesugar}(\m{exp})}{\m{fulldesugar}(\m{exp'})}$.
 
 \end{lemma}
-
-\begin{Def}[Emulation]
-If the mixed language satisfies Lemma \ref{lemma1}, then the resugaring satisfies emulation property.
-\end{Def}
 
 \begin{lemma}
 \label{lemma2}
 
-For~\m{exp} = $(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)$, if inputting $\m{fulldesugar}(\m{exp})$ to core language's evaluator reduces the expression original from $e_i$ in one step, then $\redm{}{}$ will reduce \m{exp} at $e_i$.
+For~\m{exp} = $(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)$, if $\redc{}{}$ reduces $\m{fulldesugar}(\m{exp})$ at the expression original from $e_i$ in one step, then $\redm{}{}$ will reduce \m{exp} at $e_i$.
 
 %then $\redc{\m{fulldesugar}(\m{Exp})}{\m{fulldesugar}(\m{Exp'})}$
 \end{lemma}
 
 \begin{proof}[Proof of Lemma \ref{lemma2}]
-For $\drule{(\m{SurfHead}~x_1~\ldots~x_i~\ldots~x_n)}{e}$,
 
-If $e$ is of normal form, the $\m{fulldesugar}(\m{exp})$ will not be reduced by core evaluator.
-
-If $e$ is headed with \m{CoreHead}, then according to the \m{CoreRed} rule, the $\rede{}{}$ will apply on $e$ according to \m{CoreRed1} or \m{CoreRed2}, which will reduce the subexpression $e_i$ according to the context rule of core language. Then the \m{SurfRed2} rule will reduce $e_i$. Because of the context rule, reduction of the subexpression is in correct location, so it is for $\redm{}{}$.
-
-If $e$ is headed with \m{SurfHead}, then the $\redm{}{}$ will apply recursively on $e$. If the new one satisfies the lemma, then it is for the former. Because any sugar expression will finally be able to desugar to an expression with \m{CoreHead}, it can be proved recursively.
+Correctness of lemma \ref{lemma2} is obvious, because the $\redm{}{}$ always expands the outermost sugar to check which the exact subexpression is to be reduced. And if the expansion of outermost sugar is not enough to get the location of reduced subexpression, the $\redm{}{}$ will be called recursively.
 \end{proof}
 \begin{proof}[Proof of Lemma \ref{lemma1}]
-We need to prove both \m{SurfRed1} and \m{SurfRed2} satisfy it.
-For \m{SurfRed1} rule, $\redm{(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)}{(\m{SurfHead}~e_1~\ldots~e_i''$$\ldots~e_n)}$, where $\redm{e_i}{e_i''}$.
-If $\m{fulldesugar}(e_i)$ = $\m{fulldesugar}(e_i'')$, then \m{fulldesugar}(\m{Exp}) = \m{fulldesugar}(\m{Exp'}). If not,  what we need to prove is that, $\redc{\m{fulldesugar}(\m{Exp})}{\m{fulldesugar}(\m{Exp'})}$. Note that the only difference between \m{Exp} and \m{Exp'} is the i-th subexpression, and we have proved the lemma \ref{lemma2} that the subexpression is the one to be reduced after the expression desugared totally, it will be also a recursive proof on the subexpression $e_i$.
+We need to consider the reduction rules \m{SurfRed1} and \m{SurfRed2} because \m{exp} is a \m{SurfExp}.
+For \m{SurfRed1} rule, $\redm{(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)}{(\m{SurfHead}~e_1~\ldots~e_i''$$\ldots~e_n)}$, where $\redm{e_i}{e_i''}$. Because lemma \ref{lemma2} says
+If $\m{fulldesugar}(e_i)$ = $\m{fulldesugar}(e_i'')$, that means the i-th subexpression only involves desugaring, then \m{fulldesugar}(\m{exp}) = \m{fulldesugar}(\m{exp'}). If $\m{fulldesugar}(e_i)$ $\not=$ $\m{fulldesugar}(e_i'')$, non-desugaring reduction occurs at the subexpression, then what we need to prove is that, $\redc{\m{fulldesugar}(\m{exp})}{\m{fulldesugar}(\m{exp'})}$, that means the one-step reduction in $\redm{}{}$ shows what exactly reduced in the totally desugared expression. Note that the only difference between \m{exp} and \m{exp'} is at the i-th subexpression, it is the emulation of $\redm{}{}$ on the subexpression. So the equation can be proved recursively.
 
 For \m{SurfRed2} rule, \m{Exp'} is \m{Exp} after the outermost sugar desugared. So the expressions after totally desugared are equal, \m{fulldesugar}(\m{Exp}) =
 \m{fulldesugar}(\m{Exp'}).
@@ -251,28 +244,20 @@ For \m{SurfRed2} rule, \m{Exp'} is \m{Exp} after the outermost sugar desugared. 
 
 \subsubsection{Abstraction}
 \label{mark:abs}
-
-Abstraction is not a restrict properties, because each expression has its meaning. Users may choose what they want to output during the process. Traditional resugaring approaches use marks to determine whether to display an expression generated by desugaring, or only changes on original expressions will show.
-
-We define the abstraction by catalog the expressions in the mixed language, from the reason why we need resugaring---sugar expressions become unrecognizable after desugaring. So why cannot a recursive sugar's resugaring sequences show the sugars generated by itself? We think the users should be allowed to decide which expressions are recognizable. Then during the resugaring process, if no unrecognizable expression for the user appears in the whole expression, the expression should be shown as a step in resugaring sequences. Lazy resugaring, as the key idea of our approach, makes any intermediate steps retain as many sugar structures as possible, so the abstraction is easy.
+The correctness of abstraction is obvious, because the resugaring algorithm checks whether the intermediate step is of \m{DisplayableExp} before outputting. This property is related to why we need resugaring---sugar expressions become unrecognizable after desugaring. So different from the abstraction of the traditional approach which only shows the changes of original expression, our approach define the abstraction by catalog the expressions in the mixed language. Thus, users can decide which expressions are recognizable, so that resugaring sequences will be abstract enough. For example, recursive sugar expressions' resugaring sequences will show useful information during the execution. Lazy resugaring, as the key idea of our approach, makes any intermediate steps retain as many sugar structures as possible, so the abstraction is easy.
 
 One may ask what if we just want to display core language's expression originated from the input expression. The solution is that we can write surface mirror term for core expressions. For example, if we want to show resugaring sequences of \Code{(and (if (and \#t \#f) ...) ...)} without displaying \m{if} expression produced by \m{and}, we can write a \m{IF} term, with the same evaluation rules as \m{if}. Then just input \Code{(and (IF (and \#t \#f) ...) ...)} to get the resugaring sequences. It is really flexible.
 
 \subsubsection{Coverage}
 The coverage property is important, because resugaring sequences are useless if losing intermediate steps. By lazy desugaring, it becomes obvious, because there is no chance to lose. In Lemma \ref{lemma3}, we want to show that our reduction rules in the mixed language is \emph{lazy} enough. Because it is obvious, we only give a proof sketch here.
-\begin{lemma}
+\begin{lemma}[Coverage]
 \label{lemma3}
-A syntactic sugar only desugars when \emph{necessary}, that means after a reduction on the fully-desugared expression, the sugar's structure is destroyed.
+A syntactic sugar only desugars when \emph{necessary} during the reduction of the mixed language, that means after a core reduction on the fully-desugared expression, the sugar's structure is destroyed.
 \end{lemma}
-
-\begin{Def}[Coverage]
-If the reduction of mixed language satisfies Lemma \ref{lemma3}, then the resugaring satisfies coverage property.
-\end{Def}
-
 
 
 \begin{proof}[Proof sketch of Lemma \ref{lemma3}]
-From Lemma \ref{lemma2}, we know the $\redm{}{}$ recursively reduces an expression at correct subexpression, or the $\redm{}{}$ will expand the outermost sugar (of the current expression) in rule \m{SurfRed2}. Note that it is the only rule to desugar sugars directly (other rules only desugar sugars when recursively call \m{SurfRed2}), we can prove the lemma recursively if \m{SurfRed2} are \emph{lazy} enough.
+From Lemma \ref{lemma2}, we know the $\redm{}{}$ recursively reduces an expression at correct subexpression, or the $\redm{}{}$ will expand the outermost sugar (of the current expression) in rule \m{SurfRed2}. Note that \m{SurfRed2} is the only reduction rule to desugar sugars directly (other rules only desugar sugars when recursively call \m{SurfRed2}), we can prove the lemma recursively if \m{SurfRed2} is \emph{lazy} enough.
 
 In \m{SurfRed2} rule, we firstly expand the outermost sugar and get a temp expression with the structure of the outermost sugar. Then when we recursively call $\redm{}{}$, the reduction result shows the structure has been destroyed, so the outermost sugar has to be desugared. Since the recursive reduction of a terminable (some bad sugars may never stop which are pointless) sugar expression will finally terminate, the lemma can be proved recursively.
 \end{proof}
