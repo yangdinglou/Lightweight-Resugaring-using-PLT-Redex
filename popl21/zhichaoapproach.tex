@@ -56,7 +56,7 @@ Sometimes the rules may be more complex, such as being reduced into another synt
 \label{fig:ifa-nand}
 \end{figure}
 
-When the automaton runs into the terminal node of Figure \ref{fig:ifa-nand-a}, it derives the \m{if} term. In fact, we have known how \m{if} works through the IFA of \m{if}. Thus we can replace the last node with an $\text{IFA}_{\m{if}}$ and substitute $e_1$ to $e_3$ of $\text{IFA}_{\m{if}}$ with the parameters of the node. Use the termination nodes of $\text{IFA}_{\m{if}}$ as the termination nodes of new $\text{IFA}_{\m{nand}}$. The results are shown in Figure \ref{fig:ifa-nand-b}. Further decomposing the inner \m{if} node, connecting the terminating nodes of $\text{IFA}_{\m{nand}}$ to the nodes pointed to by the original output edge, we get Figure \ref{fig:ifa-nand-c}. 
+When the automaton runs into the terminal node of Figure \ref{fig:ifa-nand-a}, it derives the \m{if} term. In fact, we have known how \m{if} works through the IFA of \m{if}. Thus we can replace the last node with an $\text{IFA}_{\m{\scriptsize if}}$ and substitute $e_1$ to $e_3$ of $\text{IFA}_{\m{\scriptsize if}}$ with the parameters of the node. Use the termination nodes of $\text{IFA}_{\m{\scriptsize if}}$ as the termination nodes of new $\text{IFA}_{\m{\scriptsize \scriptsize nand}}$. The results are shown in Figure \ref{fig:ifa-nand-b}. Further decomposing the inner \m{if} node, connecting the terminating nodes of $\text{IFA}_{\m{\scriptsize nand}}$ to the nodes pointed to by the original output edge, we get Figure \ref{fig:ifa-nand-c}. 
 
 As can be seen, the nodes of IFA in Figure \ref{fig:ifa-nand-c} have no other composite syntactic structures. Such an IFA completely expresses the semantics of a syntactic structure, and no longer cares about the evaluation rules of other syntactic structures. We do similar steps for syntactic sugar, which will be discussed later.
 
@@ -66,7 +66,7 @@ We represent the evaluation rule of \m{and} in a more complex way, as follows.
 \[
 (\m{and}~e_1~e_2) \to (\m{let}~x~e_1~(\m{if}~x~e_2~x))
 \]
-In this case, we use the let binding. So we need to record the term represented by each variable at each node called symbol table. The representation of $\text{IFA}_{\m{and}}$ is shown in Figure \ref{fig:ifa-and-a}. 
+In this case, we use the let binding. So we need to record the term represented by each variable at each node called symbol table. The representation of $\text{IFA}_{\m{\scriptsize and}}$ is shown in Figure \ref{fig:ifa-and-a}. 
 
 Further discuss the syntactic structure. We first evaluate $e_1$ and save the result in $x$. When evaluating the term of \m{if}, what is actually evaluated is $(\m{if}~x~e_2~x)[e_1/x]$. We represent it in the form of Figure \ref{fig:ifa-and-b}, where node $q_1$ contains a symbol table for recording variables and the nodes referred to. It is similar to context, but since we mapped the variable to the node, we distinguished it. Mapping to nodes is to ensure that the variable data will not be lost when the IFA is transformed.
 
@@ -114,9 +114,9 @@ Although IFA can intuitively show the behavior of a syntactic structure for eval
 \label{def:nmlifa}
 If an IFA meets following constraints, we call it a normal IFA.
 \begin{itemize}
-    \item The expression of node $q \in Q$ can only be $e_i$ or a pattern variable. If it is a pattern variable, it cannot be in the symbol table of $q$.
+    \item The expression of node $q \in Q$ can only be a pattern variable $e_i$ or a local variable $x$. If it is a local variable, it cannot be in the symbol table of $q$.
     \item For any $q_1,q_2 \in Q$ and $c_1, c_2 \in \Sigma$, $\delta(q_1, c_1) \neq \delta(q_2, c_2)$.
-    \item On each branch, each $e_i$ can only be evaluated once.
+    \item On each branch, each pattern variable $e_i$ can only be evaluated once.
 \end{itemize}
 \end{Def}
 
@@ -135,23 +135,19 @@ In order to prove this theorem, we give the following steps and prove their corr
 When evaluating a term, different branches do not influence each other. Therefore, a node with at least two sources can be cloned and applied to different branches as shown in Figure \ref{fig:nmlifa-tree}. Replace the node referenced by the branch with the cloned node in conditions and symbol tables. The correctness is obvious. In this way, we can transform an IFA into a tree so that it satisfies the second constraint of normal IFA.
 
 \begin{figure}[t]
-\centering
-\subcaptionbox{Before\label{fig:nmlifa-tree-1}}[.45\linewidth]{
-    \includegraphics[scale=0.25]{images/nmlifa/nmlifa-tree-1.png}
-}
-\subcaptionbox{After\label{fig:nmlifa-tree-2}}[.45\linewidth]{
-    \includegraphics[scale=0.25]{images/nmlifa/nmlifa-tree-2.png}
-}
-\caption{Transform into a Tree}
-\label{fig:nmlifa-tree}
+	\centering
+    \includegraphics[scale=0.25]{images/nmlifa/nmlifa-tree.png}
+	\caption{Transform into a Tree}
+	\label{fig:nmlifa-tree}
 \end{figure}
 
 %-------------------------------------------------
 \subsubsection{Substitute Sub-Syntactic Structure}
+\label{mark:hygieneinderive}
 
 If the node $q$ in the tree IFA contains a term of a syntactic structure \m{H}, we replace this node with the normal IFA of \m{H}, replace the parameters and pass the symbol table of $q$ into the sub-IFA. Connect all the termination nodes of \m{H} to the original output node $q'$, and then convert it into a tree IFA according to the method described in the previous step as shown in Figure \ref{fig:nmlifa-subst}. Replace the node referenced by the branch with the \textit{new} one in conditions and symbol tables. This step can guarantee correctness, for $(\m{H}~e_1~\ldots~e_n)[e/x] = (\m{H}~e_1[e/x]~\ldots~e_n[e/x])$.
 
-In particular, if we guarantee that a term $e$ does not contain a certain variable $x$, we can remove it from the symbol table. For example, in our problem, each $e_i$ of syntactic sugar cannot contain unbound variables. So we can remove all symbol tables of nodes with $e_i$.
+In particular, if we guarantee that a term $e$ does not contain a certain variable $x$, we can remove it from the symbol table. For example, in our problem, each pattern variable $e_i$ of syntactic sugar cannot contain unbound variables. So we can remove all symbol tables of nodes with $e_i$.
 
 For hygienic sugar, this step of substitution can also guarantee correctness. Because what we require to substitute is a normal IFA, if the expression of a node $q$ in sub-IFA is a local variable $x$, it must be unknowable in the substructure ($x$ not in the symbol table of $q$). So the value of $x$ must be passed from the outer syntactic structure.
 
@@ -165,18 +161,13 @@ For hygienic sugar, this step of substitution can also guarantee correctness. Be
 %----------------------------------------------------
 \subsubsection{Replace Variables in the Symbol Table}
 
-If the expression of a node $q$ is a pattern variable $x$ and $x$ is in the symbol table of $q$, we can replace $x$ with the expression of the node it points to, then remove $x$ from the symbol table as Figure \ref{fig:nmlifa-replace}. Because $x[e_1/x, e_2/y]=e_1[e_2/y]$, it is correct.
+If the expression of a node $q$ is a local variable $x$ and $x$ is in the symbol table of $q$, we can replace $x$ with the expression of the node it points to, then remove $x$ from the symbol table as Figure \ref{fig:nmlifa-replace}. Because $x[e_1/x, e_2/y]=e_1[e_2/y]$, it is correct.
 
 \begin{figure}[t]
-\centering
-\subcaptionbox{Before\label{fig:nmlifa-replace-1}}[.45\linewidth]{
-    \includegraphics[scale=0.25]{images/nmlifa/nmlifa-replace-1.png}
-}
-\subcaptionbox{After\label{fig:nmlifa-replace-2}}[.45\linewidth]{
-    \includegraphics[scale=0.25]{images/nmlifa/nmlifa-replace-2.png}
-}
-\caption{Replace Variables in the Symbol Table}
-\label{fig:nmlifa-replace}
+	\centering
+    \includegraphics[scale=0.25]{images/nmlifa/nmlifa-replace.png}
+	\caption{Replace Variables in the Symbol Table}
+	\label{fig:nmlifa-replace}
 \end{figure}
 
 %---------------------------------------------------------------------
@@ -187,15 +178,10 @@ If an IFA is a tree, for each branch, remove the non-terminal nodes that have be
 Since on any branch, if $e_i$ is removed, it must have been evaluated. Therefore, when IFA runs to this node, there is no need to do any evaluation on $e_i$. At the same time, the transfer edge ensures that the conditions are not lacking. Correctness is guaranteed.
 
 \begin{figure}[t]
-\centering
-\subcaptionbox{Before\label{fig:nmlifa-merge-1}}[.45\linewidth]{
-    \includegraphics[scale=0.25]{images/nmlifa/nmlifa-merge-1.png}
-}
-\subcaptionbox{After\label{fig:nmlifa-merge-2}}[.45\linewidth]{
-    \includegraphics[scale=0.25]{images/nmlifa/nmlifa-merge-2.png}
-}
-\caption{Remove Evaluated Nodes and Merge Transition Conditions}
-\label{fig:nmlifa-merge}
+	\centering
+	\includegraphics[scale=0.25]{images/nmlifa/nmlifa-merge.png}
+	\caption{Remove Evaluated Nodes and Merge Transition Conditions}
+	\label{fig:nmlifa-merge}
 \end{figure}
 
 %------------------------------------
@@ -250,7 +236,7 @@ By assumption \ref{Asm:determinacy}, we can get the following lemma, which point
 
 \begin{lemma}
 \label{lemma:one-step}
-If a term $(\m{CoreHead}~e_1~\ldots~e_n)$ does a one-step evaluation by rule (E-Head) of $\m{CoreHead}$, which is a one-step evaluation of $e_i$, then it continues to use this rule until $e_i$ becomes a value.
+If a term $(\m{CoreHead}~e_1~\ldots~e_n)$ does a one-step evaluation by rule (E-Head) of $\m{CoreHead}$, which is a one-step evaluation of pattern variable $e_i$, then it continues to use this rule until $e_i$ becomes a value.
 \end{lemma}
 
 \begin{proof}[Proof of Lemma \ref{lemma:one-step}]
@@ -269,7 +255,7 @@ If all the syntactic structures in CoreLang satisfy these assumptions, we can co
 
 We prove this theorem by giving an algorithm that converts evaluation rules to IFA. By Assumption \ref{Asm:orderliness}, we get an order of syntactic structures. We construct the IFA for each structure in turn.
 
-We generate a node for each rule of the syntactic structure \m{CoreHead} and insert them into $Q$. If the rule is a context rule for $e_i$, set $e_i$ as the expression of the node. If the rule is a reduction rule, add them into $F$ as terminal nodes and set the reduced term $e$ as the expression of the node. Symbol tables of these nodes are set to be empty. Next we connect these nodes.
+We generate a node for each rule of the syntactic structure \m{CoreHead} and insert them into $Q$. If the rule is a context rule for a pattern varibale $e_i$, set $e_i$ as the expression of the node. If the rule is a reduction rule, add them into $F$ as terminal nodes and set the reduced term $e$ as the expression of the node. Symbol tables of these nodes are set to be empty. Next we connect these nodes.
 
 For a term like $(\m{CoreHead}~e_1~\ldots~e_n)$, considering that $e_1\cdots e_n$ are not value, According to Lemma \ref{lemma:one-step}, we have the unique rule $r$ of \m{CoreHead} for one-step evaluation. Let node $q$ corresponding to $r$ be $q_0$.
 
@@ -332,7 +318,7 @@ In other words, for any term of syntactic structure \m{CoreHead}, evaluating the
 \begin{proof}[Proof of Lemma \ref{lemma:rule2ifa-correct}]
 We only need to discuss that in a one-step derivation, both get the same result.
 
-Considering a term $e=(\m{CoreHead}~e_1 \ldots e_n)$ use rule $r$ to derive. Suppose $r$ generate node $q$. By Lemma \ref{lemma:accessibility}, we find a path from $q_0$ to $q$. The term $e$ must meet the conditions from $q_0$ to $q$. Therefore, the one-step derivation of this term $e$ in IFA must be located at $q$. If $r$ is a context rule for $e_i$, the expression of $q$ is $e_i$ as well, and $e_i$ of $e$ is not a value. Thus both of the one-step derivation of $e$ are one-step derivation of $e_i$. If $r$ is a reduction rule to $e'$, both of them are $e'$.
+Considering a term $e=(\m{CoreHead}~e_1 \ldots e_n)$ use rule $r$ to derive. Suppose $r$ generate node $q$. By Lemma \ref{lemma:accessibility}, we find a path from $q_0$ to $q$. The term $e$ must meet the conditions from $q_0$ to $q$. Therefore, the one-step derivation of this term $e$ in IFA must be located at $q$. If $r$ is a context rule for a pattern variable $e_i$, the expression of $q$ is $e_i$ as well, and $e_i$ of $e$ is not a value. Thus both of the one-step derivation of $e$ are one-step derivation of $e_i$. If $r$ is a reduction rule to $e'$, both of them are $e'$.
 
 Similarly, if an term can be derived in one step in IFA, then it must be able to use the corresponding rule for one-step derivation.
 \end{proof}
@@ -369,7 +355,7 @@ Next we try to convert IFA to evaluation rules. Because IFA can be converted int
 
 \begin{Asm}
 \label{Asm:st} 
-In a normal IFA, if $q \notin F$, then the symbol table of $q$ is empty, and the expression of $q$ cannot be pattern variable.
+In a normal IFA, if $q \notin F$, then the symbol table of $q$ is empty, and the expression of $q$ cannot be a local variable.
 \end{Asm}
 
 In fact, this is a very strong assumption, which requires that only termination nodes could have substitution. Because it is difficult for us to generate a context rule for the term after substitution.
@@ -495,7 +481,7 @@ In other words, for any term of syntactic structure \m{H}, evaluating the term b
 \begin{proof}[Proof of Lemma \ref{lemma:ifa2rule-correct}]
 We only need to discuss that in a one-step derivation, both get the same result.
 
-Considering a term $e=(\m{H}~e_1 \ldots e_n)$ use rule $r$ to derive. The term $e$ must meet the condition $T$ of $r$ such as some parameters must be value or a specific value. Suppose $r$ is generated by node $q$. Then $T$ is the set of all transition conditions from $q_0$ to $q$. Therefore, the one-step derivation of this term $e$ in IFA must be located at $q$. If $r$ is a context rule for $e_i$, the expression of $q$ is $e_i$ as well, and $e_i$ of $e$ is not a value. Thus both of the one-step derivation of $e$ are one-step derivation of $e_i$.
+Considering a term $e=(\m{H}~e_1 \ldots e_n)$ use rule $r$ to derive. The term $e$ must meet the condition $T$ of $r$ such as some parameters must be value or a specific value. Suppose $r$ is generated by node $q$. Then $T$ is the set of all transition conditions from $q_0$ to $q$. Therefore, the one-step derivation of this term $e$ in IFA must be located at $q$. If $r$ is a context rule for a pattern variable $e_i$, the expression of $q$ is $e_i$ as well, and $e_i$ of $e$ is not a value. Thus both of the one-step derivation of $e$ are one-step derivation of $e_i$.
 
 Similarly, if an term can be derived in one step in IFA, then it must be able to use the corresponding rule for one-step derivation.
 
