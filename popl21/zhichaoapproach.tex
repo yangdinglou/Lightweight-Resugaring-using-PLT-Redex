@@ -2,21 +2,26 @@
 \section{Derivation of Evaluation Rules}
 \label{sec:ruleDerivation}
 
-As discussed in the overview, frequent attempts on reverse desugaring during traditional resugaring processes is costive, so that making it inefficient. If we can statically derivate syntactic sugar's evaluation rules through its structure, it will greatly improve the efficiency of resugaring. In this section, we purpose such a method to make the resugaring of syntactic sugar more efficient.
+So far, we have shown that our resugaring algorithm can use lazy desugaring to avoid costive reverse desugaring in the traditional approach. However, as shown in the reduction rules {\sc SurfRed1} and {\sc SurfRed2}, we still need a one-step try to check whether a syntactic sugar is required or not. It would be more efficient if such one-step try could be avoided. In this section, we show that this is possible, by giving an automatic method to derive evaluation rules for the syntactic sugar through symbolic computation.
+%As demonstrated in Section \ref{sec2}, this will significantly improve the efficiency of our resugaring.
+%In this section, we purpose such a method to make the resugaring of syntactic sugar more efficient.
 
-Considering a simple syntactic sugar $\drule{(\m{not}~e_1)}{(\m{if}~e_1~\m{\#f}~\m{\#t})}$, obviously, we need to \textit{embed} the evaluation rules of \m{if} to get those of \m{not}. So we need a method that can express evaluation rules and is easy to transform. To accomplish these goals, we designed \textit{inference automaton} (IFA), which can be visually described by graphs.
+%As discussed in the overview, frequent attempts on reverse desugaring during traditional resugaring processes is costive and inefficient. If we can statically derive syntactic sugar's evaluation rules through its structure, it will greatly improve the efficiency of resugaring. In this section, we purpose such a method to make the resugaring of syntactic sugar more efficient.
 
-Assuming that we already know the IFAs of all syntactic structures in CoreLang, the method of using IFA to construct the evaluation rules of syntactic sugar is as follows: First, construct the IFA of syntactic sugar according to the desugar rules. Then, transform and simplify IFA. Finally, generate evaluation rules for syntactic sugar.
+To see our idea, consider a simple syntactic sugar defined by $\drule{(\m{not}~e_1)}{(\m{if}~e_1~\m{\#f}~\m{\#t})}$. To derive reductions rules for \m{not} from those of \m{if}, we design \textit{inference automaton} (IFA) that can be used to express and manipulate a set of evaluation rules for a language construct.
+%
+Assuming that we already have the IFAs of all language constructs of the core language, our method to construct the evaluation rules of a syntactic sugar is as follows: First, we construct an IFA for the syntactic sugar according to the desugaring rules, then we transform and simplify the IFA, and finally we generate evaluation rules for the syntactic sugar from the IFA.
 
-In this section, we first give some examples of IFA and its formal definition. Then we introduce a more strict IFA called normal IFA. Next, we support an algorithm of conversion between evaluation rules and IFA. Finally, we discuss the role of IFA in dealing with syntactic sugar.
+In this following, we start with some examples of IFA, its formal definition and its normal form, before we proceed to give our algorithm for conversion between evaluation rules and IFA.
+%We discuss the role of IFA in dealing with syntactic sugar.
 
 \subsection{Inference Automaton}
 
-As mentioned above, IFA intuitively describes the evaluation rules of a certain syntactic structure. To help readers better understand it, we start with some examples, then we give the formal definition of IFA.
+As mentioned above, IFA intuitively describes the evaluation rules of a certain language construct. To help readers better understand it, we start with some examples, then we give the formal definition of IFA.
 
-\subsubsection{IFA of \m{if}}
+\begin{example}[IFA of~~ \m{if}]
 
-Considering evaluation rules of \m{if} in overview, we can observe that a term headed with \m{if} is first evaluated for $e_1$. Then it is chosen to evaluate $e_2$ or $e_3$ depending on the value of $e_1$. The evaluation result of $e_2$ or $e_3$ is the value of the term. Thus, we use Figure \ref{fig:ifa-if} to represent the evaluation rules of \m{if}.
+Recall the three evaluation rules of \m{if} in the overview. Given a term \m{if}~$e_1$~$e_2$~$e_3$, from these rules, we can see that $e_1$ should be evaluated first, then $e_2$ or $e_3$ will be chosen to evalute depending on the value of $e_1$. The evaluation result of $e_2$ or $e_3$ will be the value of the term. This evaluation procedure (or the three evaluation rules) for \m{if}~$e_1$~$e_2$~$e_3$ can be represented by the IFA in Figure \ref{fig:ifa-if}.
 
 \begin{figure}[t]
     \centering
@@ -28,8 +33,10 @@ Considering evaluation rules of \m{if} in overview, we can observe that a term h
 A node of IFA indicates that the term needs to be evaluated, and the nodes before this have been evaluated. The arrow from $q_0$ to $q_1$ indicates that this branch is selected when the evaluation result of $e_1$ is \m{\#t}. The arrow between $e_1$ and $e_3$ is similar. The double circles of $e_2$ and $e_3$ denote that their evaluation result is the result of the term with this syntactic structure. In most cases, the transition condition is the evaluation result (an abstract value) of the previous node or a specific value. To simplify the representation of IFA in the figures of this paper, in the former case, we omit the condition on the transition edge; and in the latter case, we only mark the value on the transition edge.
 
 When a term headed with \m{if} needs to be evaluated (for example \m{(if (if \#t \#t \#f) \#f \#t)}), first evaluating the $e_1$ (\m{(if \#t \#t \#f)}). Note that in this process, evaluating a subexpression requires running another automaton based on its syntax, while the outer automaton hold the state at $q_0$. According to the result of $e_1$ (\m{\#f}), the IFA selects the branch ($e_3$). Then the result of $e_3$ (\m{\#t}) is the evaluation result of the term.
+\myend
+\end{example}
 
-\subsubsection{IFA of \m{nand}}
+\begin{example}[IFA of \m{nand}]
 
 Sometimes the rules may be more complex, such as being reduced into another syntactic structure, or a term containing other syntactic structures. For example, we can express \m{nand}'s evaluation rules as follows. Based on the method discussed above, we can draw \m{nand}'s IFA as Figure \ref{fig:ifa-nand-a}.
 \[
@@ -59,8 +66,10 @@ Sometimes the rules may be more complex, such as being reduced into another synt
 When the automaton runs into the terminal node of Figure \ref{fig:ifa-nand-a}, it derives the \m{if} term. In fact, we have known how \m{if} works through the IFA of \m{if}. Thus we can replace the last node with an $\text{IFA}_{\m{\scriptsize if}}$ and substitute $e_1$ to $e_3$ of $\text{IFA}_{\m{\scriptsize if}}$ with the parameters of the node. Use the termination nodes of $\text{IFA}_{\m{\scriptsize if}}$ as the termination nodes of new $\text{IFA}_{\m{\scriptsize \scriptsize nand}}$. The results are shown in Figure \ref{fig:ifa-nand-b}. Further decomposing the inner \m{if} node, connecting the terminating nodes of $\text{IFA}_{\m{\scriptsize nand}}$ to the nodes pointed to by the original output edge, we get Figure \ref{fig:ifa-nand-c}.
 
 As can be seen, the nodes of IFA in Figure \ref{fig:ifa-nand-c} have no other composite syntactic structures. Such an IFA completely expresses the semantics of a syntactic structure, and no longer cares about the evaluation rules of other syntactic structures. We do similar steps for syntactic sugar, which will be discussed later.
+\myend
+\end{example}
 
-\subsubsection{IFA of \m{and}}
+\begin{example}[IFA of \m{and}]
 
 We represent the evaluation rule of \m{and} in a more complex way, as follows.
 \[
@@ -69,6 +78,9 @@ We represent the evaluation rule of \m{and} in a more complex way, as follows.
 In this case, we use the let binding. So we need to record the term represented by each variable at each node called symbol table. The representation of $\text{IFA}_{\m{\scriptsize and}}$ is shown in Figure \ref{fig:ifa-and-a}.
 
 Further discuss the syntactic structure. We first evaluate $e_1$ and save the result in $x$. When evaluating the term of \m{if}, what is actually evaluated is $(\m{if}~x~e_2~x)[e_1/x]$. We represent it in the form of Figure \ref{fig:ifa-and-b}, where node $q_1$ contains a symbol table for recording variables and the nodes referred to. It is similar to context, but since we mapped the variable to the node, we distinguished it. Mapping to nodes is to ensure that the variable data will not be lost when the IFA is transformed.
+\myend
+\end{example}
+
 
 \begin{figure}[t]
     \centering
@@ -83,7 +95,7 @@ Further discuss the syntactic structure. We first evaluate $e_1$ and save the re
 \end{figure}
 
 %--------------------------------
-\subsubsection{Definition of IFA}
+%\subsubsection{Definition of IFA}
 
 \begin{Def}[Inference Automaton]
 
