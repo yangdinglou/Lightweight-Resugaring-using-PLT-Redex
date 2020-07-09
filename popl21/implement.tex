@@ -9,7 +9,7 @@ Our resugaring approach is implemented using PLT Redex\cite{SEwPR}, which is a s
 In the language model, desugaring rules are written as reduction rules of \m{SurfExp}. And context rules of \m{SurfExp} have no restriction (every subexpression is reducible as a hole). Then for each resugaring step, we should choose the exact reduction which satisfies the reduction of mixed language's reduction rule  in Section \ref{mark:mixedreduction}.
 \begin{figure}[t]
 	\centering
-	\includegraphics[width=6cm]{images/frame.png}
+	\includegraphics[width=5cm]{images/frame.png}
 	\caption{Framework of Implementation}
 	\label{fig:frame}
 \end{figure}
@@ -311,7 +311,7 @@ Recursive sugar is a kind of syntactic sugars where call itself or each other du
 are common recursive sugars. The traditional resugaring approach can't process syntactic sugar written like this (non-pattern-based) easily, because boundary conditions are in the sugar itself.
 
 Take \Code{(Odd 2)} as an example. The previous work will firstly desugar the expression using the rewriting system. Then the rewriting system will never terminate as following shows.
-\begin{small}
+\begin{scriptsize}
 \begin{Codes}
    (Odd 2)
 \DeStep{ (if (> 2 0) (Even (- 2 1) \#f))}
@@ -319,7 +319,7 @@ Take \Code{(Odd 2)} as an example. The previous work will firstly desugar the ex
 \DeStep{ (if (> (- (- 2 1) 1) 0) (Even (- (- (- 2 1) 1) 1) \#f))}
 \DeStep{ ...}
 \end{Codes}
-\end{small}
+\end{scriptsize}
 
 
 
@@ -346,4 +346,4 @@ Moreover, just like the \emph{Odd and Even} sugar above, there are some simple r
 
 
 
-Note that the \m{let} term is to limit the subexpression only appears once in RHS. In this example, we can find that the list \Code{(cons 1 (list 2))}, though equal to \Code{(list 1 2)}, is represented by core language's term. So it will be difficult to handle such inline boundary conditions by rewriting systems. But our approach is easy to handle cases like this. So our resugaring approach by lazy desugaring is powerful.
+Note that the \m{let} term is to limit the subexpression only appears once in RHS. In this example, we can find that the list \Code{(cons 1 (list 2))}, though equal to \Code{(list 1 2)}, is represented by core language's term. So it will be difficult to handle such inline boundary conditions for traditional rewriting systems. But our approach is easy to handle cases like this. So our resugaring approach by lazy desugaring is powerful.
