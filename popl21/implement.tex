@@ -66,6 +66,8 @@ But something goes wrong when substitution takes place during \m{CoreExt2}. Just
 
 \label{mark:optimize}
 Note that in \m{SurfRed1} rule and \m{CoreExt1} rule, there is a recursive call on $\redm{}{}$. We can optimize the resugaring algorithm by recursively resugaring. For example, \Code{(Sugar1 (Sugar2  ...) ...)} as the input, and find the first subexpression should be reduced. We can first get the resugaring sequences of \Code{(Sugar2 ...)} as Figure \ref{fig:subsequence}, then the resugaring sequences is got as \ref{fig:optimized}. Thus, we will not need to try to expand the outermost sugar for each inner step (recursively resugaring for inner expression).
+
+\ignore{
 \begin{figure}[t]
 \centering
 \subcaptionbox{Subsequences of \m{Sugar2} \label{fig:subsequence}}[.45\linewidth]{
@@ -76,7 +78,7 @@ Note that in \m{SurfRed1} rule and \m{CoreExt1} rule, there is a recursive call 
   \OneStep{ exp1}\\
 \DeStep{\quad expi} \note{//0 or more steps}\\
 \OneStep{ expn}
-\end{Codes} 
+\end{Codes}
 }
 \end{flushleft}
 }
@@ -88,14 +90,14 @@ Note that in \m{SurfRed1} rule and \m{CoreExt1} rule, there is a recursive call 
   \OneStep{ (Sugar1 exp1 ...)}\\
 \DeStep{\quad(Sugar1 expi ...)} \note{//0 or more steps}\\
 \OneStep{ (Sugar1 expn ...)}
-\end{Codes} 
+\end{Codes}
 }
 \end{flushleft}
 }
 \caption{Recursive Optimization's Example}
 \label{fig:optimize}
 \end{figure}
-
+}
 
 As for the automatic derivation of evaluation rules, we implement a simple demo by writing some core language's IFAs (such as \m{if}, \m{let}) manually, because it is enough to do some case studies for the resugaring tasks.
 
@@ -105,6 +107,7 @@ As for the automatic derivation of evaluation rules, we implement a simple demo 
 
 We test some applications on the tool as case studies. Some examples we will discuss in this section are in Figure \ref{fig:resugaring}. Note that we set call-by-value lambda calculus as terms in \m{CommonExp}, because we need to output some intermediate sequences including lambda expressions in some examples. It's easy if we want to skip them. \todo{modify drule or simplify Codes}
 
+\ignore{
 \begin{figure}[t]
 \centering
 \subcaptionbox{Example of SKI\label{fig:SKI}}[.3\linewidth]{
@@ -200,7 +203,7 @@ We test some applications on the tool as case studies. Some examples we will dis
 \caption{Resugaring Examples}
 \label{fig:resugaring}
 \end{figure}
-
+}
 
 \subsubsection{Simple sugar}
 \label{mark:simple}
