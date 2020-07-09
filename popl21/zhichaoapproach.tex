@@ -58,7 +58,7 @@ Sometimes the rules may be more complex, such as being reduced into another synt
 
 When the automaton runs into the terminal node of Figure \ref{fig:ifa-nand-a}, it derives the \m{if} term. In fact, we have known how \m{if} works through the IFA of \m{if}. Thus we can replace the last node with an $\text{IFA}_{\m{if}}$ and substitute $e_1$ to $e_3$ of $\text{IFA}_{\m{if}}$ with the parameters of the node. Use the termination nodes of $\text{IFA}_{\m{if}}$ as the termination nodes of new $\text{IFA}_{\m{nand}}$. The results are shown in Figure \ref{fig:ifa-nand-b}. Further decomposing the inner \m{if} node, connecting the terminating nodes of $\text{IFA}_{\m{nand}}$ to the nodes pointed to by the original output edge, we get Figure \ref{fig:ifa-nand-c}. 
 
-As can be seen, the nodes of IFA in Figure \ref{fig:ifa-nand-c} have no other composite syntactic structures. Such an IFA completely expresses the semantics of a syntactic structure, and no longer cares about the evaluation rules of other syntactic structures. In fact, we do similar steps for syntactic sugar, which will be discussed later.
+As can be seen, the nodes of IFA in Figure \ref{fig:ifa-nand-c} have no other composite syntactic structures. Such an IFA completely expresses the semantics of a syntactic structure, and no longer cares about the evaluation rules of other syntactic structures. We do similar steps for syntactic sugar, which will be discussed later.
 
 \subsubsection{IFA of \m{and}}
 
@@ -68,8 +68,7 @@ We represent the evaluation rule of \m{and} in a more complex way, as follows.
 \]
 In this case, we use the let binding. So we need to record the term represented by each variable at each node called symbol table. The representation of $\text{IFA}_{\m{and}}$ is shown in Figure \ref{fig:ifa-and-a}. 
 
-Further discuss the syntactic structure. We first evaluate $e_1$ and save the result in $x$. When evaluating the term of \m{if}, what is actually evaluated is $(\m{if}~x~e_2~x[e_1/x])$. We represent it in the form of Figure \ref{fig:ifa-and-b}, where node $q_1$ contains a symbol table for recording variables and the nodes that are referred to. This is similar to the context, but since we mapped the variable to the node, we distinguished it. Mapping to nodes is to ensure that the variable data will not be lost when the IFA is deformed.
-\todo{@ziyi: $[e_1/x]$'s location?}
+Further discuss the syntactic structure. We first evaluate $e_1$ and save the result in $x$. When evaluating the term of \m{if}, what is actually evaluated is $(\m{if}~x~e_2~x)[e_1/x]$. We represent it in the form of Figure \ref{fig:ifa-and-b}, where node $q_1$ contains a symbol table for recording variables and the nodes referred to. It is similar to context, but since we mapped the variable to the node, we distinguished it. Mapping to nodes is to ensure that the variable data will not be lost when the IFA is transformed.
 
 \begin{figure}[t]
 \centering
@@ -104,7 +103,7 @@ and for each node $q$, there is no sequence of conditions $C = (c_1,c_2,\ldots,c
 
 The last constraint requires that there be no circles in our IFA.
 
-In IFA, state transition does not depend on input. The only input IFA accepts is the term to be evaluated with this syntactic structure. The state transition is through whether the term meets the condition. Note that IFA is associated with syntactic structure. At Each IFA only represents the current evaluation of a syntactic structure. The state indicates that some sub-expressions of the syntactic structure have been evaluated, and the rest have not.
+In IFA, state transition does not depend on input. The only input of IFA is the term to be evaluated with this syntactic structure. The state transition is through whether the term meets the condition. Note that IFA is associated with syntactic structure. At Each IFA only represents the current evaluation of a syntactic structure. The state indicates that some sub-expressions of the syntactic structure have been evaluated, and the rest have not.
 
 %======================
 \subsection{Normal IFA}
@@ -133,7 +132,7 @@ In order to prove this theorem, we give the following steps and prove their corr
 %------------------------------------
 \subsubsection{Transform into a Tree}
 
-When evaluating an term, different branches have no influence on each other. Therefore, a node with at least two sources can be cloned and applied to different branches as shown in Figure \ref{fig:nmlifa-tree}. Remember to replace the node referenced by the branch with the cloned node in conditions and symbol tables. The correctness is obvious. In this way, we can transform an IFA into a tree so that it satisfies the second constraint of normal IFA.
+When evaluating a term, different branches do not influence each other. Therefore, a node with at least two sources can be cloned and applied to different branches as shown in Figure \ref{fig:nmlifa-tree}. Replace the node referenced by the branch with the cloned node in conditions and symbol tables. The correctness is obvious. In this way, we can transform an IFA into a tree so that it satisfies the second constraint of normal IFA.
 
 \begin{figure}[t]
 \centering
@@ -150,9 +149,9 @@ When evaluating an term, different branches have no influence on each other. The
 %-------------------------------------------------
 \subsubsection{Substitute Sub-Syntactic Structure}
 
-If the node $q$ in the tree IFA contains an term of a syntactic structure \m{H}, we replace this node with the IFA of \m{H}, replace the parameters and pass the symbol table of $q$ into the sub-IFA. Connect all the termination nodes of \m{H} to the original output node $q'$, and then convert it into a tree IFA according to the method described in the previous step as Figure \ref{fig:nmlifa-subst}. Remember to replace the node referenced by the branch with the \textit{new} one in conditions and symbol tables. This step can guarantee correctness, for $(\m{H}~e_1~\ldots~e_n)[e/x] = (\m{H}~e_1[e/x]~\ldots~e_n[e/x])$.
+If the node $q$ in the tree IFA contains a term of a syntactic structure \m{H}, we replace this node with the IFA of \m{H}, replace the parameters and pass the symbol table of $q$ into the sub-IFA. Connect all the termination nodes of \m{H} to the original output node $q'$, and then convert it into a tree IFA according to the method described in the previous step as shown in Figure \ref{fig:nmlifa-subst}. Replace the node referenced by the branch with the \textit{new} one in conditions and symbol tables. This step can guarantee correctness, for $(\m{H}~e_1~\ldots~e_n)[e/x] = (\m{H}~e_1[e/x]~\ldots~e_n[e/x])$.
 
-In particular, if we guarantee that a term $e$ does not contain a certain variable $x$, we can remove it from the symbol table. For example, in our problem, each $e_i$ of syntactic sugar cannot contain unbound variables, so we can simply remove all symbol table of nodes with $e_i$.
+In particular, if we guarantee that a term $e$ does not contain a certain variable $x$, we can remove it from the symbol table. For example, in our problem, each $e_i$ of syntactic sugar cannot contain unbound variables. So we can remove all symbol tables of nodes with $e_i$.
 \todo{@ziyi: declare handling on hygiene?}
 
 \begin{figure}[t]
@@ -182,11 +181,10 @@ If the expression of a node $q$ is a pattern variable $x$ and $x$ is in the symb
 %---------------------------------------------------------------------
 \subsubsection{Remove Evaluated Nodes and Merge Transition Conditions}
 
-If an IFA is a tree, for each branch, remove the non-terminal nodes that have been evaluated with the same symbol table, and merge the conditions on the transition edge as Figure \ref{fig:nmlifa-merge}. Remember to replace the node referenced by the branch with the first-evaluated node in conditions and symbol tables. This step can make an IFA satisfy the third constraint of normal IFA.
+If an IFA is a tree, for each branch, remove the non-terminal nodes that have been evaluated with the same symbol table, and merge the conditions on the transition edge as Figure \ref{fig:nmlifa-merge}. Replace the node referenced by the branch with the first-evaluated node in conditions and symbol tables. This step can make an IFA satisfy the third constraint of normal IFA.
 \todo{@ziyi: Remember ... is to verbally}
 
-Since on any branch, when $e_i$ is removed, it must have been evaluated. Therefore, when IFA runs to this node, there is no need to do any evaluation on $e_i$. At the same time, the transfer side ensures that the conditions are not lacking. Correctness is guaranteed.
-\todo{@ziyi: side?}
+Since on any branch, if $e_i$ is removed, it must have been evaluated. Therefore, when IFA runs to this node, there is no need to do any evaluation on $e_i$. At the same time, the transfer edge ensures that the conditions are not lacking. Correctness is guaranteed.
 
 \begin{figure}[t]
 \centering
@@ -513,8 +511,7 @@ Similarly, if an term can be derived in one step in IFA, then it must be able to
 %===========================
 \subsection{Syntactic Sugar}
 
-We can find out that although rules of \m{nand} we used when constructing the IFA included the syntactic structure of \m{if}, the final result does not. For syntactic sugar, we also deal with it with a similar idea, that is, construct the IFA of syntactic sugar, simplify it and convert it into rules. With the IFA, we can easily get the evaluation rules for syntactic sugars.
-\todo{@ziyi: find out -> find}
+We can find that although rules of \m{nand} we used when constructing the IFA included the syntactic structure of \m{if}, the final result does not. For syntactic sugar, we also deal with it with a similar idea, that is, construct the IFA of syntactic sugar, simplify it and convert it into rules. With the IFA, we can easily get the evaluation rules for syntactic sugars.
 
 Similarly, we also need to add some constraints on syntactic sugar.
 
@@ -575,5 +572,16 @@ The IFA of \m{or} is the same as the IFA of \m{or'} whose rule is shown in Figur
 % \infrule[E-Or]{e_1 \to e_1'}{(\m{or}~e_1~e_2) \to (\m{or}~e_1'~e_2)}
 % \infrule[E-OrTrue]{e_1~\key{is}~\m{\#t}}{(\m{or}~e_1~e_2) \to e_1}
 % \infrule[E-OrFalse]{e_1~\key{is}~\m{\#f}}{(\m{or}~e_1~e_2) \to e_2}
+
+%--------------------------
+\subsubsection{Correctness}
+
+As discussed in Section \ref{sec3}, our approach should satisfy the three properties: emulation, abstraction and coverage. The property of abstraction is obvious, for the rules we generate only contain the syntactic structure itself, without any other structures in core language. However, our approach does not perfectly satisfy emulation and coverage. In the derivation, we lost the information that a syntactic structure is reduced to another syntactic structure. This makes the derivation sequence different. But through Theorem \ref{mythm:nmlifa}, Lemma \ref{lemma:rule2ifa-correct} and Lemma \ref{lemma:ifa2rule-correct}, we can guarantee the correctness of the evaluation results.
+
+
+
+
+
+
 
 
