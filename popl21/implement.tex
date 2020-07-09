@@ -68,23 +68,27 @@ But something goes wrong when substitution takes place during \m{CoreExt2}. Just
 Note that in \m{SurfRed1} rule and \m{CoreExt1} rule, there is a recursive call on $\redm{}{}$. We can optimize the resugaring algorithm by recursively resugaring. For example, \Code{(Sugar1 (Sugar2  ...) ...)} as the input, and find the first subexpression should be reduced. We can firstly get the resugaring sequences of \Code{(Sugar2 ...)} as Figure \ref{fig:subsequence}, then the resugaring sequences is got as \ref{fig:optimized}. Thus, we will not need to try to expand the outermost sugar for each inner step (recursively resugaring for inner expression).
 \begin{figure}[t]
 \centering
-\subcaptionbox{Subsequences of \m{Sugar2} \label{fig:subsequence}}[.4\linewidth]{
+\subcaptionbox{Subsequences of \m{Sugar2} \label{fig:subsequence}}[.45\linewidth]{
 \begin{flushleft}
 {\small
-  \qquad \Code{(Sugar1 (Sugar2 ...) ...)}\\
-  \OneStep{ \;\Code{exp1}}\\
-\DeStep{\quad \Code{expi}} \note{//0 or more steps}\\
-\OneStep{ \;\Code{expn}}
+\begin{Codes}
+\qquad (Sugar2 ...)\\
+  \OneStep{ exp1}\\
+\DeStep{\quad expi} \note{//0 or more steps}\\
+\OneStep{ expn}
+\end{Codes} 
 }
 \end{flushleft}
 }
-\subcaptionbox{Optimized Resugaring of \m{Sugar1} \label{fig:optimized}}[.4\linewidth]{
+\subcaptionbox{Optimized Resugaring of \m{Sugar1} \label{fig:optimized}}[.45\linewidth]{
 \begin{flushleft}
 {\small
-  \qquad \Code{(Sugar2 ...)}\\
-  \OneStep{ \;\Code{(Sugar1 exp1 ...)}}\\
-\DeStep{\quad \Code{(Sugar1 expi ...)}} \note{//0 or more steps}\\
-\OneStep{ \;\Code{(Sugar1 expn ...)}}
+\begin{Codes}
+\qquad (Sugar1 (Sugar2 ...) ...)\\
+  \OneStep{ (Sugar1 exp1 ...)}\\
+\DeStep{\quad(Sugar1 expi ...)} \note{//0 or more steps}\\
+\OneStep{ (Sugar1 expn ...)}
+\end{Codes} 
 }
 \end{flushleft}
 }
@@ -98,7 +102,7 @@ As for the automatic derivation of evaluation rules, we implement a simple demo 
 
 
 
-We test some applications on the tool as case studies. Some examples we will discuss in this section are in Figure \ref{fig:resugaring}. Note that we set call-by-value lambda calculus as terms in \m{CommonExp}, because we need to output some intermediate sequences including lambda expressions in some examples. It's easy if we want to skip them.
+We test some applications on the tool as case studies. Some examples we will discuss in this section are in Figure \ref{fig:resugaring}. Note that we set call-by-value lambda calculus as terms in \m{CommonExp}, because we need to output some intermediate sequences including lambda expressions in some examples. It's easy if we want to skip them. \todo{modify drule or simplify Codes}
 
 \begin{figure}[t]
 \centering
