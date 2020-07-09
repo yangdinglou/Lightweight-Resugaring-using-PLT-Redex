@@ -34,7 +34,7 @@ As a preparation for our resugaring algorithm, we define a mixed language that c
 For our core language,  its evaluator is driven by evaluation rules (context rules and reduction rules), with two natural assumptions. First, the evaluation is deterministic, in the sense that any expression in the core language will be reduced by a unique reduction sequence. Second, evaluation of a sub-expression has no side-effect on other parts of the expression.
 %We discuss how to trickily extend our approach with a black-box stepper as the evaluator in Appendix.
 
-An expression scheme of the core language is given in Figure \ref{fig:expression}. It is a variable, a constant, or a (language) constructor expression. Here, $\m{CoreHead}$ stands for a language constructor such as $\m{if}$ and $\m{let}$. To be concrete, we will use a simplified core language defined in Figure \ref{fig:core} to demonstrate our approach.
+An expression form of the core language is defined in Figure \ref{fig:expression}. It is a variable, a constant, or a (language) constructor expression. Here, $\m{CoreHead}$ stands for a language constructor such as $\m{if}$ and $\m{let}$. To be concrete, we will use a simplified core language defined in Figure \ref{fig:core} to demonstrate our approach.
 
 \begin{figure}[thb]
 \begin{centering}
@@ -66,21 +66,25 @@ An expression scheme of the core language is given in Figure \ref{fig:expression
 
 \subsubsection{Surface Language}
 
-Our surface language is defined by a set of syntactic sugars, together with some basic elements in the core language, such as constant, variable. So an expression of the surface language is sugar constructor expressions with sugar expressions, as defined in Figure \ref{fig:expression}.
+Our surface language is defined by a set of syntactic sugars, together with some basic elements in the core language, such as constant, variable. The surface language has expressions as given in Figure \ref{fig:expression}.
 
 A syntactic sugar is defined by a desugaring rule in the following form:
 \[
 \drule{(\m{SurfHead}~e_1~e_2~\ldots~e_n)}{\m{exp}}
 \]
-where its LHS is a simple pattern (unnested) and its RHS is an expression of surface language or core language, and any reducible sub-term (e.g. $e_1$) in LHS only appears once in RHS. For instance, we may define syntactic sugar \m{and} by
+where its LHS is a simple pattern (unnested) and its RHS is an expression of the surface language or the core language, and any pattern variable (e.g., $e_1$) in LHS only appears once in RHS. For instance, we may define syntactic sugar \m{and} by
 \[
 \drule{(\m{and}~e_1~e_2)}{(\m{if}~e_1~e_2~\false)}.
 \]
-Note that if the pattern is nested, we can introduce a new syntactic sugar to flatten it. And if we need a reducible sub-term multi times in RHS, a \m{let} binding is needed (a normal way in syntactic sugar). We take the following sugar as an example
-\[\drule{(\m{Twice}~e_1)}{(+~e_1~e_1)}\]
-If we execute \Code{(Twice (+ 1 1))}, the sugar expression will firstly desugar to \Code{(+ (+ 1 1) (+ 1 1))}, then one step reduced to \Code{(+ 2 (+ 1 1))}. The subexpression \Code{(+ 1 1)} has reduced but cannot resugar to the surface, because the other \Code{(+ 1 1)} has not reduced. It will let many intermediate steps omitted, if there are many reduction steps between reduction of them. So we just use a \m{let} binding to resolve it.
+Note that if the pattern is nested, we can introduce a new syntactic sugar to flatten it. And if we need to use a pattern variable multiple times in RHS, a \m{let} binding may be used (a normal way in syntactic sugar). We take the following sugar as an example
+\[
+\drule{(\m{Twice}~e_1)}{(+~e_1~e_1)}.
+\]
+If we execute \Code{(Twice (+ 1 1))}, it will firstly be desugared to \Code{(+ (+ 1 1) (+ 1 1))}, then reduced to \Code{(+ 2 (+ 1 1))} by one step. The subexpression \Code{(+ 1 1)} has been reduced but should not be resugared to the surface, because the other \Code{(+ 1 1)} has not been reduced yet.
+%This would let many intermediate steps omitted, if there are many reduction steps between reduction of them.
+So we just use a \m{let} binding to resolve this problem.
 
-Our surface language does not restrict the RHS to be a $\m{CoreExp}$ term. We use $\m{surfExp}$ to be able to allow definition of recursive syntactic sugars, as seen in the following example.
+Note that in the desugaring rule, we do not restrict the RHS to be a $\m{CoreExp}$ term. We can use $\m{surfExp}$ (more precisely, we allow the mixture use of syntactic sugars and core expressions) to define recursive syntactic sugars, as seen in the following example.
 \[
 \begin{array}{l}
 \drule{(\m{Odd}~e)}{(\m{if}~(>~e~0)~(\m{Even}~(-~e~1))~\false)}\\
@@ -92,7 +96,7 @@ We assume that all desugaring rules are not overlapped in the sense that for a s
 
 
 \subsubsection{Mixed Language}
-\begin{figure}[thb]
+\begin{figure}[t]
 \begin{centering}
 {\footnotesize
 \[
@@ -133,7 +137,7 @@ We assume that all desugaring rules are not overlapped in the sense that for a s
 
 Our mixed language for resugaring combines the surface language and the core language, described in Figure \ref{fig:mix}.
 %
-The differences between terms in our core language and those in our surface language are identified by their \m{Head}. But there may be some terms in the core language which are also used in the surface language for convenience, or we need some core terms to help us getting better resugaring sequences. So we separate \m{CommonHead} from the \m{CoreHead}, which can be displayed in resugaring sequences (the rest of \m{CoreHead} becomes \m{CoreHead'}). The \m{Core'Exp} terms are terms with undisplayable \m{CoreHead} (named \m{CoreHead'}). The \m{SurfExp} terms are terms with \m{SurfHead} and all subexpressions are displayable. The \m{CommonExp} terms are terms with displayable CoreLang's \m{Head} (named \m{CommonHead}), together with displayable subexpressions. There exists some other expressions during our resugaring process, which have displayable \m{Head}, but one or more subexpressions should not display. They are \m{UndisplayableExp}. We distinct the two kinds of expression for \emph{abstraction} property (discussed in Section \ref{mark:abs}).
+The differences between terms in our core language and those in our surface language are only identified by their \m{Head}. But there may be some expressions in the core language which are also used in the surface language for convenience, or we need some core terms to help us getting better resugaring sequences. So we separate \m{CommonHead} from the \m{CoreHead}, which can be displayed in resugaring sequences (the rest of \m{CoreHead} becomes \m{CoreHead'}). The \m{CoreExp'} terms are terms with undisplayable \m{CoreHead} (named \m{CoreHead'}). The \m{SurfExp} terms are terms with \m{SurfHead} and all subexpressions are displayable. The \m{CommonExp} terms are terms with displayable CoreLang's \m{Head} (named \m{CommonHead}), together with displayable subexpressions. There exists some other expressions during our resugaring process, which have displayable \m{Head}, but one or more subexpressions should not display. They are \m{UndisplayableExp}. We distinct the two kinds of expression for \emph{abstraction} property (discussed in Section \ref{mark:abs}).
 
 Take some terms in the core language in Figure \ref{fig:core} as examples.
 We may assume \m{if}, \m{let}, \m{lambdaN} (call-by-name lambda calculus), \m{empty?}, \m{first}, \m{rest} as \m{CoreHead'}, \m{op}, \m{lambda} (call-by-value lambda calculus), \m{cons} as \m{CommonHead}. Then we would show some useful intermediate steps.
