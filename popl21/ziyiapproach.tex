@@ -92,7 +92,7 @@ Note that in the desugaring rule, we do not restrict the RHS to be a $\m{CoreExp
 \end{array}
 \]
 
-We assume that all desugaring rules are not overlapped in the sense that for a syntactic sugar expression, only one desugaring rule is applicable. \todo{inner sugar?}
+We assume that all desugaring rules are not overlapped in the sense that for a syntactic sugar expression, only one desugaring rule is applicable for a single sugar in the expression.
 
 
 \subsubsection{Mixed Language}
@@ -232,7 +232,8 @@ For~\m{exp} = $(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)$, if $\redc{}{}$ reduces
 Correctness of lemma \ref{lemma2} is obvious, because the $\redm{}{}$ always expands the outermost sugar to check which the exact subexpression is to be reduced. And if the expansion of outermost sugar is not enough to get the location of reduced subexpression, the $\redm{}{}$ will be called recursively.
 \end{proof}
 \begin{proof}[Proof of Lemma \ref{lemma1}]
-We need to consider the reduction rules \m{SurfRed1} and \m{SurfRed2} because \m{exp} is a \m{SurfExp}.
+We need to consider two cases---reduction rules \m{SurfRed1} and \m{SurfRed2}, because they are rules for \m{SurfExp}.
+
 For \m{SurfRed1} rule, $\redm{(\m{SurfHead}~e_1~\ldots~e_i~\ldots~e_n)}{(\m{SurfHead}~e_1~\ldots~e_i''$$\ldots~e_n)}$, where $\redm{e_i}{e_i''}$. Because lemma \ref{lemma2} says
 If $\m{fulldesugar}(e_i)$ = $\m{fulldesugar}(e_i'')$, that means the i-th subexpression only involves desugaring, then \m{fulldesugar}(\m{exp}) = \m{fulldesugar}(\m{exp'}). If $\m{fulldesugar}(e_i)$ $\not=$ $\m{fulldesugar}(e_i'')$, non-desugaring reduction occurs at the subexpression, then what we need to prove is that, $\redc{\m{fulldesugar}(\m{exp})}{\m{fulldesugar}(\m{exp'})}$, that means the one-step reduction in $\redm{}{}$ shows what exactly reduced in the totally desugared expression. Note that the only difference between \m{exp} and \m{exp'} is at the i-th subexpression, it is the emulation of $\redm{}{}$ on the subexpression. So the equation can be proved recursively.
 
