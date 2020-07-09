@@ -19,10 +19,10 @@ As mentioned above, IFA intuitively describes the evaluation rules of a certain 
 Considering evaluation rules of \m{if} in overview, we can observe that a term headed with \m{if} is first evaluated for $e_1$. Then it is chosen to evaluate $e_2$ or $e_3$ depending on the value of $e_1$. The evaluation result of $e_2$ or $e_3$ is the value of the term. Thus, we use Figure \ref{fig:ifa-if} to represent the evaluation rules of \m{if}.
 
 \begin{figure}[t]
-	\centering
-	\includegraphics[scale=0.25]{images/ifa/ifa-if.png}
-	\caption{IFA of \m{if}}
-	\label{fig:ifa-if}
+    \centering
+    \includegraphics[scale=0.25]{images/ifa/ifa-if.png}
+    \caption{IFA of \m{if}}
+    \label{fig:ifa-if}
 \end{figure}
 
 A node of IFA indicates that the term needs to be evaluated, and the nodes before this have been evaluated. The arrow from $q_0$ to $q_1$ indicates that this branch is selected when the evaluation result of $e_1$ is \m{\#t}. The arrow between $e_1$ and $e_3$ is similar. The double circles of $e_2$ and $e_3$ denote that their evaluation result is the result of the term with this syntactic structure. In most cases, the transition condition is the evaluation result (an abstract value) of the previous node or a specific value. To simplify the representation of IFA in the figures of this paper, in the former case, we omit the condition on the transition edge; and in the latter case, we only mark the value on the transition edge.
@@ -33,53 +33,53 @@ When a term headed with \m{if} needs to be evaluated (for example \m{(if (if \#t
 
 Sometimes the rules may be more complex, such as being reduced into another syntactic structure, or a term containing other syntactic structures. For example, we can express \m{nand}'s evaluation rules as follows. Based on the method discussed above, we can draw \m{nand}'s IFA as Figure \ref{fig:ifa-nand-a}.
 \[
-\infer{(\m{nand}~e_1~e_2) \to (\m{nand}~e_1'~e_2)}{e_1 \to e_1'}
+    \infer{(\m{nand}~e_1~e_2) \to (\m{nand}~e_1'~e_2)}{e_1 \to e_1'}
 \]\[
-(\m{nand}~v_1~e_2) \to (\m{if}~(\m{if}~v_1~e_2~\m{\#f})~\m{\#f}~\m{\#t})
+    (\m{nand}~v_1~e_2) \to (\m{if}~(\m{if}~v_1~e_2~\m{\#f})~\m{\#f}~\m{\#t})
 \]
 
 % \infrule[E-Nand]{e_1 \to e_1'}{(\m{nand}~e_1~e_2) \to (\m{nand}~e_1'~e_2)}
 % \infax[E-NandV]{(\m{nand}~v_1~e_2) \to (\m{if}~(\m{if}~v_1~e_2~\m{\#f})~\m{\#f}~\m{\#t})}
 
 \begin{figure}[t]
-\centering
-\subcaptionbox{IFA according to the rules \label{fig:ifa-nand-a}}[.31\linewidth]{
-    \includegraphics[scale=0.25]{images/ifa/ifa-nand-1-small.png}
-}
-\subcaptionbox{After expanding the outer \m{if} \label{fig:ifa-nand-b}}[.31\linewidth]{
-    \includegraphics[scale=0.25]{images/ifa/ifa-nand-2-small.png}
-}
-\subcaptionbox{After expanding the inner \m{if} \label{fig:ifa-nand-c}}[.33\linewidth]{
-    \includegraphics[scale=0.25]{images/ifa/ifa-nand-3-small.png}
-}
-\caption{IFA of \m{nand}}
-\label{fig:ifa-nand}
+    \centering
+    \subcaptionbox{IFA according to the rules \label{fig:ifa-nand-a}}[.31\linewidth]{
+        \includegraphics[scale=0.25]{images/ifa/ifa-nand-1-small.png}
+    }
+    \subcaptionbox{After expanding the outer \m{if} \label{fig:ifa-nand-b}}[.31\linewidth]{
+        \includegraphics[scale=0.25]{images/ifa/ifa-nand-2-small.png}
+    }
+    \subcaptionbox{After expanding the inner \m{if} \label{fig:ifa-nand-c}}[.33\linewidth]{
+        \includegraphics[scale=0.25]{images/ifa/ifa-nand-3-small.png}
+    }
+    \caption{IFA of \m{nand}}
+    \label{fig:ifa-nand}
 \end{figure}
 
-When the automaton runs into the terminal node of Figure \ref{fig:ifa-nand-a}, it derives the \m{if} term. In fact, we have known how \m{if} works through the IFA of \m{if}. Thus we can replace the last node with an $\text{IFA}_{\m{if}}$ and substitute $e_1$ to $e_3$ of $\text{IFA}_{\m{if}}$ with the parameters of the node. Use the termination nodes of $\text{IFA}_{\m{if}}$ as the termination nodes of new $\text{IFA}_{\m{nand}}$. The results are shown in Figure \ref{fig:ifa-nand-b}. Further decomposing the inner \m{if} node, connecting the terminating nodes of $\text{IFA}_{\m{nand}}$ to the nodes pointed to by the original output edge, we get Figure \ref{fig:ifa-nand-c}. 
+When the automaton runs into the terminal node of Figure \ref{fig:ifa-nand-a}, it derives the \m{if} term. In fact, we have known how \m{if} works through the IFA of \m{if}. Thus we can replace the last node with an $\text{IFA}_{\m{if}}$ and substitute $e_1$ to $e_3$ of $\text{IFA}_{\m{if}}$ with the parameters of the node. Use the termination nodes of $\text{IFA}_{\m{if}}$ as the termination nodes of new $\text{IFA}_{\m{nand}}$. The results are shown in Figure \ref{fig:ifa-nand-b}. Further decomposing the inner \m{if} node, connecting the terminating nodes of $\text{IFA}_{\m{nand}}$ to the nodes pointed to by the original output edge, we get Figure \ref{fig:ifa-nand-c}.
 
 As can be seen, the nodes of IFA in Figure \ref{fig:ifa-nand-c} have no other composite syntactic structures. Such an IFA completely expresses the semantics of a syntactic structure, and no longer cares about the evaluation rules of other syntactic structures. We do similar steps for syntactic sugar, which will be discussed later.
 
 \subsubsection{IFA of \m{and}}
 
-We represent the evaluation rule of \m{and} in a more complex way, as follows. 
+We represent the evaluation rule of \m{and} in a more complex way, as follows.
 \[
-(\m{and}~e_1~e_2) \to (\m{let}~x~e_1~(\m{if}~x~e_2~x))
+    (\m{and}~e_1~e_2) \to (\m{let}~x~e_1~(\m{if}~x~e_2~x))
 \]
-In this case, we use the let binding. So we need to record the term represented by each variable at each node called symbol table. The representation of $\text{IFA}_{\m{and}}$ is shown in Figure \ref{fig:ifa-and-a}. 
+In this case, we use the let binding. So we need to record the term represented by each variable at each node called symbol table. The representation of $\text{IFA}_{\m{and}}$ is shown in Figure \ref{fig:ifa-and-a}.
 
 Further discuss the syntactic structure. We first evaluate $e_1$ and save the result in $x$. When evaluating the term of \m{if}, what is actually evaluated is $(\m{if}~x~e_2~x)[e_1/x]$. We represent it in the form of Figure \ref{fig:ifa-and-b}, where node $q_1$ contains a symbol table for recording variables and the nodes referred to. It is similar to context, but since we mapped the variable to the node, we distinguished it. Mapping to nodes is to ensure that the variable data will not be lost when the IFA is transformed.
 
 \begin{figure}[t]
-\centering
-\subcaptionbox{IFA according to the rules \label{fig:ifa-and-a}}[.4\linewidth]{
-    \includegraphics[scale=0.25]{images/ifa/ifa-and-1.png}
-}
-\subcaptionbox{After expanding \m{let} \label{fig:ifa-and-b}}[.4\linewidth]{
-    \includegraphics[scale=0.25]{images/ifa/ifa-and-2.png}
-}
-\caption{IFA of \m{and}}
-\label{fig:ifa-and}
+    \centering
+    \subcaptionbox{IFA according to the rules \label{fig:ifa-and-a}}[.4\linewidth]{
+        \includegraphics[scale=0.25]{images/ifa/ifa-and-1.png}
+    }
+    \subcaptionbox{After expanding \m{let} \label{fig:ifa-and-b}}[.4\linewidth]{
+        \includegraphics[scale=0.25]{images/ifa/ifa-and-2.png}
+    }
+    \caption{IFA of \m{and}}
+    \label{fig:ifa-and}
 \end{figure}
 
 %--------------------------------
@@ -87,17 +87,17 @@ Further discuss the syntactic structure. We first evaluate $e_1$ and save the re
 
 \begin{Def}[Inference Automaton]
 
-An inference automaton (IFA) of syntactic structure \m{CoreHead} is a 5-tuple, $(Q, \Sigma, q_0, F, \delta)$, consisting of
+    An inference automaton (IFA) of syntactic structure \m{CoreHead} is a 5-tuple, $(Q, \Sigma, q_0, F, \delta)$, consisting of
 
-\begin{itemize}
-    \item A finite set of nodes $Q$, each node contains a expression and a symbol table. The symbol table maps a variable to a node.
-    \item A finite set of conditions $\Sigma$
-    \item A start node $q_0 \in Q$
-    \item A set of terminal nodes $F \subseteq Q$ 
-    \item A transition function $\delta: (Q-F) \times \Sigma' \to Q$ where $\Sigma' \subseteq \Sigma$
-\end{itemize}
+    \begin{itemize}
+        \item A finite set of nodes $Q$, each node contains a expression and a symbol table. The symbol table maps a variable to a node.
+        \item A finite set of conditions $\Sigma$
+        \item A start node $q_0 \in Q$
+        \item A set of terminal nodes $F \subseteq Q$
+        \item A transition function $\delta: (Q-F) \times \Sigma' \to Q$ where $\Sigma' \subseteq \Sigma$
+    \end{itemize}
 
-and for each node $q$, there is no sequence of conditions $C = (c_1,c_2,\ldots,c_n)\subseteq \Sigma^*$, which makes that after $q$ transfers sequentially according to $P$, it returns $q$.
+    and for each node $q$, there is no sequence of conditions $C = (c_1,c_2,\ldots,c_n)\subseteq \Sigma^*$, which makes that after $q$ transfers sequentially according to $P$, it returns $q$.
 
 \end{Def}
 
@@ -111,20 +111,20 @@ In IFA, state transition does not depend on input. The only input of IFA is the 
 Although IFA can intuitively show the behavior of a syntactic structure for evaluation, IFA itself has a complicated form. For example, the IFA of a syntactic structure may contain other syntactic structures as shown in Figure \ref{fig:ifa-nand-a}. We try to deform and simplify IFA to make it easier to analyze.
 
 \begin{Def}[Normal IFA]
-\label{def:nmlifa}
-If an IFA meets following constraints, we call it a normal IFA.
-\begin{itemize}
-    \item The expression of node $q \in Q$ can only be a pattern variable $e_i$ or a local variable $x$. If it is a local variable, it cannot be in the symbol table of $q$.
-    \item For any $q_1,q_2 \in Q$ and $c_1, c_2 \in \Sigma$, $\delta(q_1, c_1) \neq \delta(q_2, c_2)$.
-    \item On each branch, each pattern variable $e_i$ can only be evaluated once.
-\end{itemize}
+    \label{def:nmlifa}
+    If an IFA meets following constraints, we call it a normal IFA.
+    \begin{itemize}
+        \item The expression of node $q \in Q$ can only be a pattern variable $e_i$ or a local variable $x$. If it is a local variable, it cannot be in the symbol table of $q$.
+        \item For any $q_1,q_2 \in Q$ and $c_1, c_2 \in \Sigma$, $\delta(q_1, c_1) \neq \delta(q_2, c_2)$.
+        \item On each branch, each pattern variable $e_i$ can only be evaluated once.
+    \end{itemize}
 \end{Def}
 
 If an IFA is normal, it means there are no more composite syntactic structures in it. And it is a tree structure. We  prove that it is always feasible to convert IFA to normal IFA.
 
 \begin{mythm}[Normalizability of IFA]
-\label{mythm:nmlifa}
-An IFA can be transformed into a normal IFA, if the normal IFAs of all sub-syntactic structures in the IFA are known.
+    \label{mythm:nmlifa}
+    An IFA can be transformed into a normal IFA, if the normal IFAs of all sub-syntactic structures in the IFA are known.
 \end{mythm}
 
 In order to prove this theorem, we give the following steps and prove their correctness.
@@ -135,10 +135,10 @@ In order to prove this theorem, we give the following steps and prove their corr
 When evaluating a term, different branches do not influence each other. Therefore, a node with at least two sources can be cloned and applied to different branches as shown in Figure \ref{fig:nmlifa-tree}. Replace the node referenced by the branch with the cloned node in conditions and symbol tables. The correctness is obvious. In this way, we can transform an IFA into a tree so that it satisfies the second constraint of normal IFA.
 
 \begin{figure}[t]
-	\centering
+    \centering
     \includegraphics[scale=0.25]{images/nmlifa/nmlifa-tree.png}
-	\caption{Transform into a Tree}
-	\label{fig:nmlifa-tree}
+    \caption{Transform into a Tree}
+    \label{fig:nmlifa-tree}
 \end{figure}
 
 %-------------------------------------------------
@@ -164,10 +164,10 @@ For hygienic sugar, this step of substitution can also guarantee correctness. Be
 If the expression of a node $q$ is a local variable $x$ and $x$ is in the symbol table of $q$, we can replace $x$ with the expression of the node it points to, then remove $x$ from the symbol table as Figure \ref{fig:nmlifa-replace}. Because $x[e_1/x, e_2/y]=e_1[e_2/y]$, it is correct.
 
 \begin{figure}[t]
-	\centering
+    \centering
     \includegraphics[scale=0.25]{images/nmlifa/nmlifa-replace.png}
-	\caption{Replace Variables in the Symbol Table}
-	\label{fig:nmlifa-replace}
+    \caption{Replace Variables in the Symbol Table}
+    \label{fig:nmlifa-replace}
 \end{figure}
 
 %---------------------------------------------------------------------
@@ -178,10 +178,10 @@ If an IFA is a tree, for each branch, remove the non-terminal nodes that have be
 Since on any branch, if $e_i$ is removed, it must have been evaluated. Therefore, when IFA runs to this node, there is no need to do any evaluation on $e_i$. At the same time, the transfer edge ensures that the conditions are not lacking. Correctness is guaranteed.
 
 \begin{figure}[t]
-	\centering
-	\includegraphics[scale=0.25]{images/nmlifa/nmlifa-merge.png}
-	\caption{Remove Evaluated Nodes and Merge Transition Conditions}
-	\label{fig:nmlifa-merge}
+    \centering
+    \includegraphics[scale=0.25]{images/nmlifa/nmlifa-merge.png}
+    \caption{Remove Evaluated Nodes and Merge Transition Conditions}
+    \label{fig:nmlifa-merge}
 \end{figure}
 
 %------------------------------------
@@ -193,7 +193,7 @@ If the expression of a node is a constant value, remove the node and merge the c
 \subsubsection{Normalizability of IFA}
 
 \begin{proof}[Proof of Theorem \ref{mythm:nmlifa}]
-By repeating the above steps continuously, we can always get normal IFA. And it is equivalent to the original IFA for the correctness of each step.
+    By repeating the above steps continuously, we can always get normal IFA. And it is equivalent to the original IFA for the correctness of each step.
 \end{proof}
 
 %===========================================
@@ -205,64 +205,64 @@ In the examples at the beginning of this section, we construct IFAs based on the
 \subsubsection{Assumptions}
 
 \begin{Asm}
-\label{Asm:rules}
-A syntactic structure $CoreHead$ only contains the following evaluation rules.
+    \label{Asm:rules}
+    A syntactic structure $CoreHead$ only contains the following evaluation rules.
 
-\[
-\infer
-{(\m{CoreHead}~e_1 \ldots e_i \ldots e_n) \to (\m{CoreHead}~e_1 \ldots e_i' \ldots e_n)}{e_i \to e_i'\quad T}
-\]
-\[
-\infer{(\m{CoreHead}~v_1 \ldots v_p~e_1 \ldots e_q) \to e}{T}
-\]
-where $e$ can be any value, one of the parameters or a term of another syntactic structure. $T$ is a set of constraints of the parameters containing $e_j$ is a value or $e_j$ is a specific value where $j \in 1,2,\ldots,n$.
+    \[
+        \infer
+        {(\m{CoreHead}~e_1 \ldots e_i \ldots e_n) \to (\m{CoreHead}~e_1 \ldots e_i' \ldots e_n)}{e_i \to e_i'\quad T}
+    \]
+    \[
+        \infer{(\m{CoreHead}~v_1 \ldots v_p~e_1 \ldots e_q) \to e}{T}
+    \]
+    where $e$ can be any value, one of the parameters or a term of another syntactic structure. $T$ is a set of constraints of the parameters containing $e_j$ is a value or $e_j$ is a specific value where $j \in 1,2,\ldots,n$.
 \end{Asm}
 
 This assumption specifies the form of the evaluation rules to ensure that IFAs can be generated. The first one is a context rule, and the other one is a reduction rule. Rule $(\m{if}~\m{\#t}~e_1~e_2) \to e_1$ can be seen as \[\infer{\m{if}~e~e_1~e_2 \to e_1}{e~\key{is}~\m{\#t}}.\]
 
 \begin{Asm}[Orderliness of Syntactic Structure]
-\label{Asm:orderliness}
-The syntactic structure in CoreLang is finite. Think of all syntactic structures as points in a directed graph. If one of $CoreHead$'s evaluation rules can generate a term containing $CoreHead'$, then construct an edge that points from $CoreHead$ to $CoreHead'$. The directed graph generated in this method has no circles.
+    \label{Asm:orderliness}
+    The syntactic structure in CoreLang is finite. Think of all syntactic structures as points in a directed graph. If one of $CoreHead$'s evaluation rules can generate a term containing $CoreHead'$, then construct an edge that points from $CoreHead$ to $CoreHead'$. The directed graph generated in this method has no circles.
 \end{Asm}
 
 IFAs are not able to construct syntactic structures that contain recursive rules. This assumption qualifies that we can find an order for all syntactic structures, and when we try to construct IFA for $CoreHead$, IFA of $CoreHead'$ is known.
 
 \begin{Asm}[Determinacy of One-Step Evaluation]
-\label{Asm:determinacy}
-The rules satisfy the determinacy of one-step evaluation.
+    \label{Asm:determinacy}
+    The rules satisfy the determinacy of one-step evaluation.
 \end{Asm}
 
 By assumption \ref{Asm:determinacy}, we can get the following lemma, which points out the feasibility of using a node in IFA to represent the evaluation of subexpressions.
 
 \begin{lemma}
-\label{lemma:one-step}
-If a term $(\m{CoreHead}~e_1~\ldots~e_n)$ does a one-step evaluation by rule (E-Head) of $\m{CoreHead}$, which is a one-step evaluation of pattern variable $e_i$, then it continues to use this rule until $e_i$ becomes a value.
+    \label{lemma:one-step}
+    If a term $(\m{CoreHead}~e_1~\ldots~e_n)$ does a one-step evaluation by rule (E-Head) of $\m{CoreHead}$, which is a one-step evaluation of pattern variable $e_i$, then it continues to use this rule until $e_i$ becomes a value.
 \end{lemma}
 
 \begin{proof}[Proof of Lemma \ref{lemma:one-step}]
-According to Assumption \ref{Asm:determinacy}, this lemma is trivial.
+    According to Assumption \ref{Asm:determinacy}, this lemma is trivial.
 \end{proof}
 
 %------------------------
 \subsubsection{Algorithm}
 
 \begin{mythm}[IFA Can Be Constructed by Evaluation Rules]
-\label{mythm:Rule2IFA}
-If all the syntactic structures in CoreLang satisfy these assumptions, we can construct IFAs for all syntactic structures in CoreLang.
+    \label{mythm:Rule2IFA}
+    If all the syntactic structures in CoreLang satisfy these assumptions, we can construct IFAs for all syntactic structures in CoreLang.
 \end{mythm}
 
 \begin{proof}[Proof of Theorem \ref{mythm:Rule2IFA}]
 
-We prove this theorem by giving an algorithm that converts evaluation rules to IFA. By Assumption \ref{Asm:orderliness}, we get an order of syntactic structures. We construct the IFA for each structure in turn.
+    We prove this theorem by giving an algorithm that converts evaluation rules to IFA. By Assumption \ref{Asm:orderliness}, we get an order of syntactic structures. We construct the IFA for each structure in turn.
 
-We generate a node for each rule of the syntactic structure \m{CoreHead} and insert them into $Q$. If the rule is a context rule for a pattern varibale $e_i$, set $e_i$ as the expression of the node. If the rule is a reduction rule, add them into $F$ as terminal nodes and set the reduced term $e$ as the expression of the node. Symbol tables of these nodes are set to be empty. Next we connect these nodes.
+    We generate a node for each rule of the syntactic structure \m{CoreHead} and insert them into $Q$. If the rule is a context rule for a pattern varibale $e_i$, set $e_i$ as the expression of the node. If the rule is a reduction rule, add them into $F$ as terminal nodes and set the reduced term $e$ as the expression of the node. Symbol tables of these nodes are set to be empty. Next we connect these nodes.
 
-For a term like $(\m{CoreHead}~e_1~\ldots~e_n)$, considering that $e_1\cdots e_n$ are not value, According to Lemma \ref{lemma:one-step}, we have the unique rule $r$ of \m{CoreHead} for one-step evaluation. Let node $q$ corresponding to $r$ be $q_0$.
+    For a term like $(\m{CoreHead}~e_1~\ldots~e_n)$, considering that $e_1\cdots e_n$ are not value, According to Lemma \ref{lemma:one-step}, we have the unique rule $r$ of \m{CoreHead} for one-step evaluation. Let node $q$ corresponding to $r$ be $q_0$.
 
-If $r$ is a context rule for $e_i$, let the term of $q$ be $e_i$. Assume that the evaluation of $e_i$ results in $v_i$, we get term $(\m{CoreHead}~e_1 \ldots e_{i-1}~v_i~e_{i+1} \ldots e_n)$. For each possible value of $v_i$, choose the rules $r'$ that should be used. The node is $q'$. Set a condition as $c=q~\key{is}~v_i$ Let $\delta(q, c)$ be $q'$. For each branch, seem $r'$ as $r$ and keep doing this until $r$ is a reduction rule.
+    If $r$ is a context rule for $e_i$, let the term of $q$ be $e_i$. Assume that the evaluation of $e_i$ results in $v_i$, we get term $(\m{CoreHead}~e_1 \ldots e_{i-1}~v_i~e_{i+1} \ldots e_n)$. For each possible value of $v_i$, choose the rules $r'$ that should be used. The node is $q'$. Set a condition as $c=q~\key{is}~v_i$ Let $\delta(q, c)$ be $q'$. For each branch, seem $r'$ as $r$ and keep doing this until $r$ is a reduction rule.
 \end{proof}
 
-In this way, we got an IFA of \m{CoreHead}. According to the lemma \ref{mythm:nmlifa}, we can also get a normal IFA of \m{CoreHead}. 
+In this way, we got an IFA of \m{CoreHead}. According to the lemma \ref{mythm:nmlifa}, we can also get a normal IFA of \m{CoreHead}.
 
 %---------------------------------------------------------
 \subsubsection{Example: Construct IFA of \m{xor} by Rules}
@@ -280,18 +280,18 @@ Suppose that \m{xor} is a syntactic structure in CoreLang. There are five rules 
 Considering a term $(\m{xor}~e_1~e_2)$, where $e_1$ and $e_2$ are not values. It will be derived by rule (E-Xor). Therefore, set the node of the rule as the start node $q_0$. According to the rules of \m{xor}, the evaluation result of $e_1$ can be \m{\#t} or \m{\#f}. If the value is \m{\#t}, the term will be $(\m{xor}~\m{\#t}~e_2)$ and use rule (E-XorTrue) to derive. Then connect $q_0$ and $q_1$ with condition $q_0~\key{is}~\m{\#t}$. Connect $q_0$ and $q_2$ with condition $q_0~\key{is}~\m{\#f}$ similarly as Figure \ref{fig:ifa-xor-b}. Then connect $q_2$ to the last two nodes with conditions according to the value of $e_2$. The IFA of \m{xor} can be expressed as Figure \ref{fig:ifa-xor-c}.
 
 \begin{figure}[t]
-\centering
-\subcaptionbox{\label{fig:ifa-xor-a}}[.3\linewidth]{
-    \includegraphics[scale=0.22]{images/ifa/ifa-xor-1.png}
-}
-\subcaptionbox{\label{fig:ifa-xor-b}}[.33\linewidth]{
-    \includegraphics[scale=0.22]{images/ifa/ifa-xor-2.png}
-}
-\subcaptionbox{\label{fig:ifa-xor-c}}[.33\linewidth]{
-    \includegraphics[scale=0.22]{images/ifa/ifa-xor-3.png}
-}
-\caption{IFA of \m{xor}: Constructed by evaluation rules}
-\label{fig:ifa-xor}
+    \centering
+    \subcaptionbox{\label{fig:ifa-xor-a}}[.3\linewidth]{
+        \includegraphics[scale=0.22]{images/ifa/ifa-xor-1.png}
+    }
+    \subcaptionbox{\label{fig:ifa-xor-b}}[.33\linewidth]{
+        \includegraphics[scale=0.22]{images/ifa/ifa-xor-2.png}
+    }
+    \subcaptionbox{\label{fig:ifa-xor-c}}[.33\linewidth]{
+        \includegraphics[scale=0.22]{images/ifa/ifa-xor-3.png}
+    }
+    \caption{IFA of \m{xor}: Constructed by evaluation rules}
+    \label{fig:ifa-xor}
 \end{figure}
 
 %--------------------------
@@ -300,27 +300,27 @@ Considering a term $(\m{xor}~e_1~e_2)$, where $e_1$ and $e_2$ are not values. It
 Before proving the correctness of the algorithm, we first prove the following lemma.
 
 \begin{lemma}
-\label{lemma:accessibility}
-If a term $e$ of syntactic structure \m{CoreHead} uses rule $r$ to derive, we can find a path from $q_0$ to $q$ generated by $r$.
+    \label{lemma:accessibility}
+    If a term $e$ of syntactic structure \m{CoreHead} uses rule $r$ to derive, we can find a path from $q_0$ to $q$ generated by $r$.
 \end{lemma}
 
 \begin{proof}[Proof of Lemma \ref{lemma:accessibility}]
-Suppose $e=(\m{CoreHead}~v_1~\ldots~v_p~e_1~\ldots~e_q)$. We build a term $e_0'=(\m{CoreHead}~\m{id}(v_1)~\ldots~\m{id}(v_p)~e_1~\ldots~e_q)$, where $\m{id}(x)=x$. $e_0'$ should have the same value as $e$. If $e_0'$ is derived by rule $r_1$, $r_1$ must be a context rule, or $e$ can also be reduced by $r_1$. Also, the node $q_1$ generated by $r_1$ will be the start node. Without loss of generality, assume that $r_1$ is a context rule for $e_1$. We get $e_1'=(\m{CoreHead}~v_1~\m{id}(v_2)~\ldots~\m{id}(v_p)~e_1~\ldots~e_q)$ after derived by $r_1$. Similarly, we find a rule $r_2$ which is a context rule for $e_2$. The node $q_2$ generated by $r_2$ satisfies $\delta(q_1, (e_1~\key{is}~v_1))=q_2$. By analogy, we can get $e_p'=(\m{CoreHead}~v_1~\ldots~v_p~e_1~\ldots~e_q)=e$ and a path $q_1(=q_0), q_2, \ldots, q_p$. At last, we use rule $r$ to derive $e$ and add $q$ to the path.
+    Suppose $e=(\m{CoreHead}~v_1~\ldots~v_p~e_1~\ldots~e_q)$. We build a term $e_0'=(\m{CoreHead}~\m{id}(v_1)~\ldots~\m{id}(v_p)~e_1~\ldots~e_q)$, where $\m{id}(x)=x$. $e_0'$ should have the same value as $e$. If $e_0'$ is derived by rule $r_1$, $r_1$ must be a context rule, or $e$ can also be reduced by $r_1$. Also, the node $q_1$ generated by $r_1$ will be the start node. Without loss of generality, assume that $r_1$ is a context rule for $e_1$. We get $e_1'=(\m{CoreHead}~v_1~\m{id}(v_2)~\ldots~\m{id}(v_p)~e_1~\ldots~e_q)$ after derived by $r_1$. Similarly, we find a rule $r_2$ which is a context rule for $e_2$. The node $q_2$ generated by $r_2$ satisfies $\delta(q_1, (e_1~\key{is}~v_1))=q_2$. By analogy, we can get $e_p'=(\m{CoreHead}~v_1~\ldots~v_p~e_1~\ldots~e_q)=e$ and a path $q_1(=q_0), q_2, \ldots, q_p$. At last, we use rule $r$ to derive $e$ and add $q$ to the path.
 \end{proof}
 
 \begin{lemma}
-\label{lemma:rule2ifa-correct}
-For any syntactic structure \m{CoreHead}, if its evaluation rules meets the above assumptions, the normal IFA got by the algorithm in Theorem \ref{mythm:Rule2IFA} has the same semantics as the rules. 
+    \label{lemma:rule2ifa-correct}
+    For any syntactic structure \m{CoreHead}, if its evaluation rules meets the above assumptions, the normal IFA got by the algorithm in Theorem \ref{mythm:Rule2IFA} has the same semantics as the rules.
 \end{lemma}
 
 In other words, for any term of syntactic structure \m{CoreHead}, evaluating the term by IFA and evaluating by rule get the same derivation sequence.
 
 \begin{proof}[Proof of Lemma \ref{lemma:rule2ifa-correct}]
-We only need to discuss that in a one-step derivation, both get the same result.
+    We only need to discuss that in a one-step derivation, both get the same result.
 
-Considering a term $e=(\m{CoreHead}~e_1 \ldots e_n)$ use rule $r$ to derive. Suppose $r$ generate node $q$. By Lemma \ref{lemma:accessibility}, we find a path from $q_0$ to $q$. The term $e$ must meet the conditions from $q_0$ to $q$. Therefore, the one-step derivation of this term $e$ in IFA must be located at $q$. If $r$ is a context rule for a pattern variable $e_i$, the expression of $q$ is $e_i$ as well, and $e_i$ of $e$ is not a value. Thus both of the one-step derivation of $e$ are one-step derivation of $e_i$. If $r$ is a reduction rule to $e'$, both of them are $e'$.
+    Considering a term $e=(\m{CoreHead}~e_1 \ldots e_n)$ use rule $r$ to derive. Suppose $r$ generate node $q$. By Lemma \ref{lemma:accessibility}, we find a path from $q_0$ to $q$. The term $e$ must meet the conditions from $q_0$ to $q$. Therefore, the one-step derivation of this term $e$ in IFA must be located at $q$. If $r$ is a context rule for a pattern variable $e_i$, the expression of $q$ is $e_i$ as well, and $e_i$ of $e$ is not a value. Thus both of the one-step derivation of $e$ are one-step derivation of $e_i$. If $r$ is a reduction rule to $e'$, both of them are $e'$.
 
-Similarly, if an term can be derived in one step in IFA, then it must be able to use the corresponding rule for one-step derivation.
+    Similarly, if an term can be derived in one step in IFA, then it must be able to use the corresponding rule for one-step derivation.
 \end{proof}
 
 %-----------------------------
@@ -328,9 +328,9 @@ Similarly, if an term can be derived in one step in IFA, then it must be able to
 
 If a certain syntactic structure does not meet the above assumptions, it does not mean that this syntactic structure does not have an IFA. We can define its IFA according to its semantics. However, this method cannot be automated and requires users to ensure its correctness. For example, given the evaluation rules of \m{let}, we can specify the IFA of \m{let} as Figure \ref{fig:ifa-let}.
 \[
-\infer{\m{let}~x~e_1~e_2 \to \m{let}~x~e_1'~e_2}{e_1 \to e_1'}
+    \infer{\m{let}~x~e_1~e_2 \to \m{let}~x~e_1'~e_2}{e_1 \to e_1'}
 \]\[
-(\m{let}~x~e_1~e_2) \to e_2[e_1/x]
+    (\m{let}~x~e_1~e_2) \to e_2[e_1/x]
 \]
 
 % \infrule[E-Let]{e_1 \to e_1'}{\m{let}~x~e_1~e_2 \to \m{let}~x~e_1'~e_2}
@@ -354,8 +354,8 @@ In the evaluation rules of \m{let}, there is a substitution. Therefore, in IFA o
 Next we try to convert IFA to evaluation rules. Because IFA can be converted into normal IFA by Theorem \ref{mythm:nmlifa}, we only need to convert normal IFA into rules. Unfortunately, IFA can express some derivation methods whose evaluation rules are difficult to describe. Therefore, we also need to have stricter constraints on IFA to ensure that evaluation rules can be generated.
 
 \begin{Asm}
-\label{Asm:st} 
-In a normal IFA, if $q \notin F$, then the symbol table of $q$ is empty, and the expression of $q$ cannot be a local variable.
+    \label{Asm:st}
+    In a normal IFA, if $q \notin F$, then the symbol table of $q$ is empty, and the expression of $q$ cannot be a local variable.
 \end{Asm}
 
 In fact, this is a very strong assumption, which requires that only termination nodes could have substitution. Because it is difficult for us to generate a context rule for the term after substitution.
@@ -366,31 +366,30 @@ In fact, this is a very strong assumption, which requires that only termination 
 Similarly, we first give its algorithm, and then prove its correctness.
 
 \begin{mythm}[Rules Can Be Constructed by Normal IFA]
-\label{mythm:ifa2rule}
-For each normal IFA satisfy Assumption \ref{Asm:st}, it can be converted to evaluation rules.
+    \label{mythm:ifa2rule}
+    For each normal IFA satisfy Assumption \ref{Asm:st}, it can be converted to evaluation rules.
 \end{mythm}
 
 \begin{proof}[Proof of Theorem \ref{mythm:ifa2rule}]
 
-Suppose that the IFA stands for the syntactic structure $H$, then we build evaluation rules for $H$. First traverse all nodes to find the set of all terms in nodes, which is the parameters of the syntactic structure $H$ like $(\m{H}~e_1 \ldots e_n)$. Then generate evaluation rule for each node.
+    Suppose that the IFA stands for the syntactic structure $H$, then we build evaluation rules for $H$. First traverse all nodes to find the set of all terms in nodes, which is the parameters of the syntactic structure $H$ like $(\m{H}~e_1 \ldots e_n)$. Then generate evaluation rule for each node.
 
-Begin with $q_0$, traverse the IFA. Let $q$ be $q_0$. Record the conditions by a set $T$.
+    Begin with $q_0$, traverse the IFA. Let $q$ be $q_0$. Record the conditions by a set $T$.
 
-Suppose that $q$ is a terminal node, the expression of $q$ is $e$ and the symbol table of $q$ is like $\{x:q_x; y:q_y; \ldots\}$. Let $e_x,e_y,\ldots$ be the expressions of $q_x, q_y, \ldots$. Add a reduction rule like
-\[
-\infer{(\m{H}~e_1 \ldots e_n) \to e[e_x/x][e_y/y]\ldots}{T}
-\]
-% \infrule[E-Hr]{T}{(\m{H}~e_1 \ldots e_n) \to e[e_x/x][e_y/y]\ldots}
+    Suppose that $q$ is a terminal node, the expression of $q$ is $e$ and the symbol table of $q$ is like $\{x:q_x; y:q_y; \ldots\}$. Let $e_x,e_y,\ldots$ be the expressions of $q_x, q_y, \ldots$. Add a reduction rule like
+    \[
+        \infer{(\m{H}~e_1 \ldots e_n) \to e[e_x/x][e_y/y]\ldots}{T}
+    \]
+    % \infrule[E-Hr]{T}{(\m{H}~e_1 \ldots e_n) \to e[e_x/x][e_y/y]\ldots}
 
-If $q$ is not a termination node, and the expression of $q$ is $e_i$, add a context rule like
-\[
-\infer{(\m{H}~e_1~\ldots~e_i~\ldots~e_n) \to (\m{H}~e_1~\ldots~e_i'~\ldots~e_n)}{e_i \to e_i' \quad T}
-\]
+    If $q$ is not a termination node, and the expression of $q$ is $e_i$, add a context rule like
+    \[
+        \infer{(\m{H}~e_1~\ldots~e_i~\ldots~e_n) \to (\m{H}~e_1~\ldots~e_i'~\ldots~e_n)}{e_i \to e_i' \quad T}
+    \]
 
-%\infrule[E-Hi]{e_i \to e_i' \quad T}{(\m{H}~e_1~\ldots~e_i~\ldots~e_n) \to (\m{H}~e_1~\ldots~e_i'~\ldots~e_n)}
+    %\infrule[E-Hi]{e_i \to e_i' \quad T}{(\m{H}~e_1~\ldots~e_i~\ldots~e_n) \to (\m{H}~e_1~\ldots~e_i'~\ldots~e_n)}
 
-For each condition $c$ and node $q'$ satisfying $\delta(q, c)=q'$, do the following steps separately. Replace the node in $c$ with its expression and add it to $T$. Let $q'$ be $q$. Keep doing this until $q$ is a terminal node.
-
+    For each condition $c$ and node $q'$ satisfying $\delta(q, c)=q'$, do the following steps separately. Replace the node in $c$ with its expression and add it to $T$. Let $q'$ be $q$. Keep doing this until $q$ is a terminal node.
 \end{proof}
 
 %----------------------------------------------------------
@@ -399,66 +398,66 @@ For each condition $c$ and node $q'$ satisfying $\delta(q, c)=q'$, do the follow
 Figure \ref{fig:ifa-nand-bs} is the IFA of \m{nand} which have been constructed. We can simplify it and get a normal IFA as Figure \ref{fig:ifa-nand-as}.
 
 \begin{figure}[t]
-\centering
-\subcaptionbox{Before Simplification\label{fig:ifa-nand-bs}}[.45\linewidth]{
-    \includegraphics[scale=0.28]{images/ifa/ifa-nand-4.png}
-}
-\subcaptionbox{After Simplification\label{fig:ifa-nand-as}}[.45\linewidth]{
-    \includegraphics[scale=0.28]{images/ifa/ifa-nand.png}
-}
-\caption{IFA of \m{nand}}
-\label{fig:ifa-nand-std}
+    \centering
+    \subcaptionbox{Before Simplification\label{fig:ifa-nand-bs}}[.45\linewidth]{
+        \includegraphics[scale=0.28]{images/ifa/ifa-nand-4.png}
+    }
+    \subcaptionbox{After Simplification\label{fig:ifa-nand-as}}[.45\linewidth]{
+        \includegraphics[scale=0.28]{images/ifa/ifa-nand.png}
+    }
+    \caption{IFA of \m{nand}}
+    \label{fig:ifa-nand-std}
 \end{figure}
 
 Start with $q_0$, we get a context rule as
 \[
-\infer{(\m{nand}~e_1~e_2) \to (\m{nand}~e_1'~e_2)}{e_1 \to e_1'}
+    \infer{(\m{nand}~e_1~e_2) \to (\m{nand}~e_1'~e_2)}{e_1 \to e_1'}
 \]
 % \infrule[E-Nand]{e_1 \to e_1'}{(\m{nand}~e_1~e_2) \to (\m{nand}~e_1'~e_2)}
 
-We first discuss the branch of $q_2$. Add $e_1 \key{is} \m{\#t}$ to $T$. Because $q_2$ is not a terminal node, add a new context rule for $q_2$.
+We first discuss the branch of $q_2$. Add $e_1~\key{is}~\m{\#t}$ to $T$. Because $q_2$ is not a terminal node, add a new context rule for $q_2$.
 \[
-\infer{(\m{nand}~e_1~e_2) \to (\m{nand}~e_1~e_2')}{e_2 \to e_2'\quad e_1~\key{is}~\m{\#t}}
+    \infer{(\m{nand}~e_1~e_2) \to (\m{nand}~e_1~e_2')}{e_2 \to e_2'\quad e_1~\key{is}~\m{\#t}}
 \]
 % \infrule[E-NandTrue]{e_2 \to e_2'\quad e_1~\key{is}~\m{\#t}}{(\m{nand}~e_1~e_2) \to (\m{nand}~e_1~e_2')}
 
-Since $q_4$ is a reduction rule, append $e_2 \key{is} \m{\#t}$ to $T$ and add a new reduction rule for $q_4$. Reduction rule for $q_5$ is similar.
+Since $q_4$ is a reduction rule, append $e_2~\key{is}~\m{\#t}$ to $T$ and add a new reduction rule for $q_4$. Reduction rule for $q_5$ is similar.
 \[
-\begin{array}{c}
-\infer{(\m{nand}~e_1~e_2) \to \m{\#f}}{e_1~\key{is}~\m{\#t}\quad e_2~\key{is}~\m{\#t}}
-\quad
-\infer{(\m{nand}~e_1~e_2) \to \m{\#t}}{e_1~\key{is}~\m{\#t}\quad e_2~\key{is}~\m{\#f}}
-\end{array}
+    \begin{array}{c}
+        \infer{(\m{nand}~e_1~e_2) \to \m{\#f}}{e_1~\key{is}~\m{\#t}\quad e_2~\key{is}~\m{\#t}}
+        \quad
+        \infer{(\m{nand}~e_1~e_2) \to \m{\#t}}{e_1~\key{is}~\m{\#t}\quad e_2~\key{is}~\m{\#f}}
+    \end{array}
 \]
 % \infrule[E-NandTrueTrue]{e_1~\key{is}~\m{\#t}\quad e_2~\key{is}~\m{\#t}}{(\m{nand}~e_1~e_2) \to \m{\#f}}
 % \infrule[E-NandTrueFalse]{e_1~\key{is}~\m{\#t}\quad e_2~\key{is}~\m{\#f}}{(\m{nand}~e_1~e_2) \to \m{\#t}}
 
 Back to $q_0$, for $q_4'$ and $q_5'$ are also terminal nodes, we can build reduction rules for $q_4'$ and $q_5'$ in the same way.
 \[
-\begin{array}{c}
-\infer{(\m{nand}~e_1~e_2) \to \m{\#f}}{e_1~\key{is}~\m{\#f}\quad \m{\#f}~\key{is}~\m{\#t}}
-\quad
-\infer{(\m{nand}~e_1~e_2) \to \m{\#t}}{e_1~\key{is}~\m{\#f}\quad \m{\#f}~\key{is}~\m{\#f}}
-\end{array}
+    \begin{array}{c}
+        \infer{(\m{nand}~e_1~e_2) \to \m{\#f}}{e_1~\key{is}~\m{\#f}\quad \m{\#f}~\key{is}~\m{\#t}}
+        \quad
+        \infer{(\m{nand}~e_1~e_2) \to \m{\#t}}{e_1~\key{is}~\m{\#f}\quad \m{\#f}~\key{is}~\m{\#f}}
+    \end{array}
 \]
 % \infrule[E-NandFalse1]{e_1~\key{is}~\m{\#f}\quad \m{\#f}~\key{is}~\m{\#t}}{(\m{nand}~e_1~e_2) \to \m{\#f}}
 % \infrule[E-NandFalse2]{e_1~\key{is}~\m{\#f}\quad \m{\#f}~\key{is}~\m{\#f}}{(\m{nand}~e_1~e_2) \to \m{\#t}}
 
 We can judge that \m{\#f} is not \m{\#t}, so we can remove the rule (NandFalse1) from the rules, for it contains a condition that is never met. At the same time, we rewrite the remaining rules into a more customary form.
 \[
-\begin{array}{cc}
-\infer{(\m{nand}~e_1~e_2) \to (\m{nand}~e_1'~e_2)}{e_1 \to e_1'}
-&
-\infer{(\m{nand}~\m{\#t}~e_2) \to (\m{nand}~\m{\#t}~e_2')}{e_2 \to e_2'}
-\end{array}
+    \begin{array}{cc}
+        \infer{(\m{nand}~e_1~e_2) \to (\m{nand}~e_1'~e_2)}{e_1 \to e_1'}
+         &
+        \infer{(\m{nand}~\m{\#t}~e_2) \to (\m{nand}~\m{\#t}~e_2')}{e_2 \to e_2'}
+    \end{array}
 \]\[
-\begin{array}{ccc}
-(\m{nand}~\m{\#t}~\m{\#t}) \to \m{\#f}
-&
-(\m{nand}~\m{\#t}~\m{\#f}) \to \m{\#t}
-&
-(\m{nand}~\m{\#f}~e_2) \to \m{\#t}
-\end{array}
+    \begin{array}{ccc}
+        (\m{nand}~\m{\#t}~\m{\#t}) \to \m{\#f}
+         &
+        (\m{nand}~\m{\#t}~\m{\#f}) \to \m{\#t}
+         &
+        (\m{nand}~\m{\#f}~e_2) \to \m{\#t}
+    \end{array}
 \]
 
 % \infrule[E-Nand]{e_1 \to e_1'}{(\m{nand}~e_1~e_2) \to (\m{nand}~e_1'~e_2)}
@@ -472,19 +471,18 @@ We can judge that \m{\#f} is not \m{\#t}, so we can remove the rule (NandFalse1)
 \subsubsection{Correctness}
 
 \begin{lemma}
-\label{lemma:ifa2rule-correct}
-For any syntactic structure \m{H}, if its normal IFA meets the above assumptions, the evaluation rules obtained according to the algorithm in Theorem \ref{mythm:ifa2rule} have the same semantics as IFA. 
+    \label{lemma:ifa2rule-correct}
+    For any syntactic structure \m{H}, if its normal IFA meets the above assumptions, the evaluation rules obtained according to the algorithm in Theorem \ref{mythm:ifa2rule} have the same semantics as IFA.
 \end{lemma}
 
 In other words, for any term of syntactic structure \m{H}, evaluating the term by IFA and evaluating by rule get the same derivation sequence.
 
 \begin{proof}[Proof of Lemma \ref{lemma:ifa2rule-correct}]
-We only need to discuss that in a one-step derivation, both get the same result.
+    We only need to discuss that in a one-step derivation, both get the same result.
 
-Considering a term $e=(\m{H}~e_1 \ldots e_n)$ use rule $r$ to derive. The term $e$ must meet the condition $T$ of $r$ such as some parameters must be value or a specific value. Suppose $r$ is generated by node $q$. Then $T$ is the set of all transition conditions from $q_0$ to $q$. Therefore, the one-step derivation of this term $e$ in IFA must be located at $q$. If $r$ is a context rule for a pattern variable $e_i$, the expression of $q$ is $e_i$ as well, and $e_i$ of $e$ is not a value. Thus both of the one-step derivation of $e$ are one-step derivation of $e_i$.
+    Considering a term $e=(\m{H}~e_1 \ldots e_n)$ use rule $r$ to derive. The term $e$ must meet the condition $T$ of $r$ such as some parameters must be value or a specific value. Suppose $r$ is generated by node $q$. Then $T$ is the set of all transition conditions from $q_0$ to $q$. Therefore, the one-step derivation of this term $e$ in IFA must be located at $q$. If $r$ is a context rule for a pattern variable $e_i$, the expression of $q$ is $e_i$ as well, and $e_i$ of $e$ is not a value. Thus both of the one-step derivation of $e$ are one-step derivation of $e_i$.
 
-Similarly, if an term can be derived in one step in IFA, then it must be able to use the corresponding rule for one-step derivation.
-
+    Similarly, if an term can be derived in one step in IFA, then it must be able to use the corresponding rule for one-step derivation.
 \end{proof}
 
 %===========================
@@ -495,20 +493,20 @@ We can find that although rules of \m{nand} we used when constructing the IFA in
 Similarly, we also need to add some constraints on syntactic sugar.
 
 \begin{Asm}[Orderliness of Syntactic Sugar]
-\label{Asm:orderliness-sugar}
-The definition of each syntactic sugar can only use the syntactic structure in coreLang and the syntactic sugar that has been defined.
+    \label{Asm:orderliness-sugar}
+    The definition of each syntactic sugar can only use the syntactic structure in coreLang and the syntactic sugar that has been defined.
 \end{Asm}
 
 \begin{Def}
-\label{def:ifa-sugar}
-Considering the following syntactic sugar 
-\[
-\drule{(\m{SurfHead}~x_1~\ldots~x_n)}{e},
-\] 
-the IFA of \m{SurfHead} is defined as the IFA of syntactic structure \m{SurfHead'} whose evaluation rule is
-\[
-(\m{SurfHead'}~x_1~\ldots~x_n) \to e
-\]
+    \label{def:ifa-sugar}
+    Considering the following syntactic sugar
+    \[
+        \drule{(\m{SurfHead}~x_1~\ldots~x_n)}{e},
+    \]
+    the IFA of \m{SurfHead} is defined as the IFA of syntactic structure \m{SurfHead'} whose evaluation rule is
+    \[
+        (\m{SurfHead'}~x_1~\ldots~x_n) \to e
+    \]
 
 \end{Def}
 
@@ -517,7 +515,7 @@ the IFA of \m{SurfHead} is defined as the IFA of syntactic structure \m{SurfHead
 
 Suppose that there are only \m{if} and \m{let} in our CoreLang, whose IFAs are known. Now we build rules for syntactic sugar \m{or} and \m{sg}.
 \[
-\drule{(\m{or}~e_1~e_2)}{(\m{let}~x~e_1~(\m{if}~x~x~e_2))} 
+    \drule{(\m{or}~e_1~e_2)}{(\m{let}~x~e_1~(\m{if}~x~x~e_2))}
 \]
 
 \m{or} syntactic sugar only uses the syntax structure of CoreLang, which meets Assumption \ref{Asm:orderliness-sugar}. Then we generate evaluation rules for \m{or}.
