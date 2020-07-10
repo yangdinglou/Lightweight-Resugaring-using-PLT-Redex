@@ -8,7 +8,7 @@ So far, we have shown that our resugaring algorithm can use lazy desugaring to a
 
 %As discussed in the overview, frequent attempts on reverse desugaring during traditional resugaring processes is costive and inefficient. If we can statically derive syntactic sugar's evaluation rules through its structure, it will greatly improve the efficiency of resugaring. In this section, we purpose such a method to make the resugaring of syntactic sugar more efficient.
 
-To see our idea, consider a simple syntactic sugar defined by $\drule{(\m{not}~e_1)}{(\m{if}~e_1~\m{\#f}~\m{\#t})}$. To derive reductions rules for \m{not} from those of \m{if}, we design \textit{inference automaton} (IFA) that can be used to express and manipulate a set of evaluation rules for a language construct.
+To see our idea, consider a simple syntactic sugar defined by $\drule{(\m{Not}~e_1)}{(\m{if}~e_1~\m{\#f}~\m{\#t})}$. To derive reductions rules for \m{not} from those of \m{if}, we design \textit{inference automaton} (IFA) that can be used to express and manipulate a set of evaluation rules for a language construct.
 %
 Assuming that we already have the IFAs of all language constructs of the core language, our method to construct the evaluation rules of a syntactic sugar is as follows: First, we construct an IFA for the syntactic sugar according to the desugaring rules, then we transform and simplify the IFA, and finally we generate evaluation rules for the syntactic sugar from the IFA.
 
@@ -223,26 +223,26 @@ In this section, we only discuss core language. Syntactic sugar is similar to th
 
 \begin{Asm}
     \label{Asm:rules}
-    A language construct $CoreHead$ only contains the evaluation rules in the following form:
+    A language construct $H$ only contains the evaluation rules in the following form:
     \[
         \infer
-        {(\m{CoreHead}~e_1 \ldots e_i \ldots e_n) \to (\m{CoreHead}~e_1 \ldots e_i' \ldots e_n)}{e_i \to e_i'\quad T}
+        {(\m{H}~e_1 \ldots e_i \ldots e_n) \to (\m{H}~e_1 \ldots e_i' \ldots e_n)}{e_i \to e_i'\quad T}
     \]
     \[
-        \infer{(\m{CoreHead}~v_1 \ldots v_p~e_1 \ldots e_q) \to e}{T}
+        \infer{(\m{H}~v_1 \ldots v_p~e_1 \ldots e_q) \to e}{T}
     \]
     %where $e$ can be any value, one of the parameters or a term of another language construct.
     where $T$ is a constraint over $e_j$ for $j \in 1,2,\ldots,n$.
 \end{Asm}
 
-This assumption specifies the form of the evaluation rules to ensure that IFAs can be generated. The first one is a context rule, and the other one is a reduction rule. Rule $(\m{if}~\m{\#t}~e_1~e_2) \to e_1$ can be seen as \[\infer{\m{if}~e~e_1~e_2 \to e_1}{e~\key{is}~\m{\#t}}.\]
+This assumption specifies the form of the evaluation rules to ensure that IFAs can be generated. The first one is a context rule, and the other one is a reduction rule. Rule $(\m{if}~\m{\#t}~e_1~e_2) \to e_1$ can be seen as \[\infer{(\m{if}~e~e_1~e_2) \to e_1}{e~\key{is}~\m{\#t}}.\]
 
 \begin{Asm}[Orderliness of Language Construct]
     \label{Asm:orderliness}
-    The language construct in the core language is finite. Think of all syntactic structures as points in a directed graph. If one of $CoreHead$'s evaluation rules can generate an expression containing $CoreHead'$, then construct an edge that points from $CoreHead$ to $CoreHead'$. The directed graph generated in this method has no circles.
+    The language construct in the core language is finite. Think of all syntactic structures as points in a directed graph. If one of $H$'s evaluation rules can generate an expression containing $H'$, then construct an edge that points from $H$ to $H'$. The directed graph generated in this method has no circles.
 \end{Asm}
 
-IFAs are not able to construct syntactic structures that contain recursive rules. This assumption qualifies that we can find an order for all syntactic structures, and when we try to construct IFA for $CoreHead$, IFA of $CoreHead'$ is known.
+IFAs are not able to construct syntactic structures that contain recursive rules. This assumption qualifies that we can find an order for all syntactic structures, and when we try to construct IFA for $H$, IFA of $H'$ is known.
 
 \begin{Asm}[Determinacy of One-Step Evaluation]
     \label{Asm:determinacy}
@@ -253,7 +253,7 @@ By assumption \ref{Asm:determinacy}, we can get the following lemma, which point
 
 \begin{lemma}
     \label{lemma:one-step}
-    If an expression $(\m{CoreHead}~e_1~\ldots~e_n)$ does a one-step evaluation by rule (E-Head) of $\m{CoreHead}$, which is a one-step evaluation of pattern variable $e_i$, then it continues to use this rule until $e_i$ becomes a value.
+    If an expression $(\m{H}~e_1~\ldots~e_n)$ does a one-step evaluation by a context rule, which is a one-step evaluation of pattern variable $e_i$, then it continues to use this rule until $e_i$ becomes a value.
 \end{lemma}
 
 \begin{proof}[Proof of Lemma \ref{lemma:one-step}]
@@ -272,15 +272,14 @@ By assumption \ref{Asm:determinacy}, we can get the following lemma, which point
 
     We prove this theorem by giving an algorithm that converts evaluation rules to IFA. By Assumption \ref{Asm:orderliness}, we get an order of syntactic structures. We construct the IFA for each structure in turn.
 
-    We generate a node for each rule of the language construct \m{CoreHead} and insert them into $Q$. If the rule is a context rule for a pattern varibale $e_i$, set $e_i$ as the expression of the node. If the rule is a reduction rule, add them into $F$ as terminal nodes and set the reduced expression $e$ as the expression of the node. Symbol tables of these nodes are set to be empty. Next we connect these nodes.
+    We generate a node for each rule of the language construct \m{H} and insert them into $Q$. If the rule is a context rule for a pattern varibale $e_i$, set $e_i$ as the expression of the node. If the rule is a reduction rule, add them into $F$ as terminal nodes and set the reduced expression $e$ as the expression of the node. Symbol tables of these nodes are set to be empty. Next we connect these nodes.
 
-    For an expression like $(\m{CoreHead}~e_1~\ldots~e_n)$, suppose that $e_1, \ldots, e_n$ are not value, According to Lemma \ref{lemma:one-step}, we have the unique rule $r$ of \m{CoreHead} for one-step evaluation. Let node $q$ corresponding to $r$ be $q_0$.
+    For an expression like $(\m{H}~e_1~\ldots~e_n)$, suppose that $e_1, \ldots, e_n$ are not value, According to Lemma \ref{lemma:one-step}, we have the unique rule $r$ of \m{H} for one-step evaluation. Let node $q$ corresponding to $r$ be $q_0$.
 
-    If $r$ is a context rule for $e_i$, let the expression of $q$ be $e_i$. Assume that the evaluation of $e_i$ results in $v_i$, we get expression $(\m{CoreHead}~e_1 \ldots e_{i-1}~v_i~e_{i+1} \ldots e_n)$. For each possible value of $v_i$, choose the rules $r'$ that should be used. The node is $q'$. Set a condition as $c=q~\key{is}~v_i$ Let $\delta(q, c)$ be $q'$. For each branch, seem $r'$ as $r$ and keep doing this until $r$ is a reduction rule.
-    \myend
+    If $r$ is a context rule for $e_i$, let the expression of $q$ be $e_i$. Assume that the evaluation of $e_i$ results in $v_i$, we get expression $(\m{H}~e_1 \ldots e_{i-1}~v_i~e_{i+1} \ldots e_n)$. For each possible value of $v_i$, choose the rules $r'$ that should be used. The node is $q'$. Set a condition as $c=q~\key{is}~v_i$ Let $\delta(q, c)$ be $q'$. For each branch, seem $r'$ as $r$ and keep doing this until $r$ is a reduction rule.
 \end{proof}
 
-In this way, we got an IFA of \m{CoreHead}. According to the lemma \ref{mythm:nmlifa}, we can also get a normal IFA of \m{CoreHead}.
+In this way, we got an IFA of \m{H}. According to the lemma \ref{mythm:nmlifa}, we can also get a normal IFA of \m{H}.
 
 %---------------------------------------------------------
 \begin{example}[Constructing IFA of \m{xor} by Rules]
@@ -322,25 +321,25 @@ Before proving the correctness of the algorithm, we first prove the following le
 
 \begin{lemma}
     \label{lemma:accessibility}
-    If an expression $e$ of language construct \m{CoreHead} uses rule $r$ to derive, we can find a path from $q_0$ to $q$ generated by $r$.
+    If an expression $e$ of language construct \m{H} uses rule $r$ to derive, we can find a path from $q_0$ to $q$ generated by $r$.
 \end{lemma}
 
 \begin{proof}[Proof of Lemma \ref{lemma:accessibility}]
-    Suppose $e=(\m{CoreHead}~v_1~\ldots~v_p~e_1~\ldots~e_q)$. We build an expression $e_0'=(\m{CoreHead}~\m{id}(v_1)~\ldots~\m{id}(v_p)~e_1~\ldots~e_q)$, where $\m{id}(x)=x$. $e_0'$ should have the same value as $e$. If $e_0'$ is derived by rule $r_1$, $r_1$ must be a context rule, or $e$ can also be reduced by $r_1$. Also, the node $q_1$ generated by $r_1$ will be the start node. Without loss of generality, assume that $r_1$ is a context rule for $e_1$. We get $e_1'=(\m{CoreHead}~v_1~\m{id}(v_2)~\ldots~\m{id}(v_p)~e_1~\ldots~e_q)$ after derived by $r_1$. Similarly, we find a rule $r_2$ which is a context rule for $e_2$. The node $q_2$ generated by $r_2$ satisfies $\delta(q_1, (e_1~\key{is}~v_1))=q_2$. By analogy, we can get $e_p'=(\m{CoreHead}~v_1~\ldots~v_p~e_1~\ldots~e_q)=e$ and a path $q_1(=q_0), q_2, \ldots, q_p$. At last, we use rule $r$ to derive $e$ and add $q$ to the path.
+    Suppose $e=(\m{H}~v_1~\ldots~v_p~e_1~\ldots~e_q)$. We build an expression $e_0'=(\m{H}~\m{id}(v_1)~\ldots~\m{id}(v_p)~e_1~\ldots~e_q)$, where $\m{id}(x)=x$. $e_0'$ should have the same value as $e$. If $e_0'$ is derived by rule $r_1$, $r_1$ must be a context rule, or $e$ can also be reduced by $r_1$. Also, the node $q_1$ generated by $r_1$ will be the start node. Without loss of generality, assume that $r_1$ is a context rule for $e_1$. We get $e_1'=(\m{H}~v_1~\m{id}(v_2)~\ldots~\m{id}(v_p)~e_1~\ldots~e_q)$ after derived by $r_1$. Similarly, we find a rule $r_2$ which is a context rule for $e_2$. The node $q_2$ generated by $r_2$ satisfies $\delta(q_1, (e_1~\key{is}~v_1))=q_2$. By analogy, we can get $e_p'=(\m{H}~v_1~\ldots~v_p~e_1~\ldots~e_q)=e$ and a path $q_1(=q_0), q_2, \ldots, q_p$. At last, we use rule $r$ to derive $e$ and add $q$ to the path.
 \end{proof}
 
 \begin{lemma}[Correctness]
     \label{lemma:rule2ifa-correct}
-    For any language construct \m{CoreHead}, under our assumption, the normal IFA got by the algorithm in Theorem \ref{mythm:Rule2IFA} has the same semantics as the rules.
+    For any language construct \m{H}, under our assumption, the normal IFA got by the algorithm in Theorem \ref{mythm:Rule2IFA} has the same semantics as the rules.
 \end{lemma}
 
-%In other words, for any term of language construct \m{CoreHead}, evaluating the term by IFA and evaluating by rule get the same derivation sequence.
+%In other words, for any term of language construct \m{H}, evaluating the term by IFA and evaluating by rule get the same derivation sequence.
 
 \begin{proof}
     %[Proof of Lemma \ref{lemma:rule2ifa-correct}]
     We only need to discuss that in a one-step derivation, both get the same result.
 
-    Consider an expression $e=(\m{CoreHead}~e_1 \ldots e_n)$ and a rule $r$ for derivation. Suppose $r$ generates node $q$. By Lemma \ref{lemma:accessibility}, we find a path from $q_0$ to $q$. The expression $e$ must meet the conditions from $q_0$ to $q$. Therefore, the one-step derivation of this expression $e$ in IFA must be located at $q$. If $r$ is a context rule for a pattern variable $e_i$, the expression of $q$ is $e_i$ as well, and $e_i$ of $e$ is not a value. Thus both of the one-step derivation of $e$ are one-step derivation of $e_i$. If $r$ is a reduction rule to $e'$, both are $e'$.
+    Consider an expression $e=(\m{H}~e_1 \ldots e_n)$ and a rule $r$ for derivation. Suppose $r$ generates node $q$. By Lemma \ref{lemma:accessibility}, we find a path from $q_0$ to $q$. The expression $e$ must meet the conditions from $q_0$ to $q$. Therefore, the one-step derivation of this expression $e$ in IFA must be located at $q$. If $r$ is a context rule for a pattern variable $e_i$, the expression of $q$ is $e_i$ as well, and $e_i$ of $e$ is not a value. Thus both of the one-step derivation of $e$ are one-step derivation of $e_i$. If $r$ is a reduction rule to $e'$, both are $e'$.
 
     Similarly, if an expression can be derived in one step in IFA, then it must be able to use the corresponding rule for one-step derivation.
 \end{proof}
@@ -538,9 +537,9 @@ Similarly, we also need to add some constraints on syntactic sugar.
 %--------------------------------------------
 \begin{example}
 
-    Suppose that there are only \m{if} and \m{let} in our core language, whose IFAs are known. Now we build rules for syntactic sugar \m{or}.
+    Suppose that there are only \m{if} and \m{let} in our core language, whose IFAs are known. Now we build rules for syntactic sugar \m{Or}.
     \[
-        \drule{(\m{or}~e_1~e_2)}{(\m{let}~x~e_1~(\m{if}~x~x~e_2))}
+        \drule{(\m{Or}~e_1~e_2)}{(\m{let}~x~e_1~(\m{if}~x~x~e_2))}
     \]
 
     \begin{figure}[t]
@@ -567,15 +566,15 @@ Similarly, we also need to add some constraints on syntactic sugar.
         \label{fig:ifa-nand-std}
     \end{figure}
 
-    The \m{or} syntactic sugar only uses the syntax structure of the core language, which meets Assumption \ref{Asm:orderliness-sugar}, so we can generate evaluation rules for \m{or}.
+    The \m{Or} syntactic sugar only uses the syntax structure of the core language, which meets Assumption \ref{Asm:orderliness-sugar}, so we can generate evaluation rules for \m{Or}.
     %
-    The IFA of \m{or} is the same as the IFA of \m{or'} whose rule is shown in Figure \ref{fig:ifa-ex-or-1}. Therefore, we can generate an IFA according to the rule as shown in Figure \ref{fig:ifa-ex-or-2}. Next we transform IFA to make it a normal IFA, as shown in Figure \ref{fig:ifa-ex-or-3} to Figure \ref{fig:ifa-ex-or-5}. Finally, according to the structure of IFA, generate or evaluation rules, as shown in Figure \ref{fig:ifa-ex-or-6}.
+    The IFA of \m{Or} is the same as the IFA of \m{Or'} whose rule is shown in Figure \ref{fig:ifa-ex-or-1}. Therefore, we can generate an IFA according to the rule as shown in Figure \ref{fig:ifa-ex-or-2}. Next we transform IFA to make it a normal IFA, as shown in Figure \ref{fig:ifa-ex-or-3} to Figure \ref{fig:ifa-ex-or-5}. Finally, according to the structure of IFA, generate or evaluation rules, as shown in Figure \ref{fig:ifa-ex-or-6}.
     \myend
 \end{example}
 
-% \infrule[E-Or]{e_1 \to e_1'}{(\m{or}~e_1~e_2) \to (\m{or}~e_1'~e_2)}
-% \infrule[E-OrTrue]{e_1~\key{is}~\m{\#t}}{(\m{or}~e_1~e_2) \to e_1}
-% \infrule[E-OrFalse]{e_1~\key{is}~\m{\#f}}{(\m{or}~e_1~e_2) \to e_2}
+% \infrule[E-Or]{e_1 \to e_1'}{(\m{Or}~e_1~e_2) \to (\m{Or}~e_1'~e_2)}
+% \infrule[E-OrTrue]{e_1~\key{is}~\m{\#t}}{(\m{Or}~e_1~e_2) \to e_1}
+% \infrule[E-OrFalse]{e_1~\key{is}~\m{\#f}}{(\m{Or}~e_1~e_2) \to e_2}
 
 %--------------------------
 %\subsubsection{Correctness}
