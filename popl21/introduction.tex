@@ -36,12 +36,12 @@ While it is natural to do resugaring by reverse desugaring of tagged core terms,
 
 In this paper, we propose a novel approach to resugaring, which does not use tagging and reverse desugaring at all.
 The key idea is "lazy desugaring", in the sense that desugaring is delayed so that the reverse application of desugaring rules becomes unnecessary.
-To this end, we consider the surface language and the core language as one language, and reduce expressions in such a smart way that all resugared terms can be fully produced based on the reduction rules in the core language and  the desugaring rules for defining syntactic sugars. To gain more efficiency, we propose an automatic method to compress a sequence of core expression reductions into a one-step reduction of the surface language, by automatically deriving evaluation rules of the syntactic sugars based on the syntactic sugar definition and evaluation rules (consist of the context rules and reductions rules) of the core language.
+To this end, we consider the surface language and the core language as one language, and reduce expressions in such a smart way that all resugared expressions can be fully produced based on the reduction rules in the core language and  the desugaring rules for defining syntactic sugars. To gain more efficiency, we propose an automatic method to compress a sequence of core expression reductions into a one-step reduction of the surface language, by automatically deriving evaluation rules (consist of the context rules and reductions rules)  of the syntactic sugars based on the syntactic sugar definition and evaluation rules of the core language.
 
 
-Our main technical contributions can be summarized as follow.
+Our main technical contributions can be summarized as follows.
 \begin{itemize}
-\item We propose a novel approach to resugaring by lazy desugaring, where reverse application of desugaring rules becomes unnecessary. We recognize a sufficient and necessary condition for a syntactic sugar to be desugared, and propose a reduction strategy, based on evaluator of the core languages and the desugaring rules, which is sufficient to produce all necessary resugared terms on the surface language. We prove the correctness of our approach.
+\item We propose a novel approach to resugaring by lazy desugaring, where reverse application of desugaring rules becomes unnecessary. We recognize a sufficient and necessary condition for a syntactic sugar to be desugared, and propose a reduction strategy, based on evaluator of the core languages and the desugaring rules, which is sufficient to produce all necessary resugared expressions on the surface language. We prove the correctness of our approach.
 
 
 

@@ -37,12 +37,14 @@ Now let us demonstrate how to execute \Code{(And (Or \#t \#f) (And \#f \#t))}, A
 \begin{figure}[t]
 \begin{center}
 \begin{minipage}{6cm}
+\begin{scriptsize}
 \begin{Codes}
     (And (Or \#t \#f) (And \#f \#t))
 \OneStep{ (And \#t (And \#f \#t))}
 \OneStep{ (And \#f \#t)}
 \OneStep{ #f}
 \end{Codes}
+\end{scriptsize}
 \end{minipage}
 \end{center}
 \caption{A Typical Resugaring Example}
@@ -117,7 +119,7 @@ Now with these rules, our resugaring will need only $3$ steps as in Figure \ref{
 Two remarks are worth making here. First, we do not require a complete set of reduction/context rules for syntactic sugars; if we have these rules, we can elaborate them to remove one-step try, and make a shortcut for a sequence of evaluation steps on core expression.
 For example, suppose that we have another syntactic sugar named \emph{Hard} whose evaluation rules cannot be derived.
 We can still do resugaring on \Code{(And (Hard (And \#t \#t) ...) ...)}, as we do early, and the derivate rules of \m{And} sugar can be used for avoiding part of one-step tries in the basic approach.
-Second, our example does not show the case when a surface expression contains language constructs of the core expression. This does not introduce any difficulty in our method; as we have no reverse desugaring, there is no worry about desugaring an original core expression to a syntactic sugar. For instance, we can deal with \Code{(And (if \#t (And \#f \#t) \#f) \#f)}, without resugaring it to \Code{(And (And \#t (And \#f \#t) \#f)}.
+Second, our example does not show the case when a surface expression contains language constructs of the core expression. This does not introduce any difficulty in our method; as we have no reverse desugaring, there is no worry about desugaring an original core expression to a syntactic sugar. For instance, we can deal with \Code{(And (if \#t (And \#f \#t) \#f) \#f)}, without resugaring it to \Code{(And (And \#t (And \#f \#t)) \#f)}.
 
 
 \subsection{New Features}
