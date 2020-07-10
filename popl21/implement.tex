@@ -66,7 +66,7 @@ But something goes wrong when substitution takes place during \m{CoreExt2}. Just
 
 
 \label{mark:optimize}
-Note that in Rules \m{SurfRed1} and \m{CoreRed1}, there is a recursive call on $\redm{}{}$. We can optimize the resugaring algorithm in our actual implementation. For example, \Code{(Sugar1 (Sugar2  ...) ...)} as the input, and find the first subexpression should be reduced. We can first get the resugaring sequences of \Code{(Sugar2 ...)} as Figure \ref{fig:subsequence}, then the resugaring sequence is got as \ref{fig:optimized}. Thus, we will not need to try to expand the outermost sugar for each inner step (recursively resugaring for inner expression).
+Note that in Rules \m{SurfRed1} and \m{CoreRed1}, there is a recursive call on $\redm{}{}$. We can optimize the resugaring algorithm in our actual implementation, based on an natural assumption that any expression can be reduced to a normal form. For example, \Code{(Sugar1 (Sugar2  ...) ...)} as the input, and find the first subexpression should be reduced. We can first get the resugaring sequences of \Code{(Sugar2 ...)} as Figure \ref{fig:subsequence}, then the resugaring sequence is got as \ref{fig:optimized}. Thus, we will not need to try to expand the outermost sugar for each inner step (recursively resugaring for inner expression).
 
 
 \begin{figure}[t]

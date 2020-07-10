@@ -32,7 +32,7 @@ Assume that our surface language is defined by two syntactic sugars defined by:
 \]
 
 
-Now let us demonstrate how to execute \Code{(And (Or \#t \#f) (And \#f \#t))}, And get the resugaring sequence as Figure \ref{fig:standard} by both the traditional approach and our new approach.
+Now let us demonstrate how to execute \Code{(And (Or \#t \#f) (And \#f \#t))}, and get the resugaring sequences as Figure \ref{fig:standard} by both the traditional approach and our new approach.
 
 \begin{figure}[t]
 \begin{center}
@@ -88,7 +88,7 @@ To solve the problem in the traditional approach, we propose a new resugaring ap
     (resugar (And \#t (And \#f \#t)))} \note{// {\bfseries displayable}}
 \DeStep{\quad \note{ \{ a one-step try on the outermost And \}}
     (try (if \#t (And \#f \#t) \#f))}
-\OneStep{\quad \note{\{ the reduction will destroy structure of the outermost And, so keep this try to desugar it \}}
+\OneStep{\quad \note{\{ the reduction will destroy structure of the outermost And, so keep this try \}}
     (resugar (And \#f \#t))} \note{// {\bfseries displayable}}
 \DeStep{\quad \note{ \{ a one-step try on the outermost And \}}
     (try (if \#f \#t \#f))} \note{// have to desugar for reduction}
