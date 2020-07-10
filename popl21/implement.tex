@@ -66,7 +66,7 @@ But something goes wrong when substitution takes place during \m{CoreExt2}. Just
 
 
 \label{mark:optimize}
-Note that in Rules \m{SurfRed1} and \m{CoreExt1}, there is a recursive call on $\redm{}{}$. We can optimize the resugaring algorithm in our actual implementation. For example, \Code{(Sugar1 (Sugar2  ...) ...)} as the input, and find the first subexpression should be reduced. We can first get the resugaring sequences of \Code{(Sugar2 ...)} as Figure \ref{fig:subsequence}, then the resugaring sequence is got as \ref{fig:optimized}. Thus, we will not need to try to expand the outermost sugar for each inner step (recursively resugaring for inner expression).
+Note that in Rules \m{SurfRed1} and \m{CoreRed1}, there is a recursive call on $\redm{}{}$. We can optimize the resugaring algorithm in our actual implementation. For example, \Code{(Sugar1 (Sugar2  ...) ...)} as the input, and find the first subexpression should be reduced. We can first get the resugaring sequences of \Code{(Sugar2 ...)} as Figure \ref{fig:subsequence}, then the resugaring sequence is got as \ref{fig:optimized}. Thus, we will not need to try to expand the outermost sugar for each inner step (recursively resugaring for inner expression).
 
 
 \begin{figure}[t]
@@ -273,12 +273,11 @@ For traditional resugaring approach, if we want to get sequences of \Code{(let x
 
 The lazy desugaring is also convenient for achieving hygiene for non-hygienic rewriting. For example, \Code{(let x 1 (+ x (let x 2 (+ x 1))))} may be reduced to \Code{(+ 1 (let 1 2 (+ 1 1)))} by a simple core language whose \Code{let} expression does not handle cases like that. But by writing a simple sugar \m{Let}
 \[\drule{\Code{(Let~$e_1$~$e_2$~$e_3$)}}{\Code{(let~$e_1$~$e_2$~$e_3$)}}\]
-and making some simple modifies (rejecting one-step try if error occurs, see details in Appendix A.2) in the reduction of mixed language, we will get the resugaring sequences as Figure \ref{fig:Let} in our tool. \ignore{\todo{@zc: let (e e) e -> let e e e; support Let now?}
-}
+and making some simple modifies (rejecting one-step try if error occurs, see details in Appendix A.2) in the reduction of mixed language, we will get the resugaring sequences as Figure \ref{fig:Let} in our tool.
 
 In practical application, we think hygiene can be easily processed by rewriting systems, so we just use a rewriting system which can rename variable automatically.
 
-And for the derivation method, there is no rewriting system at all, but the hygiene is handled more concisely. we build a hygienic sugar \m{Hygienicor} based on the \m{or} sugar.
+And for the derivation method, there is no rewriting system at all, but the hygiene is handled more concisely. we build a hygienic sugar \m{Hygienicor} based on the \m{Or} sugar.
 \[
 \begin{array}{l}
 \drule{\Code{(Or $e_1$ $e_2$)}}{\Code{(let x $e_1$ (if x x $e_2$))}}\\
