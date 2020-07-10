@@ -1,12 +1,12 @@
 %!TEX root = ./main.tex
-\section{Implementation and Case Studies}
+\section{Case Studies}
 \label{sec5}
 
 
-\subsection{Implementation}
+%\subsection{Implementation}
 
-Our resugaring approach is implemented using PLT Redex\cite{SEwPR}, which is a semantic engineering tool based on reduction semantics\cite{reduction}. The framework of the implementation is as Figure \ref{fig:frame}.
-In the language model, desugaring rules are written as reduction rules of \m{SurfExp}. And context rules of \m{SurfExp} have no restriction (every subexpression is reducible as a hole). Then for each resugaring step, we should choose the exact reduction which satisfies the reduction of mixed language's reduction rule  in Section \ref{mark:mixedreduction}.
+We have implemented our resugaring approach using PLT Redex \cite{SEwPR}, which is a semantic engineering tool based on reduction semantics \cite{reduction}. Figure \ref{fig:frame} shows the framework of the implementation.
+In the language model, desugaring rules are written as reduction rules of \m{SurfExp}. And context rules of \m{SurfExp} have no restriction (every subexpression is reducible as a hole). Then for each resugaring step, we carefully choose the exact evaluation rule which satisfies condition as defined for the mixed language in Section \ref{mark:mixedreduction}.
 \begin{figure}[t]
 	\centering
 	\includegraphics[width=5cm]{images/frame.png}
@@ -65,7 +65,7 @@ But something goes wrong when substitution takes place during \m{CoreExt2}. Just
 
 
 \label{mark:optimize}
-Note that in \m{SurfRed1} rule and \m{CoreExt1} rule, there is a recursive call on $\redm{}{}$. We can optimize the resugaring algorithm by recursively resugaring. For example, \Code{(Sugar1 (Sugar2  ...) ...)} as the input, and find the first subexpression should be reduced. We can first get the resugaring sequences of \Code{(Sugar2 ...)} as Figure \ref{fig:subsequence}, then the resugaring sequences is got as \ref{fig:optimized}. Thus, we will not need to try to expand the outermost sugar for each inner step (recursively resugaring for inner expression).
+Note that in Rules \m{SurfRed1} and \m{CoreExt1}, there is a recursive call on $\redm{}{}$. We can optimize the resugaring algorithm in our actual implementation. For example, \Code{(Sugar1 (Sugar2  ...) ...)} as the input, and find the first subexpression should be reduced. We can first get the resugaring sequences of \Code{(Sugar2 ...)} as Figure \ref{fig:subsequence}, then the resugaring sequence is got as \ref{fig:optimized}. Thus, we will not need to try to expand the outermost sugar for each inner step (recursively resugaring for inner expression).
 
 \ignore{
 \begin{figure}[t]
@@ -105,7 +105,7 @@ As for the automatic derivation of evaluation rules, we implement a simple demo 
 
 
 
-We test some applications on the tool as case studies. Some examples we will discuss in this section are in Figure \ref{fig:resugaring}. Note that we set call-by-value lambda calculus as terms in \m{CommonExp}, because we need to output some intermediate sequences including lambda expressions in some examples. It's easy if we want to skip them. \todo{modify drule or simplify Codes}
+We show several case studies to demonstrate the power of our approach. Some examples we will discuss in this section are in Figure \ref{fig:resugaring}. Note that we set call-by-value lambda calculus as terms in \m{CommonExp}, because we want to output some intermediate terms including lambda expressions in some examples. It's easy if we want to skip them. \todo{modify drule or simplify Codes}
 
 \ignore{
 \begin{figure}[t]
@@ -205,7 +205,7 @@ We test some applications on the tool as case studies. Some examples we will dis
 \end{figure}
 }
 
-\subsubsection{Simple sugar}
+\subsubsection{Simple Sugars}
 \label{mark:simple}
 
 We construct some simple syntactic sugars and try it on our tool. Some sugar is inspired by the first work of resugaring\cite{resugaring}. The result shows that our approach can handle all sugar features of their first work.
@@ -255,7 +255,8 @@ Of course, we got the same evaluation rules as the example in overview.
 \]
 
 Then for expressions headed with \m{or}, we won't need the one-step try to figure out whether desugaring or processing on a subexpression, which makes our approach more concise. Overall, the unidirectional resugaring algorithm makes our approach efficient, because no attempts for resugaring the expression are needed.
-\subsubsection{Hygienic sugar}
+
+\subsubsection{Hygienic Sugars}
 \label{mark:hygienic}
 
 
@@ -301,7 +302,7 @@ Though no need to write the sugar like that, something wrong may happen without 
 
 Overall, our result shows lazy desugaring is really a good way to handle hygienic sugar in any systems.
 
-\subsubsection{Recursive sugar}
+\subsubsection{Recursive Sugars}
 \label{sec:recursiveSugar}
 
 Recursive sugar is a kind of syntactic sugars where call itself or each other during the expanding. For example,
