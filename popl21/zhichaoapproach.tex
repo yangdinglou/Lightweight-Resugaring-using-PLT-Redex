@@ -268,7 +268,7 @@ By assumption \ref{Asm:determinacy}, we can get the following lemma, which point
 
 \begin{proof}[Proof of Theorem \ref{mythm:Rule2IFA}]
 
-    We prove this theorem by giving an algorithm that converts evaluation rules to IFA. By Assumption \ref{Asm:orderliness}, we get an order of language constructs. We construct the IFA for each structure in turn.
+    We prove this theorem by giving an algorithm that converts evaluation rules to IFA. By Assumption \ref{Asm:orderliness}, we get an order of language constructs. We construct the IFA for each language construct in turn.
 
     We generate a node for each rule of the language construct \m{H} and insert them into $Q$. If the rule is a context rule for a pattern varibale $e_i$, set $e_i$ as the expression of the node. If the rule is a reduction rule, add them into $F$ as terminal nodes and set the reduced expression $e$ as the expression of the node. Symbol tables of these nodes are set to be empty. Next we connect these nodes.
 
@@ -564,7 +564,7 @@ Similarly, we also need to add some constraints on syntactic sugar.
         \label{fig:ifa-nand-std}
     \end{figure}
 
-    The \m{Or} syntactic sugar only uses the syntax structure of the core language, which meets Assumption \ref{Asm:orderliness-sugar}, so we can generate evaluation rules for \m{Or}.
+    The \m{Or} syntactic sugar only uses the language construct of the core language, which meets Assumption \ref{Asm:orderliness-sugar}, so we can generate evaluation rules for \m{Or}.
     %
     The IFA of \m{Or} is the same as the IFA of \m{Or'} whose rule is shown in Figure \ref{fig:ifa-ex-or-1}. Therefore, we can generate an IFA according to the rule as shown in Figure \ref{fig:ifa-ex-or-2}. Next we transform IFA to make it a normal IFA, as shown in Figure \ref{fig:ifa-ex-or-3} to Figure \ref{fig:ifa-ex-or-5}. Finally, according to the structure of IFA, generate or evaluation rules, as shown in Figure \ref{fig:ifa-ex-or-6}.
     \myend
