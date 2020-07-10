@@ -44,14 +44,12 @@ An expression form of the core language is defined in Figure \ref{fig:expression
 			\m{CoreExp} &::=& \Code{(CoreExp~CoreExp~...)} ~~\note{// apply}\\
 			&|& \m{(lambda~(x~...)~CoreExp)} ~~\note{// call-by-value}\\
 			&|& \m{(lambdaN~(x~...)~CoreExp)} ~~\note{// call-by-need}\\
-			&|& \m{(if~CoreExp~CoreExp~CoreExp)}\\
-			&|& \m{(let~x~CoreExp~CoreExp)}\\
-			&|& \m{(first~CoreExp)}\\
-			&|& \m{(empty?~CoreExp)}\\
-			&|& \m{(rest~CoreExp)}\\
-			&|& \m{(cons~CoreExp~CoreExp)}\\
+			&|& \m{(if~CoreExp~CoreExp~CoreExp)} ~~\note{// condition}\\
+			&|& \m{(let~x~CoreExp~CoreExp)} ~~\note{// binding}\\
+			&|& \m{(listop~CoreExp)} ~~\note{// first, rest, empty?}\\
+			&|& \m{(cons~CoreExp~CoreExp)} ~~\note{// data structure of list}\\
 			&|& \m{(arithop~CoreExp~CoreExp)} ~~\note{// +, -, *, /, >, <, =}\\
-			&|& \m{x}\\
+			&|& \m{x} ~~\note{// variable}\\
 			&|& \m{c} ~~\note{// boolean, number and list}
 			\end{array}
 	}
@@ -140,7 +138,7 @@ Our mixed language for resugaring combines the surface language and the core lan
 The differences between expressions in our core language and those in our surface language are identified by their \m{Head}. But there may be some expressions in the core language which are also used in the surface language for convenience, or we need some core language's expressions to help us getting better resugaring sequences. So we take \m{CommonHead} out from the \m{CoreHead}, which can be displayed in resugaring sequences (the rest of \m{CoreHead} becomes \m{CoreHead'}). The \m{CoreExp'} denotes expressions with undisplayable \m{CoreHead} (named \m{CoreHead'}). The \m{SurfExp} denote expressions that have \m{SurfHead} and their subexpressions being displayable. The \m{CommonExp} denotes expressions with displayable \m{Head} (named \m{CommonHead}) in the core language, together with displayable subexpressions. There exist some other expressions during our resugaring process, which have displayable \m{Head}, but one or more of their subexpressions should not be displayed. They are of \m{UndisplayableExp}. We distinguish these two kinds of expressions for the \emph{abstraction} property (discussed in Section \ref{mark:abs}).
 
 As an example, for the core language in Figure \ref{fig:core},
-we may assume \m{if}, \m{let}, \m{lambdaN} (call-by-name lambda calculus), \m{empty?}, \m{first}, \m{rest} as \m{CoreHead'}, \m{op}, \m{lambda} (call-by-value lambda calculus), \m{cons} as \m{CommonHead}. This will allow \m{op}, \m{lambda} and \m{cons} to appear in the surface language, and thus display more intermediate steps during resugaring.
+we may assume \m{if}, \m{let}, \m{lambdaN} (call-by-name lambda calculus), \m{listop} as \m{CoreHead'}, \m{arithop}, \m{lambda} (call-by-value lambda calculus), \m{cons} as \m{CommonHead}. This will allow \m{arithop}, \m{lambda} and \m{cons} to appear in the resugaring sequences, and thus display more useful intermediate steps during resugaring.
 
 Note that some expressions with \m{CoreHead} contain subexpressions with \m{SurfHead}, they are of \m{CoreExp} but not in the core language. In the mixed language, we process these expressions by the context rules of the core language, so that the reduction rules of core language and the desugaring rules of surface language can be mixed as a whole (the $\redc{}{}$ in next section). For example, suppose we have the context rule of \m{if} expression
 \[
@@ -197,7 +195,7 @@ Now, our desugaring algorithm can be easily defined based on $\redm{}{}$.
 							& & \qquad \key{else}~\m{resugar}(e')
 \end{array}
 \]
-During the resugaring, we just apply the reduction ($\redm{}{}$) on the input expression step by step until it becomes a normal form, while outputting those intermediate expressions that belong to \m{DisplayableExp}. This algorithm is more explicit and simpler than the traditional one. Note that $\redm{}{}$ is executed recursively on the subexpressions, which provides rooms for further optimization (see Section \ref{mark:optimize}).
+During the resugaring, we just apply the reduction ($\redm{}{}$) on the input expression step by step until it becomes a normal form, while outputting those intermediate expressions that belong to \m{DisplayableExp}. This algorithm is more explicit and simpler than the traditional one. Note that $\redm{}{}$ is executed recursively on the subexpressions, which provides rooms for further optimization (see in Section \ref{mark:optimize}).
 %, because the current description is easier to understand.)
 
 \subsection{Correctness}
