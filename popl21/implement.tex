@@ -5,8 +5,13 @@
 
 %\subsection{Implementation}
 
+<<<<<<< HEAD
 We have implemented our resugaring approach using PLT Redex \cite{SEwPR}, which is a semantic engineering tool based on reduction semantics \cite{reduction}. Figure \ref{fig:frame} shows the framework of the implementation.
 In the language model, desugaring rules are written as reduction rules of \m{SurfExp}. And context rules of \m{SurfExp} have no restriction (every subexpression is reducible as a hole). Then for each resugaring step, we carefully choose the exact evaluation rule which satisfies condition as defined for the mixed language in Section \ref{mark:mixedreduction}.
+=======
+Our resugaring approach is implemented using PLT Redex \cite{SEwPR}, which is a semantic engineering tool based on reduction semantics \cite{reduction}. The framework of the implementation is as Figure \ref{fig:frame}.
+In the language model, desugaring rules are written as reduction rules of \m{SurfExp}. And context rules of \m{SurfExp} have no restriction (every subexpression is reducible as a hole). Then for each resugaring step, we should choose the exact reduction which satisfies the reduction of mixed language's reduction rule  in Section \ref{mark:mixedreduction}.
+>>>>>>> f405e689763f2460c5364dad0b87d9e75ff382fc
 \begin{figure}[t]
 	\centering
 	\includegraphics[width=5cm]{images/frame.png}
@@ -65,9 +70,12 @@ But something goes wrong when substitution takes place during \m{CoreExt2}. Just
 
 
 \label{mark:optimize}
+<<<<<<< HEAD
 Note that in Rules \m{SurfRed1} and \m{CoreExt1}, there is a recursive call on $\redm{}{}$. We can optimize the resugaring algorithm in our actual implementation. For example, \Code{(Sugar1 (Sugar2  ...) ...)} as the input, and find the first subexpression should be reduced. We can first get the resugaring sequences of \Code{(Sugar2 ...)} as Figure \ref{fig:subsequence}, then the resugaring sequence is got as \ref{fig:optimized}. Thus, we will not need to try to expand the outermost sugar for each inner step (recursively resugaring for inner expression).
+=======
+Note that in \m{SurfRed1} rule and \m{CoreExt1} rule, there is a recursive call on $\redm{}{}$. We can optimize the resugaring algorithm by recursive resugaring. For example, \Code{(Sugar1 (Sugar2  ...) ...)} as the input, and find the first subexpression should be reduced. We can first get the resugaring sequences of \Code{(Sugar2 ...)} as Figure \ref{fig:subsequence}, then the resugaring sequences is got as \ref{fig:optimized}. Thus, we will not need to try to expand the outermost sugar for each inner step (recursive resugaring for inner expression).
+>>>>>>> f405e689763f2460c5364dad0b87d9e75ff382fc
 
-\ignore{
 \begin{figure}[t]
 \centering
 \subcaptionbox{Subsequences of \m{Sugar2} \label{fig:subsequence}}[.45\linewidth]{
@@ -97,7 +105,7 @@ Note that in Rules \m{SurfRed1} and \m{CoreExt1}, there is a recursive call on $
 \caption{Recursive Optimization's Example}
 \label{fig:optimize}
 \end{figure}
-}
+
 
 As for the automatic derivation of evaluation rules, we implement a simple demo by writing some core language's IFAs (such as \m{if}, \m{let}) manually, because it is enough to do some case studies for the resugaring tasks.
 
@@ -105,9 +113,12 @@ As for the automatic derivation of evaluation rules, we implement a simple demo 
 
 
 
+<<<<<<< HEAD
 We show several case studies to demonstrate the power of our approach. Some examples we will discuss in this section are in Figure \ref{fig:resugaring}. Note that we set call-by-value lambda calculus as terms in \m{CommonExp}, because we want to output some intermediate terms including lambda expressions in some examples. It's easy if we want to skip them. \todo{modify drule or simplify Codes}
+=======
+We test some applications on the tool as case studies. Some examples we will discuss in this section are in Figure \ref{fig:resugaring}. Note that we set call-by-value lambda calculus as terms in \m{CommonExp}, because we need to output some intermediate sequences including lambda expressions in some examples. It's easy if we want to skip them.
+>>>>>>> f405e689763f2460c5364dad0b87d9e75ff382fc
 
-\ignore{
 \begin{figure}[t]
 \centering
 \subcaptionbox{Example of SKI\label{fig:SKI}}[.3\linewidth]{
@@ -203,12 +214,12 @@ We show several case studies to demonstrate the power of our approach. Some exam
 \caption{Resugaring Examples}
 \label{fig:resugaring}
 \end{figure}
-}
+
 
 \subsubsection{Simple Sugars}
 \label{mark:simple}
 
-We construct some simple syntactic sugars and try it on our tool. Some sugar is inspired by the first work of resugaring\cite{resugaring}. The result shows that our approach can handle all sugar features of their first work.
+We construct some simple syntactic sugars and try it on our tool. Some sugar is inspired by the first work of resugaring \cite{resugaring}. The result shows that our approach can handle all sugar features of their first work.
 Take an SKI combinator syntactic sugar as an example.
 \[
 \begin{array}{l}
@@ -254,13 +265,18 @@ Of course, we got the same evaluation rules as the example in overview.
 \end{array}
 \]
 
+<<<<<<< HEAD
 Then for expressions headed with \m{or}, we won't need the one-step try to figure out whether desugaring or processing on a subexpression, which makes our approach more concise. Overall, the unidirectional resugaring algorithm makes our approach efficient, because no attempts for resugaring the expression are needed.
 
 \subsubsection{Hygienic Sugars}
+=======
+Then for expressions headed with \m{or}, we won't need the one-step try to figure out whether desugaring or processing on a subexpression, which makes our approach more concise. Overall, the unidirectional resugaring algorithm based on lazy desugaring makes our approach efficient, because no attempts for resugaring the expression are needed.
+\subsubsection{Hygienic sugar}
+>>>>>>> f405e689763f2460c5364dad0b87d9e75ff382fc
 \label{mark:hygienic}
 
 
-The second work\cite{hygienic} of traditional resugaring approach mainly processes hygienic sugar compared to first work. It uses a DAG to represent the expression. However, hygiene is not hard to be handled by our lazy desugaring strategy. Our algorithm can easily process hygienic sugar without a special data structure.
+The second work \cite{hygienic} of traditional resugaring approach mainly processes hygienic sugar compared to first work. It uses a DAG to represent the expression. However, hygiene is not hard to be handled by our lazy desugaring strategy. Our algorithm can easily process hygienic sugar without a special data structure.
 A typical hygienic problem is as the following example.
 \[
 \drule{\Code{(Hygienicadd $e_1$ $e_2$)}}{\Code{(let x $e_1$ (+ x $e_2$))}}
@@ -268,13 +284,13 @@ A typical hygienic problem is as the following example.
 % \begin{Codes}
 % 	(Hygienicadd e1 e2) \DeStep{ (let ((x e1)) (+ x e2))}
 % \end{Codes}
-For traditional resugaring approach, if we want to get sequences of \Code{(let x 2 (Hygienicadd 1 x))}, it will firstly desugar to \Code{(let x 2 (let x 1 (+ x x)))}, which is awful because the two $x$ in \Code{(+ x x)} should be bind to different value. So the traditional hygienic resugaring approach uses abstract syntax DAG to distinct different \m{x} in the desugared expression. But for our approach based on lazy desugaring, the \m{hygienicadd} sugar does not have to desugar until necessary, thus, getting resugaring sequences as Figure \ref{fig:hygienicadd} based on a  rewriting system which renaming the variables during the rewriting.
+For traditional resugaring approach, if we want to get sequences of \Code{(let x 2 (Hygienicadd 1 x))}, it will firstly desugar to \Code{(let x 2 (let x 1 (+ x x)))}, which is awful because the two $x$ in \Code{(+ x x)} should be bind to different values. So the traditional hygienic resugaring approach uses abstract syntax DAG to distinct different \m{x} in the desugared expression. But for our approach based on lazy desugaring, the \m{Hygienicadd} sugar does not have to desugar until necessary, thus, getting resugaring sequences as Figure \ref{fig:hygienicadd} based on a non-hygienic rewriting system (does not rewrite variables' name during rewriting).
 
 
-The lazy desugaring is also convenient for hygienic resugaring for non-hygienic rewriting. For example, \Code{(let x 1 (+ x (let x 2 (+ x 1))))} may be reduced to \Code{(+ 1 (let 1 2 (+ 1 1)))} by a simple core language whose \Code{let} expression does not handle cases like that. But by writing a simple sugar Let,
+The lazy desugaring is also convenient for achieving hygiene for non-hygienic rewriting. For example, \Code{(let x 1 (+ x (let x 2 (+ x 1))))} may be reduced to \Code{(+ 1 (let 1 2 (+ 1 1)))} by a simple core language whose \Code{let} expression does not handle cases like that. But by writing a simple sugar \m{Let}
 \[\drule{\Code{(Let~$e_1$~$e_2$~$e_3$)}}{\Code{(let~($e_1$~$e_2$)~$e_3$)}}\]
-and making some simple modifies in the reduction of mixed language, we will get the resugaring sequences as Figure \ref{fig:Let} in our tool.
-
+and making some simple modifies (rejecting one-step try if error occurs, see details in Appendix A.2) in the reduction of mixed language, we will get the resugaring sequences as Figure \ref{fig:Let} in our tool. \ignore{\todo{@zc: let (e e) e -> let e e e; support Let now?}
+}
 
 In practical application, we think hygiene can be easily processed by rewriting systems, so we just use a rewriting system which can rename variable automatically.
 
@@ -285,7 +301,7 @@ And for the derivation method, there is no rewriting system at all, but the hygi
 \drule{\Code{(Hygienicor $e_1$ $e_2$)}}{\Code{(let x $e_1$ (or $e_2$ x))}}
 \end{array}
 \]
-Though no need to write the sugar like that, something wrong may happen without hygienic rewriting system (\Code{(if x x x)} appears). But with the step in normalization of IFA introduced in \ref{mark:hygieneinderive}, we can easily get the following rules, which will behave as it should be in resugaring.
+Though no need to write the sugar like that, something wrong may happen without hygienic rewriting system (\Code{(if x x x)} appears). But with the step in normalization of IFA introduced in \ref{mark:hygieneinderive}, we can easily get the following rules, which will behave as it should be in resugaring. The reason is that we have replaced x with expression when constructing normal IFA of or, the binding of x will not cause conflicts.
 \[
 \begin{array}{c}
 \infer {(\mbox{Hygienicor}~e_1~e_2) \rightarrow (\mbox{Hygienicor}~e_1'~e_2)} {e_1~ \rightarrow~e_1'}
@@ -350,4 +366,7 @@ Moreover, just like the \emph{Odd and Even} sugar above, there are some simple r
 
 
 
-Note that the \m{let} term is to limit the subexpression only appears once in RHS. In this example, we can find that the list \Code{(cons 1 (list 2))}, though equal to \Code{(list 1 2)}, is represented by core language's term. So it will be difficult to handle such inline boundary conditions for traditional rewriting systems. But our approach is easy to handle cases like this. So our resugaring approach by lazy desugaring is powerful.
+Note that the \m{let} term is to limit the subexpression only appears once in RHS. In this example, we can find that the list \Code{(cons 1 (list 2))}, though equal to \Code{(list 1 2)}, is represented by core language's term. So it will be difficult to handle such inline boundary conditions for traditional rewriting systems. But our approach is easy to handle cases like this. So our resugaring approach by lazy desugaring is powerful. 
+\ignore{
+\todo{@zc: whether it is necessary to discuss ifa cannot do this}
+}
