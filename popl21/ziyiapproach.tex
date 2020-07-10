@@ -195,7 +195,7 @@ Now, our desugaring algorithm can be easily defined based on $\redm{}{}$.
 							& & \qquad \key{else}~\m{resugar}(e')
 \end{array}
 \]
-During the resugaring, we just apply the reduction ($\redm{}{}$) on the input expression step by step until it becomes a normal form, while outputting those intermediate expressions that belong to \m{DisplayableExp}. This algorithm is more explicit and simpler than the traditional one. Note that $\redm{}{}$ is executed recursively on the subexpressions, which provides rooms for further optimization (see in Section \ref{mark:optimize}).
+During the resugaring, we just apply the reduction ($\redm{}{}$) on the input expression step by step until no reduction can be applied (\m{isNormal}), while outputting those intermediate expressions that belong to \m{DisplayableExp}. This algorithm is more explicit and simpler than the traditional one. Note that $\redm{}{}$ is executed recursively on the subexpressions, which provides rooms for further optimization (see in Section \ref{mark:optimize}).
 %, because the current description is easier to understand.)
 
 \subsection{Correctness}
