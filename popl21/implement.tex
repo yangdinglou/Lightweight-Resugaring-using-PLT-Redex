@@ -5,13 +5,9 @@
 
 %\subsection{Implementation}
 
-<<<<<<< HEAD
 We have implemented our resugaring approach using PLT Redex \cite{SEwPR}, which is a semantic engineering tool based on reduction semantics \cite{reduction}. Figure \ref{fig:frame} shows the framework of the implementation.
 In the language model, desugaring rules are written as reduction rules of \m{SurfExp}. And context rules of \m{SurfExp} have no restriction (every subexpression is reducible as a hole). Then for each resugaring step, we carefully choose the exact evaluation rule which satisfies condition as defined for the mixed language in Section \ref{mark:mixedreduction}.
-=======
-Our resugaring approach is implemented using PLT Redex \cite{SEwPR}, which is a semantic engineering tool based on reduction semantics \cite{reduction}. The framework of the implementation is as Figure \ref{fig:frame}.
-In the language model, desugaring rules are written as reduction rules of \m{SurfExp}. And context rules of \m{SurfExp} have no restriction (every subexpression is reducible as a hole). Then for each resugaring step, we should choose the exact reduction which satisfies the reduction of mixed language's reduction rule  in Section \ref{mark:mixedreduction}.
->>>>>>> f405e689763f2460c5364dad0b87d9e75ff382fc
+
 \begin{figure}[t]
 	\centering
 	\includegraphics[width=5cm]{images/frame.png}
@@ -70,11 +66,8 @@ But something goes wrong when substitution takes place during \m{CoreExt2}. Just
 
 
 \label{mark:optimize}
-<<<<<<< HEAD
 Note that in Rules \m{SurfRed1} and \m{CoreExt1}, there is a recursive call on $\redm{}{}$. We can optimize the resugaring algorithm in our actual implementation. For example, \Code{(Sugar1 (Sugar2  ...) ...)} as the input, and find the first subexpression should be reduced. We can first get the resugaring sequences of \Code{(Sugar2 ...)} as Figure \ref{fig:subsequence}, then the resugaring sequence is got as \ref{fig:optimized}. Thus, we will not need to try to expand the outermost sugar for each inner step (recursively resugaring for inner expression).
-=======
-Note that in \m{SurfRed1} rule and \m{CoreExt1} rule, there is a recursive call on $\redm{}{}$. We can optimize the resugaring algorithm by recursive resugaring. For example, \Code{(Sugar1 (Sugar2  ...) ...)} as the input, and find the first subexpression should be reduced. We can first get the resugaring sequences of \Code{(Sugar2 ...)} as Figure \ref{fig:subsequence}, then the resugaring sequences is got as \ref{fig:optimized}. Thus, we will not need to try to expand the outermost sugar for each inner step (recursive resugaring for inner expression).
->>>>>>> f405e689763f2460c5364dad0b87d9e75ff382fc
+
 
 \begin{figure}[t]
 \centering
@@ -113,11 +106,7 @@ As for the automatic derivation of evaluation rules, we implement a simple demo 
 
 
 
-<<<<<<< HEAD
-We show several case studies to demonstrate the power of our approach. Some examples we will discuss in this section are in Figure \ref{fig:resugaring}. Note that we set call-by-value lambda calculus as terms in \m{CommonExp}, because we want to output some intermediate terms including lambda expressions in some examples. It's easy if we want to skip them. \todo{modify drule or simplify Codes}
-=======
-We test some applications on the tool as case studies. Some examples we will discuss in this section are in Figure \ref{fig:resugaring}. Note that we set call-by-value lambda calculus as terms in \m{CommonExp}, because we need to output some intermediate sequences including lambda expressions in some examples. It's easy if we want to skip them.
->>>>>>> f405e689763f2460c5364dad0b87d9e75ff382fc
+We show several case studies to demonstrate the power of our approach. Some examples we will discuss in this section are in Figure \ref{fig:resugaring}. Note that we set call-by-value lambda calculus as terms in \m{CommonExp}, because we want to output some intermediate terms including lambda expressions in some examples. It's easy if we want to skip them.
 
 \begin{figure}[t]
 \centering
@@ -253,26 +242,21 @@ Then in our core language, the execution of expanded expression will contain 33 
 }
 
 As for the derivation of syntactic sugar's evaluation rules, we have shown an example of \m{and} sugar and \m{or} sugar in overview. But what if the \m{or} sugar written as follows?
-\[\drule{\Code{(or $e_1$ $e_2$)}}{\Code{(let x $e_1$ (if x x $e_2$))}}\]
+\[\drule{\Code{(Or $e_1$ $e_2$)}}{\Code{(let x $e_1$ (if x x $e_2$))}}\]
 Of course, we got the same evaluation rules as the example in overview.
 \[
 \begin{array}{c}
-\infer {(\mbox{or}~e_1~e_2) \rightarrow (\mbox{or}~e_1'~e_2)} {e_1~ \rightarrow~e_1'}
+\infer {(\mbox{Or}~e_1~e_2) \rightarrow (\mbox{Or}~e_1'~e_2)} {e_1~ \rightarrow~e_1'}
 \qquad
-(\mbox{or}~\#t~e2) \rightarrow \#t
+(\mbox{Or}~\#t~e2) \rightarrow \#t
 \quad
-(\mbox{or}~\#f~e2) \rightarrow e_2 \\
+(\mbox{Or}~\#f~e2) \rightarrow e_2 \\
 \end{array}
 \]
 
-<<<<<<< HEAD
-Then for expressions headed with \m{or}, we won't need the one-step try to figure out whether desugaring or processing on a subexpression, which makes our approach more concise. Overall, the unidirectional resugaring algorithm makes our approach efficient, because no attempts for resugaring the expression are needed.
 
-\subsubsection{Hygienic Sugars}
-=======
 Then for expressions headed with \m{or}, we won't need the one-step try to figure out whether desugaring or processing on a subexpression, which makes our approach more concise. Overall, the unidirectional resugaring algorithm based on lazy desugaring makes our approach efficient, because no attempts for resugaring the expression are needed.
-\subsubsection{Hygienic sugar}
->>>>>>> f405e689763f2460c5364dad0b87d9e75ff382fc
+\subsubsection{Hygienic Sugars}
 \label{mark:hygienic}
 
 
@@ -288,7 +272,7 @@ For traditional resugaring approach, if we want to get sequences of \Code{(let x
 
 
 The lazy desugaring is also convenient for achieving hygiene for non-hygienic rewriting. For example, \Code{(let x 1 (+ x (let x 2 (+ x 1))))} may be reduced to \Code{(+ 1 (let 1 2 (+ 1 1)))} by a simple core language whose \Code{let} expression does not handle cases like that. But by writing a simple sugar \m{Let}
-\[\drule{\Code{(Let~$e_1$~$e_2$~$e_3$)}}{\Code{(let~($e_1$~$e_2$)~$e_3$)}}\]
+\[\drule{\Code{(Let~$e_1$~$e_2$~$e_3$)}}{\Code{(let~$e_1$~$e_2$~$e_3$)}}\]
 and making some simple modifies (rejecting one-step try if error occurs, see details in Appendix A.2) in the reduction of mixed language, we will get the resugaring sequences as Figure \ref{fig:Let} in our tool. \ignore{\todo{@zc: let (e e) e -> let e e e; support Let now?}
 }
 
