@@ -82,7 +82,7 @@ Note that if the pattern is nested, we can introduce a new syntactic sugar to fl
 \]
 If we execute \Code{(Twice (+ 1 1))}, it will firstly be desugared to \Code{(+ (+ 1 1) (+ 1 1))}, then reduced to \Code{(+ 2 (+ 1 1))} by one step. The subexpression \Code{(+ 1 1)} has been reduced but should not be resugared to the surface, because the other \Code{(+ 1 1)} has not been reduced yet.
 %This would let many intermediate steps omitted, if there are many reduction steps between reduction of them.
-So we just use a \m{let} binding to resolve this problem.
+So we just use a \m{let} binding to resolve this problem. The RHS should be \Code{(let x $e_1$ (+ x x))} in this case.
 
 Note that in the desugaring rule, we do not restrict the RHS to be a $\m{CoreExp}$. We can use $\m{SurfExp}$ (more precisely, we allow the mixture use of syntactic sugars and core expressions) to define recursive syntactic sugars, as seen in the following example.
 \[
@@ -146,7 +146,7 @@ Note that some expressions with \m{CoreHead} contain subexpressions with \m{Surf
 \[
 \infer{(\m{if}~e_1~e_2~e_3) \rightarrow (\m{if}~e_1'~e_2~e_3)}{e_1 \rightarrow e_1'}
 \]
-then if $e_1$ is a expression in the core language, it will be reduced by the reduction rule in the core language; if $e_1$ is a \m{SurfExp}, it will be reduced by the desugaring rule of $e_1$'s \m{Head} (how the subexpression reduced does not matter, because it is just to mark the location where it should be reduced); if $e_1$ is also a \m{CoreExp} with non-core subexpressions, a recursive reduction by $\redc{}{}$ is needed.
+then if $e_1$ is a reducible expression in the core language, it will be reduced by the reduction rule in the core language; if $e_1$ is a \m{SurfExp}, it will be reduced by the desugaring rule of $e_1$'s \m{Head} (how the subexpression reduced does not matter, because it is just to mark the location where it should be reduced); if $e_1$ is also a \m{CoreExp} with non-core subexpressions, a recursive reduction by $\redc{}{}$ is needed.
 
 
 \subsection{Resugaring Algorithm}

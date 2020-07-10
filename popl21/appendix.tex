@@ -318,7 +318,7 @@ But something goes wrong when substitution takes place during \m{CoreExt2}. For 
 
 \subsection{Implementing hygiene for non-hygienic rewriting}
 
-Discussion in this subsection is to describe how to modify reduction rules of mixed language to achieve a hygienic \m{Let} sugar based on the non-hygienic \m{let} in core language.
+Discussion in this subsection is to describe how to modify reduction rules of mixed language to achieve a hygienic \m{Let} sugar based on the non-hygienic \m{let} in core language, based on Section 5.1.2.
 \begin{Codes}
     (Let x 1 (+ x (Let x 2 (+ x 1))))
 \DeStep{\quad \note{ \{ a one-step try on the outermost Let \}}

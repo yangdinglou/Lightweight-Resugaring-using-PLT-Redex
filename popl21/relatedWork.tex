@@ -3,7 +3,7 @@
 \label{sec6}
 %Explain the work that are related to your problem, and to your three contributions.
 
-As discussed many times before, our work is much related to the pioneering work of resugaring in \cite{resugaring,hygienic}. The idea of "tagging" and "reverse desugaring" is a clear explanation of "resugaring", but it becomes very complex when the RHS of the desugaring rule becomes complex. Our approach does not need to reverse desugaring, and is more lightweight, powerful, and efficient.
+As discussed many times before, our work is much related to the pioneering work of \emph{resugaring} in \cite{resugaring,hygienic}. The idea of "tagging" and "reverse desugaring" is a clear explanation of "resugaring", but it becomes very complex when the RHS of the desugaring rule becomes complex. Our approach does not need to reverse desugaring, and is more lightweight, powerful, and efficient.
 For hygienic resugaring, compared with the approach of using DAG to solve the variable binding  problem in \cite{hygienic}, our approach of "lazy desugaring" is more natural, because it  behaves as what the sugar ought to express.
 
 \ignore{
@@ -14,7 +14,7 @@ For hygienic resugaring, compared with the approach of using DAG to solve the va
 \end{itemize}
 }
 
-Our work on evaluation rule derivation for the surface language was inspired by the work of \emph{Type resugaring} \cite{resugaringtype}, which shows that it is possible to automatically construct the typing rules for the surface language by statically analyzing type inference trees. But the method based on unification is hard to be applied for our evaluation rule derivation, because it has an assumption that syntactic sugar always has a unique type. But in our problem, syntactic sugar may evaluate different subexpressions under different conditions. This will make it difficult for us to express the rules by inferring tree.
+Our work on evaluation rule derivation for the surface language was inspired by the work of \emph{Type resugaring} \cite{resugaringtype}, which shows that it is possible to automatically construct the typing rules for the surface language by statically analyzing type inference trees. But the method based on unification is hard to be applied for our evaluation rule derivation, because it has an assumption that syntactic sugar always has a unique type. But in our problem, syntactic sugar may evaluate different subexpressions under different conditions. This will make it difficult for us to express the rules by inference trees.
 
 % there is only one type rule for multi-branches of one syntactic sugar \todo{I don't understand the meaning here.}, which is not the case for evaluation rules.
 % \todo{We may explain the key idea about how we deal with this assumption.}

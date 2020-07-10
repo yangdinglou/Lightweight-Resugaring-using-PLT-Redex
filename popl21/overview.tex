@@ -64,9 +64,9 @@ As we discussed in the introduction, the traditional approach uses "tagging" and
     (if-Andtag (if-Ortag \#t \#t \#f) (if-Andtag \#f \#t \#f) \#f)}
 \OneStep{\quad \note{\{ context rule of if, reduction rule of if-false\}}
     (if-Andtag \#t (if-Andtag \#f \#t \#f) \#f)}
-\OneStep{\quad \note{\{ emit (And \#t (And \#f \#t)) by reverse desugaring, reduction rule of if-true\}}
+\OneStep{\quad \note{\{ emit{\bfseries (And \#t (And \#f \#t))} by reverse desugaring, reduction rule of if-true\}}
     (if-Andtag \#f \#t \#f)} \note{//check resugarable}
-\OneStep{\quad \note{\{ emit (And \#f \#t) by reverse desugaring, reduction rule of it-false\}}
+\OneStep{\quad \note{\{ emit{\bfseries (And \#f \#t)} by reverse desugaring, reduction rule of it-false\}}
      #f}
 \end{Codes}
 
@@ -87,8 +87,8 @@ To solve the problem in the traditional approach, we propose a new resugaring ap
 \OneStep{\quad \note{\{ keep this try, finish inner resugaring, then return to the top \}}
     (resugar (And \#t (And \#f \#t)))}
 \DeStep{\quad \note{ \{ a one-step try on the outermost And \}}
-    (try (if \#t (And \#f \#t)))}
-\OneStep{\quad \note{\{ keep this try, finish inner resugaring, then return to the top \}}
+    (try (if \#t (And \#f \#t) \#f))}
+\OneStep{\quad \note{\{ the reduction will destroy structure of the outermost And, so keep this try to desugar it \}}
     (resugar (And \#f \#t))}
 \DeStep{\quad \note{ \{ a one-step try on the outermost And \}}
     (try (if \#f \#t \#f))} \note{// have to desugar for reduction}

@@ -209,7 +209,7 @@ We show several case studies to demonstrate the power of our approach. Some exam
 \label{mark:simple}
 
 We construct some simple syntactic sugars and try it on our tool. Some sugar is inspired by the first work of resugaring \cite{resugaring}. The result shows that our approach can handle all sugar features of their first work.
-Take an SKI combinator syntactic sugar as an example.
+Take an SKI combinator syntactic sugar as an example. (We can regard \m{S} as an expression headed with S, without subexpression.)
 \[
 \begin{array}{l}
 \drule{\m{S}}{\Code{(lambdaN (x1 x2 x3) (x1 x2 (x1 x3)))}}\\
