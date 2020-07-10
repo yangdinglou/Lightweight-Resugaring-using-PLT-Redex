@@ -53,7 +53,7 @@ As mentioned above, IFA intuitively describes the evaluation rules of a certain 
         \label{fig:ifa-nand}
     \end{figure}
 
-    Sometimes the rules may be more complex, such as being reduced into another language construct, or an expression containing other syntactic structures. For example, for the following evaluation rules for \m{nand}:
+    Sometimes the rules may be more complex, such as being reduced into another language construct, or an expression containing other language constructs. For example, for the following evaluation rules for \m{nand}:
     \[
         \infer{(\m{nand}~e_1~e_2) \to (\m{nand}~e_1'~e_2)}{e_1 \to e_1'}
     \]\[
@@ -64,9 +64,9 @@ As mentioned above, IFA intuitively describes the evaluation rules of a certain 
     % \infax[E-NandV]{(\m{nand}~v_1~e_2) \to (\m{if}~(\m{if}~v_1~e_2~\m{\#f})~\m{\#f}~\m{\#t})}
     %
     we can draw \m{nand}'s IFA as Figure \ref{fig:ifa-nand-a}.
-    When the automaton runs into the terminal node of Figure \ref{fig:ifa-nand-a}, it goes to derive the \m{if} expression. In fact, we have known how \m{if} works through the IFA of \m{if}. Thus we can replace the last node with an $\text{IFA}_{\m{\scriptsize if}}$ and substitute $e_1$ to $e_3$ of $\text{IFA}_{\m{\scriptsize if}}$ with the parameters of the node. Use the termination nodes of $\text{IFA}_{\m{\scriptsize if}}$ as the termination nodes of new $\text{IFA}_{\m{\scriptsize \scriptsize nand}}$. The results are shown in Figure \ref{fig:ifa-nand-b}. Further decomposing the inner \m{if} node, connecting the terminating nodes of $\text{IFA}_{\m{\scriptsize nand}}$ to the nodes pointed to by the original output edge, we get Figure \ref{fig:ifa-nand-c}.
+    When the automaton runs into the terminal node of Figure \ref{fig:ifa-nand-a}, it goes to derive the \m{if} expression. In fact, we have known how \m{if} works through the IFA of \m{if}. Thus we can replace the last node with an $\text{IFA}_{\m{\scriptsize if}}$ and substitute $e_1$ to $e_3$ of $\text{IFA}_{\m{\scriptsize if}}$ with the parameters of the node. Use the terminal nodes of $\text{IFA}_{\m{\scriptsize if}}$ as the terminal nodes of new $\text{IFA}_{\m{\scriptsize \scriptsize nand}}$. The results are shown in Figure \ref{fig:ifa-nand-b}. Further decomposing the inner \m{if} node, connecting the terminal nodes of $\text{IFA}_{\m{\scriptsize nand}}$ to the nodes pointed to by the original output edge, we get Figure \ref{fig:ifa-nand-c}.
 
-    As the nodes of IFA in Figure \ref{fig:ifa-nand-c} have no other composite syntactic structures, such an IFA completely expresses the semantics of a language construct, and no longer cares about the evaluation rules of other syntactic structures. We will do similar steps for syntactic sugars, which will be discussed later.
+    As the nodes of IFA in Figure \ref{fig:ifa-nand-c} have no other composite language constructs, such an IFA completely expresses the semantics of a language construct, and no longer cares about the evaluation rules of other language constructs. We will do similar steps for syntactic sugars, which will be discussed later.
     \myend
 \end{example}
 
@@ -105,10 +105,10 @@ As mentioned above, IFA intuitively describes the evaluation rules of a certain 
     An inference automaton (IFA) of language construct \m{H} is a 5-tuple, $(Q, \Sigma, q_0, F, \delta)$, consisting of
 
     \begin{itemize}
-        \item A finite set of nodes $Q$, each node containing an expression and a symbol table which maps a variable to a node;
+        \item A finite set of nodes $Q$, each node containing an expression and a symbol table which maps variables to nodes;
         \item A finite set of conditions $\Sigma$;
         \item A start node $q_0 \in Q$;
-        \item A set of terminal nodes $F \subseteq Q$; and
+        \item A set of terminal nodes $F \subseteq Q$;
         \item A transition function $\delta: (Q-F) \times \Sigma' \to Q$ where $\Sigma' \subseteq \Sigma$.
     \end{itemize}
     and for each node $q$, there is no path to itself (i.e., there is no sequence of conditions $C = (c_1,c_2,\ldots,c_n)\subseteq \Sigma^*$, such that after $q$ transfers sequentially according to $P$, it returns $q$.)
@@ -116,12 +116,12 @@ As mentioned above, IFA intuitively describes the evaluation rules of a certain 
 \end{Def}
 
 %The last constraint requires that there be no circles in our IFA.
-The state transition depends on whether the expression meets the condition. Note that each IFA is associated with language construct. Each state in IFA represents the current evaluation of a language construct, indicating that some subexpressions of the language construct have been evaluated at this state, and the rest have not.
+The state transition depends on whether the expression meets the condition. Note that each IFA is associated with language construct. Each state in IFA represents the current evaluation of a language construct, indicating that some subexpressions of the language construct have been evaluated at this state, and the others have not.
 
 %======================
 \subsection{Normal IFA}
 
-Although IFA can describe the evaluation behavior of a language construct, IFA itself may be in a complicated form. For example, the IFA of a language construct contains other syntactic structures in Figure \ref{fig:ifa-nand-a}. We will simplify IFA to make it easier to analyze.
+Although IFA can describe the evaluation behavior of a language construct, IFA itself may be in a complicated form. For example, the IFA of a language construct contains other language constructs in Figure \ref{fig:ifa-nand-a}. We will simplify IFA to make it easier to analyze.
 
 \begin{Def}[Normal IFA]
     \label{def:nmlifa}
@@ -133,12 +133,12 @@ Although IFA can describe the evaluation behavior of a language construct, IFA i
     \end{itemize}
 \end{Def}
 
-If an IFA is normal, it means that there are no more composite syntactic structures in it, and that it is of a tree structure.
+If an IFA is normal, it means that there are no more composite language constructs in it, and that it is of a tree structure.
 In fact, it is always feasible to convert IFA to normal IFA.
 
 \begin{mythm}[Normalizability of IFA]
     \label{mythm:nmlifa}
-    An IFA can be transformed into a normal IFA, if the normal IFAs of all sub-syntactic structures in the IFA are known.
+    An IFA can be transformed into a normal IFA, if the normal IFAs of all sub-language constructs in the IFA are known.
 \end{mythm}
 
 We can prove this theorem by repeatedly applying the following correctness-preserving steps to normalize an IFA.
@@ -147,7 +147,7 @@ We can prove this theorem by repeatedly applying the following correctness-prese
 %------------------------------------
 \subsubsection*{Step 1: Transforming into a Tree}
 
-As we have assumed that evaluation of a subexpression does not have side effect on the evaluation of other subexpressions, a node with at least two sources can be cloned and applied to different branches as shown in Figure \ref{fig:nmlifa-tree}; replacing the node referenced by the branch with the cloned node in conditions and symbol tables.  In this way, we can transform an IFA into a tree so that it meet the second condition for a  normal IFA.
+As we have assumed that evaluation of a subexpression does not have side effects on the evaluation of other subexpressions, a node with at least two sources can be cloned and applied to different branches as shown in Figure \ref{fig:nmlifa-tree}; replacing the node referenced by the branch with the cloned node in conditions and symbol tables.  In this way, we can transform an IFA into a tree so that it meet the second condition for a normal IFA.
 
 \begin{figure}[t]
     \centering
@@ -160,7 +160,7 @@ As we have assumed that evaluation of a subexpression does not have side effect 
 \subsubsection*{Step 2: Substituting Sub-Language Construct}
 \label{mark:hygieneinderive}
 
-If node $q$ in the tree IFA contains an expression of a language construct \m{H}, we replace this node with the normal IFA of \m{H}, replace the parameters, and pass the symbol table of $q$ into the sub-IFA. Then, connect all the termination nodes of \m{H} to the original output node $q'$, and convert it into a tree IFA according to the method described in the previous step as shown in Figure \ref{fig:nmlifa-subst}. Replace the node referenced by the branch with the \textit{new} one in conditions and symbol tables. This step preserve the semantics because of $(\m{H}~e_1~\ldots~e_n)[e/x] = (\m{H}~e_1[e/x]~\ldots~e_n[e/x])$.
+If node $q$ in the tree IFA contains an expression of a language construct \m{H}, we replace this node with the normal IFA of \m{H}, replace the parameters, and pass the symbol table of $q$ into the sub-IFA. Then, connect all the terminal nodes of \m{H} to the original output node $q'$, and convert it into a tree IFA according to the method described in the previous step as shown in Figure \ref{fig:nmlifa-subst}. Replace the node referenced by the branch with the \textit{new} one in conditions and symbol tables. This step preserve the semantics because of $(\m{H}~e_1~\ldots~e_n)[e/x] = (\m{H}~e_1[e/x]~\ldots~e_n[e/x])$.
 
 In particular, if an expression $e$ does not contain a certain variable $x$, we can remove it from the symbol table. For example, in our problem, each pattern variable $e_i$ of syntactic sugar cannot contain unbound variables. So we can remove all symbol tables of nodes with $e_i$.
 
@@ -188,7 +188,7 @@ If the expression of a node $q$ is a local variable $x$ and $x$ is in the symbol
 %---------------------------------------------------------------------
 \subsubsection*{Step 4: Removing Evaluated Nodes and Merge Transition Conditions}
 
-If an IFA is a tree, for each branch, remove the non-terminal nodes that have been evaluated with the same symbol table, and merge the conditions on the transition edge as in Figure \ref{fig:nmlifa-merge}. Replace the node referenced by the branch with the first-evaluated node in conditions and symbol tables. This step can make an IFA satisfy the third constraint of normal IFA.
+If an IFA is a tree, for each branch, remove the non-terminal nodes that have been evaluated with the same symbol table, and merge the conditions on the transition edge as Figure \ref{fig:nmlifa-merge}. Replace the node referenced by the branch with the first-evaluated node in conditions and symbol tables. This step can make an IFA satisfy the third constraint of normal IFA.
 
 Since on any branch, if $e_i$ is removed, it must have been evaluated. Therefore, when IFA runs to this node, there is no need to do any evaluation on $e_i$. At the same time, the transfer edge ensures that the conditions are not lacking. Correctness is guaranteed.
 
@@ -202,7 +202,7 @@ Since on any branch, if $e_i$ is removed, it must have been evaluated. Therefore
 %------------------------------------
 \subsubsection*{Step 5: Removing Constant Value}
 
-If the expression of a node is a constant value, remove the node and merge the conditions on the transition edge just like evaluated value. Because IFA does not do anything in this node, this does not affect the correctness of IFA.
+If the expression of a node is a constant value, remove the node and merge the conditions on the transition edge. Because IFA does not do anything in this node, this does not affect the correctness of IFA.
 
 %-------------------------------------
 %\subsubsection{Normalizability of IFA}
@@ -214,22 +214,20 @@ If the expression of a node is a constant value, remove the node and merge the c
 %===========================================
 \subsection{Converting Evaluation rules to IFA}
 
-At the beginning of this section, we have shown several examples about correspondence between IFA and evaluation rules. Now, we give an algorithm that can automatically convert the evaluation rules to IFA and ensure its correctness. But at the same time, it has stricter requirements on the evaluation rules.
-
-In this section, we only discuss core language. Syntactic sugar is similar to this, which we discuss it later.
+At the beginning of this section, we have shown several examples about correspondence between IFA and evaluation rules. Now, we give an algorithm that can automatically convert the evaluation rules to IFA and ensure its correctness. But at the same time, it has stricter requirements on the evaluation rules. We only discuss the core language here. Syntactic sugar is similar to this, which we discuss later.
 
 %--------------------------
 %\subsubsection{Assumptions}
 
 \begin{Asm}
     \label{Asm:rules}
-    A language construct $H$ only contains the evaluation rules in the following form:
+    A language construct \m{H} only contains the evaluation rules in the following form:
     \[
         \infer
-        {(\m{H}~e_1 \ldots e_i \ldots e_n) \to (\m{H}~e_1 \ldots e_i' \ldots e_n)}{e_i \to e_i'\quad T}
+        {(\m{H}~e_1~\ldots~e_i~\ldots~e_n) \to (\m{H}~e_1~\ldots~e_i'~\ldots~e_n)}{e_i \to e_i'\quad T}
     \]
     \[
-        \infer{(\m{H}~v_1 \ldots v_p~e_1 \ldots e_q) \to e}{T}
+        \infer{(\m{H}~e_1~\ldots~e_n) \to e}{T}
     \]
     %where $e$ can be any value, one of the parameters or a term of another language construct.
     where $T$ is a constraint over $e_j$ for $j \in 1,2,\ldots,n$.
@@ -239,10 +237,10 @@ This assumption specifies the form of the evaluation rules to ensure that IFAs c
 
 \begin{Asm}[Orderliness of Language Construct]
     \label{Asm:orderliness}
-    The language construct in the core language is finite. Think of all syntactic structures as points in a directed graph. If one of $H$'s evaluation rules can generate an expression containing $H'$, then construct an edge that points from $H$ to $H'$. The directed graph generated in this method has no circles.
+    The language construct in the core language is finite. Think of all language constructs as points in a directed graph. If one of $H$'s evaluation rules can generate an expression containing $H'$, then construct an edge that points from $H$ to $H'$. The directed graph generated in this method has no circles.
 \end{Asm}
 
-IFAs are not able to construct syntactic structures that contain recursive rules. This assumption qualifies that we can find an order for all syntactic structures, and when we try to construct IFA for $H$, IFA of $H'$ is known.
+IFAs are not able to construct language constructs that contain recursive rules. This assumption qualifies that we can find an order for all language constructs, and when we try to construct IFA for $H$, IFA of $H'$ is known.
 
 \begin{Asm}[Determinacy of One-Step Evaluation]
     \label{Asm:determinacy}
@@ -261,22 +259,22 @@ By assumption \ref{Asm:determinacy}, we can get the following lemma, which point
 \end{proof}
 
 %------------------------
-\subsubsection{Converting Algorithm}
+\subsubsection{Algorithm}
 
 \begin{mythm}[IFA Can Be Constructed by Evaluation Rules]
     \label{mythm:Rule2IFA}
-    If all the syntactic structures in the core language satisfy these assumptions, we can construct IFAs for all syntactic structures in the core language.
+    If all the language constructs in the core language satisfy these assumptions, we can construct IFAs for all language constructs in the core language.
 \end{mythm}
 
 \begin{proof}[Proof of Theorem \ref{mythm:Rule2IFA}]
 
-    We prove this theorem by giving an algorithm that converts evaluation rules to IFA. By Assumption \ref{Asm:orderliness}, we get an order of syntactic structures. We construct the IFA for each structure in turn.
+    We prove this theorem by giving an algorithm that converts evaluation rules to IFA. By Assumption \ref{Asm:orderliness}, we get an order of language constructs. We construct the IFA for each structure in turn.
 
     We generate a node for each rule of the language construct \m{H} and insert them into $Q$. If the rule is a context rule for a pattern varibale $e_i$, set $e_i$ as the expression of the node. If the rule is a reduction rule, add them into $F$ as terminal nodes and set the reduced expression $e$ as the expression of the node. Symbol tables of these nodes are set to be empty. Next we connect these nodes.
 
     For an expression like $(\m{H}~e_1~\ldots~e_n)$, suppose that $e_1, \ldots, e_n$ are not value, According to Lemma \ref{lemma:one-step}, we have the unique rule $r$ of \m{H} for one-step evaluation. Let node $q$ corresponding to $r$ be $q_0$.
 
-    If $r$ is a context rule for $e_i$, let the expression of $q$ be $e_i$. Assume that the evaluation of $e_i$ results in $v_i$, we get expression $(\m{H}~e_1 \ldots e_{i-1}~v_i~e_{i+1} \ldots e_n)$. For each possible value of $v_i$, choose the rules $r'$ that should be used. The node is $q'$. Set a condition as $c=q~\key{is}~v_i$ Let $\delta(q, c)$ be $q'$. For each branch, seem $r'$ as $r$ and keep doing this until $r$ is a reduction rule.
+    If $r$ is a context rule for $e_i$, assume that the evaluation of $e_i$ results in $v_i$, we get expression $(\m{H}~e_1~\ldots~e_{i-1}~v_i~e_{i+1}~\ldots~e_n)$. For each possible value of $v_i$, choose the rules $r'$ that should be used. The node is $q'$. Set a condition as $c=q~\key{is}~v_i$. Let $\delta(q, c)$ be $q'$. For each branch, seem $r'$ as $r$ and keep doing this until $r$ is a reduction rule.
 \end{proof}
 
 In this way, we got an IFA of \m{H}. According to the lemma \ref{mythm:nmlifa}, we can also get a normal IFA of \m{H}.
@@ -339,7 +337,7 @@ Before proving the correctness of the algorithm, we first prove the following le
     %[Proof of Lemma \ref{lemma:rule2ifa-correct}]
     We only need to discuss that in a one-step derivation, both get the same result.
 
-    Consider an expression $e=(\m{H}~e_1 \ldots e_n)$ and a rule $r$ for derivation. Suppose $r$ generates node $q$. By Lemma \ref{lemma:accessibility}, we find a path from $q_0$ to $q$. The expression $e$ must meet the conditions from $q_0$ to $q$. Therefore, the one-step derivation of this expression $e$ in IFA must be located at $q$. If $r$ is a context rule for a pattern variable $e_i$, the expression of $q$ is $e_i$ as well, and $e_i$ of $e$ is not a value. Thus both of the one-step derivation of $e$ are one-step derivation of $e_i$. If $r$ is a reduction rule to $e'$, both are $e'$.
+    Consider an expression $e=(\m{H}~e_1~\ldots~e_n)$ and a rule $r$ for derivation. Suppose $r$ generates node $q$. By Lemma \ref{lemma:accessibility}, we find a path from $q_0$ to $q$. The expression $e$ must meet the conditions from $q_0$ to $q$. Therefore, the one-step derivation of this expression $e$ in IFA must be located at $q$. If $r$ is a context rule for a pattern variable $e_i$, the expression of $q$ is $e_i$ as well. Thus both of the one-step derivation of $e$ are one-step derivation of $e_i$. If $r$ is a reduction rule to $e'$, both are $e'$.
 
     Similarly, if an expression can be derived in one step in IFA, then it must be able to use the corresponding rule for one-step derivation.
 \end{proof}
@@ -393,17 +391,17 @@ Similarly, we first give its algorithm, and then prove its correctness.
 
 \begin{proof}
 
-    Suppose that the IFA stands for the language construct $H$, then we build evaluation rules for $H$. First traverse all nodes to find the set of all expressions in nodes, which is the parameters of the language construct $H$ like $(\m{H}~e_1 \ldots e_n)$. Then generate evaluation rule for each node.
+    Suppose that the IFA stands for the language construct \m{H}, then we build evaluation rules for $H$. First traverse all nodes to find the set of all expressions in nodes, which is the parameters of the language construct \m{H} like $(\m{H}~e_1~\ldots~e_n)$. Then generate evaluation rule for each node.
 
     Begin with $q_0$, traverse the IFA. Let $q$ be $q_0$. Record the conditions by a set $T$.
 
     Suppose that $q$ is a terminal node, the expression of $q$ is $e$ and the symbol table of $q$ is like $\{x:q_x; y:q_y; \ldots\}$. Let $e_x,e_y,\ldots$ be the expressions of $q_x, q_y, \ldots$. Add a reduction rule like
     \[
-        \infer{(\m{H}~e_1 \ldots e_n) \to e[e_x/x][e_y/y]\ldots}{T}
+        \infer{(\m{H}~e_1~\ldots~e_n) \to e[e_x/x][e_y/y]\ldots}{T}
     \]
-    % \infrule[E-Hr]{T}{(\m{H}~e_1 \ldots e_n) \to e[e_x/x][e_y/y]\ldots}
+    % \infrule[E-Hr]{T}{(\m{H}~e_1~\ldots~e_n) \to e[e_x/x][e_y/y]\ldots}
 
-    If $q$ is not a termination node, and the expression of $q$ is $e_i$, add a context rule like
+    If $q$ is not a terminal node, and the expression of $q$ is $e_i$, add a context rule like
     \[
         \infer{(\m{H}~e_1~\ldots~e_i~\ldots~e_n) \to (\m{H}~e_1~\ldots~e_i'~\ldots~e_n)}{e_i \to e_i' \quad T}
     \]
@@ -503,7 +501,7 @@ Similarly, we first give its algorithm, and then prove its correctness.
     %[Proof of Lemma \ref{lemma:ifa2rule-correct}]
     We only need to discuss that in a one-step derivation, both get the same result.
 
-    Considering an expression $e=(\m{H}~e_1 \ldots e_n)$ use rule $r$ to derive. The expression $e$ must meet the condition $T$ of $r$ such as some parameters must be value or a specific value. Suppose $r$ is generated by node $q$. Then $T$ is the set of all transition conditions from $q_0$ to $q$. Therefore, the one-step derivation of this expression $e$ in IFA must be located at $q$. If $r$ is a context rule for a pattern variable $e_i$, the expression of $q$ is $e_i$ as well, and $e_i$ of $e$ is not a value. Thus both of the one-step derivation of $e$ are one-step derivation of $e_i$.
+    Considering an expression $e=(\m{H}~e_1~\ldots~e_n)$ use rule $r$ to derive. The expression $e$ must meet the condition $T$ of $r$ such as some parameters must be value or a specific value. Suppose $r$ is generated by node $q$. Then $T$ is the set of all transition conditions from $q_0$ to $q$. Therefore, the one-step derivation of this expression $e$ in IFA must be located at $q$. If $r$ is a context rule for a pattern variable $e_i$, the expression of $q$ is $e_i$ as well, and $e_i$ of $e$ is not a value. Thus both of the one-step derivation of $e$ are one-step derivation of $e_i$.
 
     Similarly, if an expression can be derived in one step in IFA, then it must be able to use the corresponding rule for one-step derivation.
 \end{proof}
