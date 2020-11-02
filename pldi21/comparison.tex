@@ -1,0 +1,174 @@
+%!TEX root = ./main.tex
+\section{Discussion}
+\label{sec5}
+
+\subsection{Model Assumption}
+
+
+As we mentioned in the introduction (Sec \ref{mark:mention}), our approach has a more specific assumption compared to the existing approach. Here is a small gap between the motivation of existing approach and ours---existing approach focused mainly on a tool for existing language, while our approach considered more on a basic feature for language implementation. The examples in Sec \ref{sec:recursiveSugar} have shown how the lazy desugaring solve some problems in practice.
+
+In addition, as what we need for the lazy desugaring is just the computation order of the syntactic sugar, we can make a extension for the resugaring algorithm to see how it is able to work with only a black-box core language stepper. The most important difference between black-box stepper and the evaluation rules is the computation order---while the same language will behave uniquely, the evaluation rules can show the computation order statically (without running the program). So when meeting the black-box stepper for the core language, we can just use some simple program to "get" the computation order of the core language as the following example \ref{exampleorder} shows.
+
+
+\example{
+\Code{(if tmpe1 tmpe2 tmpe3)}\\ $\Downarrow_{stepper}$\\ \Code{(if tmpe1' tmpe2 tmpe3)}\\ $\Downarrow_{getnext}$\\ \Code{(if tmpv1 tmpe2 tmpe3)}\\ $\Downarrow_{stepper}$\\ \Code{tmpei}\\
+\begin{flushleft}
+so getting one context rule for the \m{if} expression.
+\end{flushleft}
+}{getting the order}{exampleorder}
+
+But that's not enough---the core language and the surface language cannot be mixed easily. We should do the same try during the evaluation to make the core language's stepper useful when meeting some surface language's term.
+
+\begin{Def}[dynamic mixed language's one step reduction $\redm{}{}$] Defined in Fig \ref{fig:dynamic}.
+
+
+
+\end{Def}
+
+\begin{figure*}[t]
+\infrule[CoreRed]
+{ \forall~i.~e_i\in \m{CoreExp}\\
+\redc{(\m{CoreHead}~e_1~\ldots~e_n)}{e'}}
+{\redm{(\m{CoreHead}~e_1~\ldots~e_n)}{e'}}
+\infrule[CoreExt1]
+{ \forall~i.~tmp_i= (e_i \in \m{SurfExp}~?~\m{tmpe}~:~e_i),~where~\m{tmpe}~is~any~reduciable~\m{CoreExp}~term\\
+\redc{(\m{CoreHead}~tmp_1~\ldots~tmp_i~\ldots~tmp_n)}{(\m{CoreHead}~tmp_1~\ldots~tmp_i'~\ldots~tmp_n)}}
+{\redm{(\m{CoreHead}~e_1~\ldots~e_i~\ldots~e_n)}{(\m{CoreHead}~e_1~\ldots~e_i'~\ldots~e_n)}\\where~\redm{e_i}{e_i'}}
+\infrule[CoreExt2]
+{ \forall~i.~tmp_i= (e_i \in \m{SurfExp}~?~\m{tmpe}~:~e_i),~where~\m{tmpe}~is~any~reduciable~\m{CoreExp}~term\\
+\redc{(\m{CoreHead}~tmp_1~\ldots~tmp_n)}{e'}~\note{// not reduced in subexpressions}}
+{\redm{(\m{CoreHead}~e_1~\ldots~e_n)}{e'[e_1/tmp_1~\ldots~e_n/tmp_n]}}
+\caption{Dynamic reduction}
+\label{fig:dynamic}
+\end{figure*}
+
+
+Putting them in simple words. For expression \Code{(CoreHead $e_1$ $\ldots$ $e_n$)} whose subexpressions contain \m{SurfExp}, replacing all \m{SurfExp} subexpressions not in core language with any reducible core language's term \m{tmpe}. Then getting a result after inputting the new expression $e'$ to the original black-box stepper. If reduction appears at a subexpression at $e_i$ or what the $e_i$ replaced by, then the stepper with the extension should return \Code{(CoreHead $e_1$ $\ldots$ $e_i'$ $\ldots$ $e_n$)}, where $e_i'$ is $e_i$ after the mixed language's one-step reduction ($\redm{}{}$) or after core language's reduction with extension ($\rede{}{}$) (rule \m{CoreExt1}, an example in Figure \ref{fig:e1}). Otherwise, the stepper should return \Code{$e'$}, with all the replaced subexpressions replacing back (rule \m{CoreExt2}, an example in Figure \ref{fig:e2}). The extension will not violate the properties of original core language's evaluator. It is obvious that the evaluator with the extension will reduce at the subexpression as it needs in core language, if the reduction appears in a subexpression. The stepper with extension behaves the same as mixing the evaluation rules of core language and desugaring rules of surface language.
+
+\begin{center}
+\begin{figure}[thb]
+\centering
+\Code{(if (and e1 e2) true false)}\\ $\Downarrow_{replace}$\\ \Code{(if tmpe1 true false)}\\ $\Downarrow_{blackbox}$\\ \Code{(if tmpe1' true false)}\\ $\Downarrow_{desugar}$\\ \Code{(if (if e1 e2 false) true false)}
+\caption{\m{CoreExt1}'s Example}
+\label{fig:e1}
+\end{figure}
+
+\begin{figure}[thb]
+\centering
+\Code{(if (if true ture false) (and ...) (or ...))}\\ $\Downarrow_{replace}$ \\\Code{ (if (if true ture false) tmpe2 tmpe3)}\\ $\Downarrow_{blackbox}$\\  \Code{(if true tmpe2 tmpe3)}\\ $\Downarrow_{replaceback}$\\ \Code{(if true (and ...) (or ...))}
+\caption{\m{CoreExt2}'s Example}
+\label{fig:e2}
+\end{figure}
+\end{center}
+
+\todo{process for substitution}
+
+Then for any sugar expression, we can process them dynamically by "one-step try"---trying which hole is to be reduced after the outermost sugar desugared, as example in Fig \ref{example:try}
+\example{
+\[
+{\footnotesize
+	\begin{array}{lcl}
+	resugaring&&one step try\\
+	\Code{({\bfseries And} (Or \#t \#f)}&&\Code{(if ({\bfseries O}r \#t \#f)}\\
+	\Code{\qquad\hspace{0.5em}(And \#f \#t))}&\xrightarrow{try}&\Code{\qquad\hspace{0.5em}(And \#f \#t)}\\
+	& &\Code{\qquad\hspace{0.5em}\#f)}\\
+	\qquad\quad\dashdownarrow& &\qquad\qquad\downarrow\\
+	\Code{(And ({\bfseries Or} \#t \#f)}& &\Code{(And ({\bfseries if} \#t \#t \#f)}\\
+	\Code{\qquad\hspace{0.5em}(And \#f \#t))}&&\Code{\qquad\hspace{0.5em}(And \#f \#t))}\\
+	\qquad\quad\dashdownarrow& &\qquad\qquad\downarrow\\
+	\Code{({\bfseries And} \#t}&\xrightarrow{try}&\Code{({\bfseries if} \#t}\\
+	\Code{\qquad\hspace{0.5em}(And \#f \#t))}&&\Code{\qquad\hspace{0.5em}(And \#f \#t)}\\
+	& &\Code{\qquad\hspace{0.5em}\#f)}\\
+	\qquad\quad\dashdownarrow& &\qquad\qquad\downarrow\\
+	\Code{({\bfseries And} \#f \#t)}&\xrightarrow{try}&\Code{({\bfseries if} \#f \#t \#f)}\\
+	\qquad\quad\dashdownarrow& &\qquad\qquad\downarrow\\
+	\Code{\#f}& &\\
+\end{array}
+}
+\]
+}{simple example}{example:try}
+
+
+
+\subsection{Correctness and Trade-off}
+The existing resugaring approach proposed three properties to define the correctness. Here we will show what are the similarities and differences between theirs and our properties.
+
+\begin{quote}
+Emulation: 
+Each term in the generated surface evaluation sequence desugars into the core term which it is meant to represent.\\
+Abstraction: 
+Code introduced by desugaring is never revealed in the surface evaluation sequence, and code originating from the original input program is never hidden by resugaring.\\
+Coverage: Resugaring is attempted on every core step, and as few core steps are skipped as possible.\\
+\end{quote}
+
+\emph{Emulation}: The properties in Section \ref{sec3} is just the same as the emulation property. We should admit that this property is the most basic one.
+
+\emph{Abstraction and Coverage}: Actually, our reduction in the mixed language has some similarities to theirs. But since our framework has no execution for the fulldesugared program and no reverse desugaring, it will be some different in details.
+
+Overall, our approach restricts the output by the \m{Head} of a program and its inner(or to say, sub) expressions. It is quite natural, since the motivation of the resugaring is to show useful intermediate sequences, we think it will be better than restricting the output by judging whether the program contains some components desugared from the original program's components. Let's see the following example in Fig \ref{example:nor}
+
+\example{
+\[
+\drule{(Nor~x~y)}{(And~(not~x)~(not~y))}
+\]
+\[
+\drule{(And~x~y)}{(if~x~y~\false)}
+\]
+
+
+}{Nor sugar}{example:nor}
+Then for the program in a logic domain, what should be a resugaring sequence of the following program?\\\m{(not~(And~(Nor~\false~\true)~\true))} 
+
+In our opinion, if the outer \m{not}, \m{And} can be displayed, so they should be after desugared.
+The existing approach will produce the sequences as follows.
+\begin{Codes}
+    (not (And (Nor \false \true) \true))
+\OneStep{ (not (And \false \true))}
+\OneStep{ (not \false)}
+\OneStep{ \true}
+\end{Codes}
+while ours will produce the following sequences.
+
+\begin{Codes}
+    (not (And (Nor \false \true) \true))
+\OneStep{ (not (And (And (not \false) (not \true)) \true))}
+\OneStep{ (not (And (And \true (not \true)) \true))}
+\OneStep{ (not (And (not \true) \true))}
+\OneStep{ (not (And \false \true))}
+\OneStep{ (not \false)}
+\OneStep{ \true}
+\end{Codes}
+
+In summary, our approach choose a slightly different way for the \emph{abstraction} for better \emph{coverage} in the real application, which the authors of existing approach also mentioned (but by different processing).
+
+% \subsection{Experiment}
+
+% \todo{pyret}
+
+\subsection{Hygiene}
+
+As an important property for sugar or macro system, the existing approach use a data structure (ASD) to handle hygiene in resugaring, while in our approach the hygiene can be handled easily. Previous research\cite{EssenceofHygiene} has discussed why some simple processing such as renaming is insufficient in some cases. But in our system, the hygiene problem is solved easily. 
+
+In our approach, the sugar can contain some bindings, written by the core language's \m{let}. The hygiene problem only happens when binders of a expanded sugar conflict with other binders. We file them into two categories
+\begin{itemize}
+\item A sugar in binding's context.
+\item A sugar's subexpression containing bindings.
+\end{itemize}
+The Fig \ref{example:case1} and \ref{example:case2} shows how the simple cases of these two.
+
+\example{
+\Code{(let (x \#t) (Or \#f x))}
+where \[\drule{\Code{(Or~e1~e2)}}{\Code{(let (x e1) (if x x e2))}}\]
+}{Case1's Example}{example:case1}
+\example{
+\Code{(Subst (+ f (let (f 1) f)) f 5) }
+where \[
+\drule{\Code{(Subst $e_1$ $e_2$ $e_3$)}}{\Code{(let (e2 e3) e1)}}
+\]
+}{Case1's Example}{example:case2}
+
+For the case1, the very basic and common hygiene problem, is not a problem, because our "lazy desugaring" setting won't let the sugar \m{Or} expanded before the x is substituted. Because the bound variables in sugar expressions are only introduced by let-binding, all of them can "delay" the expansion of the syntactic sugar.
+
+For the case2, where the subexpression \Code{f} is a free variable introduced by the sugar \m{Subst}, the program will firstly desugar the \m{Subst} (because the only hole at $e_3$ has been a value), then hygiene problem is just about the core language---which can be easily solved by renaming.
+
+You may find that for the same sugar \m{Subst}, the expression \Code{(Subst (let (f if) (f \#t 1 2)) if 5)} will cause something ambiguous. But that's the ambiguity of the program, not the hygiene. Here what we want to show is that, even without complex things like macro systems, specifying the scopes and so on, the lazy desugaring itself will solve the common hygienic problem.

@@ -1,0 +1,334 @@
+% !TEX program = pdflatex
+%!TEX spellcheck
+%% For double-blind review submission, w/o CCS and ACM Reference (max submission space)
+\documentclass[sigplan,10pt,review,anonymous]{acmart}\settopmatter{printfolios=true,printccs=false,printacmref=false}
+%% For double-blind review submission, w/ CCS and ACM Reference
+%\documentclass[acmsmall,review,anonymous]{acmart}\settopmatter{printfolios=true}
+%% For single-blind review submission, w/o CCS and ACM Reference (max submission space)
+%\documentclass[acmsmall,review]{acmart}\settopmatter{printfolios=true,printccs=false,printacmref=false}
+%% For single-blind review submission, w/ CCS and ACM Reference
+%\documentclass[acmsmall,review]{acmart}\settopmatter{printfolios=true}
+%% For final camera-ready submission, w/ required CCS and ACM Reference
+%\documentclass[acmsmall]{acmart}\settopmatter{}
+
+
+%% Journal information
+%% Supplied to authors by publisher for camera-ready submission;
+%% use defaults for review submission.
+\acmJournal{PACMPL}
+\acmVolume{1}
+\acmNumber{CONF} % CONF = POPL or ICFP or OOPSLA
+\acmArticle{1}
+\acmYear{2018}
+\acmMonth{1}
+\acmDOI{} % \acmDOI{10.1145/nnnnnnn.nnnnnnn}
+\startPage{1}
+
+%% Copyright information
+%% Supplied to authors (based on authors' rights management selection;
+%% see authors.acm.org) by publisher for camera-ready submission;
+%% use 'none' for review submission.
+\setcopyright{none}
+%\setcopyright{acmcopyright}
+%\setcopyright{acmlicensed}
+%\setcopyright{rightsretained}
+%\copyrightyear{2018}           %% If different from \acmYear
+
+%% Bibliography style
+\bibliographystyle{ACM-Reference-Format}
+%% Citation style
+%% Note: author/year citations are required for papers published as an
+%% issue of PACMPL.
+%\citestyle{acmauthoryear}   %% For author/year citations
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Note: Authors migrating a paper from PACMPL format to traditional
+%% SIGPLAN proceedings format must update the '\documentclass' and
+%% topmatter commands above; see 'acmart-sigplanproc-template.tex'.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%% Some recommended packages.
+\usepackage{booktabs}   %% For formal tables:
+                        %% http://ctan.org/pkg/booktabs
+\usepackage{subcaption} %% For complex figures with subfigures/subcaptions
+                        %% http://ctan.org/pkg/subcaption
+
+\usepackage{algorithm}
+\usepackage{tabularx}
+\usepackage{algorithmic}
+\usepackage{proof}
+\usepackage{alltt}
+\usepackage{pgf}
+\usepackage{bcproof}
+
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+
+\newtheorem{Def}{Defination}[section]
+\newtheorem{mythm}{Theorem}[section]
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{Asm}{Assumption}
+
+\newcommand{\Code}[1]{\texttt{#1}}
+\newenvironment{Codes}
+  {\begin{alltt}\leftskip=1.5em} % \tiny
+  {\end{alltt}}
+
+\newenvironment{smallCodes}
+  {\begin{alltt}\leftskip=1.5em\small} %
+  {\end{alltt}}
+
+\newcommand{\OneStep}{{\rule{0pt}{1.2\baselineskip}{\ensuremath\longrightarrow}}}
+\newcommand{\DeStep}{{\rule{0pt}{1.2\baselineskip}{\ensuremath\dashrightarrow}}}
+
+\newcommand\m[1]{\mbox{\tt #1}}
+\newcommand\key[1]{\mbox{\rm \bf #1}}
+\newcommand\drule[2]{#1 ~\rightarrow_d~ #2}
+\newcommand\redc[2]{#1 ~\rightarrow_c~#2}
+\newcommand\rede[2]{#1 ~\rightarrow_e~#2}
+\newcommand\redm[2]{#1 ~\rightarrow_m~#2}
+\newcommand\note[1]{\mbox{{\scriptsize #1}}}
+\newcommand\ignore[1]{}
+
+\def\coreId{\m{cId}}
+\def\surfId{\m{sId}}
+\def\headId{\m{hId}}
+
+\def\true{\#t}
+\def\false{\#f}
+
+\def\myend{\flushright{\qed}}
+
+% some macros for editing/commenting the paper
+
+\def\modify#1#2#3{{\small\underline{\sf{#1}}:} {\color{red}{\small #2}}
+{{\color{red}\mbox{$\Rightarrow$}}} {\color{blue}{#3}}}
+
+\newcommand{\hmodify}[2]{\modify{Hu}{#1}{#2}}
+\newcommand\mymargin[1]{\marginpar{{\flushleft\textsc\footnotesize {#1}}}}
+\newcommand\hmargin[1]{\mymargin{Hu:\;#1}}
+
+\newcommand{\hmodifyok}[2]{#2}
+
+\newcommand{\mycomment}[2]{{\small\color{magenta}\underline{\sf{#1}}:} {\color{magenta}{\small #2}}}
+\newcommand{\hcomment}[1]{\mycomment{Hu}{#1}}
+\newcommand{\todo}[1]{\mycomment{Todo}{#1}}
+
+\newcommand{\reduce}[1]{{\color{blue}{#1}}}
+\newcommand{\reducedversion}[1]{{\color{blue}{#1}}}
+
+\newcommand{\example}[3]{
+\begin{figure}[thb]
+\begin{center}
+#1
+\end{center}
+\caption{#2}
+\label{#3}
+\end{figure}
+}
+
+\makeatletter
+\newcommand{\xleftrightarrow}[2][]{\ext@arrow 3359\leftrightarrowfill@{#1}{#2}}
+\newcommand{\xdashrightarrow}[2][]{\ext@arrow 0359\rightarrowfill@@{#1}{#2}}
+\newcommand{\xdashleftarrow}[2][]{\ext@arrow 3095\leftarrowfill@@{#1}{#2}}
+\newcommand{\xdashleftrightarrow}[2][]{\ext@arrow 3359\leftrightarrowfill@@{#1}{#2}}
+\def\rightarrowfill@@{\arrowfill@@\relax\relbar\rightarrow}
+\def\leftarrowfill@@{\arrowfill@@\leftarrow\relbar\relax}
+\def\leftrightarrowfill@@{\arrowfill@@\leftarrow\relbar\rightarrow}
+\def\arrowfill@@#1#2#3#4{%
+  $\m@th\thickmuskip0mu\medmuskip\thickmuskip\thinmuskip\thickmuskip
+   \relax#4#1
+   \xleaders\hbox{$#4#2$}\hfill
+   #3$%
+}
+\makeatother
+
+\makeatletter
+\newcommand*{\dashdownarrow}{%
+  \mathrel{%
+    \mathpalette\dasharrow@vert{-90}%
+  }%
+}
+\newcommand*{\dashuparrow}{%
+  \mathrel{%
+    \mathpalette\dasharrow@vert{90}%
+  }%
+}
+\newcommand*{\dasharrow@vert}[2]{%
+  \sbox0{$#1\vcenter{}$}%
+  \sbox2{$#1\dashrightarrow\m@th$}%
+  \dimen@=1.2\dimexpr\ht2-\ht0\relax
+  % 1/2 width of the new symbol with side bearing
+  \sbox2{\raisebox{-\ht0}{\unhcopy2}}%
+  \ht2=\z@
+  \dp2=\z@
+  \vcenter{\hbox to 2\dimen@{\hfill\rotatebox{#2}{\box2}\hfill}}%
+}
+\makeatother
+
+\makeatletter
+\newcommand*\bigcdot{\mathpalette\bigcdot@{.5}}
+\newcommand*\bigcdot@[2]{\mathbin{\vcenter{\hbox{\scalebox{#2}{$\m@th#1\bullet$}}}}}
+\makeatother
+
+\begin{document}
+
+%% Title information
+\title%[Short Title]
+{Lifting Resugaring by Lazy Desugaring}
+%{A lightweight resugaring approach based on reduction semantics}
+%% [Short Title] is optional;
+                                        %% when present, will be used in
+                                        %% header instead of Full Title.
+%\titlenote{with title note}             %% \titlenote is optional;
+                                        %% can be repeated if necessary;
+                                        %% contents suppressed with 'anonymous'
+%\subtitle{Subtitle}                     %% \subtitle is optional
+%\subtitlenote{with subtitle note}       %% \subtitlenote is optional;
+                                        %% can be repeated if necessary;
+                                        %% contents suppressed with 'anonymous'
+
+
+%% Author information
+%% Contents and number of authors suppressed with 'anonymous'.
+%% Each author should be introduced by \author, followed by
+%% \authornote (optional), \orcid (optional), \affiliation, and
+%% \email.
+%% An author may have multiple affiliations and/or emails; repeat the
+%% appropriate command.
+%% Many elements are not rendered, but should be provided for metadata
+%% extraction tools.
+
+%% Author with single affiliation.
+\author{First1 Last1}
+\authornote{with author1 note}          %% \authornote is optional;
+                                        %% can be repeated if necessary
+\orcid{nnnn-nnnn-nnnn-nnnn}             %% \orcid is optional
+\affiliation{
+  \position{Position1}
+  \department{Department1}              %% \department is recommended
+  \institution{Institution1}            %% \institution is required
+  \streetaddress{Street1 Address1}
+  \city{City1}
+  \state{State1}
+  \postcode{Post-Code1}
+  \country{Country1}                    %% \country is recommended
+}
+\email{first1.last1@inst1.edu}          %% \email is recommended
+
+%% Author with two affiliations and emails.
+\author{First2 Last2}
+\authornote{with author2 note}          %% \authornote is optional;
+                                        %% can be repeated if necessary
+\orcid{nnnn-nnnn-nnnn-nnnn}             %% \orcid is optional
+\affiliation{
+  \position{Position2a}
+  \department{Department2a}             %% \department is recommended
+  \institution{Institution2a}           %% \institution is required
+  \streetaddress{Street2a Address2a}
+  \city{City2a}
+  \state{State2a}
+  \postcode{Post-Code2a}
+  \country{Country2a}                   %% \country is recommended
+}
+\email{first2.last2@inst2a.com}         %% \email is recommended
+\affiliation{
+  \position{Position2b}
+  \department{Department2b}             %% \department is recommended
+  \institution{Institution2b}           %% \institution is required
+  \streetaddress{Street3b Address2b}
+  \city{City2b}
+  \state{State2b}
+  \postcode{Post-Code2b}
+  \country{Country2b}                   %% \country is recommended
+}
+\email{first2.last2@inst2b.org}         %% \email is recommended
+
+
+%% Abstract
+%% Note: \begin{abstract}...\end{abstract} environment must come
+%% before \maketitle command
+\begin{abstract}
+
+
+Syntactic sugar, first coined by Peter J. Landin in 1964, has proved to be very useful for defining domain-specific languages and extending languages. Unfortunately, when syntactic sugar is eliminated by transformation, it obscures the relationship between the user’s source program and the transformed program. Resugaring is a powerful technique to resolve this problem, which automatically converts the evaluation sequences of desugared expression in the core language into representative sugar's syntax in the surface language. However, the traditional approach relies on reverse application of desugaring rules to desugared core expression whenever possible. When a desugaring rule is complex and a desugared expression is large, such reverse desugaring becomes very complex and costive.
+
+In this paper, we propose a novel approach to resugaring by lazy desugaring, where reverse application of desugaring rules is unnecessary. We recognize a sufficient and necessary condition for a syntactic sugar to be desugared, and propose a reduction strategy, based on the evaluator of the core languages and the desugaring rules, which can produce all necessary resugared expressions on the surface language. We have implemented a system based on this new approach. Compared to the traditional approach, the new approach is not only more efficient, but also more powerful in that it cannot only deal with all cases (such as hygienic and simple recursive sugars) published so far, but can do more allowing more flexible recursive sugars.
+
+\end{abstract}
+
+
+%% 2012 ACM Computing Classification System (CSS) concepts
+%% Generate at 'http://dl.acm.org/ccs/ccs.cfm'.
+\begin{CCSXML}
+<ccs2012>
+<concept>
+<concept_id>10011007.10011006.10011008</concept_id>
+<concept_desc>Software and its engineering~General programming languages</concept_desc>
+<concept_significance>500</concept_significance>
+</concept>
+<concept>
+<concept_id>10003456.10003457.10003521.10003525</concept_id>
+<concept_desc>Social and professional topics~History of programming languages</concept_desc>
+<concept_significance>300</concept_significance>
+</concept>
+</ccs2012>
+\end{CCSXML}
+
+\ccsdesc[500]{Software and its engineering~General programming languages}
+\ccsdesc[300]{Social and professional topics~History of programming languages}
+%% End of generated code
+
+
+%% Keywords
+%% comma separated list
+\keywords{Resugaring, Syntactic Sugar, Interpreter, Domain-Specific Language, Reduction Semantics}  %% \keywords are mandatory in final camera-ready submission
+
+
+%% \maketitle
+%% Note: \maketitle command must come after title commands, author
+%% commands, abstract environment, Computing Classification System
+%% environment and commands, and keywords command.
+\maketitle
+
+\input{introduction}
+\input{overview}
+\input{ziyiapproach}
+% \input{zhichaoapproach}
+\input{casestudy}
+\input{comparison}
+\input{relatedWork}
+\input{conclusion}
+
+%% Acknowledgments
+\begin{acks}                            %% acks environment is optional
+                                        %% contents suppressed with 'anonymous'
+  %% Commands \grantsponsor{<sponsorID>}{<name>}{<url>} and
+  %% \grantnum[<url>]{<sponsorID>}{<number>} should be used to
+  %% acknowledge financial support and will be used by metadata
+  %% extraction tools.
+  This material is based upon work supported by the
+  \grantsponsor{GS100000001}{National Science
+    Foundation}{http://dx.doi.org/10.13039/100000001} under Grant
+  No.~\grantnum{GS100000001}{nnnnnnn} and Grant
+  No.~\grantnum{GS100000001}{mmmmmmm}.  Any opinions, findings, and
+  conclusions or recommendations expressed in this material are those
+  of the author and do not necessarily reflect the views of the
+  National Science Foundation.
+\end{acks}
+
+
+%% Bibliography
+\bibliography{reference}
+
+
+%% Appendix
+% \appendix
+% \section{Appendix}
+
+% Text of appendix \ldots
+
+\end{document}

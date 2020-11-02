@@ -1,0 +1,142 @@
+%!TEX root = ./main.tex
+\section{Overview}
+\label{sec2}
+
+\todo{Maybe the most relative example is recursive sugar?}
+
+In this section, we give a brief overview of our approach, explaining its difference from the traditional approach and highlighting its new features. To be concrete, we will consider the following simple core language, defining boolean expressions based on \m{if} construct:
+\[
+\begin{array}{lllll}
+\m{Coreexp} &::=& \Code{(if~e~e~e)} &\note{// if construct}\\
+& |& \true  & \note{// true value}\\
+& |& \false & \note{// false value}
+\end{array}
+\]
+The semantics of the language is very simple, consisting of the following context rule defining the computation order:
+
+\[
+\begin{array}{lcl}
+C &:=& \Code{(if $[\bigcdot]$ e e)}\\
+&&hole\\
+\end{array}
+\]
+
+and two reduction rules (the letter c means core):
+\[
+\centering
+ \redc{(\m{if}~\true~e_1~e_2)}{e_1}  \qquad \redc{(\m{if}~\false~e_1~e_2)}{e_2} 
+\]
+Assume that our surface language is defined by two syntactic sugars defined by:
+%---\emph{and} sugar and \emph{or} sugar on the core language.
+\[
+\begin{array}{c}
+\drule{(\m{And}~e_1~e_2)}{(\m{if}~e_1~e_2~\false)}\\
+\drule{(\m{Or}~e_1~e_2)}{(\m{if}~e_1~\true~e_2)}
+\end{array}
+\]
+
+
+Now let us demonstrate how to execute \Code{(And (Or \true~\false) (And \false ~\true))}, and get the resugaring sequences as Figure \ref{fig:standard} by both the traditional approach and our new approach.
+
+\begin{figure}[t]
+\begin{center}
+\begin{minipage}{6cm}
+\begin{scriptsize}
+\begin{Codes}
+    (And (Or \true \false) (And \false \true))
+\OneStep{ (And \true (And \false \true))}
+\OneStep{ (And \false \true)}
+\OneStep{ #f}
+\end{Codes}
+\end{scriptsize}
+\end{minipage}
+\end{center}
+\caption{A Typical Resugaring Example}
+\label{fig:standard}
+\end{figure}
+
+
+To solve the problem in the traditional approach, we propose a new resugaring approach by eliminating "reverse desugaring" via "lazy desugaring", where a syntactic sugar will be desugared only when it is necessary. While giving the evaluation rules of the core language, we can figure the following context rules of the surface language.
+
+\[
+\begin{array}{lcl}
+C &:=& (\m{And}~[\bullet]~e)\\
+&|& (\m{Or}~[\bullet]~e)\\
+&|&hole\\
+\end{array}
+\]
+
+Then we can just mix the surface language and the core language as follows.
+
+\begin{figure}[t]
+\centering
+\subcaptionbox{Syntax \label{fig:mixexample}}[\linewidth]{
+\begin{flushleft}
+\[
+\begin{array}{lll}
+\m{Mixedexp} &::=& \m{Coreexp}\\
+&|&\m{Surfexp}\\
+&|&\m{Commonexp}\\
+\m{Coreexp} &::=& \Code{(if~e~e~e)}\\
+\m{Surfexp} &::=& \Code{(And~e~e)}\\
+&|&\Code{(Or~e~e)}\\
+\m{Commonexp} &::=& \true\\
+&|& \false\\
+\end{array}
+\]
+\end{flushleft}
+
+}
+\subcaptionbox{Context \label{fig:mixexample}}[\linewidth]{
+\begin{flushleft}
+\[
+\begin{array}{lcl}
+C &:=& (\m{if}~[\bigcdot]~e~e)\\
+&|& (\m{And}~[\bigcdot]~e)\\
+&|& (\m{Or}~[\bigcdot]~e)\\
+&|&hole\\
+\end{array}
+\]
+\end{flushleft}
+
+}
+
+\subcaptionbox{Reduction \label{fig:mixexample}}[\linewidth]{
+\begin{flushleft}
+\[
+\begin{array}{c}
+\redm{(\m{And}~e_1~e_2)}{(\m{if}~e_1~e_2~\false)}\\
+\redm{(\m{Or}~e_1~e_2)}{(\m{if}~e_1~\true~e_2)}\\
+\redm{(\m{if}~\true~e_1~e_2)}{e_1}\\
+\redm{(\m{if}~\false~e_1~e_2)}{e_2} 
+\end{array}
+\]
+\end{flushleft}
+
+}
+
+\caption{Mixed Language Example}
+\label{fig:mixexample}
+\end{figure}
+
+Finally the program \Code{(And (Or \true~\false) (And \false~\true))} will got the evaluation sequence in Fig \ref{fig:mixexec} in the mixed language. We can just filter the intermediate sequences without \m{Coreexp} in any sub-expressions to get the resugaring sequence as Fig \ref{fig:standard}.
+
+\begin{figure}[t]
+\begin{center}
+\begin{minipage}{6cm}
+\begin{scriptsize}
+\begin{Codes}
+    (And (Or \true \false) (And \false \true))
+\OneStep{ (And (if \true \true \false) (And \false \true))}
+\OneStep{ (And \true (And \false \true))}
+\OneStep{ (if \true (And \false \true) \false)}
+\OneStep{ (And \false \true)}
+\OneStep{ (if \false \true \false)}
+\OneStep{ \false}
+\end{Codes}
+\end{scriptsize}
+\end{minipage}
+\end{center}
+\caption{mix}
+\label{fig:mixexec}
+\end{figure}
