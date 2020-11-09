@@ -7,7 +7,7 @@ We have implemented our resugaring approach using PLT Redex \cite{SEwPR}, which 
 
 \begin{figure*}[t]
 \centering
-\subcaptionbox{Example of SKI\label{fig:SKI}}[.3\linewidth]{
+\subcaptionbox{Example of SKI\label{fig:SKI}}[.4\linewidth]{
 \begin{flushleft}
 {\scriptsize
 \begin{Codes}
@@ -22,7 +22,7 @@ We have implemented our resugaring approach using PLT Redex \cite{SEwPR}, which 
 }
 \end{flushleft}
 }
-\subcaptionbox{Example of \m{Hygienicadd}\label{fig:hygienicadd}}[.32\linewidth]{
+\subcaptionbox{Example of \m{Hygienicadd}\label{fig:hygienicadd}}[.5\linewidth]{
 \begin{flushleft}
 {\scriptsize
 \begin{Codes}
@@ -36,19 +36,19 @@ We have implemented our resugaring approach using PLT Redex \cite{SEwPR}, which 
 }
 \end{flushleft}
 }
-\subcaptionbox{Example of \m{Let}\label{fig:Let}}[.36\linewidth]{
-\begin{flushleft}
-{\scriptsize
-\begin{Codes}
-\qquad    (Let x 1 (+ x (Let x 2 (+ x 1))))\\
-\OneStep{ (Let x 1 (+ x (+ 2 1)))}\\
-\OneStep{ (Let x 1 (+ x 3))}\\
-\OneStep{ (+ 1 3)}\\
-\OneStep{ 4}\\
-\end{Codes}
-}
-\end{flushleft}
-}
+% \subcaptionbox{Example of \m{Let}\label{fig:Let}}[.36\linewidth]{
+% \begin{flushleft}
+% {\scriptsize
+% \begin{Codes}
+% \qquad    (Let x 1 (+ x (Let x 2 (+ x 1))))\\
+% \OneStep{ (Let x 1 (+ x (+ 2 1)))}\\
+% \OneStep{ (Let x 1 (+ x 3))}\\
+% \OneStep{ (+ 1 3)}\\
+% \OneStep{ 4}\\
+% \end{Codes}
+% }
+% \end{flushleft}
+% }
 
 %newline
 \subcaptionbox{Example of \m{Odd} and \m{Even}\label{fig:oddeven}}[.3\linewidth]{
@@ -69,10 +69,10 @@ We have implemented our resugaring approach using PLT Redex \cite{SEwPR}, which 
 \begin{flushleft}
 {\scriptsize
 \begin{Codes}
-    \qquad(Map (lambda (x) (+ x 1)) (cons 1 (list 2)))\\
-\OneStep{ (Map (lambda (x) (+ x 1)) (list 1 2))}\\
-\OneStep{ (cons 2 (Map (lambda (x) (+ 1 x)) (list 2)))}\\
-\OneStep{ (cons 2 (cons 3 (Map (lambda (x) (+ 1 x)) (list))))}\\
+    \qquad(Map ($\lambda$ (x) (+ x 1)) (cons 1 (list 2)))\\
+\OneStep{ (Map ($\lambda$ (x) (+ x 1)) (list 1 2))}\\
+\OneStep{ (cons 2 (Map ($\lambda$ (x) (+ 1 x)) (list 2)))}\\
+\OneStep{ (cons 2 (cons 3 (Map ($\lambda$ (x) (+ 1 x)) (list))))}\\
 \OneStep{ (cons 2 (cons 3 (list)))}\\
 \OneStep{ (cons 2 (list 3))}\\
 \OneStep{ (list 2 3)}
@@ -84,11 +84,11 @@ We have implemented our resugaring approach using PLT Redex \cite{SEwPR}, which 
 \begin{flushleft}
 {\scriptsize
 \begin{Codes}
-    \qquad(Filter (lambda (x) (and (> x 1) (< x 4))) (list 1 2 3 4))\\
-\OneStep{ (Filter (lambda (x) (and (> x 1) (< x 4))) (list 2 3 4))}\\
-\OneStep{ (cons 2 (Filter (lambda (x) (and (> x 1) (< x 4))) (list 3 4)))}\\
-\OneStep{ (cons 2 (cons 3 (Filter (lambda (x) (and (> x 1) (< x 4))) (list 4))))}\\
-\OneStep{ (cons 2 (cons 3 (Filter (lambda (x) (and (> x 1) (< x 4))) (list))))}\\
+    \qquad(Filter ($\lambda$ (x) (and (> x 1) (< x 4))) (list 1 2 3 4))\\
+\OneStep{ (Filter ($\lambda$ (x) (and (> x 1) (< x 4))) (list 2 3 4))}\\
+\OneStep{ (cons 2 (Filter ($\lambda$ (x) (and (> x 1) (< x 4))) (list 3 4)))}\\
+\OneStep{ (cons 2 (cons 3 (Filter ($\lambda$ (x) (and (> x 1) (< x 4))) (list 4))))}\\
+\OneStep{ (cons 2 (cons 3 (Filter ($\lambda$ (x) (and (> x 1) (< x 4))) (list))))}\\
 \OneStep{ (cons 2 (cons 3 (list)))}\\
 \OneStep{ (cons 2 (list 3))}\\
 \OneStep{ (list 2 3)}
@@ -106,12 +106,12 @@ We have implemented our resugaring approach using PLT Redex \cite{SEwPR}, which 
 \label{mark:simple}
 
 We construct some simple syntactic sugars and try it on our tool. Some sugars are inspired by the first work of resugaring \cite{resugaring}. The result shows that our approach can handle all sugar features of their first work.
-Take an SKI combinator syntactic sugar as an example. (We can regard \m{S} as an expression headed with S, without subexpression.)
+Take an SKI combinator syntactic sugar as an example. (We can regard \m{S} as an expression headed with S, without subexpression.) And for showing a concise result, we add the call-by-need lambda calculus in the core language for this example.
 \[
 \begin{array}{l}
-\drule{\m{S}}{\Code{(lambdaN (x1 x2 x3) (x1 x2 (x1 x3)))}}\\
-\drule{\m{K}}{\Code{(lambdaN (x1 x2) x1)}}\\
-\drule{\m{I}}{\Code{(lambdaN (x) x)}}
+\drule{\m{S}}{\Code{($\lambda_N$ (x1 x2 x3) (x1 x2 (x1 x3)))}}\\
+\drule{\m{K}}{\Code{($\lambda_N$ (x1 x2) x1)}}\\
+\drule{\m{I}}{\Code{($\lambda_N$ (x) x)}}
 \end{array}
 \]
 
@@ -148,17 +148,17 @@ Then for expressions headed with \m{or}, we won't need the one-step try to figur
 The second work \cite{hygienic} of traditional resugaring approach mainly processes hygienic sugar compared to first work. It uses a DAG to represent the expression. However, hygiene is not hard to be handled by our lazy desugaring strategy. Our algorithm can easily process hygienic sugar without a special data structure.
 A typical hygienic problem is as the following example.
 \[
-\drule{\Code{(Hygienicadd $e_1$ $e_2$)}}{\Code{(let x $e_1$ (+ x $e_2$))}}
+\drule{\Code{(Hygienicadd $e_1$ $e_2$)}}{\Code{(let (x $e_1$) (+ x $e_2$))}}
 \]
 % \begin{Codes}
 % 	(Hygienicadd e1 e2) \DeStep{ (let ((x e1)) (+ x e2))}
 % \end{Codes}
-For traditional resugaring approach, if we want to get sequences of \Code{(let x 2 (Hygienicadd 1 x))}, it will firstly desugar to \Code{(let x 2 (let x 1 (+ x x)))}, which is awful because the two $x$ in \Code{(+ x x)} should be bound to different values. So the traditional hygienic resugaring approach uses abstract syntax DAG to distinct different \m{x} in the desugared expression. But for our approach based on lazy desugaring, the \m{Hygienicadd} sugar does not have to desugar until necessary, thus, getting resugaring sequences as Figure \ref{fig:hygienicadd} based on a non-hygienic rewriting system.
+For traditional resugaring approach, if we want to get sequences of \Code{(let (x 2) (Hygienicadd 1 x))}, it will firstly desugar to \Code{(let (x 2) (let x 1 (+ x x)))}, which is awful because the two $x$ in \Code{(+ x x)} should be bound to different values. So the traditional hygienic resugaring approach uses abstract syntax DAG to distinct different \m{x} in the desugared expression. But for our approach based on lazy desugaring, the \m{Hygienicadd} sugar does not have to desugar until necessary, thus, getting resugaring sequences as Figure \ref{fig:hygienicadd} based on a non-hygienic rewriting system.
 
 
-The lazy desugaring is also convenient for achieving hygiene for non-hygienic rewriting. For example, \Code{(let x 1 (+ x (let x 2 (+ x 1))))} may be reduced to \Code{(+ 1 (let 1 2 (+ 1 1)))} by a simple core language whose \Code{let} expression does not handle cases like that. But by writing a sugar (not syntactic sugar in the usual sense, because we do not want it to behave as \m{let}) \m{Let}
-\[\drule{\Code{(Let~$e_1$~$e_2$~$e_3$)}}{\Code{(let~$e_1$~$e_2$~$e_3$)}}\]
-and making the following modifies in the reduction of mixed language: rejecting the one-step try (i.e., delaying the expansion of the sugar, another form of lazy desugaring) if an error occurs, then recursively applying $\redm{}{}$ on the subexpression where the error takes place. In this example, it is to delay the expansion of outermost \m{Let} and apply $\redm{}{}$ on \Code{(+ x (Let x 2 (+ x 1)))}. We will get the resugaring sequences as Figure \ref{fig:Let} in our tool. It is not resugaring in the usual sense for violating the emulation property, but can be useful for implementing lightweight hygiene.
+% The lazy desugaring is also convenient for achieving hygiene for non-hygienic core language. For example, \Code{(let x 1 (+ x (let x 2 (+ x 1))))} may be reduced to \Code{(+ 1 (let 1 2 (+ 1 1)))} by a simple core language whose \Code{let} expression does not handle cases like that. But by writing a sugar (not syntactic sugar in the usual sense, because we do not want it to behave as \m{let}) \m{Let}
+% \[\drule{\Code{(Let~$e_1$~$e_2$~$e_3$)}}{\Code{(let~($e_1$~$e_2$)~$e_3$)}}\]
+% and making the following modifies in the reduction of mixed language: rejecting the one-step try (i.e., delaying the expansion of the sugar, another form of lazy desugaring) if an error occurs, then recursively applying $\redm{}{}$ on the subexpression where the error takes place. In this example, it is to delay the expansion of outermost \m{Let} and apply $\redm{}{}$ on \Code{(+ x (Let x 2 (+ x 1)))}. We will get the resugaring sequences as Figure \ref{fig:Let} in our tool. It is not resugaring in the usual sense for violating the emulation property, but can be useful for implementing lightweight hygiene.
 
 In practical application, we think hygiene can be easily processed by rewriting systems, so we finally use a rewriting system which can rename variables automatically.
 
@@ -211,7 +211,7 @@ Here, although the sugar can be processed by traditional resugaring approach, it
 Moreover, just like the \emph{Odd \emph{and} Even} sugar above, there are some simple rewriting systems which do not allow pattern-based rewriting. Or there are some sugars that need to be expressed by the expressions in core language as branching conditions. Take the example of another higher-order sugar \m{Map} as an example, and get resugaring sequences as Figure \ref{fig:Map}.
 \[
 \begin{array}{l}
-\drule{\Code{\small(Map $e_1$ $e_2$)}}{}\\
+\drule{\Code{\small(Map $e_1$ $e_2$)}}{}\todo{\m{format?}}\\
 \quad\Code{\small (let f $e_1$}\\
 \qquad\Code{\small(let x $e_2$}\\
 \qquad\quad

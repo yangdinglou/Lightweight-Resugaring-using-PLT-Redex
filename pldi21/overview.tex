@@ -2,12 +2,11 @@
 \section{Overview}
 \label{sec2}
 
-\todo{Maybe the most relative example is recursive sugar?}
 
 In this section, we give a brief overview of our approach, explaining its difference from the traditional approach and highlighting its new features. To be concrete, we will consider the following simple core language, defining boolean expressions based on \m{if} construct:
 \[
 \begin{array}{lllll}
-\m{Coreexp} &::=& \Code{(if~e~e~e)} &\note{// if construct}\\
+\m{Coreexp} &::=& \Code{(if~$e$~$e$~$e$)} &\note{// if construct}\\
 & |& \true  & \note{// true value}\\
 & |& \false & \note{// false value}
 \end{array}
@@ -16,11 +15,10 @@ The semantics of the language is very simple, consisting of the following contex
 
 \[
 \begin{array}{lcl}
-C &:=& \Code{(if $[\bigcdot]$ e e)}\\
+C &:=& \Code{(if $[\bigcdot]$ $e$ $e$)}\\
 &&hole\\
 \end{array}
 \]
-
 and two reduction rules (the letter c means core):
 \[
 \centering
@@ -41,14 +39,14 @@ Now let us demonstrate how to execute \Code{(And (Or \true~\false) (And \false ~
 \begin{figure}[t]
 \begin{center}
 \begin{minipage}{6cm}
-\begin{scriptsize}
+\begin{footnotesize}
 \begin{Codes}
     (And (Or \true \false) (And \false \true))
 \OneStep{ (And \true (And \false \true))}
 \OneStep{ (And \false \true)}
 \OneStep{ #f}
 \end{Codes}
-\end{scriptsize}
+\end{footnotesize}
 \end{minipage}
 \end{center}
 \caption{A Typical Resugaring Example}
@@ -60,8 +58,8 @@ To solve the problem in the traditional approach, we propose a new resugaring ap
 
 \[
 \begin{array}{lcl}
-C &:=& (\m{And}~[\bullet]~e)\\
-&|& (\m{Or}~[\bullet]~e)\\
+C &:=& (\m{And}~[\bigcdot]~e)\\
+&|& (\m{Or}~[\bigcdot]~e)\\
 &|&hole\\
 \end{array}
 \]
@@ -70,16 +68,16 @@ Then we can just mix the surface language and the core language as follows.
 
 \begin{figure}[t]
 \centering
-\subcaptionbox{Syntax \label{fig:mixexample}}[\linewidth]{
+\subcaptionbox{Syntax \label{fig:mixsyntax}}[\linewidth]{
 \begin{flushleft}
 \[
 \begin{array}{lll}
 \m{Mixedexp} &::=& \m{Coreexp}\\
 &|&\m{Surfexp}\\
 &|&\m{Commonexp}\\
-\m{Coreexp} &::=& \Code{(if~e~e~e)}\\
-\m{Surfexp} &::=& \Code{(And~e~e)}\\
-&|&\Code{(Or~e~e)}\\
+\m{Coreexp} &::=& \Code{(if~$e$~$e$~$e$)}\\
+\m{Surfexp} &::=& \Code{(And~$e$~$e$)}\\
+&|&\Code{(Or~$e$~$e$)}\\
 \m{Commonexp} &::=& \true\\
 &|& \false\\
 \end{array}
@@ -87,13 +85,13 @@ Then we can just mix the surface language and the core language as follows.
 \end{flushleft}
 
 }
-\subcaptionbox{Context \label{fig:mixexample}}[\linewidth]{
+\subcaptionbox{Context \label{fig:mixcontext}}[\linewidth]{
 \begin{flushleft}
 \[
 \begin{array}{lcl}
-C &:=& (\m{if}~[\bigcdot]~e~e)\\
-&|& (\m{And}~[\bigcdot]~e)\\
-&|& (\m{Or}~[\bigcdot]~e)\\
+C &:=& (\m{if}~[\bigcdot]~$e$~$e$)\\
+&|& (\m{And}~[\bigcdot]~$e$)\\
+&|& (\m{Or}~[\bigcdot]~$e$)\\
 &|&hole\\
 \end{array}
 \]
@@ -101,7 +99,7 @@ C &:=& (\m{if}~[\bigcdot]~e~e)\\
 
 }
 
-\subcaptionbox{Reduction \label{fig:mixexample}}[\linewidth]{
+\subcaptionbox{Reduction \label{fig:mixreduction}}[\linewidth]{
 \begin{flushleft}
 \[
 \begin{array}{c}

@@ -38,7 +38,7 @@ Resugaring is a powerful technique to resolve this problem \cite{resugaring,hygi
 	\Code{(Or \#f }& &\Code{(let ((t \#f)) }\\
 	\Code{\qquad (not \#f))}&\xleftarrow[resugar]&\Code{\qquad\hspace{0.5em}(if t t (not \#f)))}\\
 	\qquad\quad\dashdownarrow& &\qquad\qquad\downarrow\\
-	\text{no resugared program}& &\Code{(if \#f \#f \#t)}\\
+	\text{no resugaring}& &\Code{(if \#f \#f \#t)}\\
 	\qquad\quad\dashdownarrow& &\qquad\qquad\downarrow\\
 	\Code{\#t}& & \Code{\#t}\\
 \end{array}
@@ -59,7 +59,7 @@ But it is not as easy as the example above. Sometimes the program in the core la
 	\qquad\qquad\vdots& &\qquad\qquad\vdots\\
 	\qquad\qquad\dashdownarrow& &\qquad\qquad\downarrow\\
 	\Code{(Or \#t \#t)}& &\Code{(let ((t \#t))}\\
-	&\xleftarrow[resugar?]&\Code{\qquad\hspace{0.5em}(if t t \#t))}\\
+	&\xleftarrow[resugar?]&\Code{\quad(if t t \#t))}\\
 	\qquad\qquad\vdots& &\qquad\qquad\vdots\\
 \end{array}
 }
@@ -81,7 +81,7 @@ If we use simple binder renaming for solving the simple case, some other informa
 	\begin{array}{lcl}
 	Surface&&Core\\
 	\Code{(let (t 1)}&\xrightarrow{desugar}&\Code{(let (t 1)}\\
-	\Code{\qquad\hspace{0.5em}(Double t))}&\xdashleftarrow[resugar?]&\Code{\qquad\hspace{0.5em}(let (t' t) (* 2 t')))}\\
+	\Code{\quad(Double t))}&\xdashleftarrow[resugar?]&\Code{\quad(let (t' t) (* 2 t')))}\\
 \end{array}
 }
 \]
@@ -96,7 +96,7 @@ Also, as the debugging for host language can be a good application of resugaring
 % \todo{why existing resugaring has a problem, examples. good but complicate, novel without desugaring}
 
 \label{mark:mention}
-In this paper, we propose a novel approach to resugaring, which does not use reverse desugaring at all.
+In this paper, we propose a novel approach to compositional resugaring, which does not use reverse desugaring at all.
 The key idea is "lazy desugaring", in the sense that desugaring is delayed so that the reverse application of desugaring rules becomes unnecessary. Rather than assuming a black-box stepper for the core language, our resugaring approach is based on the evaluation rules (consist of the context rules and reduction rules) of the core language.
 To this end, we consider the surface language and the core language as one language. We regard the desugaring rules as the reduction rules of surface language and deriving the context rules of surface language to see how lazy the desugaring of sugar expressions can be. Then the intermediate evaluation steps of the mixed language will contain the resugaring evaluation sequences of a program.
 
