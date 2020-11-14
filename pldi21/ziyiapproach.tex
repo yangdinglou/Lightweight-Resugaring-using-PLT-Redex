@@ -35,7 +35,7 @@ As a preparation for our resugaring algorithm, we define a mixed language that c
 \subsubsection{Core Language}
 
 
-For our core language,  its evaluator is driven by evaluation rules (context rules and reduction rules), with three natural assumptions. First, the evaluation is deterministic, in the sense that any expression in the core language will be reduced by a unique reduction sequence (restricted by context rules). Second, evaluation of a sub-expression has no side-effect on other parts of the expression. Third, the context rules have no condition; a counterexample for this assumption is in Fig \ref{example:side}.
+For our core language,  its evaluator is driven by evaluation rules (context rules and reduction rules), with three natural assumptions. First, the evaluation is deterministic, in the sense that any expression in the core language will be reduced by a unique reduction sequence (restricted by context rules). Second, evaluation of a sub-expression has no side-effect on other parts of the expression. Third, the context rules have no condition\gcomment{conditions}; a counterexample for this assumption is in Fig \ref{example:side}.
 
 \example{
 \[
