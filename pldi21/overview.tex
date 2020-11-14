@@ -35,7 +35,7 @@ Assume that our surface language is defined by two syntactic sugars defined by:
 \]
 
 
-Now let us demonstrate how to execute \Code{(And (Or \true~\false) (And \false ~\true))}, and get the resugaring sequences as Figure \ref{fig:standard} by both the existing approach and our new approach.
+Now let us demonstrate how to execute \Code{(And (Or \true~\false) (And \false ~\true))}, and get the resugaring sequences as Figure \ref{fig:standard} by our approach.
 
 \begin{figure}[thb]
 \begin{center}
@@ -55,7 +55,7 @@ Now let us demonstrate how to execute \Code{(And (Or \true~\false) (And \false ~
 \end{figure}
 
 
-To solve the problem in the traditional approach, we propose a new resugaring approach by eliminating "reverse desugaring" via "lazy desugaring", where a syntactic sugar will be desugared only when it is necessary. While giving the evaluation rules of the core language, we can figure the following context rules of the surface language.
+We propose a new resugaring approach by eliminating "reverse desugaring" via "lazy desugaring", where a syntactic sugar will be desugared only when it is necessary. While giving the evaluation rules of the core language, we can figure the following context rules of the surface language.
 
 \[
 \begin{array}{lcl}
@@ -122,7 +122,6 @@ Finally the program \Code{(And (Or \true~\false) (And \false~\true))} will got t
 
 \begin{figure}[thb]
 \begin{center}
-\begin{minipage}{6cm}
 \begin{scriptsize}
 \begin{Codes}
     (And (Or \true \false) (And \false \true))
@@ -134,7 +133,6 @@ Finally the program \Code{(And (Or \true~\false) (And \false~\true))} will got t
 \OneStep{ \false}
 \end{Codes}
 \end{scriptsize}
-\end{minipage}
 \end{center}
 \caption{Example of Mixed Language's Reduction}
 \label{fig:mixexec}

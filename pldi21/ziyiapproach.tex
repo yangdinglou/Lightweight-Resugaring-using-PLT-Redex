@@ -125,16 +125,15 @@ Here we just assume a simple rewriting for a syntactic sugar expression. We will
 \[
 \drule{(\m{SurfHead}~e_1~e_2~\ldots~e_n)}{\m{exp}}
 \]
-where its left-hand-side (LHS) is a unnested pattern and its RHS is an expression of the surface language or the core language, and any pattern variable (e.g., $e_1$) in LHS only appears once in RHS. For instance, we may define syntactic sugar \m{And} by
+where its left-hand-side (LHS) is a pattern and its left-hand-side (RHS) is an expression of the surface language or the core language.The LHS can be nested or not, that means, we can write sugar like \Code{(SurfHead ($e_1$ ($e_2$ $e_3$)) $\ldots$ $e_n$)}. And any pattern variable (e.g., $e_1$) in LHS only appears once in RHS. For instance, we may define syntactic sugar \m{And} by
 \[
 \drule{(\m{And}~e_1~e_2)}{(\m{if}~e_1~e_2~\false)}.
 \]
-Note that if the pattern is nested, we can introduce a new syntactic sugar to flatten it. And if we need to use a pattern variable multiple times in RHS, a \m{let} binding may be used (a normal way in syntactic sugar). We take the following sugar as an example
+And if we need to use a pattern variable multiple times in RHS, a \m{let} binding may be used (a normal way in syntactic sugar). We take the following sugar as an example
 \[
 \drule{(\m{Twice}~e_1)}{(+~e_1~e_1)}.
 \]
 If we execute \Code{(Twice (+ 1 1))}, it will firstly be desugared to \Code{(+ (+ 1 1) (+ 1 1))}, then reduced to \Code{(+ 2 (+ 1 1))} by one step. The subexpression \Code{(+ 1 1)} has been reduced but should not be resugared to the surface, because the other \Code{(+ 1 1)} has not been reduced yet.
-%This would let many intermediate steps omitted, if there are many reduction steps between reduction of them.
 So we just use a \m{let} binding to resolve this problem. The RHS should be \Code{(let x $e_1$ (+ x x))} in this case.
 
 
@@ -360,3 +359,5 @@ If there is any sugar in \m{C}, then it is to prove the program \m{fulldesugar(C
 \begin{proof}[Proof of Theorem \ref{thm2}]
 According to the lemma, any sugar has the correct context rules. So the hole is also correct for the mixed language.
 \end{proof}
+
+\subsection{Combining with Other Rewriting}
