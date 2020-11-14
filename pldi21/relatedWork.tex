@@ -22,7 +22,7 @@ For hygienic resugaring, compared with the approach of using DAG to solve the va
 
 Our work is related to the \emph{Galois slicing for imperative functional programs} \cite{slicing}, a work for dynamic analyzing functional programs during execution. The forward component of the Galois connection maps a partial input $x$ to the greatest partial output $y$ that can be computed from $x$; the backward component of the Galois connection maps a partial output $y$ to the least partial input $x$ from which we can compute $y$.
 %Our approach used a similar idea on slicing expressions and processing on subexpressions.
-This can also be considered as a bidirectional transformation \cite{bx,lens07} and the round-tripping between desugaring and resugaring in traditional approach. In contrast to these work, our resugaring approach is basically unidirectional, with a local bidirectional step
+This can also be considered as a bidirectional transformation \cite{bx,lens07} and the round-tripping between desugaring and resugaring in existing approach. In contrast to these work, our resugaring approach is basically unidirectional, with a local bidirectional step
 for a one-step try in our lazy desugaring. It should be noted that Galois slicing may be useful to handle side effects in resugaring in the future (for example, slicing the part where side effects appear).
 
 

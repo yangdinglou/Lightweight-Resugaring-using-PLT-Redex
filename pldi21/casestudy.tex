@@ -6,7 +6,7 @@ In this section, we present several examples to show different aspects of our ap
 
 \subsection{Case Study on Expressiveness}
 
-We have implemented our resugaring approach using PLT Redex \cite{SEwPR}, which is a semantic engineering tool based on reduction semantics \cite{reduction}. We show several case studies to demonstrate the power of our approach. Some examples we will discuss in this section are in Figure \ref{fig:resugaring}. Note that we set call-by-value lambda calculus as terms in \m{CommonExp}, because we want to output some intermediate expressions including lambda expressions in some examples. It's easy if we want to skip them.
+We have implemented our resugaring approach using PLT Redex \cite{SEwPR}, which is a semantic engineering tool based on reduction semantics \cite{reduction}. We show several case studies to demonstrate the power of our approach. Some examples we will discuss in this section are in Fig.  \ref{fig:resugaring}. Note that we set call-by-value lambda calculus as terms in \m{CommonExp}, because we want to output some intermediate expressions including lambda expressions in some examples. It's easy if we want to skip them.
 
 \begin{figure*}[t]
 \centering
@@ -109,7 +109,7 @@ Take an SKI combinator syntactic sugar as an example. We can regard \m{S} as an 
 
 
 
-Although SKI combinator calculus is a reduced version of lambda calculus, we can construct combinators' sugar based on call-by-need lambda calculus in our core language. For the sugar expression \Code{(S (K (S I)) K xx yy)}, we get the resugaring sequences as Figure \ref{fig:SKI}. Here the sugars contains no sub-expression, then the sugar should just desugar to the core expression. It is interesting that the sugar without sub-expressions (written by lambda calculus) and the sugar with sub-expressions will behave different. For example, in this case we can write the sugar as \Code{(S e e e ...)} and so on, then the sugar may not have to be desugared. Moreover, we can use this difference to force a syntactic sugar desugared by call-by-need lambda calculus. See if we want a sugar \m{ForceAnd} which does not
+Although SKI combinator calculus is a reduced version of lambda calculus, we can construct combinators' sugar based on call-by-need lambda calculus in our core language. For the sugar expression \Code{(S (K (S I)) K xx yy)}, we get the resugaring sequences as Fig.  \ref{fig:SKI}. Here the sugars contains no sub-expression, then the sugar should just desugar to the core expression. It is interesting that the sugar without sub-expressions (written by lambda calculus) and the sugar with sub-expressions will behave different. For example, in this case we can write the sugar as \Code{(S e e e ...)} and so on, then the sugar may not have to be desugared. Moreover, we can use this difference to force a syntactic sugar desugared by call-by-need lambda calculus. See if we want a sugar \m{ForceAnd} which does not
 want to use the context rules of \m{if} to getting the resugaring sequence, we can just write the following sugar.
 
 \[
@@ -146,7 +146,7 @@ A typical hygienic problem is as the following example.
 % \begin{Codes}
 % 	(Hygienicadd e1 e2) \DeStep{ (let ((x e1)) (+ x e2))}
 % \end{Codes}
-For existing resugaring approach, if we want to get sequences of \Code{(let (x 2) (Hygienicadd 1 x))}, it will firstly desugar to \Code{(let (x 2) (let x 1 (+ x x)))}, which is awful because the two $x$ in \Code{(+ x x)} should be bound to different values. So the existing hygienic resugaring approach uses abstract syntax DAG to distinct different \m{x} in the desugared expression. But for our approach based on lazy desugaring, the \m{Hygienicadd} sugar does not have to desugar until necessary, thus, getting resugaring sequences as Figure \ref{fig:hygienicadd} based on a non-hygienic rewriting system.
+For existing resugaring approach, if we want to get sequences of \Code{(let (x 2) (Hygienicadd 1 x))}, it will firstly desugar to \Code{(let (x 2) (let x 1 (+ x x)))}, which is awful because the two $x$ in \Code{(+ x x)} should be bound to different values. So the existing hygienic resugaring approach uses abstract syntax DAG to distinct different \m{x} in the desugared expression. But for our approach based on lazy desugaring, the \m{Hygienicadd} sugar does not have to desugar until necessary, thus, getting resugaring sequences as Fig.  \ref{fig:hygienicadd} based on a non-hygienic rewriting system.
 
 
 % The lazy desugaring is also convenient for achieving hygiene for non-hygienic core language. For example, \Code{(let x 1 (+ x (let x 2 (+ x 1))))} may be reduced to \Code{(+ 1 (let 1 2 (+ 1 1)))} by a simple core language whose \Code{let} expression does not handle cases like that. But by writing a sugar (not syntactic sugar in the usual sense, because we do not want it to behave as \m{let}) \m{Let}
@@ -168,7 +168,7 @@ Recursive sugar is a kind of syntactic sugars where call itself or each other du
 are recursive sugars. The existing resugaring approach can't process syntactic sugar written like this (non-pattern-based) easily, because boundary conditions are in the sugar itself.
 
 Take \Code{(Odd 2)} as an example. The previous work will firstly desugar the expression using the rewriting system. Then the rewriting system will never terminate as following shows.
-\begin{scriptsize}
+\begin{footnotesize}
 \begin{Codes}
    (Odd 2)
 \DeStep{ (let ((x 2)) (if (> x 0) (Even (- x 1)) \#f))}
@@ -177,11 +177,11 @@ Take \Code{(Odd 2)} as an example. The previous work will firstly desugar the ex
 \qquad\quad\#f))
 \DeStep{ ...}
 \end{Codes}
-\end{scriptsize}
+\end{footnotesize}
 
 
 
-Then the advantage of our approach is embodied. Our lightweight approach does not require a whole expanding of sugar expression, which gives the framework chances to judge boundary conditions in sugars themselves, and showing more intermediate sequences. We get the resugaring sequences as Figure \ref{fig:oddeven} of the former example using our tool.
+Then the advantage of our approach is embodied. Our lightweight approach does not require a whole expanding of sugar expression, which gives the framework chances to judge boundary conditions in sugars themselves, and showing more intermediate sequences. We get the resugaring sequences as Fig.  \ref{fig:oddeven} of the former example using our tool.
 
 
 
@@ -197,10 +197,10 @@ We also construct some higher-order syntactic sugars and test them. The higher-o
 \\
 \drule{\Code{\small(Filter $e$ (list))}}{\Code{\small(list)}}
 \end{array}\]
-and getting resugaring sequences as Figure \ref{fig:Filter}.
+and getting resugaring sequences as Fig.  \ref{fig:Filter}.
 Here, although the sugar can be processed by existing resugaring approach, it will be redundant. The reason is that, a Filter for a list of length $n$ will match to find possible resugaring $n*(n-1)/2$ times. Thus, lazy desugaring is really important to reduce the resugaring complexity of recursive sugar.
 
-Moreover, just like the \emph{Odd \emph{and} Even} sugar above, there are some simple rewriting systems which do not allow pattern-based rewriting. Or there are some sugars that need to be expressed by the expressions in core language as branching conditions. Take the example of another higher-order sugar \m{Map} as an example, and get resugaring sequences as Figure \ref{fig:Map}.
+Moreover, just like the \m{Odd} and \m{Even} sugar above, there are some simple rewriting systems which do not allow pattern-based rewriting. Or there are some sugars that need to be expressed by the expressions in core language as branching conditions. Take the example of another higher-order sugar \m{Map} as an example, and get resugaring sequences as Fig.  \ref{fig:Map}.
 \[
 \begin{array}{l}
 \drule{\Code{\small(Map $e_1$ $e_2$)}}{}\todo{\m{format?}}\\
@@ -222,10 +222,10 @@ Note that the \m{let} expression is to limit the subexpression only appears once
 
 \subsubsection{Limitation on Presentation}
 One may note that the context rules of our sugar setting limit the presentation of syntactic sugar. For example, it is difficult to present a sugar with ellipsis, because the form of its context rule may vary. It is still possible if we add some 
-restriction (so that the algorithm \ref{alg:f} will work), or we can just make it using the list operation just as what the sugar \m{Map, Filter} work. Overall, the presentation of our sugar system is not so flexible, but it won't affect the expressiveness. \todo{Autmaton}
+restriction (so that the algorithm \ref{alg:f} will work), or we can just make it using the list operation just as what the sugar \m{Map, Filter} work. Overall, the presentation of our sugar system is not so flexible, but it won't affect the expressiveness. \todo{Automaton}
 
 \subsection{Efficiency}
-To show the efficiency of our approach, we try some programs from simple to hard. We use the reduction steps comparing to the existing approach as the metrics. The following figure shows the difference of the two approach. Notice that both approaches have pre-processions---for the existing one, it is to desugar the programs to the core language together with some tags; for ours, it is to calculate the context rules of syntactic sugars. We do not consider the steps during these pre-processes. Besides, we derive the reduction steps of existing approach into three different kinds---the reductions in core language, the reverse expansion with failed resugaring, the reverse expansion with successful resugaring.
+To show the efficiency of our approach, we try some programs from simple to hard. We use the reduction steps comparing to the existing approach as the metrics. The following Fig. \ref{fig:step} shows the difference of the two approach. Notice that both approaches have pre-processions---for the existing one, it is to desugar the programs to the core language together with some tags; for ours, it is to calculate the context rules of syntactic sugars. We do not consider the steps during these pre-processes. Besides, we derive the reduction steps of existing approach into three different kinds---the reductions in core language, the reverse expansion with failed resugaring, the reverse expansion with successful resugaring.
 
 \begin{figure}[thb]
   \begin{center}\small
@@ -242,4 +242,4 @@ To show the efficiency of our approach, we try some programs from simple to hard
   \caption{Comparison on Reduction Steps}
   \label{fig:step}
   \end{figure}
-Our result is in Fig. \ref{fig:step}. The general regularity is that, the more complex the sugar is, the more steps will our approach save. Note that if the RHS of a syntactic sugar is huge, one step reduction of the reverse desugaring will also be more complex.
+The general regularity is that, the more complex the sugar is, the more steps will our approach save. Note that if the RHS of a syntactic sugar is huge, one step reduction of the reverse desugaring will also be more complex.
