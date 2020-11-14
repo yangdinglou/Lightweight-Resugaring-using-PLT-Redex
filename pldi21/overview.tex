@@ -7,7 +7,7 @@
 In this section, we give a brief overview of our approach, explaining its difference from the existing  approach and highlighting its new features. To be concrete, we will consider the following simple core language, defining boolean expressions based on \m{if} construct:
 \[
 \begin{array}{lllll}
-\m{Coreexp} &::=& \Code{(if~$e$~$e$~$e$)} &\note{// if construct}\\
+\m{Coreexp}\gcomment{\m{CoreExp}} &::=& \Code{(if~$e$~$e$~$e$)} &\note{// if construct}\\
 & |& \true  & \note{// true value}\\
 & |& \false & \note{// false value}
 \end{array}
@@ -73,13 +73,13 @@ Then we can just mix the surface language and the core language as Fig. \ref{fig
 \begin{flushleft}
 \[
 \begin{array}{lll}
-\m{Mixedexp} &::=& \m{Coreexp}\\
-&|&\m{Surfexp}\\
-&|&\m{Commonexp}\\
-\m{Coreexp} &::=& \Code{(if~$e$~$e$~$e$)}\\
-\m{Surfexp} &::=& \Code{(And~$e$~$e$)}\\
+\m{Mixedexp}\gcomment{\m{MixedExp}} &::=& \m{Coreexp}\gcomment{\m{CoreExp}} \\
+&|&\m{Surfexp}\gcomment{\m{SurfExp}}\\
+&|&\m{Commonexp}\gcomment{\m{CommonExp}}\\
+\m{Coreexp}\gcomment{\m{CoreExp}} &::=& \Code{(if~$e$~$e$~$e$)}\\
+\m{Surfexp}\gcomment{\m{SurfExp}} &::=& \Code{(And~$e$~$e$)}\\
 &|&\Code{(Or~$e$~$e$)}\\
-\m{Commonexp} &::=& \true\\
+\m{Commonexp}\gcomment{\m{CommonExp}} &::=& \true\\
 &|& \false\\
 \end{array}
 \]
