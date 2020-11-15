@@ -277,7 +277,7 @@ Or if the \m{Head} is a \m{SurfHead} with its context rules calculated, then we 
 \drule{(\m{Even}~e)}{(\m{Odd}~(-~e~1))}
 \]
 
-After calculating all context rules, we can add them to the mixed language's context rule; we can also add the desugaring rules to the mixed language's reduction rule as what we showed in Sec \ref{sec2}.
+After calculating all context rules, we can add them to the mixed language's context rule; we can also add the desugaring rules to the mixed language's reduction rule as what we showed in Section \ref{sec2}.
 
 %\todo{Add explanantion of the above rule.}
 
@@ -360,4 +360,18 @@ If there is any sugar in \m{C}, then it is to prove the program \m{fulldesugar(C
 According to the lemma, any sugar has the correct context rules. So the hole is also correct for the mixed language.
 \end{proof}
 
-\subsection{Combining with Other Rewriting\todo{}}
+\subsection{Combining with Other Rewriting}
+
+We describe a resugaring approach based on a simple rewriting. What if we need a more complex rewriting system to describe more complex semantics for syntactic sugar? For example, we may need a type system for checking; we may specify the binding of syntactic sugar for a more general hygiene (We solved the hygiene in our core language without specific the binding, as described in Section \ref{mark:hygiene}); we may use some other functions to help the desugaring. All of these extensions are possible as long as following some conditions. We summarize the conditions as follows.
+\begin{enumerate}
+	\item \emph{Compositional}: Generally speaking, the desugaring order and should not effect the semantics of a sugar expression. Otherwise, the lazy desugaring will not be correct.
+	\item \emph{Unique evaluation order}: For any rules of syntactic sugar, the context rules should limit a expression to have only one computational order. Otherwise the algorithm calcontext will not be deterministic.
+	\item \emph{Clear Semantic}: If a syntactic sugar's desugaring rule is ambiguous or wrong, the calcontext algorithm may go wrong.
+\end{enumerate}
+
+We find a possible problem that if we want a desugar rule like follows,
+
+\[
+\drule{\Code{(Sugar $e_1$ $e_2$ $\ldots$ $e_n$)}}{\Code{(if (Helper $e_1$ $e_2$) $\ldots$)}}
+\]
+where \m{Helper} is a external function, that means we don't have the evaluation rules of \m{Helper}. In this case, we can force the expansion of sugar expressions headed by \m{Sugar}. We describe how to force the expansion in Section \ref{mark:simple}.

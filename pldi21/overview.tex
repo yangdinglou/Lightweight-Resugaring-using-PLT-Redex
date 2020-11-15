@@ -137,3 +137,5 @@ Finally the program \Code{(And (Or \true~\false) (And \false~\true))} will got t
 \caption{Example of Mixed Language's Reduction}
 \label{fig:mixexec}
 \end{figure}
+
+Note that the context rules should restrict the computation order of a sugar expression's sub-term, we should let the context rule be correct---reflecting what should be executed in the desugared expression. Also, as the goal of resugaring is to present evaluation of sugar expressions, we clearly defined which expression should be outputted. For the example in this section, of course the sugar \m{And} and \m{Or} should be outputted, and also the boolean expressions should be. So by clearly separate what \m{DisplayableExp} (defined in next section) is, we can alway get the resugaring evaluation sequences we need. (Slightly different from the existing approach's setting, as we will discuss in Section \ref{mark:correct}.)

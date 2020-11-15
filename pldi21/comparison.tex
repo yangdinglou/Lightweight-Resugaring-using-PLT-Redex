@@ -6,7 +6,7 @@
 \label{sec5.1}
 
 
-As we mentioned in the introduction (Sec \ref{mark:mention}), our approach has a more specific assumption compared to the existing approach. Here is a small gap between the motivation of existing approach and ours---existing approach focused mainly on a tool for existing language, while our approach considered more on a basic feature for language implementation. The examples in Sec \ref{sec:recursiveSugar} have shown how the lazy desugaring solve some problems in practice.
+As we mentioned in the introduction (Section \ref{mark:mention}), our approach has a more specific assumption compared to the existing approach. Here is a small gap between the motivation of existing approach and ours---existing approach focused mainly on a tool for existing language, while our approach considered more on a basic feature for language implementation. The examples in Section \ref{sec:recursiveSugar} have shown how the lazy desugaring solve some problems in practice.
 
 In addition, as what we need for the lazy desugaring is just the computation order of the syntactic sugar, we can make a extension for the resugaring algorithm to see how it is able to work with only a black-box core language stepper. The most important difference between black-box stepper and the evaluation rules is the computation order---while the same language will behave uniquely, the evaluation rules can show the computation order statically (without running the program). So when meeting the black-box stepper for the core language, we can just use some simple program to "get" the computation order of the core language as the  example in Fig. \ref{example:order} shows: we simply let the sub-expressions of a \m{Head} be some reducible expressions and test the computation order.
 
@@ -90,7 +90,9 @@ Then for any sugar expression, we can process them dynamically by "one-step try"
 
 
 \subsection{Correctness and Trade-off}
-The existing resugaring approach proposed three properties to define the correctness. Here we will show what are the similarities and differences between theirs and our properties.
+\label{mark:correctness}
+
+The existing resugaring approach proposed following three properties to define the correctness.
 
 \begin{quote}
 Emulation: 
@@ -99,6 +101,7 @@ Abstraction:
 Code introduced by desugaring is never revealed in the surface evaluation sequence, and code originating from the original input program is never hidden by resugaring.\\
 Coverage: Resugaring is attempted on every core step, and as few core steps are skipped as possible.\\
 \end{quote}
+Here we will show what are the similarities and differences between theirs and our properties.
 
 \emph{Emulation}: The properties in Section \ref{sec3} is just the same as the emulation property. We should admit that this property is the most basic one.
 
@@ -143,14 +146,15 @@ while ours will produce the following sequences.
 \end{footnotesize}
 
 
-In summary, our approach choose a slightly different way for the \emph{abstraction} for better \emph{coverage} in the real application, which the authors of existing approach also mentioned (but by different processing).
+In summary, our approach choose a slightly different way for the \emph{abstraction} for better \emph{coverage} in the real application, which the authors of existing approach also mentioned (but by different processing). \todo{specify the displayable}
 
 
 \subsection{Hygiene}
+\label{mark:hygiene}
 
 As an important property for sugar or macro system, the existing approach use a data structure (ASD) to handle hygiene in resugaring, while in our approach the hygiene can be handled easily. Previous research\cite{EssenceofHygiene} has discussed why some simple processing such as renaming is insufficient in some cases. But in our system, the hygiene problem is solved easily. 
 
-In our approach, the sugar can contain some bindings, written by the core language's \m{let}. The hygiene problem only happens when binders of a expanded sugar conflict with other binders. We file them into two categories
+In our approach, the sugar can contain some bindings, written by the core language's \m{let}. The hygiene problem only happens when binders of a expanded sugar conflict with other binders. We file them into two categories---
 \begin{itemize}
 \item A sugar in binding's context.
 \item A sugar's subexpression containing bindings.

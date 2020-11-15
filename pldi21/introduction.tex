@@ -12,7 +12,7 @@
 %What are the three main technical contributions of this paper?
 
 %The rest of the paper is organized as follows. ...
-\gcomment{(1) Fig 1 should be changed to Fig. 1 or Figure 1. I am not sure whether it shoule be capital. The paper Inferring Type Rules uses format like fig. 1 and section 1. (2) Don't forget to adjust the upper/lower case of syntactic sugar. Also, \m{nNotif} or \m{nNotIf}, and \m{hHygienicadd} or \m{hHygienicAdd}, I prefer the second ones.}
+
 
 
 Syntactic sugar, first coined by Peter J. Landin in 1964 \cite{syntacticsugar}, was introduced to describe the surface syntax of a simple ALGOL-like programming language which was defined semantically in terms of the applicative expressions of the core lambda calculus. It has been proved to be very useful for defining domain-specific languages (DSLs) and extending languages \cite{FellFFKBMT18,CulpFFK19}.
@@ -20,7 +20,7 @@ Unfortunately, when syntactic sugar is eliminated by transformation, it obscures
 
 
 
-Resugaring is a powerful technique to resolve this problem \cite{resugaring,hygienic}. It  can automatically convert the evaluation sequences of desugared expression in the core language into representative sugar's syntax in the surface language. Just like the existing approach, it is natural to try matching the programs after the desugared with syntactic sugars' rules to reversely desugar the sugars---that why it was named "resugaring". Just as the example in Fig. \ref{fig:example1}, here we use the sugar \Code{Or} to see how existing resugaring approach works, with following desugaring rule.
+Resugaring is a powerful technique to resolve this problem \cite{resugaring,hygienic}. It  can automatically convert the evaluation sequences of desugared expression in the core language into representative sugar's syntax in the surface language. Just like the existing approach, it is natural to try matching the programs after the desugared with syntactic sugars' rules to reversely desugar the sugars---that why it was named "resugaring". Just as the example in Fig. \ref{fig:example1}, here we use the sugar \Code{Or} to see how existing resugaring approach works, with following desugaring rule. (Considering the \m{not} as a core language's constructor)
 \[
 \begin{array}{l}
 \drule{\Code{(Or $e_1$ $e_2$)}}{\Code{(let ((t $e_1$)) (if t t $e_2$))}}\\
@@ -33,10 +33,10 @@ Resugaring is a powerful technique to resolve this problem \cite{resugaring,hygi
 	\begin{array}{lcl}
 	Surface&&Core\\
 	\Code{(Or (not \#t) }&\xrightarrow{desugar}&\Code{(let ((t (not \#t))) }\\
-	\Code{\qquad (not \#f))}&\xleftarrow{resugar}&\Code{\qquad\hspace{0.5em}(if t t (not \#f)))}\\
+	\Code{\qquad \#t)}&\xleftarrow{resugar}&\Code{\qquad\hspace{0.5em}(if t t \#t))}\\
 	\qquad\quad\dashdownarrow& &\qquad\qquad\downarrow\\
 	\Code{(Or \#f }& &\Code{(let ((t \#f)) }\\
-	\Code{\qquad (not \#f))}&\xleftarrow[resugar]&\Code{\qquad\hspace{0.5em}(if t t (not \#f)))}\\
+	\Code{\qquad \#t)}&\xleftarrow[resugar]&\Code{\qquad\hspace{0.5em}(if t t \#t))}\\
 	\qquad\quad\dashdownarrow& &\qquad\qquad\downarrow\\
 	\text{no resugaring}& &\Code{(if \#f \#f \#t)}\\
 	\qquad\quad\dashdownarrow& &\qquad\qquad\downarrow\\
@@ -73,7 +73,7 @@ Moreover, when meeting hygienic sugar, the simple match and substitution will no
 \drule{\Code{(Double $e_1$)}}{\Code{(let (t $e_1$) (+ t t))}}\\
 \end{array}
 \]
-If we use simple binder renaming for solving the simple case, some other information is needed (such as the permutation).
+If we use binder renaming for solving the simple case, some other information is needed (such as the permutation).
 
 \example{
 \[
@@ -89,7 +89,7 @@ If we use simple binder renaming for solving the simple case, some other informa
 
 % \todo{Examples of 2 resugaring method(what is, why hard)}
 
-The existing resugaring approaches subtly solved the problems above by "tagging"\cite{resugaring} and "abstract syntax DAG"\cite{hygienic}. While those techniques successfully make the resugaring method usable, there is a key point which makes the existing approaches not very practical---the reverse expansion of sugars needed to match the desugared programs to see if it is able to resugar. It is quite a huge job when the program contains many syntactic sugars or some syntactic sugars can be desugared to large sub-programs.
+The existing resugaring approaches subtly solved the problems above by "tagging"\cite{resugaring} and "abstract syntax DAG"\cite{hygienic}. While those techniques successfully make the resugaring method usable, there is a key point which makes the existing approaches not very practical---the reverse expansion of sugars need to match the desugared programs to see if it is able to resugar. It is quite a huge job when the program contains many syntactic sugars or some syntactic sugars can be desugared to large sub-programs.
 Also, as the debugging for host language can be a good application of resugaring, the efficiency matters.
 
 
@@ -97,8 +97,8 @@ Also, as the debugging for host language can be a good application of resugaring
 
 \label{mark:mention}
 In this paper, we propose a novel approach to compositional resugaring, which does not use reverse desugaring at all.
-The key idea is "lazy desugaring", in the sense that desugaring is delayed so that the reverse application of desugaring rules becomes unnecessary. Rather than assuming a black-box stepper for the core language as the existing approach, our resugaring approach is based on the evaluation rules (consist of the context rules and reduction rules) of the core language. So our approach seems to be a meta-level language feature rather than a tool for existing language. (Although it can also work with a black-box stepper, as we will discuss in Section \ref{sec5.1})
-To this end, we consider the surface language and the core language as one language. We regard the desugaring rules as the reduction rules of surface language and deriving the context rules of surface language to see how lazy the desugaring of sugar expressions can be. Then the intermediate evaluation steps of the mixed language will contain the resugaring evaluation sequences of a program.
+The key idea is "lazy desugaring", in the sense that desugaring is delayed so that the reverse application of desugaring rules becomes unnecessary. Rather than assuming a black-box stepper for the core language as the existing approach, our resugaring approach is based on the evaluation rules (consist of the context rules and reduction rules) of the core language. So our approach seems to be a meta-level language feature rather than a tool for existing languages. (Although it can also work with a black-box stepper, as we will discuss in Section \ref{sec5.1})
+To this end, we consider the surface language and the core language as a whole language. We regard the desugaring rules as the reduction rules of surface language and calculate the context rules of surface language to see how lazy the desugaring of sugar expressions can be. Then the intermediate evaluation steps of the mixed language will contain the resugaring evaluation sequences of a program.
 
 
 Our main technical contributions can be summarized as follows.
@@ -112,4 +112,4 @@ Our main technical contributions can be summarized as follows.
 
 \end{itemize}
 
-The rest of our paper is organized as follows. We start with an overview of our approach in Section \ref{sec2}. We then discuss the core of resugaring by lazy desugaring in Section \ref{sec3}. We describe our experiment and evaluation in Section \ref{sec4}. We discuss on our core insight in Section \ref{sec5}, on related work in Section \ref{sec6}, and conclude the paper in Section \ref{sec7}.
+The rest of our paper is organized as follows. We start with an overview of our approach in Section \ref{sec2}. We then discuss the core of resugaring by lazy desugaring in Section \ref{sec3}. We describe our experiment and evaluation in Section \ref{sec4}. We discuss on some other issues in Section \ref{sec5}, on related work in Section \ref{sec6}, and conclude the paper in Section \ref{sec7}.
