@@ -8,7 +8,7 @@
 
 As we mentioned in the introduction (Section \ref{mark:mention}), our approach has a more specific assumption compared to the existing approach. Here is a small gap between the motivation of existing approach and ours---existing approach focused mainly on a tool for existing language, while our approach considered more on a basic feature for language implementation. The examples in Section \ref{sec:recursiveSugar} have shown how the lazy desugaring solve some problems in practice.
 
-In addition, as what we need for the lazy desugaring is just the computation order of the syntactic sugar, we can make a extension for the resugaring algorithm to see how it is able to work with only a black-box core language stepper. The most important difference between black-box stepper and the evaluation rules is the computation order---while the same language will behave uniquely, the evaluation rules can show the computation order statically (without running the program). So when meeting the black-box stepper for the core language, we can just use some simple program to "get" the computation order of the core language as the  example in Fig. \ref{example:order} shows: we simply let the sub-expressions of a \m{Head} be some reducible expressions and test the computation order.
+In addition, as what we need for the lazy desugaring is just the computational order of the syntactic sugar, we can make a extension for the resugaring algorithm to see how it is able to work with only a black-box core language stepper. The most important difference between black-box stepper and the evaluation rules is the computational order---while the same language will behave uniquely, the evaluation rules can show the computational order statically (without running the program). So when meeting the black-box stepper for the core language, we can just use some simple program to "get" the computational order of the core language as the  example in Fig. \ref{example:order} shows: we simply let the sub-expressions of a \m{Head} be some reducible expressions and test the computational order.
 
 
 \example{
@@ -85,7 +85,7 @@ Then for any sugar expression, we can process them dynamically by "one-step try"
 \end{array}
 }
 \]
-}{simple example}{example:try}
+}{Example of One-step-try}{example:try}
 
 
 
@@ -107,18 +107,14 @@ Here we will show what are the similarities and differences between theirs and o
 
 \emph{Abstraction and Coverage}: Actually, our reduction in the mixed language has some similarities to theirs. But since our framework has no execution for the fulldesugared program and no reverse desugaring, it will be some different in details.
 
-Overall, our approach restricts the output by the \m{Head} of a program and its inner(or to say, sub) expressions. It is quite natural, since the motivation of the resugaring is to show useful intermediate sequences, we think it will be better than restricting the output by judging whether the program contains some components desugared from the original program's components. Let's see the following example in Fig.  \ref{example:nor}
+Overall, our approach restricts the output by the \m{Head} of a program and its inner (or to say, sub) expressions. It is quite natural, since the motivation of the resugaring is to show useful intermediate sequences, we think it will be better than restricting the output by judging whether the program contains some components desugared from the original program's components. Let's see the following sugar definition.
 
-\example{
 \[
 \drule{\Code{(Nor~x~y)}}{\Code{(And~(not~x)~(not~y))}}
 \]
 \[
 \drule{\Code{(And~x~y)}}{\Code{(if~x~y~\false)}}
 \]
-
-
-}{Nor sugar}{example:nor}
 Then for the program in a logic domain, what should be a resugaring sequence of the program \Code{(not (And (Nor \false~\true) \true))} ?
 
 In our opinion, if the outer \m{not}, \m{And} can be displayed, so they should be after desugared.
@@ -131,7 +127,6 @@ The existing approach will produce the sequences as follows.
 \OneStep{ \true}
 \end{Codes}
 \end{footnotesize}
-
 while ours will produce the following sequences.
 \begin{footnotesize}
 \begin{Codes}
@@ -161,10 +156,16 @@ In our approach, the sugar can contain some bindings, written by the core langua
 \end{itemize}
 The Fig.  \ref{example:case1} and \ref{example:case2} shows how the simple cases of these two.
 
+
+
+
+For the case1, the very basic and common hygiene problem, is not a problem, because our "lazy desugaring" setting won't let the sugar \m{Or} expanded before the x is substituted. Because the bound variables in sugar expressions are only introduced by let-binding, all of them can "delay" the expansion of the syntactic sugar.
 \example{
 \Code{(let (x \#t) (Or \#f x))}
 \scriptsize{where \[\drule{\Code{(Or~e1~e2)}}{\Code{(let (x e1) (if x x e2))}}\]}
 }{Case1's Example}{example:case1}
+
+For the case2, where the subexpression \Code{f} is a free variable introduced by the sugar \m{Subst}, the program will firstly desugar the \m{Subst} (because the only hole at $e_3$ has been a value), then hygiene problem is just about the core language---which can be easily solved by capture-avoiding substitution.
 \example{
 \Code{(Subst (+ f (let (f 1) f)) f 5) }
 \scriptsize{
@@ -172,10 +173,6 @@ where \[
 \drule{\Code{(Subst $e_1$ $e_2$ $e_3$)}}{\Code{(let (e2 e3) e1)}}
 \]}
 }{Case1's Example}{example:case2}
-
-For the case1, the very basic and common hygiene problem, is not a problem, because our "lazy desugaring" setting won't let the sugar \m{Or} expanded before the x is substituted. Because the bound variables in sugar expressions are only introduced by let-binding, all of them can "delay" the expansion of the syntactic sugar.
-
-For the case2, where the subexpression \Code{f} is a free variable introduced by the sugar \m{Subst}, the program will firstly desugar the \m{Subst} (because the only hole at $e_3$ has been a value), then hygiene problem is just about the core language---which can be easily solved by capture-avoiding substitution.
 
 Because of the definition of desugaring in our approach, we can not achieve hygiene by proving the $\alpha-equivalence$.
 Here what we want to show is that, even without complex things like macro systems, specifying the scopes and so on, the lazy desugaring itself will solve the common hygienic problem with carefully-designed core language. And of course the lazy desugaring will also work together with a hygienic rewriting system (e.g., by specific the binding scope \cite{10.5555/1792878.1792884}). Also the scope inference of syntactic sugar\cite{resugaringscope} provide a good perspective for solving the hygienic problem.

@@ -189,12 +189,10 @@ We also construct some higher-order syntactic sugars and test them. The higher-o
 \[\begin{array}{l}
 \drule{\Code{\small(Filter $e$ (list $v_1$ $v_2$ ...))}}{}\\
 \quad
-\begin{array}{ll}
-\Code{\small (let ((f $e$)) (if}&\Code{\small(f $v_1$)}\\
-&\Code{\small (cons $v_1$ (Filter f (list $v_2$ ...)))}\\
-&\Code{\small (Filter f (list $v_2$ ...))))}
-\end{array}
-\\
+\Code{\small (let ((f $e$)) (if (f $v_1$)}\\
+\qquad\qquad\qquad\qquad\;\;\Code{\small (cons $v_1$ (Filter f (list $v_2$ ...)))}\\
+\qquad\qquad\qquad\qquad\;\;\Code{\small (Filter f (list $v_2$ ...))))}\\
+
 \drule{\Code{\small(Filter $e$ (list))}}{\Code{\small(list)}}
 \end{array}\]
 and getting resugaring sequences as Fig.  \ref{fig:Filter}.
@@ -203,15 +201,15 @@ Here, although the sugar can be processed by existing resugaring approach, it wi
 Moreover, just like the \m{Odd} and \m{Even} sugar above, there are some simple rewriting systems which do not allow pattern-based rewriting. Or there are some sugars that need to be expressed by the expressions in core language as branching conditions. Take the example of another higher-order sugar \m{Map} as an example, and get resugaring sequences as Fig.  \ref{fig:Map}.
 \[
 \begin{array}{l}
-\drule{\Code{\small(Map $e_1$ $e_2$)}}{}\todo{\m{format?}}\\
+\drule{\Code{\small(Map $e_1$ $e_2$)}}{}\\
 \quad\Code{\small (let ((f $e_1$))}\\
 \qquad\Code{\small(let ((x $e_2$))}\\
 \qquad\quad
-\begin{array}{ll}
-\Code{\small(if}&\Code{\small(empty? x)}\\
-&\Code{\small(list)}\\
-&\Code{\small(cons (f (first x)) (Map f (rest x))))))}
-\end{array}
+
+\Code{\small(if (empty? x)}\\
+\qquad\qquad\;\;\;\Code{\small(list)}\\
+\qquad\qquad\;\;\;\Code{\small(cons (f (first x)) (Map f (rest x))))))}
+
 
 \end{array}
 \]
@@ -225,12 +223,10 @@ One may note that the context rules of our sugar setting limit the presentation 
 restriction (so that the algorithm \ref{alg:f} will work), or we can just make it using the list operation just as what the sugar \m{Map, Filter} work. Overall, the presentation of our sugar system is not so flexible, but it won't affect the expressiveness. \todo{Automaton}
 
 \subsection{Efficiency}
-To show the efficiency of our approach, we try some programs from simple to hard. We use the reduction steps comparing to the existing approach as the metrics. The following Fig. \ref{fig:step} shows the difference of the two approach. Notice that both approaches have pre-processions---for the existing one, it is to desugar the programs to the core language together with some tags; for ours, it is to calculate the context rules of syntactic sugars. We do not consider the steps during these pre-processes. Besides, we derive the reduction steps of existing approach into three different kinds---the reductions in core language, the reverse expansion with failed resugaring, the reverse expansion with successful resugaring. 
-
 \begin{figure}[thb]
   \begin{center}\small
   \begin{tabular}{l | l | l |l}
-    \emph{Sugar} & \emph{steps of ours} & \emph{Steps of existing} & \emph{Description} \\ \hline
+    \emph{Sugar} & \emph{Ours Steps} & \emph{Existing's Steps} & \emph{Description} \\ \hline
     And, Or & 4  & 2+0+2=4 & \\
     And, Newor & 10 & 7+6+3=16 & Or with binding \\
     Filter & 29 & 22+78+10=110 &  \\
@@ -242,4 +238,26 @@ To show the efficiency of our approach, we try some programs from simple to hard
   \caption{Comparison on Reduction Steps}
   \label{fig:step}
   \end{figure}
-The general regularity is---the more complex the sugar is, the more steps will our approach save. Note that if the RHS of a syntactic sugar is huge, one step reduction of the reverse desugaring will also be more complex, because the huge sugars will contains many failed attempts to resugar. So avoiding reverse expansion of syntactic sugar can improve the efficiency for practical use, because there is not always small programs like the demos.
+To show the efficiency of our approach, we try some programs from simple to hard. We use the reduction steps comparing to the existing approach as the metrics. The following Fig. \ref{fig:step} shows the difference of the two approach. Notice that both approaches have pre-processions---for the existing one, it is to desugar the programs to the core language together with some tags; for ours, it is to calculate the context rules of syntactic sugars. We do not consider the steps during these pre-processes. Besides, we derive the reduction steps of existing approach into three different kinds---the reductions in core language, the reverse expansion with failed resugaring, the reverse expansion with successful resugaring.  We use the example in Fig \ref{example:diff} to present the difference. Consider a sugar named \m{Hard} with two arguments, which has many reduction steps after desugared. Assuming for specific $e_1$ and $e_2$, the \Code{(Hard $e_1$ $e_2$)} after fulldesugared has 100 reduction steps (finally to \#f, for example), and only 1 intermediate step can be resugared (to \Code{(Hard $v_1$ $e_2$)}, for example). Then for \Code{(And (Hard $e_1$ $e_2$) \#t)}, although all the 100 steps in the core language try the reverse expansion, only \Code{(if stepn \#t \#f)} (2 steps on \m{And}, \m{Hard}) and \Code{(if \#f \#t \#f)} (1 step on \m{And}) are successful. Other 98 attempts will be failed together with 98 steps on \m{And}.
+
+\example{
+\[
+{\footnotesize
+	\begin{array}{lcl}
+	Surface&&Core\\
+	\Code{(And (Hard $e_1$ $e_2$) \#t)}&\xrightarrow{desugar}&\Code{(if step0 \#t \#f)}\\
+	\qquad\quad\dashdownarrow& &\qquad\qquad\downarrow\\
+	\Code{(And step1 \#t)}&\xleftarrow{resugar}&\Code{(if step1 \#t \#f)}\\
+	\qquad\quad\vdots& &\qquad\qquad\vdots\\
+	\Code{(And (Hard $v_1$ $e_2$) \#t)}&\xleftarrow{resugar}&\Code{(if stepn \#t \#f)}\\
+	\qquad\quad\vdots& &\qquad\qquad\vdots\\
+	\Code{(And \#f \#t)}&\xleftarrow{resugar}& \Code{(if \#f \#t \#f)}\\
+	\qquad\quad\dashdownarrow& &\qquad\qquad\downarrow\\
+	\Code{\#f}&& \Code{\#f}\\
+\end{array}
+}
+\]
+}{Difference of Steps}{example:diff}
+
+
+The general regularity is---the more complex the sugar is, the more steps will our approach save. Note that if the RHS of a syntactic sugar is huge, one step reduction of the reverse desugaring will also be more complex, because the huge sugars will contains many failed attempts to resugar. So avoiding reverse expansion of syntactic sugar can improve the efficiency for practical use, because there are not always small programs like the demos.

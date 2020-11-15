@@ -2,17 +2,17 @@
 \section{Overview}
 \label{sec2}
 
-\todo{goals?}
 
 In this section, we give a brief overview of our approach, explaining its difference from the existing  approach and highlighting its new features. To be concrete, we will consider the following simple core language, defining boolean expressions based on \m{if} construct:
 \[
 \begin{array}{lllll}
+e &::=& \m{CoreExp}\\
 \m{CoreExp} &::=& \Code{(if~$e$~$e$~$e$)} &\note{// if construct}\\
 & |& \true  & \note{// true value}\\
 & |& \false & \note{// false value}
 \end{array}
 \]
-The semantics of the language is very simple, consisting of the following context rule defining the computation order:
+The semantics of the language is very simple, consisting of the following context rule defining the computational order:
 
 \[
 \begin{array}{lcl}
@@ -73,7 +73,7 @@ Then we can just mix the surface language and the core language as Fig. \ref{fig
 \begin{flushleft}
 \[
 \begin{array}{lll}
-\m{MixedExp} &::=& \m{CoreExp} \\
+e &::=& \m{CoreExp} \\
 &|&\m{SurfExp}\\
 &|&\m{CommonExp}\\
 \m{CoreExp} &::=& \Code{(if~$e$~$e$~$e$)}\\
@@ -138,4 +138,4 @@ Finally the program \Code{(And (Or \true~\false) (And \false~\true))} will got t
 \label{fig:mixexec}
 \end{figure}
 
-Note that the context rules should restrict the computation order of a sugar expression's sub-term, we should let the context rule be correct---reflecting what should be executed in the desugared expression. Also, as the goal of resugaring is to present evaluation of sugar expressions, we clearly defined which expression should be outputted. For the example in this section, of course the sugar \m{And} and \m{Or} should be outputted, and also the boolean expressions should be. So by clearly separate what \m{DisplayableExp} (defined in next section) is, we can alway get the resugaring evaluation sequences we need. (Slightly different from the existing approach's setting, as we will discuss in Section \ref{mark:correct}.)
+Note that the context rules should restrict the computational order of a sugar expression's sub-term, we should let the context rules be correct---reflecting what should be executed in the desugared expression. Also, as the goal of resugaring is to present evaluation of sugar expressions, we clearly defined which expression should be outputted. For the example in this section, of course the sugar \m{And} and \m{Or} should be outputted, and also the boolean expressions should be. So by clearly separate what \m{DisplayableExp} (defined in next section) is, we can alway get the resugaring evaluation sequences we need. (Slightly different from the existing approach's setting, as we will discuss in Section \ref{mark:correct}.)

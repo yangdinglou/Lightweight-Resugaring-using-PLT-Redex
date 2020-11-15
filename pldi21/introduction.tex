@@ -103,7 +103,7 @@ To this end, we consider the surface language and the core language as a whole l
 
 Our main technical contributions can be summarized as follows.
 \begin{itemize}
-\item We propose a novel approach to resugaring by lazy desugaring, where reverse application of desugaring rules becomes unnecessary. We recognize a algorithm to calculate the computation orders (limited by context rules) for syntactic sugars, and propose a reduction strategy, based on evaluator of the core languages and the desugaring rules together with the context rules of syntactic sugar, which is sufficient to produce all necessary resugared expressions on the surface language. We prove the correctness of our approach.
+\item We propose a novel approach to resugaring by lazy desugaring, where reverse application of desugaring rules becomes unnecessary. We recognize a algorithm to calculate the computational orders (limited by context rules) for syntactic sugars, and propose a reduction strategy, based on evaluator of the core languages and the desugaring rules together with the context rules of syntactic sugar, which is sufficient to produce all necessary resugared expressions on the surface language. We prove the correctness of our approach.
 
 \item We have implemented a system based on the new resugaring approach. It is much more efficient than the existing approach, because it completely avoids unnecessary complexity of the reverse desugaring. It also provides extra expressiveness for even the simple rewriting so that it can also deal with the common hygienic sugars and flexible recursive sugars. All the examples in this paper have passed the test of the system. 
 
