@@ -198,7 +198,7 @@ We assume that all desugaring rules are not overlapped in the sense that for a s
 \label{fig:mix}
 \end{figure}
 
-Our mixed language for resugaring combines the surface language and the core language, described in Fig.  \ref{fig:mix}.
+Our mixed language for resugaring combines the surface language and the core language, described in Fig.  \ref{fig:mix}. \gcomment{Use * in Fig. \ref{fig:mix}, but ... otherwise.}
 %
 The differences between expressions in our core language and those in our surface language are identified by their \m{Head}. But there may be some expressions in the core language which are also used in the surface language for convenience, or to say, we need some core language's expressions to help us get better resugaring sequences. So we take \m{CommonHead} as a subset of the \m{CoreHead}, which can be displayed in resugaring sequences. Then if any sub-terms in an expression contain no \m{CoreHead} except for \m{CommonHead}, we should let them display during the evaluation process (named \m{DisplayableExp}). Otherwise, the expression should not be displayed. We just use a \m{MixedExp} term to present the expressions which is not necessarily displayed for concision.
 

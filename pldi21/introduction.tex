@@ -73,7 +73,7 @@ Moreover, when meeting hygienic sugar, the simple match and substitution will no
 \drule{\Code{(Double $e_1$)}}{\Code{(let (t $e_1$) (+ t t))}}\\
 \end{array}
 \]
-If we use binder renaming for solving the simple case, some other information is needed (such as the permutation).
+If we use binder renaming for solving the simple case, some other information is needed (such as the permutation).\gcomment{In the hygiene example, the expression in CoreLang may have a one-step eval then resugar?}
 
 \example{
 \[
@@ -89,8 +89,8 @@ If we use binder renaming for solving the simple case, some other information is
 
 % \todo{Examples of 2 resugaring method(what is, why hard)}
 
-The existing resugaring approaches subtly solved the problems above by "tagging"\cite{resugaring} and "abstract syntax DAG"\cite{hygienic}. While those techniques successfully make the resugaring method usable, there is a key point which makes the existing approaches not very practical---the reverse expansion of sugars need to match the desugared programs to see if it is able to resugar. It is quite a huge job when the program contains many syntactic sugars or some syntactic sugars can be desugared to large sub-programs.
-Also, as the debugging for host language can be a good application of resugaring, the efficiency matters.
+The existing resugaring approaches subtly solved the problems above by "tagging"\cite{resugaring} and "abstract syntax DAG"\cite{hygienic}. While those techniques successfully make the resugaring method usable, there is a key point which makes the existing approaches not very practical---the reverse expansion of sugars need to match the desugared programs to see if it is able to resugar. It is quite a huge job when the program contains many syntactic sugars or some syntactic sugars can be desugared to large sub-programs\gcomment{sub-expressions}.
+Also, as the debugging for host language can be a good application of resugaring, the efficiency matters.\gcomment{I don't understand this 'debugging' actually. And maybe use 'core language' is better than 'host language'?}
 
 
 % \todo{why existing resugaring has a problem, examples. good but complicate, novel without desugaring}
@@ -112,4 +112,4 @@ Our main technical contributions can be summarized as follows.
 
 \end{itemize}
 
-The rest of our paper is organized as follows. We start with an overview of our approach in Section \ref{sec2}. We then discuss the core of resugaring by lazy desugaring in Section \ref{sec3}. We describe our experiment and evaluation in Section \ref{sec4}. We discuss on some other issues in Section \ref{sec5}, on related work in Section \ref{sec6}, and conclude the paper in Section \ref{sec7}.
+The rest of our paper is organized as follows. We start with an overview of our approach in Section \ref{sec2}. We then discuss the core of resugaring by lazy desugaring in Section \ref{sec3}. We describe our experiment and evaluation in Section \ref{sec4}. We discuss on\gcomment{no 'on' here?} some other issues in Section \ref{sec5}, on related work in Section \ref{sec6}, and conclude the paper in Section \ref{sec7}.
