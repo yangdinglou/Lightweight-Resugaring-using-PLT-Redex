@@ -35,24 +35,16 @@ Assume that our surface language is defined by two syntactic sugars defined by:
 \]
 
 
-Now let us demonstrate how to execute \Code{(And (Or \true~\false) (And \false ~\true))}, and get the resugaring sequences as Fig.  \ref{fig:standard} by our approach.
+Now let us demonstrate how to execute \Code{(And (Or \true~\false) (And \false ~\true))}, and get the resugaring sequences as follows by our approach.
 
-\begin{figure}[thb]
-\begin{center}
-\begin{minipage}{6cm}
-\begin{footnotesize}
+
 \begin{Codes}
     (And (Or \true \false) (And \false \true))
 \OneStep{ (And \true (And \false \true))}
 \OneStep{ (And \false \true)}
 \OneStep{ #f}
 \end{Codes}
-\end{footnotesize}
-\end{minipage}
-\end{center}
-\caption{A Typical Resugaring Example}
-\label{fig:standard}
-\end{figure}
+
 
 
 We propose a new resugaring approach by eliminating "reverse desugaring" via "lazy desugaring", where a syntactic sugar will be desugared only when it is necessary. While giving the evaluation rules of the core language, we can figure out the following context rules of the surface language.
@@ -86,7 +78,7 @@ e &::=& \m{CoreExp} \\
 \end{flushleft}
 
 }
-\subcaptionbox{Context \label{fig:mixcontext}}[\linewidth]{
+\subcaptionbox{Context Rules \label{fig:mixcontext}}[\linewidth]{
 \begin{flushleft}
 \[\footnotesize
 \begin{array}{lcl}
@@ -100,7 +92,7 @@ C &:=& (\m{if}~[\bigcdot]~$e$~$e$)\\
 
 }
 
-\subcaptionbox{Reduction \label{fig:mixreduction}}[\linewidth]{\footnotesize
+\subcaptionbox{Reduction Rules \label{fig:mixreduction}}[\linewidth]{\footnotesize
 \begin{flushleft}
 \[
 \begin{array}{c}
@@ -118,11 +110,9 @@ C &:=& (\m{if}~[\bigcdot]~$e$~$e$)\\
 \label{fig:mixexample}
 \end{figure}
 
-Finally the program \Code{(And (Or \true~\false) (And \false~\true))} will got the evaluation sequence in Fig.  \ref{fig:mixexec} in the mixed language. We can just filter the intermediate sequences without \m{Coreexp} in any sub-expressions to get the resugaring sequence as Fig.  \ref{fig:standard}.
+Finally the program \Code{(And (Or \true~\false) (And \false~\true))} will got the evaluation sequence as follows in the mixed language. We can just filter the intermediate sequences without \m{Coreexp} in any sub-expressions to get the resugaring sequence above. \todo{program/expression/term; desugared/expanded}
 
-\begin{figure}[thb]
-\begin{center}
-\begin{footnotesize}
+
 \begin{Codes}
     (And (Or \true \false) (And \false \true))
 \OneStep{ (And (if \true \true \false) (And \false \true))}
@@ -132,10 +122,5 @@ Finally the program \Code{(And (Or \true~\false) (And \false~\true))} will got t
 \OneStep{ (if \false \true \false)}
 \OneStep{ \false}
 \end{Codes}
-\end{footnotesize}
-\end{center}
-\caption{Example of Mixed Language's Reduction}
-\label{fig:mixexec}
-\end{figure}
 
-Note that the context rules should restrict the computational order of a sugar expression's sub-term, we should let the context rules be correct---reflecting what should be executed in the desugared expression. Also, as the goal of resugaring is to present evaluation of sugar expressions, we clearly defined which expression should be outputted. For the example in this section, of course the sugar \m{And} and \m{Or} should be outputted, and also the boolean expressions should be. So by clearly separate what \m{DisplayableExp} (defined in next section) is, we can alway get the resugaring evaluation sequences we need. (Slightly different from the existing approach's setting, as we will discuss in Section \ref{mark:correct}.)
+Note that the context rules should restrict the computational order of a sugar expression's subexpression, we should let the context rules be correct---reflecting what should be executed in the desugared expression. Also, as the goal of resugaring is to present evaluation of sugar expressions, we clearly defined which expression should be outputted. For the example in this section, of course the sugar \m{And} and \m{Or} should be outputted, and also the boolean expressions should be. So we set boolean expressions as \m{CommonExp}, so that they can be displayed though they are of core language. By clearly separating what should be displayed, we can alway get the resugaring evaluation sequences we need. (Slightly different from the existing approach's setting, as we will discuss in Section \ref{mark:correct}.)

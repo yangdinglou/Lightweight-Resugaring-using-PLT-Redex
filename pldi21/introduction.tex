@@ -20,10 +20,10 @@ Unfortunately, when syntactic sugar is eliminated by transformation, it obscures
 
 
 
-Resugaring is a powerful technique to resolve this problem \cite{resugaring,hygienic}. It  can automatically convert the evaluation sequences of desugared expression in the core language into representative sugar's syntax in the surface language. Just like the existing approach, it is natural to try matching the programs after the desugared with syntactic sugars' rules to reversely desugar the sugars---that why it was named "resugaring". Just as the example in Fig. \ref{fig:example1}, here we use the sugar \Code{Or} to see how existing resugaring approach works, with following desugaring rule. (Considering the \m{not} as a core language's constructor)
+Resugaring is a powerful technique to resolve this problem \cite{resugaring,hygienic}. It  can automatically convert the evaluation sequences of desugared program in the core language into representative sugar's syntax in the surface language. Just like the existing approach, it is natural to try matching the programs after the desugared with syntactic sugars' rules to reversely desugar the sugars---that why it was named "resugaring". Just as the example in Fig. \ref{fig:example1}, here we use the sugar \Code{Newor} to see how existing resugaring approach works, with following desugaring rule. (Considering the \m{not} as a core language's constructor)
 \[
 \begin{array}{l}
-\drule{\Code{(Or $e_1$ $e_2$)}}{\Code{(let ((t $e_1$)) (if t t $e_2$))}}\\
+\drule{\Code{(Newor $e_1$ $e_2$)}}{\Code{(let ((t $e_1$)) (if t t $e_2$))}}\\
 \end{array}
 \]
 
@@ -32,10 +32,10 @@ Resugaring is a powerful technique to resolve this problem \cite{resugaring,hygi
 {\footnotesize
 	\begin{array}{lcl}
 	Surface&&Core\\
-	\Code{(Or (not \#t) }&\xrightarrow{desugar}&\Code{(let ((t (not \#t))) }\\
+	\Code{(Newor (not \#t) }&\xrightarrow{desugar}&\Code{(let ((t (not \#t))) }\\
 	\Code{\qquad \#t)}&\xleftarrow{resugar}&\Code{\qquad\hspace{0.5em}(if t t \#t))}\\
 	\qquad\quad\dashdownarrow& &\qquad\qquad\downarrow\\
-	\Code{(Or \#f }& &\Code{(let ((t \#f)) }\\
+	\Code{(Newor \#f }& &\Code{(let ((t \#f)) }\\
 	\Code{\qquad \#t)}&\xleftarrow[resugar]&\Code{\qquad\hspace{0.5em}(if t t \#t))}\\
 	\qquad\quad\dashdownarrow& &\qquad\qquad\downarrow\\
 	\text{no resugaring}& &\Code{(if \#f \#f \#t)}\\
@@ -54,11 +54,11 @@ But it is not as easy as the example above. Sometimes the program in the core la
 	\begin{array}{lcl}
 	Surface&&Core\\
 	\Code{(let ((t \#t)))}&\xrightarrow{desugar}&\Code{(let ((t \#t)))}\\
-	\Code{\quad(if t t (Or \#t \#f)))}&\xleftarrow[resugar]&\Code{\quad(if t t (let\ldots))}\\
+	\Code{\quad(if t t (Newor \#t \#f)))}&\xleftarrow[resugar]&\Code{\quad(if t t (let\ldots))}\\
 	\qquad\qquad\dashdownarrow& &\qquad\qquad\downarrow\\
 	\qquad\qquad\vdots& &\qquad\qquad\vdots\\
 	\qquad\qquad\dashdownarrow& &\qquad\qquad\downarrow\\
-	\Code{(Or \#t \#t)}& &\Code{(let ((t \#t))}\\
+	\Code{(Newor \#t \#t)}& &\Code{(let ((t \#t))}\\
 	&\xleftarrow[resugar?]&\Code{\quad(if t t \#t))}\\
 	\qquad\qquad\vdots& &\qquad\qquad\vdots\\
 \end{array}

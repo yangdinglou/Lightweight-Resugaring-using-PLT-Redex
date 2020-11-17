@@ -146,14 +146,14 @@ A typical hygienic problem is as the following example.
 % \begin{Codes}
 % 	(Hygienicadd e1 e2) \DeStep{ (let ((x e1)) (+ x e2))}
 % \end{Codes}
-For existing resugaring approach, if we want to get sequences of \Code{(let (x 2) (Hygienicadd 1 x))}, it will firstly desugar to \Code{(let (x 2) (let x 1 (+ x x)))}, which is awful because the two $x$ in \Code{(+ x x)} should be bound to different values. So the existing hygienic resugaring approach uses abstract syntax DAG to distinct different \m{x} in the desugared expression. But for our approach based on lazy desugaring, the \m{Hygienicadd} sugar does not have to desugar until necessary, thus, getting resugaring sequences as Fig.  \ref{fig:hygienicadd} based on a non-hygienic rewriting system.
+For existing resugaring approach, if we want to get sequences of \Code{(let (x 2) (Hygienicadd 1 x))}, it will firstly desugar to \Code{(let (x 2) (let x 1 (+ x x)))}, which is awful because the two $x$ in \Code{(+ x x)} should be bound to different values. So the existing hygienic resugaring approach uses abstract syntax DAG to distinct different \m{x} in the desugared expression. But for our approach based on lazy desugaring, the \m{Hygienicadd} sugar does not have to desugar until necessary, thus, getting resugaring sequences as Fig.  \ref{fig:hygienicadd} based on a non-hygienic transformer system. We will discuss hygiene problem in Section \ref{mark:hygiene}.
 
 
 % The lazy desugaring is also convenient for achieving hygiene for non-hygienic core language. For example, \Code{(let x 1 (+ x (let x 2 (+ x 1))))} may be reduced to \Code{(+ 1 (let 1 2 (+ 1 1)))} by a simple core language whose \Code{let} expression does not handle cases like that. But by writing a sugar (not syntactic sugar in the usual sense, because we do not want it to behave as \m{let}) \m{Let}
 % \[\drule{\Code{(Let~$e_1$~$e_2$~$e_3$)}}{\Code{(let~($e_1$~$e_2$)~$e_3$)}}\]
 % and making the following modifies in the reduction of mixed language: rejecting the one-step try (i.e., delaying the expansion of the sugar, another form of lazy desugaring) if an error occurs, then recursively applying $\redm{}{}$ on the subexpression where the error takes place. In this example, it is to delay the expansion of outermost \m{Let} and apply $\redm{}{}$ on \Code{(+ x (Let x 2 (+ x 1)))}. We will get the resugaring sequences as Figure \ref{fig:Let} in our tool. It is not resugaring in the usual sense for violating the emulation property, but can be useful for implementing lightweight hygiene.
 
-In practical application, we think hygiene can be easily processed by more complex rewriting systems (such as \cite{10.5555/1792878.1792884}), so we also try combining the lazy desugaring with other rewriting system in later chapter. Overall, our results show lazy desugaring is a good way to handle hygienic sugars in any systems.
+In practical application, we think hygiene can be easily processed by more complex transformer systems (such as \cite{10.5555/1792878.1792884}), so we discuss about combining the lazy desugaring with other desugaring system in later chapter. Overall, our results show lazy desugaring is a good way to handle hygienic sugars in any systems.
 
 \subsubsection{Recursive Sugars}
 \label{sec:recursiveSugar}
@@ -167,7 +167,7 @@ Recursive sugar is a kind of syntactic sugars where call itself or each other du
 \]
 are recursive sugars. The existing resugaring approach can't process syntactic sugar written like this (non-pattern-based) easily, because boundary conditions are in the sugar itself.
 
-Take \Code{(Odd 2)} as an example. The previous work will firstly desugar the expression using the rewriting system. Then the rewriting system will never terminate as following shows.
+Take \Code{(Odd 2)} as an example. The previous work will firstly desugar the expression using the rules. Then the desugaring will never terminate as following shows.
 \begin{footnotesize}
 \begin{Codes}
    (Odd 2)
@@ -185,7 +185,7 @@ Then the advantage of our approach is embodied. Our lightweight approach does no
 
 
 
-We also construct some higher-order syntactic sugars and test them. The higher-order feature is important for constructing practical syntactic sugars. And many higher-order sugars should be constructed by recursive definition. The first sugar is \m{Filter}, implemented by pattern matching term rewriting.
+We also construct some higher-order syntactic sugars and test them. The higher-order feature is important for constructing practical syntactic sugars. And many higher-order sugars should be constructed by recursive definition. The first sugar is \m{Filter}, implemented by pattern matching.
 \[\begin{array}{l}
 \drule{\Code{\small(Filter $e$ (list $v_1$ $v_2$ ...))}}{}\\
 \quad
@@ -198,7 +198,7 @@ We also construct some higher-order syntactic sugars and test them. The higher-o
 and getting resugaring sequences as Fig.  \ref{fig:Filter}.
 Here, although the sugar can be processed by existing resugaring approach, it will be redundant. The reason is that, a Filter for a list of length $n$ will match to find possible resugaring $n*(n-1)/2$ times. Thus, lazy desugaring is really important to reduce the resugaring complexity of recursive sugar.
 
-Moreover, just like the \m{Odd} and \m{Even} sugar above, there are some simple rewriting systems which do not allow pattern-based rewriting. Or there are some sugars that need to be expressed by the expressions in core language as branching conditions. Take the example of another higher-order sugar \m{Map} as an example, and get resugaring sequences as Fig.  \ref{fig:Map}.
+Moreover, just like the \m{Odd} and \m{Even} sugar above, there are some simple desugaring systems which do not allow pattern-based desugaring. Or there are some sugars that need to be expressed by the expressions in core language as branching conditions. Take the example of another higher-order sugar \m{Map} as an example, and get resugaring sequences as Fig.  \ref{fig:Map}.
 \[
 \begin{array}{l}
 \drule{\Code{\small(Map $e_1$ $e_2$)}}{}\\
@@ -216,7 +216,7 @@ Moreover, just like the \m{Odd} and \m{Even} sugar above, there are some simple 
 
 
 
-Note that the \m{let} expression is to limit the subexpression only appears once in RHS. In this example, we can find that the list \Code{(cons 1 (list 2))}, though equal to \Code{(list 1 2)}, is represented by core language's expression. So it will be difficult to naturally handle such inline boundary conditions for existing rewriting systems. (The case can be specific by some setting, such as \todo{local-expansion} in Racket's macro.) But our approach is easy to handle cases like this. 
+Note that the \m{let} expression is to limit the subexpression only appears once in RHS. In this example, we can find that the list \Code{(cons 1 (list 2))}, though equal to \Code{(list 1 2)}, is represented by core language's expression. So it will be difficult to naturally handle such inline boundary conditions for existing desugaring systems. (The case can be specific by some setting, such as \todo{local-expansion} in Racket's macro.) But our approach is easy to handle cases like this. 
 
 \subsubsection{Limitation on Presentation}
 One may note that the context rules of our sugar setting limit the presentation of syntactic sugar. For example, it is difficult to present a sugar with ellipsis, because the form of its context rule may vary. It is still possible if we add some 
