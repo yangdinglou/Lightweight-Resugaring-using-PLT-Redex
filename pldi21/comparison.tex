@@ -10,14 +10,14 @@ As we mentioned in the introduction (Section \ref{mark:mention}), our approach h
 
 In addition, as what we need for the lazy desugaring is just the computational order of the syntactic sugar, we can make a extension for the resugaring algorithm to see how it is able to work with only a black-box core language stepper. The most important difference between black-box stepper and the evaluation rules is the computational order---while the same language will behave uniquely, the evaluation rules can show the computational order statically (without running the program). So when meeting the black-box stepper for the core language, we can just use some simple program to "get" the computational order of the core language as the following example  shows: we simply let the sub-expressions of a \m{Head} be some reducible expressions and test the computational order. 
 
-\begin{center}
+\begin{center}\footnotesize
 	\Code{(if tmpe1 tmpe2 tmpe3)}\\ $\Downarrow_{stepper}$\\ \Code{(if tmpe1' tmpe2 tmpe3)}\\ $\Downarrow_{getnext}$\\ \Code{(if tmpv1 tmpe2 tmpe3)}\\ $\Downarrow_{stepper}$\\ \Code{tmpei}\\
 \end{center}
 
 
 But that's not enough---the core language and the surface language cannot be mixed easily. We should do the same try during the evaluation to make the core language's stepper useful when meeting some surface language's expression.
 
-\begin{Def}[Dynamic mixed language's one step reduction $\redm{}{}$] Defined in Fig.  \ref{fig:dynamic}. Note that here we only define the reduction for unnested syntactic sugar for convenience. It is easy to extend to nested sugar (but so huge to express).
+\begin{Def}[Dynamic mixed language's one step reduction $\redm{}{}$] Defined in Fig.  \ref{fig:dynamic}. 
 \end{Def}
 \begin{figure*}[t]
 \infrule[CoreRed]
@@ -36,16 +36,16 @@ But that's not enough---the core language and the surface language cannot be mix
 \caption{Dynamic Reduction}
 \label{fig:dynamic}
 \end{figure*}
-Putting them in simple words. For expression \Code{(CoreHead $e_1$ $\ldots$ $e_n$)} whose subexpressions contain \m{SurfExp}, replacing all \m{SurfExp} subexpressions not in core language with any reducible core language's expression \m{tmpe}. Then getting a result after inputting the new expression $e'$ to the original black-box stepper. If reduction appears at a subexpression at $e_i$ or what the $e_i$ replaced by, then the stepper with the extension should return \Code{(CoreHead $e_1$ $\ldots$ $e_i'$ $\ldots$ $e_n$)}, where $e_i'$ is $e_i$ after the mixed language's one-step reduction ($\redm{}{}$) or after core language's reduction with extension ($\rede{}{}$) (rule \m{CoreExt1}, an example in Fig.  \ref{fig:e1}). Otherwise, the stepper should return \Code{$e'$}, with all the replaced subexpressions replacing back (rule \m{CoreExt2}, an example in Fig.  \ref{fig:e2}). The extension will not violate the properties of original core language's evaluator. It is obvious that the evaluator with the extension will reduce at the subexpression as it needs in core language, if the reduction appears in a subexpression. The stepper with extension behaves the same as mixing the evaluation rules of core language and desugaring rules of surface language.
+Note that here we only define the reduction for unnested syntactic sugar for convenience. It is easy to extend to nested sugar (but so huge to express). Putting them in words. For expression \Code{(CoreHead $e_1$ $\ldots$ $e_n$)} whose subexpressions contain \m{SurfExp}, replacing all \m{SurfExp} subexpressions not in core language with any reducible core language's expression \m{tmpe}. Then getting a result after inputting the new expression $e'$ to the original black-box stepper. If reduction appears at a subexpression at $e_i$ or what the $e_i$ replaced by, then the stepper with the extension should return \Code{(CoreHead $e_1$ $\ldots$ $e_i'$ $\ldots$ $e_n$)}, where $e_i'$ is $e_i$ after the mixed language's one-step reduction ($\redm{}{}$) or after core language's reduction with extension ($\rede{}{}$) (rule \m{CoreExt1}, an example in Fig.  \ref{fig:e1}). Otherwise, the stepper should return \Code{$e'$}, with all the replaced subexpressions replacing back (rule \m{CoreExt2}, an example in Fig.  \ref{fig:e2}). The extension will not violate the properties of original core language's evaluator. It is obvious that the evaluator with the extension will reduce at the subexpression as it needs in core language, if the reduction appears in a subexpression. The stepper with extension behaves the same as mixing the evaluation rules of core language and desugaring rules of surface language.
 \begin{center}
 \begin{figure}[thb]
-\centering
+\centering \footnotesize
 \Code{(if (and e1 e2) true false)}\\ $\Downarrow_{replace}$\\ \Code{(if tmpe1 true false)}\\ $\Downarrow_{blackbox}$\\ \Code{(if tmpe1' true false)}\\ $\Downarrow_{desugar}$\\ \Code{(if (if e1 e2 false) true false)}
 \caption{\m{CoreExt1}'s Example}
 \label{fig:e1}
 \end{figure}
 \begin{figure}[thb]
-\centering
+\centering\footnotesize
 \Code{(if (if true ture false) (and ...) (or ...))}\\ $\Downarrow_{replace}$ \\\Code{ (if (if true ture false) tmpe2 tmpe3)}\\ $\Downarrow_{blackbox}$\\  \Code{(if true tmpe2 tmpe3)}\\ $\Downarrow_{replaceback}$\\ \Code{(if true (and ...) (or ...))}
 \caption{\m{CoreExt2}'s Example}
 \label{fig:e2}

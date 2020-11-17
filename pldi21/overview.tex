@@ -37,18 +37,18 @@ Assume that our surface language is defined by two syntactic sugars defined by:
 
 Now let us demonstrate how to execute \Code{(And (Or \true~\false) (And \false ~\true))}, and get the resugaring sequences as follows by our approach.
 
-
+{\scriptsize
 \begin{Codes}
     (And (Or \true \false) (And \false \true))
 \OneStep{ (And \true (And \false \true))}
 \OneStep{ (And \false \true)}
 \OneStep{ #f}
 \end{Codes}
+}
 
 
-
-We propose a new resugaring approach by eliminating "reverse desugaring" via "lazy desugaring", where a syntactic sugar will be desugared only when it is necessary. While giving the evaluation rules of the core language, we can figure out the following context rules of the surface language.\gcomment{From the context rules of \m{if}, we can find that the condition ($e_1$) is always evaluated first. Therefore, for expression $e_1~\m{And}
-~e_2$ defined by syntactic sugar, $e_1$ is also evaluated first, which is the context rule of \m{And}. Similarly, we can calculate the context rule of \m{Or}.}
+We propose a new resugaring approach by eliminating "reverse desugaring" via "lazy desugaring", where a syntactic sugar will be desugared only when it is necessary. While giving the evaluation rules of the core language, we can figure out the following context rules of the surface language. From the context rules of \m{if}, we can find that the condition ($e_1$) is always evaluated first. Therefore, for expression $e_1~\m{And}
+~e_2$ defined by syntactic sugar, $e_1$ is also evaluated first, which is the context rule of \m{And}. Similarly, we can calculate the context rule of \m{Or}.
 
 \[
 \begin{array}{lcl}
@@ -58,7 +58,7 @@ C &:=& (\m{And}~[\bigcdot]~e)\\
 \end{array}
 \]
 
-Then we can just mix the surface language and the core language as Fig. \ref{fig:mixexample}. \gcomment{Then we mix the surface language and the core language as Fig. \ref{fig:mixexample}, where \m{CommonExp} means the expressions used in the surface language and the core language both, and $\to_d$ is a one-step evaluation in our mixed language.}
+Then we mix the surface language and the core language as Fig. \ref{fig:mixexample}, where \m{CommonExp} means the expressions used in the surface language and the core language both, and $\to_m$ is a one-step evaluation in our mixed language.
 
 \begin{figure}[thb]
 \centering
@@ -113,7 +113,7 @@ C &:=& (\m{if}~[\bigcdot]~$e$~$e$)\\
 
 Finally the program \Code{(And (Or \true~\false) (And \false~\true))} will get the evaluation sequence as follows in the mixed language. We can just filter the intermediate sequences without \m{Coreexp} in any sub-expressions to get the resugaring sequence above. \todo{program/expression/term; desugared/expanded}
 
-
+{\scriptsize
 \begin{Codes}
     (And (Or \true \false) (And \false \true))
 \OneStep{ (And (if \true \true \false) (And \false \true))}
@@ -123,5 +123,5 @@ Finally the program \Code{(And (Or \true~\false) (And \false~\true))} will get t
 \OneStep{ (if \false \true \false)}
 \OneStep{ \false}
 \end{Codes}
-
+}
 Note that the context rules should restrict the computational order of a sugar expression's subexpression, we should let the context rules be correct---reflecting what should be executed in the desugared expression. Also, as the goal of resugaring is to present evaluation of sugar expressions, we clearly defined which expression should be outputted. For the example in this section, of course the sugar \m{And} and \m{Or} should be outputted, and also the boolean expressions should be. So we set boolean expressions as \m{CommonExp}, so that they can be displayed though they are of core language. By clearly separating what should be displayed, we can alway get the resugaring evaluation sequences we need. (Slightly different from the existing approach's setting, as we will discuss in Section \ref{mark:correct}.)
