@@ -227,7 +227,7 @@ Our resugaring algorithm works on the mixed language, based on the evaluation ru
 \end{enumerate}
 
 \begin{algorithm}
-	\caption{calcontext}
+	\caption{\m{calcontext}}
 	\label{alg:f}     % 给算法一个标签，以便其它地方引用该算法
 	\begin{algorithmic}[1]       % 数字 "1" 表示为算法显示行号的时候，每几行显示一个行号，如："1" 表示每行都显示行号，"2" 表示每两行显示一个行号，也是为了方便其它地方的引用
 		\REQUIRE ~~\\      % 算法的输入参数说明部分
@@ -308,6 +308,8 @@ Or if the \m{Head} is a \m{SurfHead} with its context rules calculated, then we 
 \drule{(\m{Even}~e)}{(\m{Odd}~(-~e~1))}
 \]
 
+The reason we can calculate the context rules of a syntactic sugar is: for a sugar's $RHS$ like \Code{(\m{Head}~$\ldots~e_1'~e_2'~\ldots~e_m'$)}, if any reduction happens, the reduction will be on $e_i$ or the reduction will destroy the $RHS$'s form. So we can trace the computational order until the sugar form has to be destroyed.
+
 After calculating all context rules, we can add them to the mixed language's context rule; we can also add the desugaring rules to the mixed language's reduction rule as what we showed in Section \ref{sec2}.
 
 %\todo{Add explanantion of the above rule.}
@@ -361,7 +363,7 @@ An expression \m{P} can be fully desugared if \Code{$\mathtt{D}(\m{P})$} is term
 
 
 \begin{property} \label{thm1} 
-	For a program \m{P}=$\m{E}[\m{S}]$ of the mixed language which can be fully desugared, where \m{P'}=$\mathtt{D}(\m{P})$=$\m{E'}[\m{C}]$, and \m{S}=\Code{(SurfHead $e_1$ ... $e_n$)} in the program \m{P} together with \m{E'}=$\mathtt{D}(\m{E})$ (then of course \m{C}=$\mathtt{D}(\m{S})$); if $\redm{\m{E}[\m{S}]}{\m{E}[\m{S'}]}$ and $\drule{\m{S}}{\m{S'}}$, then $\redc{\m{E'}[\m{C}]}{\m{E'}[\m{C'}]}$ together with destroying the sugar form of \m{S} by $\redc{\m{C}}{\m{C'}}$. An example in Fig. \ref{example:ppt1}.
+	For a program \m{P}=$\m{E}[\m{S}]$ of the mixed language which can be fully desugared, where \m{P'}=$\mathtt{D}(\m{P})$=$\m{E'}[\m{C}]$, and \m{S}=\Code{(SurfHead $e_1$ ... $e_n$)} in the program \m{P} together with \m{E'}=$\mathtt{D}(\m{E})$ (then of course \m{C}=$\mathtt{D}(\m{S})$); if $\redm{\m{E}[\m{S}]}{\m{E}[\m{S'}]}$ and $\drule{\m{S}}{\m{S'}}$, then $\redc{\m{E'}[\m{C}]}{\m{E'}[\m{C'}]}$ together with destroying the sugar's $RHS$ form of \m{S} by $\redc{\m{C}}{\m{C'}}$. An example in Fig. \ref{example:ppt1}.
 \end{property}
 \example{\tiny
 \begin{tabular}{|l | l | l |}\hline
@@ -399,7 +401,7 @@ An expression \m{P} can be fully desugared if \Code{$\mathtt{D}(\m{P})$} is term
 
 The properties limit the laziness of our mixed language---the resugaring sequences should behave as the sequences after desugared to the core language.    
 
-Proof in Appendix.
+Proof sketch in Appendix.
 
 \ignore{
 \begin{lemma}
