@@ -3,7 +3,7 @@
 \label{sec2}
 
 
-In this section, we give a brief overview of our approach, explaining its difference from the existing  approach and highlighting its new features. To be concrete, we will consider the following simple core language, defining boolean expressions based on \m{if} construct:
+In this section, we give a brief overview of our approach. To be concrete, we will consider the following simple core language, defining boolean expressions together with \m{if} construct:
 \[
 \begin{array}{lllll}
 e &::=& \m{CoreExp}\\
@@ -17,7 +17,7 @@ The semantics of the language is very simple, consisting of the following contex
 \[
 \begin{array}{lcl}
 C &:=& \Code{(if $[\bigcdot]$ $e$ $e$)}\\
-&&hole\\
+&|&hole\\
 \end{array}
 \]
 and two reduction rules (the letter c means core):
@@ -47,8 +47,7 @@ Now let us demonstrate how to execute \Code{(And (Or \true~\false) (And \false ~
 }
 
 
-We propose a new resugaring approach by eliminating "reverse desugaring" via "lazy desugaring", where a syntactic sugar will be desugared only when it is necessary. While giving the evaluation rules of the core language, we can figure out the following context rules of the surface language. From the context rules of \m{if}, we can find that the condition ($e_1$) is always evaluated first. Therefore, for expression $e_1~\m{And}
-~e_2$ defined by syntactic sugar, $e_1$ is also evaluated first, which is the context rule of \m{And}. Similarly, we can calculate the context rule of \m{Or}.
+We propose a new resugaring approach by eliminating "reverse desugaring" via "lazy desugaring", where a syntactic sugar will be desugared only when it is necessary. While giving the evaluation rules of the core language, we can figure out the following context rules of the surface language. From the context rules of \m{if}, we can find that the condition ($e_1$) is always evaluated first. Therefore, for expression \Code{And $e_1$ $e_2$} defined by syntactic sugar, $e_1$ is also evaluated first, which is the context rule of \m{And}. Similarly, we can calculate the context rule of \m{Or}.
 
 \[
 \begin{array}{lcl}
@@ -124,4 +123,4 @@ Finally the program \Code{(And (Or \true~\false) (And \false~\true))} will get t
 \OneStep{ \false}
 \end{Codes}
 }
-Note that the context rules should restrict the computational order of a sugar expression's subexpression, we should let the context rules be correct---reflecting what should be executed in the desugared expression. Also, as the goal of resugaring is to present evaluation of sugar expressions, we clearly defined which expression should be outputted. For the example in this section, of course the sugar \m{And} and \m{Or} should be outputted, and also the boolean expressions should be. So we set boolean expressions as \m{CommonExp}, so that they can be displayed though they are of core language. By clearly separating what should be displayed, we can alway get the resugaring evaluation sequences we need. (Slightly different from the existing approach's setting, as we will discuss in Section \ref{mark:correct}.)
+Note that the context rules should restrict the computational order of a sugar expression's sub-expressions, thus we should let the context rules be correct---reflecting what should be executed in the desugared expression. Also, as the goal of resugaring is to present evaluation of sugar expressions, we clearly defined which expression should be outputted. For the example in this section, of course the sugar \m{And} and \m{Or} should be outputted, and also the boolean expressions should be. So we set boolean expressions as \m{CommonExp}, so that they can be displayed though they are of core language. By clearly separating what should be displayed, we can alway get the resugaring evaluation sequences we need. (Slightly different from the existing approach's setting, as we will discuss in Section \ref{mark:correct}.)

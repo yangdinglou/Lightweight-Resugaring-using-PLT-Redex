@@ -6,7 +6,7 @@ In this section, we present several examples to show different aspects of our ap
 
 \subsection{Case Study on Expressiveness}
 
-We have implemented our resugaring approach using PLT Redex \cite{SEwPR}, which is a semantic engineering tool based on reduction semantics \cite{reduction}. We show several case studies to demonstrate the power of our approach. Some examples we will discuss in this section are in Fig.  \ref{fig:resugaring}. Note that we set call-by-value lambda calculus as terms in \m{CommonExp}, because we want to output some intermediate expressions including lambda expressions in some examples. It's easy if we want to skip them.
+We have implemented our resugaring approach using PLT Redex \cite{SEwPR}, which is a semantic engineering tool based on reduction semantics \cite{reduction}. We show several case studies to demonstrate the power of our approach. Some examples we will discuss in this section are in Fig.  \ref{fig:resugaring}. Note that we set call-by-value lambda calculus as terms in \m{CommonExp}, because we want to output some intermediate expressions including lambda calculus in some examples. It's easy if we want to skip them.
 
 \begin{figure*}[t]
 \centering
@@ -97,7 +97,7 @@ We have implemented our resugaring approach using PLT Redex \cite{SEwPR}, which 
 \label{mark:simple}
 
 We construct some simple syntactic sugars and try it on our tool. Some sugars are inspired by the first work of resugaring \cite{resugaring}. 
-Take an SKI combinator syntactic sugar as an example. We can regard \m{S} as an expression headed with S, without subexpression. And for showing a concise result, we add the call-by-need lambda calculus in the core language for this example.
+Take an SKI combinator syntactic sugar as an example. We can regard \m{S} as an expression headed with S, without sub-expression. And for showing a concise result, we add the call-by-need lambda calculus in the core language for this example.
 \[
 \begin{array}{l}
 \drule{\m{S}}{\Code{($\lambda_N$ (x1 x2 x3) (x1 x2 (x1 x3)))}}\\
@@ -109,7 +109,7 @@ Take an SKI combinator syntactic sugar as an example. We can regard \m{S} as an 
 
 
 
-Although SKI combinator calculus is a reduced version of lambda calculus, we can construct combinators' sugar based on call-by-need lambda calculus in our core language. For the sugar expression \Code{(S (K (S I)) K xx yy)}, we get the resugaring sequences as Fig.  \ref{fig:SKI}. Here the sugars contains no sub-expression, then the sugar should just desugar to the core expression. It is interesting that the sugar without sub-expressions (written by lambda calculus) and the sugar with sub-expressions will behave different. For example, in this case we can write the sugar as \Code{(S e e e ...)} and so on, then the sugar may not have to be desugared. Moreover, we can use this difference to force a syntactic sugar desugared by call-by-need lambda calculus. See if we want a sugar \m{ForceAnd} which does not
+Although SKI combinator calculus is a reduced version of lambda calculus, we can construct combinators' sugar based on call-by-need lambda calculus in our core language. For the sugar program \Code{(S (K (S I)) K xx yy)}, we get the resugaring sequences as Fig.  \ref{fig:SKI}. Here the sugars contains no sub-expression, then the sugar should just desugar to the core expression. It is interesting that the sugar without sub-expressions (written by lambda calculus) and the sugar with sub-expressions will behave different. For example, in this case we can write the sugar as \Code{(S e e e ...)} and so on, then the sugar may not have to be desugared. Moreover, we can use this difference to force a syntactic sugar desugared by call-by-need lambda calculus. See if we want a sugar \m{ForceAnd} which does not
 want to use the context rules of \m{if} to getting the resugaring sequence, we can just write the following sugar.
 
 \[
@@ -167,7 +167,7 @@ Recursive sugar is a kind of syntactic sugars where call itself or each other du
 \]
 are recursive sugars. The existing resugaring approach can't process syntactic sugar written like this (non-pattern-based) easily, because boundary conditions are in the sugar itself.
 
-Take \Code{(Odd 2)} as an example. The previous work will firstly desugar the expression using the rules. Then the desugaring will never terminate as following shows.
+Take \Code{(Odd 2)} as an example. The previous work will firstly desugar the program using the rules. Then the desugaring will never terminate as following shows.
 \begin{footnotesize}
 \begin{Codes}
    (Odd 2)
@@ -216,7 +216,7 @@ Moreover, just like the \m{Odd} and \m{Even} sugar above, there are some simple 
 
 
 
-Note that the \m{let} expression is to limit the subexpression only appears once in RHS. In this example, we can find that the list \Code{(cons 1 (list 2))}, though equal to \Code{(list 1 2)}, is represented by core language's expression. So it will be difficult to naturally handle such inline boundary conditions for existing desugaring systems. (The case can be specific by some setting, such as \todo{local-expansion} in Racket's macro.) But our approach is easy to handle cases like this. 
+Note that the \m{let} expression is to limit the sub-expression only appears once in RHS. In this example, we can find that the list \Code{(cons 1 (list 2))}, though equal to \Code{(list 1 2)}, is represented by core language's expression. So it will be difficult to naturally handle such inline boundary conditions for existing desugaring systems. (The case can be specific by some setting, such as \todo{local-expansion} in Racket's macro.) But our approach is easy to handle cases like this. 
 
 \subsubsection{Limitation on Presentation}
 One may note that the context rules of our sugar setting limit the presentation of syntactic sugar. For example, it is difficult to present a sugar with ellipsis, because the form of its context rule may vary. It is still possible if we add some 

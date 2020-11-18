@@ -20,7 +20,7 @@ Unfortunately, when syntactic sugar is eliminated by transformation, it obscures
 
 
 
-Resugaring is a powerful technique to resolve this problem \cite{resugaring,hygienic}. It  can automatically convert the evaluation sequences of desugared program in the core language into representative sugar's syntax in the surface language. Just like the existing approach, it is natural to try matching the programs after the desugared with syntactic sugars' rules to reversely desugar the sugars---that why it was named "resugaring". Here we use the sugar \Code{Newor} to see how existing resugaring approach works, with following desugaring rule. (Considering the \m{not} as a core language's constructor)
+Resugaring is a powerful technique to resolve this problem \cite{resugaring,hygienic}. It  can automatically convert the evaluation sequences of desugared program in the core language into representative sugar's syntax in the surface language. Just like the existing approach, it is natural to try matching the expressions after the desugared with syntactic sugars' rules to reversely desugar the sugars---that why it was named "resugaring". Here we use the sugar \Code{Newor} to see how existing resugaring approach works, with following desugaring rule. (Considering the \m{not} as a core language's constructor)
 
 \begin{center}
 	\[
@@ -71,7 +71,7 @@ Moreover, when meeting hygienic sugar, the simple match and substitution will no
 	\begin{array}{lcl}
 	Surface&&Core\\
 	\Code{(let (t 1)}&\xrightarrow{desugar}&\Code{(let (t 1)}\\
-	\Code{\quad(Double t))}&\xdashleftarrow[resugar?]&\Code{\quad(let (t' t) (* 2 t')))}\\
+	\Code{\quad(Double t))}&&\Code{\quad(let (t' t) (* 2 t')))}\\
 	\qquad\qquad\dashdownarrow& &\qquad\qquad\downarrow\\
 	\Code{\quad(Double 1))}&\xdashleftarrow[resugar?]&\Code{\quad(let (t' 1) (* 2 t')))}\\
 \end{array}
@@ -85,7 +85,7 @@ If we use binder renaming for solving the simple case, some other information is
 
 % \todo{Examples of 2 resugaring method(what is, why hard)}
 
-The existing resugaring approaches subtly solved the problems above by "tagging"\cite{resugaring} and "abstract syntax DAG"\cite{hygienic}. While those techniques successfully make the resugaring method usable, there is a key point which makes the existing approaches not very practical---the reverse expansion of sugars need to match the desugared programs to see if it is able to resugar. It is quite a huge job when the program contains many syntactic sugars or some syntactic sugars can be desugared to large sub-expressions.
+The existing resugaring approaches subtly solved the problems above by "tagging"\cite{resugaring} and "abstract syntax DAG"\cite{hygienic}. While those techniques successfully make the resugaring method usable, there is a key point which makes the existing approaches not very practical---the reverse expansion of sugars need to match the desugared expressions to see if it is able to resugar. It is quite a huge job when the program contains many syntactic sugars or some syntactic sugars can be desugared to large sub-expressions.
 Also, as the debugging for surface languages can be a good application of resugaring, the efficiency matters.
 
 
