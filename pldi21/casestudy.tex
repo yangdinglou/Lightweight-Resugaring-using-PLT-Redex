@@ -100,9 +100,9 @@ We construct some simple syntactic sugars and try it on our tool. Some sugars ar
 Take an SKI combinator syntactic sugar as an example. We can regard \m{S} as an expression headed with S, without sub-expression. And for showing a concise result, we add the call-by-need lambda calculus in the core language for this example.
 \[
 \begin{array}{l}
-\drule{\m{S}}{\Code{($\lambda_N$ (x1 x2 x3) (x1 x2 (x1 x3)))}}\\
-\drule{\m{K}}{\Code{($\lambda_N$ (x1 x2) x1)}}\\
-\drule{\m{I}}{\Code{($\lambda_N$ (x) x)}}
+\drule{\m{S}}{\Code{($\lambda_N$ ($x_1$ $x_2$ $x_3$) ($x_1$ $x_2$ ($x_1$ $x_3$)))}}\\
+\drule{\m{K}}{\Code{($\lambda_N$ ($x_1$ $x_2$) $x_1$)}}\\
+\drule{\m{I}}{\Code{($\lambda_N$ ($x$) $x$)}}
 \end{array}
 \]
 
@@ -113,7 +113,7 @@ Although SKI combinator calculus is a reduced version of lambda calculus, we can
 want to use the context rules of \m{if} to getting the resugaring sequence, we can just write the following sugar.
 
 \[
-\drule{\Code{ForceAnd}}{\Code{($\lambda_N$ ($e_1$ $e_2$) (if $e_1$ $e_2$ \false))}}
+\drule{\Code{ForceAnd}}{\Code{($\lambda_N$ ($x_1$ $x_2$) (if $x_1$ $x_2$ \false))}}
 \]
 
 
@@ -223,22 +223,29 @@ One may note that the context rules of our sugar setting limit the presentation 
 restriction (so that the algorithm \ref{alg:f} will work), or we can just make it using the list operation just as what the sugar \m{Map, Filter} work. Overall, the presentation of our sugar system is not so flexible, but it won't affect the expressiveness. \todo{Automaton}
 
 \subsection{Efficiency}
-\begin{figure}[thb]
-  \begin{center}\small
-  \begin{tabular}{l | l | l |l}
-    \emph{Sugar} & \emph{Ours Steps} & \emph{Existing's Steps} & \emph{Description} \\ \hline
-    And, Or & 4  & 2+0+2=4 & \\
-    And, Newor & 10 & 7+6+3=16 & Or with binding \\
-    Filter & 29 & 22+78+10=110 &  \\
-    Sg, and, or & 11 & 5+0+10=15 & Sg is nested \\ 
-    HygienicAdd & 6 & 5+1+1=7 &  \\
-    S, K, I & 16 & 11+13+10=34 &  \\
-  \end{tabular}
-  \end{center}
-  \caption{Comparison on Reduction Steps}
-  \label{fig:step}
-  \end{figure}
-To show the efficiency of our approach, we try some programs from simple to hard. We use the reduction steps comparing to the existing approach as the metrics. The following Fig. \ref{fig:step} shows the difference between the two approaches. Notice that both approaches have pre-processions---for the existing one, it is to desugar the programs to the core language together with some tags; for ours, it is to calculate the context rules of syntactic sugars. We do not consider the steps during these pre-processes. Besides, we derive the reduction steps of the existing approach into three different kinds---the reductions in the core language, the reverse desugaring with failed resugaring, the reverse desugaring with successful resugaring.  Use the following example to see the difference. Consider a sugar named \m{Hard} with two arguments, which has many reduction steps after desugared. Assuming for specific $e_1$ and $e_2$, the \Code{(Hard $e_1$ $e_2$)} after fully desugared has 100 reduction steps (finally to \#f, for example), and only 1 intermediate step can be resugared (to \Code{(Hard $v_1$ $e_2$)}, for example). Then for \Code{(And (Hard $e_1$ $e_2$) \#t)}, although all the 100 steps in the core language try the reverse desugaring, only \Code{(if stepn \#t \#f)} (2 steps on \m{And}, \m{Hard}) and \Code{(if \#f \#t \#f)} (1 step on \m{And}) are successful. Other 98 attempts will be failed together with 98 steps on \m{And}.
+% \begin{figure}[thb]
+%   \begin{center}\small
+%   \begin{tabular}{l | l | l |l}
+%     \emph{Sugar} & \emph{Ours Steps} & \emph{Existing's Steps} & \emph{Description} \\ \hline
+%     And, Or & 4  & 2+0+2=4 & \\
+%     And, Newor & 10 & 7+6+3=16 & Or with binding \\
+%     Filter & 29 & 22+78+10=110 &  \\
+%     Sg, and, or & 11 & 5+0+10=15 & Sg is nested \\ 
+%     HygienicAdd & 6 & 5+1+1=7 &  \\
+%     S, K, I & 16 & 11+13+10=34 &  \\
+%   \end{tabular}
+%   \end{center}
+%   \caption{Comparison on Reduction Steps}
+%   \label{fig:step}
+%   \end{figure}
+
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=0.45\textwidth]{images/efficiency.png}
+	\caption{Comparison on Reduction Steps}
+	\label{fig:step}
+\end{figure}
+To show the efficiency of our approach, we use the reduction steps comparing to the existing approach as the metrics. The following Fig. \ref{fig:step} shows the difference between the two approaches. Notice that both approaches have pre-processions---for the existing one, it is to desugar the programs to the core language together with some tags; for ours, it is to calculate the context rules of syntactic sugars. We do not consider the steps during these pre-processes. Besides, we derive the reduction steps of the existing approach into three different kinds---the reductions in the core language, the reverse expansion with failed resugaring, the reverse expansion with successful resugaring.  Use the following example to see the difference. Consider a sugar named \m{Hard} with two arguments, which has many reduction steps after desugared. Assuming for specific $e_1$ and $e_2$, the \Code{(Hard $e_1$ $e_2$)} after fully desugared has 100 reduction steps (finally to \#f, for example), and only 1 intermediate step can be resugared (to \Code{(Hard $v_1$ $e_2$)}, for example). Then for \Code{(And (Hard $e_1$ $e_2$) \#t)}, although all the 100 steps in the core language try the reverse desugaring, only \Code{(if stepn \#t \#f)} (2 steps on \m{And}, \m{Hard}) and \Code{(if \#f \#t \#f)} (1 step on \m{And}) are successful. Other 98 attempts will be failed together with 98 steps on \m{And}.
 
 \[
 {\footnotesize
