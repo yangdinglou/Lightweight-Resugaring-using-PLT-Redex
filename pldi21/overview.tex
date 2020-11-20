@@ -37,7 +37,7 @@ Assume that our surface language is defined by two syntactic sugars defined by:
 
 Now let us demonstrate how to execute \Code{(And (Or \true~\false) (And \false ~\true))}, and get the resugaring sequences as follows by our approach.
 
-{\scriptsize
+{\footnotesize
 \begin{Codes}
     (And (Or \true \false) (And \false \true))
 \OneStep{ (And \true (And \false \true))}
@@ -118,7 +118,7 @@ Then we mix the surface language and the core language as Fig. \ref{fig:mixexamp
 
 Finally the program \Code{(And (Or \true~\false) (And \false~\true))} will get the evaluation sequence as follows in the mixed language. We can just filter the intermediate sequences without \m{Coreexp} in any sub-expressions to get the resugaring sequence above.
 
-{\scriptsize
+{\footnotesize
 \begin{Codes}
     (And (Or \true \false) (And \false \true))
 \OneStep{ (And (if \true \true \false) (And \false \true))}

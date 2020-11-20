@@ -142,7 +142,7 @@ In summary, our approach chooses a slightly different way for the \emph{abstract
 
 As an important property for sugar or macro system, the existing approach uses a data structure (ASD) to handle hygiene problems in resugaring, while in our approach the hygiene can be handled easily. Previous research\cite{EssenceofHygiene} has discussed why some simple processing such as renaming is insufficient in some cases. But in our system, the hygienic problem is solved easily. 
 
-In our approach, the sugar can contain some bindings, written by the core language's \m{let}. The hygienic problem only happens when binders of an expanded sugar conflict with other binders. We file them into two categories---
+In our approach, the sugar can contain some bindings, written by the core language's \m{let}. The hygienic problem only happens when binders of an expanded sugar conflict with other binders. We file them into two cases---
 \begin{itemize}
 \item A sugar in binding's context.
 \item A sugar's sub-expression containing bindings.

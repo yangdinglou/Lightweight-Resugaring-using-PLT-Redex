@@ -141,7 +141,7 @@ Our surface language is defined by a set of syntactic sugars, together with some
 Here we just assume a simple desugaring system for a syntactic sugar expression. We will show how this approach can be combined with other complex desugaring. A syntactic sugar is defined by a desugaring rule in the following form,
 
 \[
-\drule{(\m{SurfHead}~e_1~e_2~\ldots~e_n)}{\m{exp}} \todo{\text{font size in drule}}
+\drule{(\m{SurfHead}~e_1~e_2~\ldots~e_n)}{\m{exp}} %\todo{\text{font size in drule}}
 \]
 where its left-hand-side (LHS) is a pattern and its left-hand-side (RHS) is an expression of the surface language or the core language. The LHS can be nested or not, that means, we can write sugars like \Code{(SurfHead ($e_1$ ($e_2$ $e_3$)) $\ldots$ $e_n$)}. And any pattern variable (e.g., $e_1$) in LHS only appears once in RHS. For instance, we may define syntactic sugar \m{And} by
 \[
@@ -302,7 +302,10 @@ $OrderList$ = $\{e_1,~e_2\}$ \hfill(depth3, getting rules
 
 Or if the \m{Head} is a \m{SurfHead} with its context rules calculated, then we regard it as \m{CoreHead}. If it is without context rules, we will try calculating its context rules first. However, if the recursive process has tried calculating it, it will be an ill-formed recursive sugar, as the following example shows.
 \[
-\drule{(\m{Odd}~e)}{(\m{Even}~(-~e~1))}\quad
+\drule{(\m{Odd}~e)}{(\m{Even}~(-~e~1))}
+\]
+
+\[
 \drule{(\m{Even}~e)}{(\m{Odd}~(-~e~1))}
 \]
 
@@ -433,7 +436,7 @@ According to the lemma, any sugar has the correct context rules. So the hole is 
 We describe a resugaring approach based on a simple transformer. What if we need a more complex transformer system to describe more complex semantics for syntactic sugar? For example, we may need a type system for checking; we may specify the binding of syntactic sugar for more general hygiene (We solved the hygiene in our core language without specific the binding, as described in Section \ref{mark:hygiene}); we may use some other functions to help the desugaring. All of these extensions are possible as long as following some conditions. We summarize the conditions as follows.
 \begin{enumerate}
 	\item \emph{Compositional}: Generally speaking, the desugaring order and should not affect the semantics of a sugar expression. Otherwise, the lazy desugaring will not be correct.
-	\item \emph{Unique Evaluation Order}: For any rules of syntactic sugar, the context rules should limit an expression to have only one computational order. Otherwise, the algorithm \m{calcontext} will not be deterministic.
+	\item \emph{Unique Computational Order}: For any rules of syntactic sugar, the context rules should limit an expression to have only one computational order. Otherwise, the algorithm \m{calcontext} will not be deterministic.
 	\item \emph{Clear Semantic}: If a syntactic sugar's desugaring rule is ambiguous or wrong, the algorithm \m{calcontext} may go wrong.
 \end{enumerate}
 
