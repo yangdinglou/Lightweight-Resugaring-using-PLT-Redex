@@ -262,7 +262,10 @@
 % Syntactic sugar, first coined by Peter J. Landin in 1964, has proved to be very useful for defining domain-specific languages and extending languages. Unfortunately, when syntactic sugar is eliminated by transformation, it obscures the relationship between the user’s source program and the transformed program. Resugaring is a powerful technique to resolve this problem, which automatically converts the evaluation sequences of desugared program in the core language into representative sugar's syntax in the surface language. However, the existing approach relies on the reverse application of desugaring rules to desugared core expression whenever possible. When a desugaring rule is complex and a desugared program is large, such reverse expansion becomes very complex and costive.
 
 % In this paper, 
-We propose a novel approach to resugaring, which is a technique to get the surface evaluation sequences of syntactic sugars, by lazy desugaring. We recognize the condition for lazy desugaring, and propose a reduction strategy for the language mixed by the surface language and the core language, which can produce the correct resugaring evaluation sequence. We have implemented a system based on this new approach. The result shows that our new approach is more efficient compared to the existing approach, and the lazy desugaring also provides powerful expressiveness even for a simple desugaring so that it can also deal with the common hygienic sugars and flexible recursive sugars.
+We propose a novel approach to resugaring, which can automatically convert the evaluation sequences of desugared program in the core language into representative sugar's syntax in the surface language by lazy desugaring.
+%which  is a technique to get the surface evaluation sequences of syntactic sugars, by lazy desugaring. 
+We define the lazy desugaring by proposing a reduction strategy for the language combining the surface language with the core language, prove that it will produce correct resugaring evaluation sequences, and demonstrate that it is powerful enough to deal with hygienic, recursive and higher-order sugars.
+We have implemented a resugaring system based on this new approach, and the experimental results show that our approach is much more efficient than the existing ones.
 
 \end{abstract}
 
