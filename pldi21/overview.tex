@@ -17,7 +17,7 @@ The semantics of the language is very simple, consisting of the following contex
 \[
 \begin{array}{lcl}
 C &:=& \Code{(if C $e$ $e$)}\\
-&|&[\bigcdot]\note{//hole}\\
+&|&[\bigcdot]\note{//evaluation context's hole}\\
 \end{array}
 \]
 and two reduction rules (the letter c means core):
@@ -61,50 +61,56 @@ Then we mix the surface language and the core language as Fig. \ref{fig:mixexamp
 
 \begin{figure}[thb]
 \centering
-\subcaptionbox{Syntax \label{fig:mixsyntax}}[\linewidth]{\footnotesize
-\begin{flushleft}
-\[
-\begin{array}{lll}
-e &::=& \m{CoreExp} \\
-&|&\m{SurfExp}\\
-&|&\m{CommonExp}\\
-\m{CoreExp} &::=& \Code{(if~$e$~$e$~$e$)}\\
-\m{SurfExp} &::=& \Code{(And~$e$~$e$)}\\
-&|&\Code{(Or~$e$~$e$)}\\
-\m{CommonExp} &::=& \true\\
-&|& \false\\
-\end{array}
-\]
-\end{flushleft}
-
+\begin{subfigure}{\linewidth}{\footnotesize
+    \begin{flushleft}
+        \[
+        \begin{array}{lll}
+        e &::=& \m{CoreExp} \\
+        &|&\m{SurfExp}\\
+        &|&\m{CommonExp}\\
+        \m{CoreExp} &::=& \Code{(if~$e$~$e$~$e$)}\\
+        \m{SurfExp} &::=& \Code{(And~$e$~$e$)}\\
+        &|&\Code{(Or~$e$~$e$)}\\
+        \m{CommonExp} &::=& \true\\
+        &|& \false\\
+        \end{array}
+        \]
+    \end{flushleft}
+    \caption{Syntax}
+    \label{fig:mixsyntax}
 }
-\subcaptionbox{Context Rules \label{fig:mixcontext}}[\linewidth]{
-\begin{flushleft}
-\[\footnotesize
-\begin{array}{lcl}
-C &:=& (\m{if}~[\bigcdot]~$e$~$e$)\\
-&|& (\m{And}~[\bigcdot]~$e$)\\
-&|& (\m{Or}~[\bigcdot]~$e$)\\
-&|&hole\\
-\end{array}
-\]
-\end{flushleft}
-
+\end{subfigure}
+\begin{subfigure}{\linewidth}{\footnotesize
+    \begin{flushleft}
+        \[\footnotesize
+        \begin{array}{lcl}
+        C &:=& (\m{if}~C~$e$~$e$)\\
+        &|& (\m{And}~C~$e$)\\
+        &|& (\m{Or}~C~$e$)\\
+        &|&[\bigcdot]\\
+        \end{array}
+        \]
+        \end{flushleft}
+    \caption{Context Rules}
+    \label{fig:mixcontext}
 }
+\end{subfigure}
 
-\subcaptionbox{Reduction Rules \label{fig:mixreduction}}[\linewidth]{\footnotesize
-\begin{flushleft}
-\[
-\begin{array}{c}
-\redm{(\m{And}~e_1~e_2)}{(\m{if}~e_1~e_2~\false)}\\
-\redm{(\m{Or}~e_1~e_2)}{(\m{if}~e_1~\true~e_2)}\\
-\redm{(\m{if}~\true~e_1~e_2)}{e_1}\\
-\redm{(\m{if}~\false~e_1~e_2)}{e_2} 
-\end{array}
-\]
-\end{flushleft}
-
+\begin{subfigure}{\linewidth}{\footnotesize
+    \begin{flushleft}
+        \[
+        \begin{array}{c}
+        \redm{(\m{And}~e_1~e_2)}{(\m{if}~e_1~e_2~\false)}\\
+        \redm{(\m{Or}~e_1~e_2)}{(\m{if}~e_1~\true~e_2)}\\
+        \redm{(\m{if}~\true~e_1~e_2)}{e_1}\\
+        \redm{(\m{if}~\false~e_1~e_2)}{e_2} 
+        \end{array}
+        \]
+    \end{flushleft}
+    \caption{Reduction Rules}
+    \label{fig:mixreduction}
 }
+\end{subfigure}
 
 \caption{Mixed Language Example}
 \label{fig:mixexample}

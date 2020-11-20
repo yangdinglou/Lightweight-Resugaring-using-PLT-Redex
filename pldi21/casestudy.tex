@@ -10,84 +10,104 @@ We have implemented our resugaring approach using PLT Redex \cite{SEwPR}, which 
 
 \begin{figure*}[t]
 \centering
-\subcaptionbox{Example of SKI\label{fig:SKI}}[.4\linewidth]{
-\begin{flushleft}
-{\scriptsize
-\begin{Codes}
-\qquad (S (K (S I)) K xx yy)\\
-\OneStep{ (((K (S I)) xx (K xx)) yy)}\\
-\OneStep{ (((S I) (K xx)) yy)}\\
-\OneStep{ (I yy ((K xx) yy))}\\
-\OneStep{ (yy ((K xx) yy))}\\
-\OneStep{ (yy xx)}
-
-\end{Codes}
-}
-\end{flushleft}
-}
-\subcaptionbox{Example of \m{Hygienicadd}\label{fig:hygienicadd}}[.5\linewidth]{
-\begin{flushleft}
-{\scriptsize
-\begin{Codes}
-\qquad    (let x 2 (Hygienicadd 1 x))\\
-\OneStep{ (Hygienicadd 1 2)}\\
-\OneStep{ (+ 1 2)}\\
-\OneStep{ 3}\\
-
-\end{Codes}
-
-}
-\end{flushleft}
-}
-
-
+\begin{subfigure}{.3\linewidth}
+	\begin{spacing}{0.5}
+		\begin{flushleft}
+			{\scriptsize
+			\begin{Codes}
+			\qquad (S (K (S I)) K xx yy)\\
+			\OneStep{ (((K (S I)) xx (K xx)) yy)}\\
+			\OneStep{ (((S I) (K xx)) yy)}\\
+			\OneStep{ (I yy ((K xx) yy))}\\
+			\OneStep{ (yy ((K xx) yy))}\\
+			\OneStep{ (yy xx)}\\
+			\end{Codes}
+			}
+		\end{flushleft}
+	\end{spacing}
+	
+	\caption{Example of SKI}
+	\label{fig:SKI}
+\end{subfigure}
+\begin{subfigure}{.3\linewidth}
+	\begin{spacing}{0.5}
+		\begin{flushleft}
+			{\scriptsize
+			\begin{Codes}
+			    (let x 2 (Hygienicadd 1 x))\\
+			\OneStep{ (Hygienicadd 1 2)}\\
+			\OneStep{ (+ 1 2)}\\
+			\OneStep{ 3}\\[2.25em]
+			
+			\end{Codes}
+			
+			}
+		\end{flushleft}
+		
+	\end{spacing}
+	
+	\caption{Example of \m{Hygienicadd}}
+	\label{fig:hygienicadd}
+\end{subfigure}
+\begin{subfigure}{.25\linewidth}
+	\begin{spacing}{0.5}
+		\begin{flushleft}
+			{\scriptsize
+			\begin{Codes}
+			    (Odd 2)\\
+			\OneStep{ (Even (- 2 1))}\\
+			\OneStep{ (Even 1)}\\
+			\OneStep{ (Odd (- 1 1))}\\
+			\OneStep{ (Odd 0)}\\
+			\OneStep{ \#f}\\
+			\end{Codes}
+			}
+		\end{flushleft}
+		
+	\end{spacing}
+	
+	\caption{Example of \m{Odd} and \m{Even}}
+	\label{fig:oddeven}
+\end{subfigure}
 %newline
-\subcaptionbox{Example of \m{Odd} and \m{Even}\label{fig:oddeven}}[.3\linewidth]{
-\begin{flushleft}
-{\scriptsize
-\begin{Codes}
-\qquad    (Odd 2)\\
-\OneStep{ (Even (- 2 1))}\\
-\OneStep{ (Even 1)}\\
-\OneStep{ (Odd (- 1 1))}\\
-\OneStep{ (Odd 0)}\\
-\OneStep{ \#f}
-\end{Codes}
-}
-\end{flushleft}
-}
-\subcaptionbox{Example of \m{Map}\label{fig:Map}}[.55\linewidth]{
-\begin{flushleft}
-{\scriptsize
-\begin{Codes}
-    \qquad(Map ($\lambda$ (x) (+ x 1)) (cons 1 (list 2)))\\
-\OneStep{ (Map ($\lambda$ (x) (+ x 1)) (list 1 2))}\\
-\OneStep{ (cons 2 (Map ($\lambda$ (x) (+ 1 x)) (list 2)))}\\
-\OneStep{ (cons 2 (cons 3 (Map ($\lambda$ (x) (+ 1 x)) (list))))}\\
-\OneStep{ (cons 2 (cons 3 (list)))}\\
-\OneStep{ (cons 2 (list 3))}\\
-\OneStep{ (list 2 3)}
-\end{Codes}
-}
-\end{flushleft}
-}
-\subcaptionbox{Example of \m{Filter}\label{fig:Filter}}[.9\linewidth]{
-\begin{flushleft}
-{\scriptsize
-\begin{Codes}
-    \qquad(Filter ($\lambda$ (x) (and (> x 1) (< x 4))) (list 1 2 3 4))\\
-\OneStep{ (Filter ($\lambda$ (x) (and (> x 1) (< x 4))) (list 2 3 4))}\\
-\OneStep{ (cons 2 (Filter ($\lambda$ (x) (and (> x 1) (< x 4))) (list 3 4)))}\\
-\OneStep{ (cons 2 (cons 3 (Filter ($\lambda$ (x) (and (> x 1) (< x 4))) (list 4))))}\\
-\OneStep{ (cons 2 (cons 3 (Filter ($\lambda$ (x) (and (> x 1) (< x 4))) (list))))}\\
-\OneStep{ (cons 2 (cons 3 (list)))}\\
-\OneStep{ (cons 2 (list 3))}\\
-\OneStep{ (list 2 3)}
-\end{Codes}
+\begin{subfigure}{.4\linewidth}
+		\begin{flushleft}
+			{\scriptsize
+			% \begin{Codes}
+				\quad\;\;\;\Code{ (Map ($\lambda$ (x) (+ x 1)) (cons 1 (list 2)))}\\
+			\OneStep{ \Code{ (Map ($\lambda$ (x) (+ x 1)) (list 1 2))}}\\
+			\OneStep{ \Code{ (cons 2 (Map ($\lambda$ (x) (+ 1 x)) (list 2)))}}\\
+			\OneStep{ \Code{ (cons 2 (cons 3 (Map ($\lambda$ (x) (+ 1 x)) (list))))}}\\
+			\OneStep{ \Code{ (cons 2 (cons 3 (list)))}}\\
+			\OneStep{ \Code{ (cons 2 (list 3))}}\\
+			\OneStep{ \Code{ (list 2 3)}}\\[2em]
+			% \end{Codes}
+			}
+		\end{flushleft}
+		
+	
+	\caption{Example of \m{Map}}
+	\label{fig:Map}
+\end{subfigure}
+\begin{subfigure}{.5\linewidth}
+		\begin{flushleft}
+			{\scriptsize
+			\quad\;\;\;\Code{ (Filter ($\lambda$ (x) (and (> x 1) (< x 4))) (list 1 2 3 4))}\\
+			\OneStep{ \Code{ (Filter ($\lambda$ (x) (and (> x 1) (< x 4))) (list 2 3 4))}}\\
+			\OneStep{ \Code{ (cons 2 (Filter ($\lambda$ (x) (and (> x 1) (< x 4))) (list 3 4)))}}\\
+			\OneStep{ \Code{ (cons 2 (cons 3 (Filter ($\lambda$ (x) (and (> x 1) (< x 4))) (list 4))))}}\\
+			\OneStep{ \Code{ (cons 2 (cons 3 (Filter ($\lambda$ (x) (and (> x 1) (< x 4))) (list))))}}\\
+			\OneStep{ \Code{ (cons 2 (cons 3 (list)))}}\\
+			\OneStep{ \Code{ (cons 2 (list 3))}}\\
+			\OneStep{ \Code{ (list 2 3)}}
+			
+			}
+		\end{flushleft}
+	
+	\caption{Example of \m{Filter}}
+	\label{fig:Filter}
+\end{subfigure}
 
-}
-\end{flushleft}
-}
 \caption{Resugaring Examples}
 \label{fig:resugaring}
 \end{figure*}
@@ -109,7 +129,7 @@ Take an SKI combinator syntactic sugar as an example. We can regard \m{S} as an 
 
 
 
-Although SKI combinator calculus is a reduced version of lambda calculus, we can construct combinators' sugars based on call-by-need lambda calculus in our core language. For the sugar program \Code{(S (K (S I)) K xx yy)}, we get the resugaring sequences as Fig.  \ref{fig:SKI}. Here the sugars contain no sub-expression, then the sugar should just desugar to the core expression. It is interesting that the sugar without sub-expressions (written by lambda calculus) and the sugar with sub-expressions will behave differently. For example, in this case, we can write the sugar as \Code{(S e e e ...)} and so on, then the sugar may not have to be expanded. Moreover, we can use this difference to force a syntactic sugar desugared using call-by-need lambda calculus. See if we want a sugar \m{ForceAnd} which does not
+Although SKI combinator calculus is a reduced version of lambda calculus, we can construct combinators' sugars based on call-by-need lambda calculus in our core language. For the sugar program \Code{(S (K (S I)) K xx yy)}, we get the resugaring sequences as Fig.  \ref{fig:SKI}. Here the sugars contain no sub-expression, then the sugar should just desugar to the core expression. It is interesting that the sugar without sub-expressions (written by lambda calculus) and the sugar with sub-expressions will behave differently. For example, in this case, we can write the sugar as \Code{(S e e e)} and so on, then the sugar may not have to be expanded. Moreover, we can use this difference to force a syntactic sugar desugared using call-by-need lambda calculus. See if we want a sugar \m{ForceAnd} which does not
 want to use the context rules of \m{if} to getting the resugaring sequence, we can just write the following sugar.
 
 \[
@@ -146,7 +166,7 @@ A typical hygienic problem is as the following example.
 % \begin{Codes}
 % 	(Hygienicadd e1 e2) \DeStep{ (let ((x e1)) (+ x e2))}
 % \end{Codes}
-For the existing resugaring approach, if we want to get sequences of \Code{(let (x 2) (Hygienicadd 1 x))}, it will firstly desugar to \Code{(let (x 2) (let x 1 (+ x x)))}, which is awful because the two $x$ in \Code{(+ x x)} should be bound to different values. So the existing hygienic resugaring approach uses abstract syntax DAG to distinct different \m{x} in the desugared expression. But for our approach based on lazy desugaring, the \m{Hygienicadd} sugar does not have to expand until necessary, thus, getting resugaring sequences as Fig.  \ref{fig:hygienicadd} based on a non-hygienic transformer system. We will discuss hygiene problem in Section \ref{mark:hygiene}.
+For the existing resugaring approach, if we want to get sequences of \Code{(let (x 2) (Hygienicadd 1 x))}, it will firstly desugar to \Code{(let (x 2) (let x 1 (+ x x)))}, which is awful because the two $x$ in \Code{(+ x x)} should be bound to different values. So the existing hygienic resugaring approach uses abstract syntax DAG to distinct different \m{x} in the desugared expression. But for our approach based on lazy desugaring, the \m{Hygienicadd} sugar does not have to expand until necessary, thus, getting resugaring sequences as Fig.  \ref{fig:hygienicadd} based on a non-hygienic transformer system. We will discuss hygienic problem in Section \ref{mark:hygiene}.
 
 
 % The lazy desugaring is also convenient for achieving hygiene for non-hygienic core language. For example, \Code{(let x 1 (+ x (let x 2 (+ x 1))))} may be reduced to \Code{(+ 1 (let 1 2 (+ 1 1)))} by a simple core language whose \Code{let} expression does not handle cases like that. But by writing a sugar (not syntactic sugar in the usual sense, because we do not want it to behave as \m{let}) \m{Let}

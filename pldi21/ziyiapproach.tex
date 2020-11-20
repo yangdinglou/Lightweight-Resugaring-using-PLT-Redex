@@ -110,9 +110,8 @@ The expression form of the core language is defined in Fig. \ref{fig:expression}
 \caption{Context Rules}
 \end{subfigure}
 
-
-\subcaptionbox{Part of Reduction Rules \label{fig:corereduction}}[0.8\linewidth]{
-\[
+\begin{subfigure}{0.8\linewidth}
+	\[
 {\footnotesize
 		\begin{array}{lcl}	
 		\Code{(($\lambda$~($x_1$~$x_2$~...)~CoreExp)~$\m{value}_1$~$\m{value}_2$~...)} &\redc{}{}& \Code{(($\lambda$~($x_2$~...)~CoreExp[$\m{value}_1$/$x_1$])~$\m{value}_2$~...)}\\
@@ -124,11 +123,10 @@ The expression form of the core language is defined in Fig. \ref{fig:expression}
 		\end{array}
 }
 \]
-}
+	\caption{Part of Reduction Rules}
+\end{subfigure}
 
-
-
-\caption{A Core Language Example}
+\caption{A Core Language's Example}
 \label{fig:core}
 \end{figure*}
 

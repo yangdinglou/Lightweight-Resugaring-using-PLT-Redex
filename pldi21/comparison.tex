@@ -6,12 +6,12 @@
 \label{sec5.1}
 
 
-As we mentioned in the introduction (Section \ref{mark:mention}), our approach has a more specific assumption compared to the existing approach. Here is a small gap between the motivation of the existing approach and ours---the existing approach focused mainly on a tool for existing language, while our approach considered more on a basic feature for language implementation. The examples in Section \ref{sec:recursiveSugar} have shown how the lazy desugaring solve some problems in practice.
+As we mentioned in the introduction (Section \ref{mark:mention}), our approach has a more specific assumption compared to the existing approach. Here is a small gap between the motivation of the existing approach and ours---the existing approach focused mainly on a tool for existing language, while our approach considered more on a basic feature for language implementation. The examples in Section \ref{sec:recursiveSugar} have shown how the lazy desugaring solves some problems in practice.
 
 In addition, as what we need for the lazy desugaring is just the computational order of the syntactic sugar, we can make an extension for the resugaring algorithm to work with only a black-box core language stepper. The most important difference between the black-box stepper and the evaluation rules is the computational order---while the same language behaves uniquely, the evaluation rules can show the computational order statically (without running the program). So when meeting the black-box stepper for the core language, we can just use some simple program to "get" the computational order of the core language as the following example  shows: we simply let the sub-expressions of a \m{Head} be some reducible expressions and test the computational order. 
 
 \begin{center}\footnotesize
-	\Code{(if tmpe1 tmpe2 tmpe3)}\\ $\Downarrow_{stepper}$\\ \Code{(if tmpe1' tmpe2 tmpe3)}\\ $\Downarrow_{getnext}$\\ \Code{(if tmpv1 tmpe2 tmpe3)}\\ $\Downarrow_{stepper}$\\ \Code{tmpei}\\
+	\Code{(if tmpe1 tmpe2 tmpe3)}\\ $\Downarrow_{stepper}$\\ \Code{\qquad\qquad\qquad\qquad\;\;(if tmpe1' tmpe2 tmpe3)}\note{//getting a context rule}\\ $\Downarrow_{getnext}$\\ \Code{(if tmpv1 tmpe2 tmpe3)}\\ $\Downarrow_{stepper}$\\ \qquad\Code{tmpei}\note{//no more rules}\\
 \end{center}
 
 
@@ -140,9 +140,9 @@ In summary, our approach chooses a slightly different way for the \emph{abstract
 \subsection{Hygiene}
 \label{mark:hygiene}
 
-As an important property for sugar or macro system, the existing approach uses a data structure (ASD) to handle hygiene problems in resugaring, while in our approach the hygiene can be handled easily. Previous research\cite{EssenceofHygiene} has discussed why some simple processing such as renaming is insufficient in some cases. But in our system, the hygiene problem is solved easily. 
+As an important property for sugar or macro system, the existing approach uses a data structure (ASD) to handle hygiene problems in resugaring, while in our approach the hygiene can be handled easily. Previous research\cite{EssenceofHygiene} has discussed why some simple processing such as renaming is insufficient in some cases. But in our system, the hygienic problem is solved easily. 
 
-In our approach, the sugar can contain some bindings, written by the core language's \m{let}. The hygiene problem only happens when binders of an expanded sugar conflict with other binders. We file them into two categories---
+In our approach, the sugar can contain some bindings, written by the core language's \m{let}. The hygienic problem only happens when binders of an expanded sugar conflict with other binders. We file them into two categories---
 \begin{itemize}
 \item A sugar in binding's context.
 \item A sugar's sub-expression containing bindings.
@@ -161,10 +161,10 @@ where \[
 
 
 
-For the case1, the very basic and common hygiene problem, is not a problem, because our "lazy desugaring" setting won't let the sugar \m{Or} expanded before the x is substituted. Because the bound variables in sugar expressions are only introduced by let-binding, all of them can "delay" the expansion of the syntactic sugar.
+For the case1, the very basic and common hygienic problem, is not a problem, because our "lazy desugaring" setting won't let the sugar \m{Or} expanded before the x is substituted. Because the bound variables in sugar expressions are only introduced by let-binding, all of them can "delay" the expansion of the syntactic sugar.
 
 
-For the case2, where the sub-expression \Code{f} is a free variable introduced by the sugar \m{Subst}, the program will firstly expand the \m{Subst} (because the only hole at $e_3$ has been a value), then hygiene problem is just about the core language---which can be easily solved by capture-avoiding substitution.
+For the case2, where the sub-expression \Code{f} is a free variable introduced by the sugar \m{Subst}, the program will firstly expand the \m{Subst} (because the only hole at $e_3$ has been a value), then hygienic problem is just about the core language---which can be easily solved by capture-avoiding substitution.
 
 
 Because of the definition of desugaring in our approach, we can not achieve hygiene by proving the $\alpha-equivalence$.
