@@ -4,7 +4,7 @@
 %Explain the work that are related to your problem, and to your three contributions.
 
 As discussed many times before, our work is much related to the pioneering work of \emph{resugaring} in \cite{resugaring,hygienic}. The idea of "tagging" and "reverse desugaring" is a clear explanation of "resugaring", but it becomes very complex when the RHS of the desugaring rule becomes complex. Our approach does not need to reverse desugaring, and is more lightweight, powerful, and efficient.
-For hygienic resugaring, compared with the approach of using DAG to solve the variable binding  problem in \cite{hygienic}, our approach of "lazy desugaring" can achieve kind of natural hygiene without special treatment. It oughts to combine with existing hygienic resugaring approaches.
+For hygienic resugaring, compared with the approach of using DAG to solve the variable binding  problem in \cite{hygienic}, our approach of "lazy desugaring" can achieve kind of natural hygiene within our core language.
 
 
 
@@ -16,7 +16,7 @@ This can also be considered as a bidirectional transformation \cite{bx,lens07} a
 for a one-step try in our lazy desugaring. It should be noted that Galois slicing may be useful to handle side effects in resugaring in the future (for example, slicing the part where side effects appear).
 
 
-There is a long history of hygienic macro expansion\cite{hygienicmacro}, and a formal specific hygiene definition was given \cite{10.5555/1792878.1792884} by specific the binding scopes of macros. \cite{EssenceofHygiene} is also another formal definition of the hygienic macro.
+There is a long history of hygienic macro expansion\cite{hygienicmacro}, and a formal specific hygiene definition was given \cite{10.5555/1792878.1792884} by specific the binding scopes of macros. another formal definition of the hygienic macro\cite{EssenceofHygiene} is based on nominal logic\cite{10.1007/s001650200016}.
 %
 %When the tracking in their notation can be easily done for sugar whose rules can be derived automatically.
 

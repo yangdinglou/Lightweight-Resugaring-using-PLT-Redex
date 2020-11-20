@@ -163,7 +163,7 @@ Note that in the desugaring rule, we do not restrict the RHS to be a $\m{CoreExp
 \end{array}
 \]
 
-As described above, we only assume the desugaring is a transformer without other helper function, thus there will be many kinds of ill-formed syntactic sugar which cannot desugared well (just as the \m{Odd}, \m{Even} sugars above, although can be processed by our lazy desugaring), or the semantics of the sugar cannot be defined clearly. \todo{maybe example}
+As described above, we only assume the desugaring is a transformer without other helper function, thus there will be many kinds of ill-formed syntactic sugar which cannot desugared well (just as the \m{Odd}, \m{Even} sugars above, although can be processed by our lazy desugaring), or the semantics of the sugar cannot be defined clearly.
 
 We assume that all desugaring rules are not overlapped in the sense that for any syntactic sugar in an expression, only one desugaring rule is applicable.
 
@@ -227,9 +227,11 @@ Our resugaring algorithm works on the mixed language, based on the evaluation ru
 	\label{alg:f}     % 给算法一个标签，以便其它地方引用该算法
 	\begin{algorithmic}[1]       % 数字 "1" 表示为算法显示行号的时候，每几行显示一个行号，如："1" 表示每行都显示行号，"2" 表示每两行显示一个行号，也是为了方便其它地方的引用
 		\REQUIRE ~~\\      % 算法的输入参数说明部分
-		\Code{currentLHS = (SurfHead~$t_1$~$t_2$~$\ldots$~$t_n$)} //where $t_i$ is $e$ or $v$(value).\\
-		\Code{currentContext = (Head~$\ldots~e_1'~e_2'~\ldots~e_m'$)} //where $e_i'$ can be at any depth of sub-expressions.\\
-		\Code{currentIncal = $\{\ldots\}$} //list of contexts in calculation.
+		\Code{currentLHS = (SurfHead~$t_1$~$t_2$~$\ldots$~$t_n$)}\hfill \\
+		\note{//where $t_i$ is $e$ or $v$(value).}\\
+		\Code{currentContext = (Head~$\ldots~e_1'~e_2'~\ldots~e_m'$)} \\
+		\note{//where $e_i'$ can be at any depth of sub-expressions.}\\
+		\Code{currentIncal = $\{\ldots\}$} \note{//list of contexts in calculation.}
 		\ENSURE ~~\\     % 算法的输出说明
 		\Code{ListofRule}
 		\STATE     \Code{Let ListofRule = \{\}, tmpLHS = currentLHS, InCal = append(currentIncal, SurfHead)}
@@ -241,7 +243,7 @@ Our resugaring algorithm works on the mixed language, based on the evaluation ru
 				\STATE \qquad\Code{calcontext(\m{Head}.LHS,\m{Head}.RHS,InCal))}
 			\ENDIF
 		\ENDIF
-		\STATE \Code{Let OrderList = $\{e_i',~e_j',~\ldots\}$} //got by context rules
+		\STATE \Code{Let OrderList = $\{e_i',~e_j',~\ldots\}$}\hfill\\ \note{//$RHS$'s computational order got by context rules}
 		\FOR {\Code{subExp} in \m{OrderList}}
 			\IF {$\exists i, s.t. e_i=\Code{subExp}$}
 				\STATE \Code{ListofRule= append(ListofRule,}
@@ -251,7 +253,7 @@ Our resugaring algorithm works on the mixed language, based on the evaluation ru
 				\STATE \qquad\Code{tmpLHS,~subExp,~Incal)}
 				\STATE \Code{tmpLHS = recLHS}
 				\STATE \Code{ListofRule = append(ListofRule, recRule)}
-				\STATE {\bfseries break}
+				\STATE {\bfseries break}\note{//means the RHS has to be destroyed.}
 			\ENDIF
 		\ENDFOR
 		\RETURN \Code{ListofRule, tmpLHS}
@@ -304,7 +306,7 @@ Or if the \m{Head} is a \m{SurfHead} with its context rules calculated, then we 
 \drule{(\m{Even}~e)}{(\m{Odd}~(-~e~1))}
 \]
 
-The reason we can calculate the context rules of a syntactic sugar is: for a sugar's $RHS$ like \Code{(\m{Head}~$\ldots~e_1'~e_2'~\ldots~e_m'$)}, if any reduction happens, the reduction will be on $e_i$ or the reduction will destroy the $RHS$'s form. So we can trace the computational order until the sugar form has to be destroyed.
+The reason we can calculate the context rules of a syntactic sugar is: for a sugar's $RHS$ like \Code{(\m{Head}~$\ldots~e_1'~e_2'~\ldots~e_m'$)}, if any reduction happens, the reduction will be on $e_i$ of the sugar's $LHS$ or the reduction will destroy the $RHS$'s form. So we can trace the computational order until the sugar form has to be destroyed.
 
 After calculating all context rules, we can add them to the mixed language's context rule; we can also add the desugaring rules to the mixed language's reduction rule as what we showed in Section \ref{sec2}.
 
