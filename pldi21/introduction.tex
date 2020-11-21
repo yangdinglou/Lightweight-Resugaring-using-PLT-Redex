@@ -19,7 +19,7 @@ Syntactic sugar, first coined by Peter J. Landin in 1964 \cite{syntacticsugar}, 
 Unfortunately, when syntactic sugar is eliminated by transformation, it obscures the relationship between the user’s source program and the transformed program.
 
 
-Resugaring is a powerful technique that has been proposed to resolve this problem \cite{resugaring,hygienic}. It  can automatically convert the evaluation sequences of desugared program in the core language into representative sugar's syntax in the surface language.
+Resugaring is a powerful technique that has been proposed to resolve this problem \cite{resugaring,hygienic}. It  can automatically convert the evaluation sequences of a desugared program in the core language into representative sugar's syntax in the surface language.
 %Just like the existing approach, it is natural to try matching the expressions after the desugared with syntactic sugars' dusugaring rules to reversely expand the sugars---that why it was named "resugaring". Here we use the sugar \Code{Newor} to see how the existing resugaring approach works, with following desugaring rule. (Considering the \m{not} as a core language's constructor)
 %
 As a simple example, consider \Code{Or1}, a syntactic sugar defined by the following desugaring rule:
@@ -28,9 +28,9 @@ As a simple example, consider \Code{Or1}, a syntactic sugar defined by the follo
 \]
 Figure \ref{fig:resugar1} demonstrates a resugaring process for
 \[
-\Code{(Or1 (not \#t) \#t)}.
+\Code{(Or1 (not \#t) \#t)}
 \]
-The sequence of expressions on the left is obtained from the evaluation sequence of the desugared program (in the core language) on the right by repeated reverse expansion of the sugar (reverse application of the desugaring rule through match and substitution).
+by the existing approach. The sequence of expressions on the left is obtained from the evaluation sequence of the desugared program (in the core language) on the right by repeated reverse expansion of the sugar (reverse application of the desugaring rule through match and substitution).
 \begin{figure}
 \begin{center}
 	\[
