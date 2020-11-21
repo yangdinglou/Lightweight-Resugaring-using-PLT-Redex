@@ -2,7 +2,7 @@
 \section{Case Study on Expressiveness}
 \label{sec:cases}
 
-In this section, we present several examples to demonstrate the expressive power of our approach.
+In this section, we present several examples to demonstrate the expressive power of our approach. Note that we set call-by-value lambda calculus as terms in \m{CommonExp}, because we want to output some intermediate expressions including it in some examples. It is easy if we want to skip them.
 
 \begin{figure*}[t]
 \centering
@@ -201,7 +201,7 @@ We construct some higher-order syntactic sugars and test them. The higher-order 
 \drule{\Code{\small(Filter $e$ (list))}}{\Code{\small(list)}}
 \end{array}\]
 and getting resugaring sequences as Fig.  \ref{fig:Filter}.
-Here, although the sugar can be processed by the existing resugaring approach, it will be redundant. The reason is that a \m{Filter} program for a list of length $n$ will match to find possible resugaring $n*(n-1)/2$ times. Thus, lazy desugaring is really important to reduce the resugaring's complexity of recursive sugar.
+Here, although the sugar can be processed by the existing resugaring approach, it will be redundant. The reason is that a \m{Filter} program for a list of length $n$ will match to find possible resugaring $n*(n-1)/2$ times. 
 
 Moreover, just like the \m{Odd} and \m{Even} sugar above, there are some sugars that need to be expressed by the expressions in core language as branching conditions, or sometimes the pattern-matching desugaring rules are not useful enough to express a syntactic sugar. Take the example of another higher-order sugar \m{Map} as an example, sometimes only inline condition like \Code{(empty? x)} can judge the branch. That is hard to solve by a simple desugaring. We get resugaring sequences as Fig.  \ref{fig:Map}.
 \[

@@ -6,7 +6,7 @@
 \label{sec5.1}
 
 
-As we mentioned in the introduction (Section \ref{mark:mention}), our approach has a more specific assumption compared to the existing approach. Here is a small gap between the motivation of the existing approach and ours---the existing approach focused mainly on a tool for existing language, while our approach considered more on a meta-level feature for language implementation. The examples in Section \ref{sec:recursiveSugar} have shown how the lazy desugaring solves some problems in practice.
+As we mentioned in the introduction (Section \ref{mark:mention}), our approach assumes a more specific model (evaluation rules) compared to the existing approach (black-box stepper). Here is a small gap between the motivation of the existing approach and ours---the existing approach focused mainly on a tool for existing language, while our approach considered more on a meta-level feature for language implementation. The examples in Section \ref{sec:recursiveSugar} have shown how the lazy desugaring solves some problems in practice.
 
 In addition, as what we need for the lazy desugaring is just the computational order of the syntactic sugar, we can make an extension for the resugaring algorithm to work with only a black-box core language stepper. The most important difference between the black-box stepper and the evaluation rules is the computational order---while the same language behaves uniquely, the evaluation rules can show the computational order statically (without running the program). So when meeting the black-box stepper for the core language, we can just use some simple program to "get" the computational order of the core language as the following example  shows: we simply let the sub-expressions of a \m{Head} be some reducible expressions and test the computational order.
 
@@ -19,7 +19,7 @@ But that's not enough---the core language and the surface language cannot be mix
 
 \begin{Def}[Dynamic mixed language's one-step reduction $\redm{}{}$] Defined in Fig.  \ref{fig:dynamic}.
 \end{Def}
-\begin{figure*}[t]
+\begin{figure*}[t]\footnotesize
 \infrule[CoreRed]
 { \forall~i.~e_i\in \m{CoreExp}\\
 \redc{(\m{CoreHead}~e_1~\ldots~e_n)}{e'}}
@@ -96,7 +96,7 @@ Then for any sugar expression, we can process them dynamically by "one-step-try"
 \subsection{Properties and Trade-off}
 \label{mark:correctness}
 
-The existing resugaring approach proposed the following three properties to define the correctness.
+The existing resugaring approaches \cite{resugaring,hygienic} proposed the following three properties to define the correctness.
 
 \begin{quote}
 Emulation:
@@ -107,7 +107,7 @@ Coverage: Resugaring is attempted on every core step, and as few core steps are 
 \end{quote}
 Here we will show what are the similarities and differences between theirs and our properties.
 
-\emph{Emulation}: The properties in Section \ref{sec3} is just the same as the emulation property. We should admit that this property is the most basic one.
+\emph{Emulation}: The properties in Section \ref{sec3} is just the same as the emulation property. It is the most basic one.
 
 \emph{Abstraction and Coverage}: Our reduction in the mixed language has some similarities to theirs. But since our framework has no execution for the fully desugared program and no reverse desugaring, there are some differences in details.
 
