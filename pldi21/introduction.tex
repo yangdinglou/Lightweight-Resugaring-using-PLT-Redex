@@ -26,7 +26,7 @@ As a simple example, consider \Code{Or1}, a syntactic sugar defined by the follo
 \[
 \drule{\Code{(Or1 $e_1$ $e_2$)}}{\Code{(let ((t $e_1$)) (if t t $e_2$))}}.
 \]
-Figure \ref{fig:resugar1} demonstrates a resugaring process for
+Figure \ref{fig:resugar1} demonstrates a resugaring process in \cite{resugaring} for
 \[
 \Code{(Or1 (not \#t) \#t)}.
 \]
