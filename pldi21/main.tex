@@ -1,26 +1,24 @@
 % !TEX program = pdflatex
 %!TEX spellcheck
 %% For double-blind review submission, w/o CCS and ACM Reference (max submission space)
-\documentclass[sigplan,10pt,review,anonymous]{acmart}\settopmatter{printfolios=true,printccs=false,printacmref=false}
+\documentclass[sigplan,10pt,review,anonymous]{acmart}
+\settopmatter{printfolios=true,printccs=false,printacmref=false}
 %% For double-blind review submission, w/ CCS and ACM Reference
-%\documentclass[acmsmall,review,anonymous]{acmart}\settopmatter{printfolios=true}
+%\documentclass[sigplan,review,anonymous]{acmart}\settopmatter{printfolios=true}
 %% For single-blind review submission, w/o CCS and ACM Reference (max submission space)
-%\documentclass[acmsmall,review]{acmart}\settopmatter{printfolios=true,printccs=false,printacmref=false}
+%\documentclass[sigplan,review]{acmart}\settopmatter{printfolios=true,printccs=false,printacmref=false}
 %% For single-blind review submission, w/ CCS and ACM Reference
-%\documentclass[acmsmall,review]{acmart}\settopmatter{printfolios=true}
+%\documentclass[sigplan,review]{acmart}\settopmatter{printfolios=true}
 %% For final camera-ready submission, w/ required CCS and ACM Reference
-%\documentclass[acmsmall]{acmart}\settopmatter{}
+%\documentclass[sigplan]{acmart}\settopmatter{}
 
 
-%% Journal information
+%% Conference information
 %% Supplied to authors by publisher for camera-ready submission;
 %% use defaults for review submission.
-\acmJournal{PACMPL}
-\acmVolume{1}
-\acmNumber{CONF} % CONF = POPL or ICFP or OOPSLA
-\acmArticle{1}
+\acmConference[PL'18]{ACM SIGPLAN Conference on Programming Languages}{January 01--03, 2018}{New York, NY, USA}
 \acmYear{2018}
-\acmMonth{1}
+\acmISBN{} % \acmISBN{978-x-xxxx-xxxx-x/YY/MM}
 \acmDOI{} % \acmDOI{10.1145/nnnnnnn.nnnnnnn}
 \startPage{1}
 
@@ -37,15 +35,24 @@
 %% Bibliography style
 \bibliographystyle{ACM-Reference-Format}
 %% Citation style
-%% Note: author/year citations are required for papers published as an
-%% issue of PACMPL.
-%\citestyle{acmauthoryear}   %% For author/year citations
+%\citestyle{acmauthoryear}  %% For author/year citations
+%\citestyle{acmnumeric}     %% For numeric citations
+%\setcitestyle{nosort}      %% With 'acmnumeric', to disable automatic
+                            %% sorting of references within a single citation;
+                            %% e.g., \cite{Smith99,Carpenter05,Baker12}
+                            %% rendered as [14,5,2] rather than [2,5,14].
+%\setcitesyle{nocompress}   %% With 'acmnumeric', to disable automatic
+                            %% compression of sequential references within a
+                            %% single citation;
+                            %% e.g., \cite{Baker12,Baker14,Baker16}
+                            %% rendered as [2,3,4] rather than [2-4].
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Note: Authors migrating a paper from PACMPL format to traditional
-%% SIGPLAN proceedings format must update the '\documentclass' and
-%% topmatter commands above; see 'acmart-sigplanproc-template.tex'.
+%% Note: Authors migrating a paper from traditional SIGPLAN
+%% proceedings format to PACMPL format must update the
+%% '\documentclass' and topmatter commands above; see
+%% 'acmart-pacmpl-template.tex'.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -182,19 +189,16 @@
 \begin{document}
 
 %% Title information
-\title%[Short Title]
-{Resugaring by Lazy Desugaring}
-%{A lightweight resugaring approach based on reduction semantics}
-%% [Short Title] is optional;
+\title{Resugaring by Lazy Desugaring}         %% [Short Title] is optional;
                                         %% when present, will be used in
                                         %% header instead of Full Title.
-%\titlenote{with title note}             %% \titlenote is optional;
-                                        %% can be repeated if necessary;
-                                        %% contents suppressed with 'anonymous'
-%\subtitle{Subtitle}                     %% \subtitle is optional
-%\subtitlenote{with subtitle note}       %% \subtitlenote is optional;
-                                        %% can be repeated if necessary;
-                                        %% contents suppressed with 'anonymous'
+% \titlenote{with title note}             %% \titlenote is optional;
+%                                         %% can be repeated if necessary;
+%                                         %% contents suppressed with 'anonymous'
+% \subtitle{Subtitle}                     %% \subtitle is optional
+% \subtitlenote{with subtitle note}       %% \subtitlenote is optional;
+%                                         %% can be repeated if necessary;
+%                                         %% contents suppressed with 'anonymous'
 
 
 %% Author information
@@ -257,13 +261,7 @@
 %% Note: \begin{abstract}...\end{abstract} environment must come
 %% before \maketitle command
 \begin{abstract}
-
-
-% Syntactic sugar, first coined by Peter J. Landin in 1964, has proved to be very useful for defining domain-specific languages and extending languages. Unfortunately, when syntactic sugar is eliminated by transformation, it obscures the relationship between the user’s source program and the transformed program. Resugaring is a powerful technique to resolve this problem, which automatically converts the evaluation sequences of desugared program in the core language into representative sugar's syntax in the surface language. However, the existing approach relies on the reverse application of desugaring rules to desugared core expression whenever possible. When a desugaring rule is complex and a desugared program is large, such reverse expansion becomes very complex and costive.
-
-% In this paper, 
-We propose a novel approach to resugaring, which is a technique to get the surface evaluation sequences of syntactic sugars, by lazy desugaring. We recognize the condition for lazy desugaring, and propose a reduction strategy for the language mixed by the surface language and the core language, which can produce the correct resugaring evaluation sequence. We have implemented a system based on this new approach. The result shows that our new approach is more efficient compared to the existing approach, and the lazy desugaring also provides powerful expressiveness even for a simple desugaring so that it can also deal with the common hygienic sugars and flexible recursive sugars.
-
+  We propose a novel approach to resugaring, which is a technique to get the surface evaluation sequences of syntactic sugars, by lazy desugaring. We recognize the condition for lazy desugaring, and propose a reduction strategy for the language mixed by the surface language and the core language, which can produce the correct resugaring evaluation sequence. We have implemented a system based on this new approach. The result shows that our new approach is more efficient compared to the existing approach, and the lazy desugaring also provides powerful expressiveness even for a simple desugaring so that it can also deal with the common hygienic sugars and flexible recursive sugars.
 \end{abstract}
 
 
@@ -291,7 +289,7 @@ We propose a novel approach to resugaring, which is a technique to get the surfa
 
 %% Keywords
 %% comma separated list
-\keywords{Resugaring, Syntactic Sugar, Interpreter, Domain-Specific Language, Reduction Semantics}  %% \keywords are mandatory in final camera-ready submission
+\keywords{Resugaring, Syntactic Sugar, Domain-Specific Language, Reduction Semantics, Metaprogramming}  %% \keywords are mandatory in final camera-ready submission
 
 
 %% \maketitle
@@ -300,14 +298,15 @@ We propose a novel approach to resugaring, which is a technique to get the surfa
 %% environment and commands, and keywords command.
 \maketitle
 
+
 \input{introduction}
 \input{overview}
 \input{ziyiapproach}
-% \input{zhichaoapproach}
 \input{casestudy}
 \input{comparison}
 \input{relatedWork}
 \input{conclusion}
+
 
 %% Acknowledgments
 \begin{acks}                            %% acks environment is optional

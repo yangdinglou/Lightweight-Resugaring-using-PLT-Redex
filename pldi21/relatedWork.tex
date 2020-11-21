@@ -12,14 +12,13 @@ For hygienic resugaring, compared with the approach of using DAG to solve the va
 
 Our work is related to the \emph{Galois slicing for imperative functional programs} \cite{slicing}, a work for dynamic analyzing functional programs during execution. The forward component of the Galois connection maps a partial input $x$ to the greatest partial output $y$ that can be computed from $x$; the backward component of the Galois connection maps a partial output $y$ to the least partial input $x$ from which we can compute $y$.
 %Our approach used a similar idea on slicing expressions and processing on subexpressions.
-This can also be considered as a bidirectional transformation \cite{bx,lens07} and the round-tripping between desugaring and resugaring in the existing approach. In contrast to these works, our resugaring approach is basically unidirectional, with a local bidirectional step
-for a one-step try in our lazy desugaring. It should be noted that Galois slicing may be useful to handle side effects in resugaring in the future (for example, slicing the part where side effects appear).
+This can also be considered as a bidirectional transformation \cite{bx,lens07} and the round-tripping between desugaring and resugaring in the existing approach. In contrast to these works, our resugaring approach is basically unidirectional. It should be noted that Galois slicing may be useful to handle side effects in resugaring in the future (for example, slicing the part where side effects appear).
 
 
 There is a long history of hygienic macro expansion\cite{hygienicmacro}, and a formal specific hygiene definition was given \cite{10.5555/1792878.1792884} by specific the binding scopes of macros. another formal definition of the hygienic macro\cite{EssenceofHygiene} is based on nominal logic\cite{10.1007/s001650200016}.
 %
 %When the tracking in their notation can be easily done for sugar whose rules can be derived automatically.
 
-Our implementation is built upon the PLT Redex \cite{SEwPR}, a semantics engineering tool, but it is possible to implement our approach on other semantics engineering tools such as those in \cite{dynsem,Ksemantic} which aim to test or verify the semantics of languages. The methods of these researches can be easily combined with our approach to implementing more general rule derivation. \emph{Ziggurat} \cite{Ziggurat} is a semantic-extension framework, also allowing defining new macros with semantics based on existing terms in a language. It is should be useful for static analysis of macros.
+Our implementation is built upon the PLT Redex \cite{SEwPR}, a semantics engineering tool, but it is possible to implement our approach on other semantics engineering tools such as those in \cite{dynsem,Ksemantic} which aim to test or verify the semantics of languages. The methods of these researches can be easily combined with our approach to implementing more general rule derivation. \emph{Ziggurat} \cite{Ziggurat} is a semantic extension framework, also allowing defining new macros with semantics based on existing terms in a language. It is should be useful for static analysis of macros.
 %Instead of semantics based on core language, the reduction rules of sugar derived by our approach is independent of core language, which may be more concise for static analysis.
 

@@ -43,9 +43,8 @@ Resugaring is a powerful technique to resolve this problem \cite{resugaring,hygi
 \end{center}
 
 
-But it is not as easy as the example above. Sometimes the program in the core language contains a desugared form of a syntactic sugar, but the form may belong to the original (not desugared) program. In the following example, the reverse expansion of sugar should be noticed.
+But it is not as easy as the example above. Sometimes the program in the core language contains a desugared form of a syntactic sugar, but the form may belong to the original (not desugared) program. In the following example, the reverse expansion of sugar should be noticed. The desugaring rule is the same as above.
 \begin{center}
-	$\drule{\Code{(Newor $e_1$ $e_2$)}}{\Code{(let ((t $e_1$)) (if t t $e_2$))}}$
 \[
 {\footnotesize
 	\begin{array}{lcl}
@@ -64,7 +63,7 @@ But it is not as easy as the example above. Sometimes the program in the core la
 \end{center}
 
 
-Moreover, when meeting hygienic sugar, the simple match and substitution will not work as the following example shows. 
+Moreover, when meeting sugars with binding, like the \m{Double} above, the simple match and substitution will not work as the following example shows. 
 \begin{center}
 	$\drule{\Code{(Double $e_1$)}}{\Code{(let (t $e_1$) (* 2 t))}}$
 \[
@@ -82,7 +81,7 @@ Moreover, when meeting hygienic sugar, the simple match and substitution will no
 
 
 
-If we use binder renaming for solving the case as above, some other information is needed (such as the permutation $\m{t} \to \m{t'}$).
+If we use binder renaming for solving the hygienic problem as above, some other information is needed (such as the permutation $\m{t} \to \m{t'}$).
 
 
 

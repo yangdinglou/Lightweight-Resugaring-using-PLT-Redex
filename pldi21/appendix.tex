@@ -1,26 +1,24 @@
 % !TEX program = pdflatex
 %!TEX spellcheck
 %% For double-blind review submission, w/o CCS and ACM Reference (max submission space)
-\documentclass[sigplan,10pt,review,anonymous]{acmart}\settopmatter{printfolios=true,printccs=false,printacmref=false}
+\documentclass[sigplan,10pt,review,anonymous]{acmart}
+\settopmatter{printfolios=true,printccs=false,printacmref=false}
 %% For double-blind review submission, w/ CCS and ACM Reference
-%\documentclass[acmsmall,review,anonymous]{acmart}\settopmatter{printfolios=true}
+%\documentclass[sigplan,review,anonymous]{acmart}\settopmatter{printfolios=true}
 %% For single-blind review submission, w/o CCS and ACM Reference (max submission space)
-%\documentclass[acmsmall,review]{acmart}\settopmatter{printfolios=true,printccs=false,printacmref=false}
+%\documentclass[sigplan,review]{acmart}\settopmatter{printfolios=true,printccs=false,printacmref=false}
 %% For single-blind review submission, w/ CCS and ACM Reference
-%\documentclass[acmsmall,review]{acmart}\settopmatter{printfolios=true}
+%\documentclass[sigplan,review]{acmart}\settopmatter{printfolios=true}
 %% For final camera-ready submission, w/ required CCS and ACM Reference
-%\documentclass[acmsmall]{acmart}\settopmatter{}
+%\documentclass[sigplan]{acmart}\settopmatter{}
 
 
-%% Journal information
+%% Conference information
 %% Supplied to authors by publisher for camera-ready submission;
 %% use defaults for review submission.
-\acmJournal{PACMPL}
-\acmVolume{1}
-\acmNumber{CONF} % CONF = POPL or ICFP or OOPSLA
-\acmArticle{1}
+\acmConference[PL'18]{ACM SIGPLAN Conference on Programming Languages}{January 01--03, 2018}{New York, NY, USA}
 \acmYear{2018}
-\acmMonth{1}
+\acmISBN{} % \acmISBN{978-x-xxxx-xxxx-x/YY/MM}
 \acmDOI{} % \acmDOI{10.1145/nnnnnnn.nnnnnnn}
 \startPage{1}
 
@@ -37,15 +35,24 @@
 %% Bibliography style
 \bibliographystyle{ACM-Reference-Format}
 %% Citation style
-%% Note: author/year citations are required for papers published as an
-%% issue of PACMPL.
-%\citestyle{acmauthoryear}   %% For author/year citations
+%\citestyle{acmauthoryear}  %% For author/year citations
+%\citestyle{acmnumeric}     %% For numeric citations
+%\setcitestyle{nosort}      %% With 'acmnumeric', to disable automatic
+                            %% sorting of references within a single citation;
+                            %% e.g., \cite{Smith99,Carpenter05,Baker12}
+                            %% rendered as [14,5,2] rather than [2,5,14].
+%\setcitesyle{nocompress}   %% With 'acmnumeric', to disable automatic
+                            %% compression of sequential references within a
+                            %% single citation;
+                            %% e.g., \cite{Baker12,Baker14,Baker16}
+                            %% rendered as [2,3,4] rather than [2-4].
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Note: Authors migrating a paper from PACMPL format to traditional
-%% SIGPLAN proceedings format must update the '\documentclass' and
-%% topmatter commands above; see 'acmart-sigplanproc-template.tex'.
+%% Note: Authors migrating a paper from traditional SIGPLAN
+%% proceedings format to PACMPL format must update the
+%% '\documentclass' and topmatter commands above; see
+%% 'acmart-pacmpl-template.tex'.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -62,6 +69,7 @@
 \usepackage{alltt}
 \usepackage{pgf}
 \usepackage{bcproof}
+\usepackage{setspace}
 
 \renewcommand{\algorithmicrequire}{\textbf{Input:}}
 
@@ -70,7 +78,7 @@
 \newtheorem{Def}{Defination}[section]
 \newtheorem{mythm}{Theorem}[section]
 \newtheorem{property}{Property}[section]
-\newtheorem{lemma}{Lemma}
+\newtheorem{lemma}{Lemma}[section]
 \newtheorem{Asm}{Assumption}
 
 \newcommand{\Code}[1]{\texttt{#1}}
@@ -181,19 +189,16 @@
 \begin{document}
 
 %% Title information
-\title%[Short Title]
-{Compositional Resugaring by Lazy Desugaring}
-%{A lightweight resugaring approach based on reduction semantics}
-%% [Short Title] is optional;
+\title{Resugaring by Lazy Desugaring}         %% [Short Title] is optional;
                                         %% when present, will be used in
                                         %% header instead of Full Title.
-%\titlenote{with title note}             %% \titlenote is optional;
-                                        %% can be repeated if necessary;
-                                        %% contents suppressed with 'anonymous'
-%\subtitle{Subtitle}                     %% \subtitle is optional
-%\subtitlenote{with subtitle note}       %% \subtitlenote is optional;
-                                        %% can be repeated if necessary;
-                                        %% contents suppressed with 'anonymous'
+% \titlenote{with title note}             %% \titlenote is optional;
+%                                         %% can be repeated if necessary;
+%                                         %% contents suppressed with 'anonymous'
+% \subtitle{Subtitle}                     %% \subtitle is optional
+% \subtitlenote{with subtitle note}       %% \subtitlenote is optional;
+%                                         %% can be repeated if necessary;
+%                                         %% contents suppressed with 'anonymous'
 
 
 %% Author information
@@ -255,7 +260,9 @@
 %% Abstract
 %% Note: \begin{abstract}...\end{abstract} environment must come
 %% before \maketitle command
-
+% \begin{abstract}
+%   We propose a novel approach to resugaring, which is a technique to get the surface evaluation sequences of syntactic sugars, by lazy desugaring. We recognize the condition for lazy desugaring, and propose a reduction strategy for the language mixed by the surface language and the core language, which can produce the correct resugaring evaluation sequence. We have implemented a system based on this new approach. The result shows that our new approach is more efficient compared to the existing approach, and the lazy desugaring also provides powerful expressiveness even for a simple desugaring so that it can also deal with the common hygienic sugars and flexible recursive sugars.
+% \end{abstract}
 
 
 %% 2012 ACM Computing Classification System (CSS) concepts
@@ -281,8 +288,8 @@
 
 
 %% Keywords
-%% comma separated list
-\keywords{Resugaring, Syntactic Sugar, Interpreter, Domain-Specific Language, Reduction Semantics}  %% \keywords are mandatory in final camera-ready submission
+%% comma separated list/
+\keywords{Resugaring, Syntactic Sugar, Domain-Specific Language, Reduction Semantics, Metaprogramming}  %% \keywords are mandatory in final camera-ready submission
 
 
 %% \maketitle
@@ -315,7 +322,6 @@
 
 
 
-%% Appendix
 \appendix
 \section{Appendix}
 \subsection{Proof of Properties}
@@ -367,9 +373,10 @@ Then for any program \m{P} headed with \m{SurfHead}, if the sub-expressions $\{e
 \begin{proof} [Proof Sketch of Property 3.2]
   If $\redm{\m{E}[\m{CC}]}{\m{E}[\m{CC'}]}$ reduced by the \m{CoreHead}'s reduction rule on \m{CC}, according to lemma 1 and context rules of core language's expression, the program \m{P} reduces recursively on the correct sub-expression, so for $\redm{\m{E'}[\m{C}]}{\m{E'}[\m{C'}]}$, it will reduce on the same sub-expression.
 
-  Because the sub-expression \m{CC} can be reduced by its \m{CoreHead}, so matter how its inner expressions desugared, according to the context rules, the fully desugared \m{C} will also reduced by its \m{CoreHead}.
+  Because the sub-expression \m{CC} is reduced by its \Code{CoreHead}, so matter how its inner expressions desugared, according to the context rules, the fully desugared \m{C} will also reduced by its \m{CoreHead}.
   
 \end{proof}
 
+% Text of appendix \ldots
 
 \end{document}
