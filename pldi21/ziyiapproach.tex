@@ -137,7 +137,7 @@ The form of the expressions in our core language is defined in Fig. \ref{fig:exp
 Our surface language is defined by a set of syntactic sugars, together with some elements in the core language, such as constants and variables. The expression of a surface language has a similar form as shown in Fig.  \ref{fig:expression}. To separate surface language's \m{Head} from that of the core language, we capitalize the first letter of surface language's \m{Head}.
 
 %Here we just assume a simple desugaring system for a syntactic sugar expression. We will show how this approach can be combined with other complex desugaring.
-A syntactic sugar is defined by a desugaring rule in the following form
+A syntactic sugar \m{SurfHead} is defined by a desugaring rule in the following form
 
 \[
 \drule{(\m{SurfHead}~e_1~e_2~\ldots~e_n)}{\m{exp}} %\todo{\text{font size in drule}}
@@ -165,7 +165,7 @@ Note that in the desugaring rule, we relax the ordinary restriction that RHS mus
 
 %As described above, we only assume the desugaring is a transformer without other helper function, thus there will be many kinds of ill-formed syntactic sugar which cannot desugared well (just as the \m{Odd}, \m{Even} sugars above, although can be processed by our lazy desugaring), or the semantics of the sugar cannot be defined clearly.
 
-Without lost of generosity, we assume that all desugaring rules are not overlapped in the sense that for any syntactic sugar in an expression, only one desugaring rule is applicable.
+Without loss of generosity, we assume that all desugaring rules are not overlapped in the sense that for any syntactic sugar in an expression, only one desugaring rule is applicable.
 
 
 \subsubsection{Mixed Language}
@@ -234,7 +234,7 @@ Our resugaring algorithm works on the mixed language, based on the evaluation ru
 		\note{//where $e_i'$ can be at any depth of sub-expressions.}\\
 		\Code{currentIncal = $\{\ldots\}$} \note{//list of contexts in calculation.}
 		\ENSURE ~~\\     % 算法的输出说明
-		\Code{ListofRule}
+		\Code{ListofRule, tmpLHS}
 		\STATE     \Code{Let ListofRule = \{\}, tmpLHS = currentLHS, InCal = append(currentIncal, SurfHead)}
 		\IF {$\not \exists~contexts~rules~of~\m{Head}$}
 			\IF {$\exists$ \m{Head} in \m{InCal}}
@@ -261,60 +261,74 @@ Our resugaring algorithm works on the mixed language, based on the evaluation ru
 
 	\end{algorithmic}
 \end{algorithm}
-The algorithm for the first part, \texttt{calcontext}, is described as Algorithm \ref{alg:f}. It works as follows. For sugar
+
+\subsubsection{Context Rule Derivation}
+Given a sugar \m{SurfHead} defined by
 \[
 \drule{(\m{SurfHead}~e_1~e_2~\ldots~e_n)}{(\m{Head}~\ldots~e_1'~e_2'~\ldots~e_m')}
 \]
-we should run \Code{calcontext(LHS,~RHS, \{\})}, and add the context rules to the mixed language.
+the context rule derivation is to infer which and in which order $e_i$ should be computed before this desugaring rule is applied. This information can be derived by analyzing computation order of each subexpression in RHS of the desugaring rule.
+The algorithm for this derivation, \texttt{calcontext}, is described as Algorithm \ref{alg:f}. Running
+\[
+ \Code{calcontext(\m{SurfHead}.LHS,~\m{SurfHead}.RHS, \{\})}
+\]
+will yield the context rules for \m{SurfHead}.
 
+Before explaining the algorithm in detail, we use a simple example to illustrate the idea.
+Consider \m{Sg} defined by the following desugaring rule:
+\[
+\drule{\m{(Sg}~e_1~e_2~e_3~e_4\m{)}}{\m{(+}~e_1~\m{(if}~e_2~e_3~e_4\m{))}}
+\]
+where we assume that $+$ computes its first argument and then its second argument before performing reduction, i.e., the context rules for $+$ are  $(+~[\bigcdot]~e_2)$ and $(+~v_1~[\bigcdot]~e_2)$. Now from $\m{(+}~e_1~\m{(if}~e_2~e_3~e_4\m{))}$, we can infer that $e_1$ should be computed first from the context rule of $+$, and then $e_2$ is computed from the context rule of the inner $\m{if}$, and finally it stops because no context rule is applicable for any remaining subexpression. Therefore we get the following context rules for \m{Sg}:
+\[
+(\m{Sg}~[\bigcdot]~e_2~e_3~e_4),~(\m{Sg}~v_1~[\bigcdot]~e_3~e_4).
+\]
 
-If \m{Head} is a \m{CoreHead}, for each context rule of the \m{Head} in order, we should just recursively make context rules for each hole, until a whole sub-expression is iterated. See examples in Fig.  \ref{example:algo1} and \ref{example:algo2}. For \m{Sg1}, the sugar does not have to be expanded until all four sub-expressions are reduced to value. But for \m{Sg2}, once the sub-expressions $e_1$ and $e_2$ are reduced to value, the sugar has to be expanded, because if being desugared to the core language, the sub-expression \Code{(+ $v_3~v_4$)} will be reduced, then the sugar form of RHS is destroyed.
-\example{
+Return to the algorithm. If \m{Head} is a \m{CoreHead}, for each context rule of the \m{Head} in order, we should just recursively make context rules for each hole, until a whole sub-expression is iterated. For instance of \m{Sg1}:
 \[
 \drule{\m{(Sg1}~e_1~e_2~e_3~e_4\m{)}}{\m{(+}~e_1~\m{(+}~e_2~\m{(+}~e_3~e_4\m{)))}}
 \]
-
-$OrderList$ = $\{e_1,~(+~e_2~(+~e_3~e_4))\}$ \hfill(depth1, getting a rule
-
-\hfill\Code{(Sg1 $[\bigcdot]~e_2~e_3~e_4$)})
-
-$OrderList$ = $\{e_2,~(+~e_3~e_4)\}$ \hfill(depth2, getting a rule
-
-\hfill\Code{(Sg1 $v_1~[\bigcdot]~e_3~e_4$)})
-
-$OrderList$ = $\{e_3,~e_4\}$ \hfill(depth3, getting rules
-
-\hfill\Code{(Sg1 $v_1~v_2~[\bigcdot]~e_4$),(Sg1 $v_1~v_2~v_3~[\bigcdot]$)})
-}{Example1 of algorithm \m{calcontext}}{example:algo1}
-
-\example{
+the sugar does not have to be expanded until all four sub-expressions are reduced to value, as demonstrated in the following execution trace.
+\[
+\begin{array}{l}
+\mbox{$OrderList$ = $\{e_1,~(+~e_2~(+~e_3~e_4))\}$} \\
+\quad \mbox{$\Rightarrow$ \Code{(Sg1 $[\bigcdot]~e_2~e_3~e_4$)}}\\
+\mbox{$OrderList$ = $\{e_2,~(+~e_3~e_4)\}$}\\
+\quad \mbox{$\Rightarrow$ \Code{(Sg1 $v_1~[\bigcdot]~e_3~e_4$)}}\\
+\mbox{$OrderList$ = $\{e_3,~e_4\}$} \\
+\quad \mbox{$\Rightarrow$ \Code{(Sg1 $v_1~v_2~[\bigcdot]~e_4$),(Sg1 $v_1~v_2~v_3~[\bigcdot]$)}}
+\end{array}
+\]
+But for instance of \m{Sg2}:
 \[
 \drule{(\m{Sg2}~e_1~e_2~e_3~e_4)}{\m{(+~(+~(+}~e_1~e_2\m{)}~e_3\m{)}~e_4\m{)}}
 \]
-
-$OrderList$ = $\{(+~(+~e_1~e_2)~e_3),~e_4\}$ \hfill(depth1)
-
-$OrderList$ = $\{(+~e_1~e_2),~e_3\}$ \hfill(depth2)
-
-$OrderList$ = $\{e_1,~e_2\}$ \hfill(depth3, getting rules
-
-\hfill\Code{(Sg2 $[\bigcdot]~e_2~e_3~e_4$), (Sg2 $v_1~[\bigcdot]~e_3~e_4$)})
-}{Example2 of algorithm \m{calcontext}}{example:algo2}
-
-Or if the \m{Head} is a \m{SurfHead} with its context rules calculated, then we regard it as \m{CoreHead}. If it is without context rules, we will try calculating its context rules first. However, if the recursive process has tried calculating it, it will be an ill-formed recursive sugar, as the following example shows.
+once the sub-expressions $e_1$ and $e_2$ are reduced to value, the sugar has to be expanded, because if being desugared to the core language, the sub-expression \Code{(+ $v_3~v_4$)} will be reduced, then the sugar form of RHS is destroyed.
 \[
-\drule{(\m{Odd}~e)}{(\m{Even}~(-~e~1))}
+\begin{array}{l}
+\mbox{$OrderList$ = $\{(+~(+~e_1~e_2)~e_3),~e_4\}$}\\
+\quad \Rightarrow \mbox{nothing}\\
+\mbox{$OrderList$ = $\{(+~e_1~e_2),~e_3\}$}\\
+\quad \Rightarrow \mbox{nothing}\\
+\mbox{$OrderList$ = $\{e_1,~e_2\}$}\\
+\quad \Rightarrow \mbox{\Code{(Sg2 $[\bigcdot]~e_2~e_3~e_4$), (Sg2 $v_1~[\bigcdot]~e_3~e_4$)})}
+\end{array}
 \]
 
+If the \m{Head} is a \m{SurfHead} with its context rules calculated, then we regard it as \m{CoreHead}. If it has no context rule, we will try calculating its context rules first. However, if an infinite recursive process happens, it means that the original recursive sugars are of ill-form, such as the following:
 \[
-\drule{(\m{Even}~e)}{(\m{Odd}~(-~e~1))}
+\begin{array}{l}
+\drule{(\m{Odd}~e)}{(\m{Even}~(-~e~1))}\\
+\drule{(\m{Even}~e)}{(\m{Odd}~(-~e~1))}.
+\end{array}
 \]
 
-The reason we can calculate the context rules of a syntactic sugar is: for a sugar's $RHS$ like \Code{(\m{Head}~$\ldots~e_1'~e_2'~\ldots~e_m'$)}, if any reduction happens, the reduction will be on $e_i$ of the sugar's $LHS$ or the reduction will destroy the $RHS$'s form. So we can trace the computational order until the sugar form has to be destroyed.
 
 After calculating all context rules, we can add them to the mixed language's context rule; we can also add the desugaring rules to the mixed language's reduction rule as what we showed in Section \ref{sec2}.
 
 %\todo{Add explanantion of the above rule.}
+
+\subsubsection{Filtering and Main Algorithm}
 
 As the second part of the whole process, our resugaring algorithm can be defined based on evaluation rules of the mixed language. Let $\redm{}{}$ be one-step reduction in the mixed language.
 
@@ -334,22 +348,25 @@ During the resugaring, we just apply the reduction ($\redm{}{}$) on the input pr
 \subsection{Correctness}
 \label{mark:correct}
 
-We give following properties to describe the correctness of our resugaring approach.
-\begin{Def}[Fully desugar] The function that recursively desugars any expressions of the mixed language is defined as Fig.  \ref{fig:fulldesugar}.\end{Def}
+We show several important properties of our desugaring algorithm.
 
-\example{
-\begin{flushleft}
-\Code{$\mathtt{D}(\Code{value}) =$ value}
+First of all, we define a function $D$ to fully remove sugars in a program using desugaring rules.
+\[
+\begin{array}{lll}
+D(\Code{value}) = \Code{Value}\\
+D(\Code{CoreHead}~e_1~e_2~ ...) = (\Code{CoreHead}~(D(e_1))~(D(e_2))~...)\\
+D(\Code{SurfHead}~e_1~e_2~ ...) = D(e[e_i/x_i]\\
+\quad \mbox{\bf where}~\drule{(\Code{SurfHead}~x_1~x_2~ ...)}{e}
+%\mbox{\Code{$\mathtt{D}(\Code{value}) =$ value}}\\
+%\mbox{\Code{$\mathtt{D}(\Code{x}) =$ x}}\\
+%\mbox{\Code{$\mathtt{D}(\Code{(CoreHead $e_1$ $e_2$ ...)}) =
+%%\Code{(CoreHead $\mathtt{D}(e_1')$ $\mathtt{D}(e_2')$ ...)}}}
+%\mbox{\Code{$\mathtt{D}(\Code{(SurfHead $e_1$ $e_2$ ...)})$} = \Code{(CoreHead $\mathtt{D}(e_1')$ $\mathtt{D}(e_2')$ ...)}}\\
+%\mbox{\scriptsize{where $\drule{\Code{(SurfHead $e_1$ $e_2$ ...)}}{\Code{(CoreHead $e_1'$ $e_2'$ ...)}}$}}
+\end{array}
+\]
 
-\Code{$\mathtt{D}(\Code{x}) =$ x}
-
-\Code{$\mathtt{D}(\Code{(CoreHead $e_1$ $e_2$ ...)}) =$  \\\quad\Code{(CoreHead $\mathtt{D}(e_1')$ $\mathtt{D}(e_2')$ ...)}}
-
-\Code{$\mathtt{D}(\Code{(SurfHead $e_1$ $e_2$ ...)})$} = \\\quad\Code{(CoreHead $\mathtt{D}(e_1')$ $\mathtt{D}(e_2')$ ...)}\\ \scriptsize{where $\drule{\Code{(SurfHead $e_1$ $e_2$ ...)}}{\Code{(CoreHead $e_1'$ $e_2'$ ...)}}$}
-\end{flushleft}
-
-}{Defination of "fully desugar"}{fig:fulldesugar}
-An expression \m{P} can be fully desugared if \Code{$\mathtt{D}(\m{P})$} is terminable. We use $\m{E}[\m{P}]$ to present a evaluation context \m{E}'s hole filled with \m{P}. And as the evaluation rules of the mixed language defined, there are only two kinds of reduction---desugaring on an expression headed with \m{SurfHead}; reduction on an expression headed with \m{CoreHead}. The fully desugaring of the evaluation context is also the same form, by following desugar rules of evaluation context.
+An expression \m{P} can be fully desugared if \Code{$\mathtt{D}(\m{P})$} terminates. We use $\m{E}[\m{P}]$ to denote filling in the hole of the evaluation context \m{E} with \m{P}. And as the evaluation rules of the mixed language defined, there are only two kinds of reduction---desugaring on an expression headed with \m{SurfHead}; reduction on an expression headed with \m{CoreHead}. The fully desugaring of the evaluation context is also the same form, by following desugar rules of evaluation context.
 
 \begin{Def}[Desugaring rule of evaluation context]
 	For syntactic sugar S
@@ -434,15 +451,14 @@ According to the lemma, any sugar has the correct context rules. So the hole is 
 
 \subsection{Possible Extensions}
 
-We describe a resugaring approach based on a simple transformer. What if we need a more complex transformer system to describe more complex semantics for syntactic sugar? For example, we may need a type system for checking; we may specify the binding of syntactic sugar for more general hygiene (We solved the hygiene in our core language without specific the binding, as described in Section \ref{mark:hygiene}); we may use some other functions to help the desugaring. All of these extensions are possible as long as following some conditions. We summarize the conditions as follows.
+So far, our desugaring rules are of a simple form. What if we need a more complex form to describe more complex semantics for syntactic sugar? For example, we may need a type system for checking during desugaring; we may specify the binding of syntactic sugar for more general hygiene; we may use some other functions to help the desugaring. All of these extensions are possible as long as the following conditions are satisfied.
 \begin{enumerate}
 	\item \emph{Compositional}: Generally speaking, the desugaring order and should not affect the semantics of a sugar expression. Otherwise, the lazy desugaring will not be correct.
 	\item \emph{Unique Computational Order}: For any rules of syntactic sugar, the context rules should limit an expression to have only one computational order. Otherwise, the algorithm \m{calcontext} will not be deterministic.
 	\item \emph{Clear Semantic}: If a syntactic sugar's desugaring rule is ambiguous or wrong, the algorithm \m{calcontext} may go wrong.
 \end{enumerate}
 
-We find a possible problem that if we need a desugaring rule like follows,
-
+For instance, we may need a desugaring rule like
 \[
 \drule{\Code{(Sugar $e_1$ $e_2$ $\ldots$ $e_n$)}}{\Code{(if (Helper $e_1$ $e_2$) $\ldots$)}}
 \]
