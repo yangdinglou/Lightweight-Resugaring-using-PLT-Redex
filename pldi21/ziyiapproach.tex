@@ -76,7 +76,7 @@ The form of the expressions in our core language is defined in Fig. \ref{fig:exp
 		\m{CoreExp} &::=& \Code{(apply~CoreExp~CoreExp~...)}\\
 
 		&|& \m{(if~CoreExp~CoreExp~CoreExp)} ~~\note{// condition}\\
-		&|& \m{(let~((x~CoreExp)~...)~CoreExp)} ~~\note{// binding}\\
+		&|& \m{(let~(x~CoreExp))~CoreExp)} ~~\note{// binding}\\
 		&|& \m{(listop~CoreExp)} ~~\note{// first, rest, empty?}\\
 		&|& \m{(cons~CoreExp~CoreExp)} ~~\note{// data structure of list}\\
 		&|& \m{(arithop~CoreExp~CoreExp)} ~~\note{// +, -, *, /, >, <, =}\\
@@ -95,13 +95,13 @@ The form of the expressions in our core language is defined in Fig. \ref{fig:exp
 		\begin{array}{lcl}
 		\Code{C} &::=& \Code{(apply~value~...~C~CoreExp~...)}\\
 		&|& \Code{(if~C~CoreExp~CoreExp)}\\
-		&|& \Code{(let~((x~value)~...~(x~C)~(x~CoreExp)~...)~CoreExp)}\\
+		&|& \Code{(let~(x~value)~CoreExp)}\\
 		&|& \Code{(listop~C)}\\
 		&|& \Code{(cons~C~CoreExp)}\\
 		&|& \Code{(cons~value~C)}\\
 		&|& \Code{(arithop~C~CoreExp)}\\
 		&|& \Code{(arithop~value~C)}\\
-		&|& [\bigcdot]
+		&|& [\bigcdot]\\[1.5em]
 		\end{array}
 }
 \]
@@ -116,7 +116,7 @@ The form of the expressions in our core language is defined in Fig. \ref{fig:exp
 
 		\Code{(if~$\true$~$\m{CoreExp}_1$~$\m{CoreExp}_2$)}&\redc{}{}& \Code{$\m{CoreExp}_1$}\\
 		\Code{(if~$\false$~$\m{CoreExp}_1$~$\m{CoreExp}_2$)}&\redc{}{}& \Code{$\m{CoreExp}_2$}\\
-		\Code{(let~(($x_1$~$\m{value}_1$)~($x_2$~$\m{value}_2$)~...)~CoreExp)}&\redc{}{}&\Code{(let~(($x_2$~$\m{value}_2$)~...)~CoreExp[$\m{value}_1$/$x_1$])}\\
+		\Code{(let~($x$~$\m{value}$)~CoreExp)}&\redc{}{}&\Code{CoreExp[\m{value}/$x$]}\\
 		\ldots&&
 		\end{array}
 }
@@ -152,14 +152,14 @@ If we need to use a pattern variable multiple times in RHS, a \m{let} binding ma
 \]
 If we execute \Code{(Twice (+ 1 1))}, it will first be desugared to \Code{(+ (+ 1 1) (+ 1 1))}, then reduced to \Code{(+ 2 (+ 1 1))} by one step. The sub-expression \Code{(+ 1 1)} has been reduced but should not be resugared to the surface, because the other \Code{(+ 1 1)} has not been reduced yet.
 So we just use a \m{let} binding to resolve this problem. The RHS should be \Code{(let x $e_1$ (+ x x))} in this case.
-
+\todo{\text{let}}
 
 Note that in the desugaring rule, we relax the ordinary restriction that RHS must be a $\m{CoreExp}$. This makes it possible to define recursive sugars:
 %, which We can use $\m{SurfExp}$ (more precisely, we allow the mixture use of syntactic sugars and core expressions) to define recursive syntactic sugars, as seen in the following example.
 \[
 \begin{array}{l}
-\drule{(\m{Odd}~e)}{(\m{let}~((x~e))~(\m{if}~(>~x~0)~(\m{Even}~(-~x~1))~\false))}\\
-\drule{(\m{Even}~e)}{(\m{let}~((x~e))~(\m{if}~(>~x~0)~(\m{Odd}~(-~x~1))~\true))}
+\drule{(\m{Odd}~e)}{(\m{let}~(x~e)~(\m{if}~(>~x~0)~(\m{Even}~(-~x~1))~\false))}\\
+\drule{(\m{Even}~e)}{(\m{let}~(x~e)~(\m{if}~(>~x~0)~(\m{Odd}~(-~x~1))~\true))}
 \end{array}
 \]
 

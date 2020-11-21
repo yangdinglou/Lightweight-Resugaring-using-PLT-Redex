@@ -24,9 +24,9 @@ Resugaring is a powerful technique that has been proposed to resolve this proble
 %
 As a simple example, consider \Code{Or1}, a syntactic sugar defined by the following desugaring rule:
 \[
-\drule{\Code{(Or1 $e_1$ $e_2$)}}{\Code{(let ((t $e_1$)) (if t t $e_2$))}}.
+\drule{\Code{(Or1 $e_1$ $e_2$)}}{\Code{(let (t $e_1$) (if t t $e_2$))}}.
 \]
-Figure \ref{fig:resugar1} demonstrates a resugaring process in \cite{resugaring} for
+Figure \ref{fig:resugar1} demonstrates a resugaring process in the existing approach for
 \[
 \Code{(Or1 (not \#t) \#t)}
 \]
@@ -78,15 +78,15 @@ But it is not as easy as the example above. Sometimes the program in the core la
 
 Resugaring becomes complex, if we use core language constructs in  surface programs. For instance, for the following surface program
 \[
-\Code{(let ((t \#t)) (if t t (Or1 \#t \#f)))}
+\Code{(let (t \#t) (if t t (Or1 \#t \#f)))}
 \]
 after one-step reduction on the surface program, we get
 \[
-\Code{(let ((t \#t)) (if t t \#t))}
+\Code{(let (t \#t) (if t t \#t))}
 \]
 but we do not want to further get \Code{(Or1 \#t \#t)} by reverse application of the desugaring rule of \Code{Or1}, because this \Code{let} was originally used in the surface program.
 
-Resugaring becomes hard, if we allow sugars to be hygienic, recursive and of higher-order.
+Resugaring becomes hard, if we allow sugars to be recursive of higher-order, and with binding.
 For instance, when meeting hygienic sugar, the reverse expansion by a simple match and substitution will not work. Consider the following hygienic sugar:
 \[
 \drule{\Code{(Double $e_1$)}}{\Code{(let (t $e_1$) (* 2 t))}}
