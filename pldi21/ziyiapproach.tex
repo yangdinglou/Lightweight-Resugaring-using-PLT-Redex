@@ -3,7 +3,7 @@
 \section{Resugaring by Lazy Desugaring}
 \label{sec3}
 
-In this section, we present our new approach to resugaring. Different from the existing approach that clearly separates the surface from the core languages, we intentionally combine them as one mixed language, allowing free use of the language constructs in both languages. We will show that any expressions in the mixed language can be evaluated in such a smart way that a sequence of all expressions that are necessary to be resugared by the existing approach can be correctly produced.
+In this section, we present our new approach to resugaring. Different from the existing approach that clearly separates the surface from the core languages, we intentionally combine them as one mixed language, allowing free use of the language constructs in both languages. We will show that any expression in the mixed language can be evaluated in such a smart way that a sequence of all expressions that are necessary to be resugared can be correctly produced.
 
 \subsection{Mixed Language for Resugaring}
 
@@ -29,24 +29,22 @@ In this section, we present our new approach to resugaring. Different from the e
 	\label{fig:expression}
 \end{figure}
 
-As a preparation for our resugaring algorithm, we define a mixed language that combines a core language with a surface language (defined by syntactic sugars over the core language). An expression in this language is reduced step by step by the evaluation rules for the core language and the desugaring rules for the syntactic sugars in the surface language. Our approach assumes the evaluation is  compositional (as the definition in \cite{hygienic}), that is, for evaluation contexts $E_1$ and $E_2$, $E_1[E_2]$ is also a evaluation context.
+As a preparation for our resugaring algorithm, we define a mixed language that combines a core language with a surface language (defined by syntactic sugars over the core language). An expression in this language is reduced step by step by the evaluation rules for the core language and the desugaring rules for the syntactic sugars in the surface language. We assume that the evaluation of the core language is  compositional (as the definition in \cite{hygienic}), that is, for evaluation contexts $E_1$ and $E_2$, $E_1[E_2]$ is also a evaluation context.
 \subsubsection{Core Language}
 
 
-The evaluator of our core language is driven by evaluation rules (context rules and reduction rules), with three natural assumptions. First, the evaluation is deterministic, in the sense that any expression in the core language will be reduced by a unique reduction sequence (restricted by context rules). Second, evaluation of a sub-expression has no side-effect on other parts of the expression. Third, the context rules have no conditions, which means the rules as following are not permitted.
+The evaluator of our core language is driven by evaluation rules (context rules and reduction rules), with three natural assumptions. First, the evaluation is deterministic, in the sense that any expression in the core language will be reduced by a unique reduction sequence (restricted by context rules). Second, evaluation of a sub-expression has no side-effect on other parts of the expression. Third, the context rules have no conditions, which means the following rules are not permitted.
 
 {\footnotesize
 \[
 \begin{array}{lll}
 \m{C}& ::= & (\m{notif}~[\bigcdot]~e_2~e_3)\\
-&|& (\m{notif}~v_1~[\bigcdot]~e_3), (side-condition~(equal?~v_1~\true))\\
-&|& (\m{notif}~v_1~e_2~[\bigcdot]), (side-condition~(equal?~v_1~\false))
+&|& (\m{notif}~v_1~[\bigcdot]~e_3), \qquad \m{if}~(\m{equal}?~v_1~\true)\\
+&|& (\m{notif}~v_1~e_2~[\bigcdot]), \qquad \m{if}~(\m{equal}?~v_1~\false)
 \end{array}
 \]}
 
-
-
-The expression form of the core language is defined in Fig. \ref{fig:expression}. It is a variable, a constant, or a (language) constructor expression. Here, $\m{CoreHead}$ stands for a language constructor such as $\m{if}$ and $\m{let}$. To be concrete, we will use a simplified core language defined in Fig.  \ref{fig:core} to demonstrate our approach. Here the [e/x] is a capture-avoiding substitution.
+The form of the expressions in our core language is defined in Fig. \ref{fig:expression}. It is a variable, a constant, or a (language) constructor expression. Here, $\m{CoreHead}$ stands for a language constructor such as $\m{if}$ and $\m{let}$. To be concrete, we will use the core language defined in Fig.  \ref{fig:core} to demonstrate our approach. It is a usual functional language and its semantics is defined by the context rules and the reduction rules. Here the [e/x] denotes capture-avoiding substitution.
 
 \begin{figure*}[thb]
 % \subcaptionbox{Syntax \label{fig:coresyntax}}[0.32\linewidth]{
@@ -136,18 +134,19 @@ The expression form of the core language is defined in Fig. \ref{fig:expression}
 
 \subsubsection{Surface Language}
 
-Our surface language is defined by a set of syntactic sugars, together with some basic elements in the core language, such as constants and variables. The expression forms of surface language is given in Fig.  \ref{fig:expression}. To separate surface language's \m{Head} from core language's, we capitalize the first letter of surface language's \m{Head}.
+Our surface language is defined by a set of syntactic sugars, together with some elements in the core language, such as constants and variables. The expression of a surface language has a similar form as shown in Fig.  \ref{fig:expression}. To separate surface language's \m{Head} from that of the core language, we capitalize the first letter of surface language's \m{Head}.
 
-Here we just assume a simple desugaring system for a syntactic sugar expression. We will show how this approach can be combined with other complex desugaring. A syntactic sugar is defined by a desugaring rule in the following form,
+%Here we just assume a simple desugaring system for a syntactic sugar expression. We will show how this approach can be combined with other complex desugaring.
+A syntactic sugar is defined by a desugaring rule in the following form
 
 \[
 \drule{(\m{SurfHead}~e_1~e_2~\ldots~e_n)}{\m{exp}} %\todo{\text{font size in drule}}
 \]
-where its left-hand-side (LHS) is a pattern and its left-hand-side (RHS) is an expression of the surface language or the core language. The LHS can be nested or not, that means, we can write sugars like \Code{(SurfHead ($e_1$ ($e_2$ $e_3$)) $\ldots$ $e_n$)}. And any pattern variable (e.g., $e_1$) in LHS only appears once in RHS. For instance, we may define syntactic sugar \m{And} by
+where its left-hand-side (LHS) is a pattern and its left-hand-side (RHS) is an expression of the surface language or the core language. The LHS may be nested , so we can write sugars like \Code{(SurfHead ($e_1$ ($e_2$ $e_3$)) $\ldots$ $e_n$)}. And any pattern variable (e.g., $e_1$) in LHS appears only once in RHS. For instance, we may define syntactic sugar \m{And} by
 \[
 \drule{(\m{And}~e_1~e_2)}{(\m{if}~e_1~e_2~\false)}.
 \]
-And if we need to use a pattern variable multiple times in RHS, a \m{let} binding may be used (a normal way in syntactic sugar). We take the following sugar as an example
+If we need to use a pattern variable multiple times in RHS, a \m{let} binding may be used (a normal way in syntactic sugar). To see the problem of multiple uses of variable, suppose we define a sugar as follow:
 \[
 \drule{(\m{Twice}~e_1)}{(+~e_1~e_1)}.
 \]
@@ -155,7 +154,8 @@ If we execute \Code{(Twice (+ 1 1))}, it will first be desugared to \Code{(+ (+ 
 So we just use a \m{let} binding to resolve this problem. The RHS should be \Code{(let x $e_1$ (+ x x))} in this case.
 
 
-Note that in the desugaring rule, we do not restrict the RHS to be a $\m{CoreExp}$. We can use $\m{SurfExp}$ (more precisely, we allow the mixture use of syntactic sugars and core expressions) to define recursive syntactic sugars, as seen in the following example.
+Note that in the desugaring rule, we relax the ordinary restriction that RHS must be a $\m{CoreExp}$. This makes it possible to define recursive sugars:
+%, which We can use $\m{SurfExp}$ (more precisely, we allow the mixture use of syntactic sugars and core expressions) to define recursive syntactic sugars, as seen in the following example.
 \[
 \begin{array}{l}
 \drule{(\m{Odd}~e)}{(\m{let}~((x~e))~(\m{if}~(>~x~0)~(\m{Even}~(-~x~1))~\false))}\\
@@ -163,9 +163,9 @@ Note that in the desugaring rule, we do not restrict the RHS to be a $\m{CoreExp
 \end{array}
 \]
 
-As described above, we only assume the desugaring is a transformer without other helper function, thus there will be many kinds of ill-formed syntactic sugar which cannot desugared well (just as the \m{Odd}, \m{Even} sugars above, although can be processed by our lazy desugaring), or the semantics of the sugar cannot be defined clearly.
+%As described above, we only assume the desugaring is a transformer without other helper function, thus there will be many kinds of ill-formed syntactic sugar which cannot desugared well (just as the \m{Odd}, \m{Even} sugars above, although can be processed by our lazy desugaring), or the semantics of the sugar cannot be defined clearly.
 
-We assume that all desugaring rules are not overlapped in the sense that for any syntactic sugar in an expression, only one desugaring rule is applicable.
+Without lost of generosity, we assume that all desugaring rules are not overlapped in the sense that for any syntactic sugar in an expression, only one desugaring rule is applicable.
 
 
 \subsubsection{Mixed Language}
@@ -197,7 +197,7 @@ We assume that all desugaring rules are not overlapped in the sense that for any
 
 Our mixed language for resugaring combines the surface language and the core language, described in Fig.  \ref{fig:mix}.
 %
-The differences between expressions in our core language and those in our surface language are identified by their \m{Head}. But there may be some expressions in the core language which are also used in the surface language for convenience, or to say, we need some core language's expressions to help us get better resugaring sequences. So we take \m{CommonHead} as a subset of the \m{CoreHead}, which can be displayed in resugaring sequences (just as the \m{CommonExp} in our Section \ref{sec2}). Then if any sub-expressions in an expression contain no \m{CoreHead} except for \m{CommonHead}, we should let them display during the evaluation process (named \m{DisplayableExp}). Otherwise, the expression should not be displayed. We just use a \m{MixedExp} expression to present the expressions which are not necessarily displayed for concision. We will discuss more on \m{DisplayableExp}  in Section \ref{sec5}.
+The differences between expressions in our core language and those in our surface language are identified by their \m{Head}. But there may be some expressions in the core language which are also used in the surface language for convenience, or to say, we need some core language's expressions to help us get better resugaring sequences. So we take \m{CommonHead} as a subset of the \m{CoreHead}, which can be displayed in resugaring sequences (just as the \m{CommonExp} in our Section \ref{sec2}). Then if any subexpression in an expression contains no \m{CoreHead} except for \m{CommonHead}, we should let them displayed during the evaluation process (named \m{DisplayableExp}). Otherwise, the expression should not be displayed. We just use a \m{MixedExp} expression to represent the expressions that are unnecessarily displayed for concision, and discuss more on \m{DisplayableExp}  in Section \ref{sec5}.
 
  % The \m{SurfExp} denotes an expression that have \m{SurfHead} and their subexpressions being displayable. The \m{CommonExp} denotes an expression with displayable \m{Head} (named \m{CommonHead}) in the core language, together with displayable subexpressions. There exist some other expressions during our resugaring process, which have displayable \m{Head}, but one or more of their subexpressions should not be displayed. They are of \m{UndisplayableExp}.
 
@@ -206,7 +206,8 @@ The differences between expressions in our core language and those in our surfac
 As an example, for the core language in Fig.  \ref{fig:core},
 we may assume \m{arithop}, \m{$\lambda$} (call-by-value lambda calculus), \m{cons} as \m{CommonHead}, \m{if}, \m{let}, \m{listop} as \m{CoreHead} but out of \m{CommonHead}. This will allow \m{arithop}, \m{$\lambda$} and \m{cons} to appear in the resugaring sequences, and thus display more useful intermediate steps during resugaring.
 
-Note that some expressions with \m{CoreHead} contain sub-expressions with \m{SurfHead}, they are of \m{CoreExp} but not in the core language. In the mixed language, we process these expressions by the context rules of the core language, so that the reduction rules of the core language and the desugaring rules of surface language can be mixed as a whole (the $\redc{}{}$ in former section). For example, suppose we have the context rule of \m{if} expression\footnote{It is another presentation of \Code{(if $[\bigcdot]$ e e)}, we use this form here for convenience.}
+In the mixed language some expressions with \m{CoreHead} may contain subexpressions with \m{SurfHead}. They will be treated as \m{CoreExp} in the mixed language but not \m{CoreExp} in the core language. In the mixed language, we process these expressions by the context rules of the core language, so that the reduction rules of the core language and the desugaring rules of surface language can be mixed as a whole
+ (the $\redm{}{}$ in Fig. \ref{fig:mixexample}). For example, suppose we have the context rule of \m{if} expression\footnote{It is another presentation of \Code{(if $[\bigcdot]$ e e)}, we use this form here for convenience.}
 \[
 \infer{(\m{if}~e_1~e_2~e_3) \rightarrow (\m{if}~e_1'~e_2~e_3)}{e_1 \rightarrow e_1'}
 \]
