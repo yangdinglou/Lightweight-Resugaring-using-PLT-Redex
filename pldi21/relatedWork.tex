@@ -15,7 +15,7 @@ Our work is related to the \emph{Galois slicing for imperative functional progra
 This can also be considered as a bidirectional transformation \cite{bx,lens07} and the round-tripping between desugaring and resugaring in the existing approach. In contrast to these works, our resugaring approach is basically unidirectional. It should be noted that Galois slicing may be useful to handle side effects in resugaring in the future (for example, slicing the part where side effects appear).
 
 
-There is a long history of hygienic macro expansion\cite{hygienicmacro}, and a formal specific hygiene definition was given \cite{10.5555/1792878.1792884} by specific the binding scopes of macros. another formal definition of the hygienic macro\cite{EssenceofHygiene} is based on nominal logic\cite{10.1007/s001650200016}.
+There is a long history of hygienic macro expansion\cite{hygienicmacro}, and a formal specific hygiene definition was given \cite{10.5555/1792878.1792884} by specific the binding scopes of macros. another formal definition of the hygienic macro\cite{EssenceofHygiene} is based on nominal logic\cite{10.1007/s001650200016}. Instead of using the desugaring rule or something else to achieve hygiene, we use the lazy desugaring with the small core language to avoid hygienic problem in our approach.
 %
 %When the tracking in their notation can be easily done for sugar whose rules can be derived automatically.
 
