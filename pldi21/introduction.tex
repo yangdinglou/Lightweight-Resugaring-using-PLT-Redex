@@ -81,11 +81,11 @@ Resugaring becomes complex, if we use core language constructs in  surface progr
 \[
 \Code{(let ((t \#t)) (if t t (Or1 \#t \#f)))}
 \]
-on the surface, after one-step reduction, we get
+after one-step reduction on the surface program, we get
 \[
 \Code{(let ((t \#t)) (if t t \#t))}
 \]
-but we do not want to further get \Code{(Or1 \#t \#t)} based on the desugaring rule of \Code{Or1}, because this \Code{let} was originally used in the surface program.
+but we do not want to further get \Code{(Or1 \#t \#t)} by reverse application of the desugaring rule of \Code{Or1}, because this \Code{let} was originally used in the surface program.
 
 Resugaring becomes hard, if we allow sugars to be hygienic, recursive and of higher-order.
 For instance, when meeting hygienic sugar, the reverse expansion by a simple match and substitution will not work. Consider the following hygienic sugar:
@@ -126,7 +126,7 @@ However, there is a key step that makes the existing approaches less practical--
 In this paper, we propose a new approach to resugaring, which does not use reverse expansion (reverse desugaring) at all.
 The key idea is "lazy desugaring", in the sense that desugaring is done lazily  so that the reverse application of desugaring rules becomes unnecessary. Rather than assuming a black-box stepper for the core language as the existing approaches, we treat the core language as a white-box, explicitly using
 %our resugaring approach is based on the
-its evaluation rules (consist of the context rules and reduction rules) of the core language.
+its evaluation rules (consisting of the context rules and reduction rules) of the core language.
 %So our approach seems to be a meta-level language feature rather than a tool for existing languages. (Although it can also work with a black-box stepper, as we will discuss in Section \ref{sec5.1})
 Our idea is to consider the surface language and the core language as one mixed language. We regard desugaring rules as reduction rules of the surface language and calculate the context rules of surface language to show when desugaring
 should be done. Our method can guarantee that the intermediate evaluation steps of the mixed language will contain the resugaring evaluation sequence for a surface program.
@@ -141,7 +141,7 @@ Our main technical contributions can be summarized as follows.
 \item We have implemented a system based on the new approach, and the experimental results show that it is much more efficient than the existing approach. We demonstrate with many examples that our system is powerful enough to deal with hygienic, recursive and higher-order sugars. All the examples in this paper have passed the test of the system.
 
 \item We discuss how lazy desugaring makes sense, including how the approach can be extended to a model with a black-box stepper, how it can easily deal with hygiene, and how we deal with the trade-off of our approach's properties.
-\todo{Usually, a discuss should not be considered as an important contribution. Either we omit it, or we should just talk about our extension.}
+\todo{Usually, a discussion should not be considered as an important contribution. Either we omit it, or we should just talk about our extension.}
 
 \end{itemize}
 
