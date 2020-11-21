@@ -17,7 +17,7 @@ To show the efficiency of our approach, we use the number of reduction steps com
 \[
 {\footnotesize
 	\begin{array}{lcl}
-	Surface&&Core\\
+	\text{Surface}&&\text{Core}\\
 	\Code{(And (Hard $e_1$ $e_2$) \#t)}&\xrightarrow{desugar}&\Code{(if $\m{step}_0$ \#t \#f)}\\
 	\qquad\quad\dashdownarrow& &\qquad\qquad\downarrow\\
 	\Code{(And $\m{step}_1$ \#t)}&\xleftarrow{resugar}&\Code{(if $\m{step}_1$ \#t \#f)}\\

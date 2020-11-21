@@ -36,7 +36,7 @@ by the existing approach. The sequence of expressions on the left is obtained fr
 	\[
 	{\footnotesize
 		\begin{array}{lcl}
-		Surface&&Core\\
+		\text{Surface}&&\text{Core}\\
 		\Code{(Or1 (not \#t) }&\xrightarrow{desugar}&\Code{(let ((t (not \#t))) }\\
 		\Code{\qquad\hspace{0.5em}\#t)}&\xleftarrow{resugar}&\Code{\qquad\hspace{0.5em}(if t t \#t))}\\
 		\qquad\quad\dashdownarrow& &\qquad\qquad\downarrow\\
