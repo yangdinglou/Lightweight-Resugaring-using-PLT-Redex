@@ -244,7 +244,7 @@ Our resugaring algorithm works on the mixed language, based on the evaluation ru
 				\STATE \qquad\Code{calcontext(\m{Head}.LHS,\m{Head}.RHS,InCal))}
 			\ENDIF
 		\ENDIF
-		\STATE \Code{Let OrderList = $\{e_i',~e_j',~\ldots\}$}\hfill\\ \note{//$RHS$'s computational order got by context rules}
+		\STATE \Code{Let OrderList = $\{e_i',~e_j',~\ldots\}$}\hfill\\ \note{//RHS's computational order got by context rules}
 		\FOR {\Code{subExp} in \m{OrderList}}
 			\IF {$\exists i, s.t. e_i=\Code{subExp}$}
 				\STATE \Code{ListofRule= append(ListofRule,}
@@ -267,21 +267,20 @@ Given a sugar \m{SurfHead} defined by
 \[
 \drule{(\m{SurfHead}~e_1~e_2~\ldots~e_n)}{(\m{Head}~\ldots~e_1'~e_2'~\ldots~e_m')}
 \]
-the context rule derivation is to infer which and in which order $e_i$ should be computed before this desugaring rule is applied. This information can be derived by analyzing computation order of each subexpression in RHS of the desugaring rule.
-The algorithm for this derivation, \texttt{calcontext}, is described as Algorithm \ref{alg:f}. Running
+the context rule derivation is to infer which and in which order $e_i$ should be computed before this desugaring rule is applied. This information can be derived by analyzing computational order of each sub-expression in RHS of the desugaring rule. The reason we can derive the context rules of syntactic sugar is that, for any sugar's RHS, a reduction will either reduce on the $e_i$ of its $LHS$, or reduction on other component of RHS to destroy the RHS's form (which means the sugar has to be expanded). So we can trace the order before the destroying. The algorithm for this derivation, \texttt{calcontext}, is described as Algorithm \ref{alg:f}. Running
 \[
  \Code{calcontext(\m{SurfHead}.LHS,~\m{SurfHead}.RHS, \{\})}
 \]
 will yield the context rules for \m{SurfHead}.
 
 Before explaining the algorithm in detail, we use a simple example to illustrate the idea.
-Consider \m{Sg} defined by the following desugaring rule:
+Consider a sugar \m{Sg0} defined by the following desugaring rule:
 \[
-\drule{\m{(Sg}~e_1~e_2~e_3~e_4\m{)}}{\m{(+}~e_1~\m{(if}~e_2~e_3~e_4\m{))}}
+\drule{\m{(Sg0}~e_1~e_2~e_3~e_4\m{)}}{\m{(+}~e_1~\m{(if}~e_2~e_3~e_4\m{))}}
 \]
-where we assume that $+$ computes its first argument and then its second argument before performing reduction, i.e., the context rules for $+$ are  $(+~[\bigcdot]~e_2)$ and $(+~v_1~[\bigcdot]~e_2)$. Now from $\m{(+}~e_1~\m{(if}~e_2~e_3~e_4\m{))}$, we can infer that $e_1$ should be computed first from the context rule of $+$, and then $e_2$ is computed from the context rule of the inner $\m{if}$, and finally it stops because no context rule is applicable for any remaining subexpression. Therefore we get the following context rules for \m{Sg} as
+where we assume that $+$ computes its first argument and then its second argument before performing reduction, i.e., the context rules for $+$ are  $(+~[\bigcdot]~e_2)$ and $(+~v_1~[\bigcdot]~e_2)$. Now from $\m{(+}~e_1~\m{(if}~e_2~e_3~e_4\m{))}$, we can infer that $e_1$ should be computed first from the context rule of $+$, and then $e_2$ is computed from the context rule of the inner $\m{if}$, and finally it stops because no context rule is applicable for any remaining subexpression. Therefore we get the following context rules for \m{Sg0} as
 $
-(\m{Sg}~[\bigcdot]~e_2~e_3~e_4),~(\m{Sg}~v_1~[\bigcdot]~e_3~e_4).
+(\m{Sg0}~[\bigcdot]~e_2~e_3~e_4),~(\m{Sg0}~v_1~[\bigcdot]~e_3~e_4).
 $
 
 Return to the algorithm. If \m{Head} is a \m{CoreHead}, for each context rule of the \m{Head} in order, we should just recursively make context rules for each hole, until a whole sub-expression is iterated. For instance of \m{Sg1}:
@@ -306,7 +305,7 @@ But for instance of \m{Sg2}:
 \[
 \drule{(\m{Sg2}~e_1~e_2~e_3~e_4)}{\m{(+~(+~(+}~e_1~e_2\m{)}~e_3\m{)}~e_4\m{)}}
 \]
-once the sub-expressions $e_1$ and $e_2$ are reduced to value, the sugar has to be expanded, because if being desugared to the core language, the sub-expression \Code{(+ $v_3~v_4$)} will be reduced, then the sugar form of RHS is destroyed.
+once the sub-expressions $e_1$ and $e_2$ are reduced to value, the sugar has to be expanded, because if being desugared to the core language, the sub-expression \Code{(+ $v_1~v_2$)} will be reduced, then the sugar form of RHS is destroyed.
 \begin{footnotesize}
 	
 
@@ -331,7 +330,6 @@ If the \m{Head} is a \m{SurfHead} with its context rules calculated, then we reg
 \end{array}
 \]
 
-% The reason we can derive the context rules of syntactic sugar, 
 After calculating all context rules, we can add them to the mixed language's context rule; we can also add the desugaring rules to the mixed language's reduction rule as what we showed in Section \ref{sec2}.
 
 %\todo{Add explanantion of the above rule.}
@@ -390,7 +388,7 @@ An expression \m{P} can be fully desugared if \Code{$\mathtt{D}(\m{P})$} termina
 As the evaluation rules of the mixed language defined, there are only two kinds of reductions---(1) desugaring on an expression headed with \m{SurfHead}; (2) reduction on an expression headed with \m{CoreHead}. And because we need the mixed language's reduction corresponds to the execution of the fully desugared program, for any program \m{P} in the mixed language, if it reduces by expanding a sugar, then the reduction will occurs in the the expression after the sugar expanded in $\mathtt{D}(\m{P})$; otherwise (reduced by \m{CoreHead}), the reduction will be also by the same \m{CoreHead} in $\mathtt{D}(\m{P})$.
 
 \begin{property} \label{thm1}
-	For a program \m{P}=$\m{E}[\m{S}]$ of the mixed language which can be fully desugared, where \m{P'}=$\mathtt{D}(\m{P})$=$\m{E'}[\m{C}]$, and \m{S}=\Code{(SurfHead $e_1$ ... $e_n$)} in the program \m{P} together with \m{E'}=$\mathtt{D}(\m{E})$ (then of course \m{C}=$\mathtt{D}(\m{S})$); if $\redm{\m{E}[\m{S}]}{\m{E}[\m{S'}]}$ and $\drule{\m{S}}{\m{S'}}$, then $\redc{\m{E'}[\m{C}]}{\m{E'}[\m{C'}]}$ together with destroying the sugar's $RHS$ form of \m{S} by $\redc{\m{C}}{\m{C'}}$. An example in Fig. \ref{example:ppt1}.
+	For a program \m{P}=$\m{E}[\m{S}]$ of the mixed language which can be fully desugared, where \m{P'}=$\mathtt{D}(\m{P})$=$\m{E'}[\m{C}]$, and \m{S}=\Code{(SurfHead $e_1$ ... $e_n$)} in the program \m{P} together with \m{E'}=$\mathtt{D}(\m{E})$ (then of course \m{C}=$\mathtt{D}(\m{S})$); if $\redm{\m{E}[\m{S}]}{\m{E}[\m{S'}]}$ and $\drule{\m{S}}{\m{S'}}$, then $\redc{\m{E'}[\m{C}]}{\m{E'}[\m{C'}]}$ together with destroying the sugar's RHS form of \m{S} by $\redc{\m{C}}{\m{C'}}$. An example in Fig. \ref{example:ppt1}.
 \end{property}
 \example{\tiny
 \begin{tabular}{|l | l | l |}\hline
@@ -426,7 +424,7 @@ As the evaluation rules of the mixed language defined, there are only two kinds 
 
 }{Example of property \ref{thm2}}{example:ppt2}
 
-The properties limit the laziness of our mixed language---the resugaring sequences should behave as the sequences after desugared to the core language.
+The properties restricts how the lazy desugaring of our mixed language should be---the resugaring sequences should behave as the sequences after desugared to the core language.
 
 Proof sketch in Appendix. We discuss the hygiene of our approach in Section \ref{mark:hygiene}.
 

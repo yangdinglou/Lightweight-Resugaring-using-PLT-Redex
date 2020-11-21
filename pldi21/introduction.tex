@@ -130,7 +130,6 @@ its evaluation rules (consisting of the context rules and reduction rules) of th
 Our idea is to consider the surface language and the core language as one mixed language. We regard desugaring rules as reduction rules of the surface language and calculate the context rules of surface language to show when desugaring
 should be done. Our method can guarantee that the intermediate evaluation steps of the mixed language will contain the resugaring evaluation sequence for a surface program.
 
-\todo{This part should be revised later.}
 Our main technical contributions can be summarized as follows.
 \begin{itemize}
 \item We propose a novel approach to resugaring by lazy desugaring, where the reverse application of desugaring rules is unnecessary. The new approach has two new features: (1) it is powerful, providing a new way to deal with hygenic sugars and solving the open problem of recursive sugars; and (2) it is efficient because it completely avoids unnecessary complexity of the reverse desugaring.
