@@ -1,12 +1,8 @@
 %!TEX root = ./main.tex
-\section{Experiment}
-\label{sec4}
+\section{Case Study on Expressiveness}
+\label{sec:cases}
 
-In this section, we present several examples to show different aspects of our approach.
-
-\subsection{Case Study on Expressiveness}
-
-We have implemented our resugaring approach using PLT Redex \cite{SEwPR}, which is a semantic engineering tool based on reduction semantics \cite{reduction}. We show several case studies to demonstrate the power of our approach. Some examples we will discuss in this section are in Fig.  \ref{fig:resugaring}. Note that we set call-by-value lambda calculus as terms in \m{CommonExp}, because we want to output some intermediate expressions including lambda calculus in some examples. It's easy if we want to skip them.
+In this section, we present several examples to demonstrate the expressive power of our approach.
 
 \begin{figure*}[t]
 \centering
@@ -25,7 +21,7 @@ We have implemented our resugaring approach using PLT Redex \cite{SEwPR}, which 
 			}
 		\end{flushleft}
 	\end{spacing}
-	
+
 	\caption{Example of SKI}
 	\label{fig:SKI}
 \end{subfigure}
@@ -38,14 +34,14 @@ We have implemented our resugaring approach using PLT Redex \cite{SEwPR}, which 
 			\OneStep{ (Hygienicadd 1 2)}\\
 			\OneStep{ (+ 1 2)}\\
 			\OneStep{ 3}\\[2.25em]
-			
+
 			\end{Codes}
-			
+
 			}
 		\end{flushleft}
-		
+
 	\end{spacing}
-	
+
 	\caption{Example of \m{Hygienicadd}}
 	\label{fig:hygienicadd}
 \end{subfigure}
@@ -63,9 +59,9 @@ We have implemented our resugaring approach using PLT Redex \cite{SEwPR}, which 
 			\end{Codes}
 			}
 		\end{flushleft}
-		
+
 	\end{spacing}
-	
+
 	\caption{Example of \m{Odd} and \m{Even}}
 	\label{fig:oddeven}
 \end{subfigure}
@@ -84,8 +80,8 @@ We have implemented our resugaring approach using PLT Redex \cite{SEwPR}, which 
 			% \end{Codes}
 			}
 		\end{flushleft}
-		
-	
+
+
 	\caption{Example of \m{Map}}
 	\label{fig:Map}
 \end{subfigure}
@@ -100,10 +96,10 @@ We have implemented our resugaring approach using PLT Redex \cite{SEwPR}, which 
 			\OneStep{ \Code{ (cons 2 (cons 3 (list)))}}\\
 			\OneStep{ \Code{ (cons 2 (list 3))}}\\
 			\OneStep{ \Code{ (list 2 3)}}
-			
+
 			}
 		\end{flushleft}
-	
+
 	\caption{Example of \m{Filter}}
 	\label{fig:Filter}
 \end{subfigure}
@@ -113,10 +109,10 @@ We have implemented our resugaring approach using PLT Redex \cite{SEwPR}, which 
 \end{figure*}
 
 
-\subsubsection{Simple Sugars}
+\subsection{Simple Sugars}
 \label{mark:simple}
 
-We construct some simple syntactic sugars and try it on our tool. Some sugars are inspired by the first work of resugaring \cite{resugaring}. 
+We construct some simple syntactic sugars and try it on our tool. Some sugars are inspired by the first work of resugaring \cite{resugaring}.
 Take an SKI combinator syntactic sugar as an example. We can regard \m{S} as an expression headed with S, without sub-expression. And for showing a concise result, we add the call-by-need lambda calculus in the core language for this example.
 \[
 \begin{array}{l}
@@ -154,7 +150,7 @@ Then in our core language, the execution of expanded expression will contain 33 
 }
 
 
-\subsubsection{Hygienic Sugars}
+\subsection{Hygienic Sugars}
 \label{mark:hygienic}
 
 
@@ -175,7 +171,7 @@ For the existing resugaring approach, if we want to get sequences of \Code{(let 
 
 In practical application, we think hygiene can be easily processed by more complex transformer systems (such as \cite{10.5555/1792878.1792884}). Overall, our results show lazy desugaring is a good way to handle hygienic sugars in any system.
 
-\subsubsection{Recursive Sugars}
+\subsection{Recursive Sugars}
 \label{sec:recursiveSugar}
 
 Recursive sugar is a kind of syntactic sugars where calls itself or each other during the expansion. For example,
@@ -238,11 +234,13 @@ Moreover, just like the \m{Odd} and \m{Even} sugar above, there are some simple 
 
 Note that the \m{let} expression is to limit the sub-expression only appears once in RHS. In this example, we can find that the list \Code{(cons 1 (list 2))}, though equal to \Code{(list 1 2)}, is represented by core language's expression. So it will be difficult to naturally handle such inline boundary conditions for existing desugaring systems. (The case can be specific by some setting, such as local-expansion\cite{10.1017/S0956796812000093} in Racket language's macro.) But our approach is easy to handle cases like this without specifying the expansion.
 
+\ignore{
 \subsubsection{Limitation on Presentation}
-One may note that the context rules of our sugar setting limit the presentation of syntactic sugar. For example, it is difficult to present a sugar with ellipses, because the form of its context rule may vary. It is still possible if we add some 
+One may note that the context rules of our sugar setting limit the presentation of syntactic sugar. For example, it is difficult to present a sugar with ellipses, because the form of its context rule may vary. It is still possible if we add some
 restriction (so that the algorithm \ref{alg:f} will work), or we can just make it using the list operation just as what the sugar \m{Map, Filter} work. Overall, the presentation of our sugar system is not so flexible, but it won't affect the expressiveness.
+}
 
-\subsection{Efficiency}
+%\subsection{Efficiency}
 % \begin{figure}[thb]
 %   \begin{center}\small
 %   \begin{tabular}{l | l | l |l}
@@ -250,7 +248,7 @@ restriction (so that the algorithm \ref{alg:f} will work), or we can just make i
 %     And, Or & 4  & 2+0+2=4 & \\
 %     And, Newor & 10 & 7+6+3=16 & Or with binding \\
 %     Filter & 29 & 22+78+10=110 &  \\
-%     Sg, and, or & 11 & 5+0+10=15 & Sg is nested \\ 
+%     Sg, and, or & 11 & 5+0+10=15 & Sg is nested \\
 %     HygienicAdd & 6 & 5+1+1=7 &  \\
 %     S, K, I & 16 & 11+13+10=34 &  \\
 %   \end{tabular}
@@ -259,13 +257,21 @@ restriction (so that the algorithm \ref{alg:f} will work), or we can just make i
 %   \label{fig:step}
 %   \end{figure}
 
+
+\section{Implementation}
+\label{sec4}
+
+
+We have implemented our resugaring approach using PLT Redex \cite{SEwPR}, which is a semantic engineering tool based on reduction semantics \cite{reduction}. We show several case studies to demonstrate the power of our approach. Some examples we will discuss in this section are in Fig.  \ref{fig:resugaring}. Note that we set call-by-value lambda calculus as terms in \m{CommonExp}, because we want to output some intermediate expressions including lambda calculus in some examples. It's easy if we want to skip them.
+
 \begin{figure}[t]
 	\centering
 	\includegraphics[width=0.48\textwidth]{images/efficiency.png}
 	\caption{Comparison on Reduction Steps}
 	\label{fig:step}
 \end{figure}
-To show the efficiency of our approach, we use the reduction steps comparing to the existing approach as the metrics. The following Fig. \ref{fig:step} shows the difference between the two approaches. Notice that both approaches have pre-processions---for the existing one, it is to desugar the programs to the core language together with some tags; for ours, it is to calculate the context rules of syntactic sugars. We do not consider the steps during these pre-processes. Besides, we derive the reduction steps of the existing approach into three different kinds---the reductions in the core language, the reverse expansion with failed resugaring, the reverse expansion with successful resugaring.  Use the following example to see the difference. Consider a sugar named \m{Hard} with two arguments, which has many reduction steps after desugared. Assuming for specific $e_1$ and $e_2$, the \Code{(Hard $e_1$ $e_2$)} after fully desugared has 100 reduction steps (finally to \#f, for example), and only 1 intermediate step can be resugared (to \Code{(Hard $v_1$ $e_2$)}, for example). Then for \Code{(And (Hard $e_1$ $e_2$) \#t)}, although all the 100 steps in the core language try the reverse desugaring, only \Code{(if stepn \#t \#f)} (2 steps on \m{And}, \m{Hard}) and \Code{(if \#f \#t \#f)} (1 step on \m{And}) are successful. Other 98 attempts will be failed together with 98 steps on \m{And}.
+
+To show the efficiency of our approach, we use the reduction steps comparing to the existing approach as the metrics. Figure \ref{fig:step} shows the difference between the two approaches. Notice that both approaches have pre-processions---for the existing one, it is to desugar the programs to the core language together with some tags; for ours, it is to calculate the context rules of syntactic sugars. We do not consider the steps during these pre-processes. Besides, we derive the reduction steps of the existing approach into three different kinds---the reductions in the core language, the reverse expansion with failed resugaring, the reverse expansion with successful resugaring.  Use the following example to see the difference. Consider a sugar named \m{Hard} with two arguments, which has many reduction steps after desugared. Assuming for specific $e_1$ and $e_2$, the \Code{(Hard $e_1$ $e_2$)} after fully desugared has 100 reduction steps (finally to \#f, for example), and only 1 intermediate step can be resugared (to \Code{(Hard $v_1$ $e_2$)}, for example). Then for \Code{(And (Hard $e_1$ $e_2$) \#t)}, although all the 100 steps in the core language try the reverse desugaring, only \Code{(if stepn \#t \#f)} (2 steps on \m{And}, \m{Hard}) and \Code{(if \#f \#t \#f)} (1 step on \m{And}) are successful. Other 98 attempts will be failed together with 98 steps on \m{And}.
 
 \[
 {\footnotesize

@@ -55,7 +55,7 @@ The expression form of the core language is defined in Fig. \ref{fig:expression}
 % {\footnotesize
 % 		\begin{array}{lcl}
 % 		\m{CoreExp} &::=& \Code{(CoreExp~CoreExp~...)} ~~\note{// apply}\\
-		
+
 % 		&|& \m{(if~CoreExp~CoreExp~CoreExp)} ~~\note{// condition}\\
 % 		&|& \m{(let~((x~CoreExp)~...)~CoreExp)} ~~\note{// binding}\\
 % 		&|& \m{(listop~CoreExp)} ~~\note{// first, rest, empty?}\\
@@ -76,7 +76,7 @@ The expression form of the core language is defined in Fig. \ref{fig:expression}
 {\footnotesize
 		\begin{array}{lcl}
 		\m{CoreExp} &::=& \Code{(apply~CoreExp~CoreExp~...)}\\
-		
+
 		&|& \m{(if~CoreExp~CoreExp~CoreExp)} ~~\note{// condition}\\
 		&|& \m{(let~((x~CoreExp)~...)~CoreExp)} ~~\note{// binding}\\
 		&|& \m{(listop~CoreExp)} ~~\note{// first, rest, empty?}\\
@@ -94,7 +94,7 @@ The expression form of the core language is defined in Fig. \ref{fig:expression}
 \begin{subfigure}{0.5\linewidth}
 \[
 {\footnotesize
-		\begin{array}{lcl}	
+		\begin{array}{lcl}
 		\Code{C} &::=& \Code{(apply~value~...~C~CoreExp~...)}\\
 		&|& \Code{(if~C~CoreExp~CoreExp)}\\
 		&|& \Code{(let~((x~value)~...~(x~C)~(x~CoreExp)~...)~CoreExp)}\\
@@ -113,7 +113,7 @@ The expression form of the core language is defined in Fig. \ref{fig:expression}
 \begin{subfigure}{0.8\linewidth}
 	\[
 {\footnotesize
-		\begin{array}{lcl}	
+		\begin{array}{lcl}
 		\Code{(($\lambda$~($x_1$~$x_2$~...)~CoreExp)~$\m{value}_1$~$\m{value}_2$~...)} &\redc{}{}& \Code{(($\lambda$~($x_2$~...)~CoreExp[$\m{value}_1$/$x_1$])~$\m{value}_2$~...)}\\
 
 		\Code{(if~$\true$~$\m{CoreExp}_1$~$\m{CoreExp}_2$)}&\redc{}{}& \Code{$\m{CoreExp}_1$}\\
@@ -195,11 +195,11 @@ We assume that all desugaring rules are not overlapped in the sense that for any
 \label{fig:mix}
 \end{figure}
 
-Our mixed language for resugaring combines the surface language and the core language, described in Fig.  \ref{fig:mix}. 
+Our mixed language for resugaring combines the surface language and the core language, described in Fig.  \ref{fig:mix}.
 %
 The differences between expressions in our core language and those in our surface language are identified by their \m{Head}. But there may be some expressions in the core language which are also used in the surface language for convenience, or to say, we need some core language's expressions to help us get better resugaring sequences. So we take \m{CommonHead} as a subset of the \m{CoreHead}, which can be displayed in resugaring sequences (just as the \m{CommonExp} in our Section \ref{sec2}). Then if any sub-expressions in an expression contain no \m{CoreHead} except for \m{CommonHead}, we should let them display during the evaluation process (named \m{DisplayableExp}). Otherwise, the expression should not be displayed. We just use a \m{MixedExp} expression to present the expressions which are not necessarily displayed for concision. We will discuss more on \m{DisplayableExp}  in Section \ref{sec5}.
 
- % The \m{SurfExp} denotes an expression that have \m{SurfHead} and their subexpressions being displayable. The \m{CommonExp} denotes an expression with displayable \m{Head} (named \m{CommonHead}) in the core language, together with displayable subexpressions. There exist some other expressions during our resugaring process, which have displayable \m{Head}, but one or more of their subexpressions should not be displayed. They are of \m{UndisplayableExp}. 
+ % The \m{SurfExp} denotes an expression that have \m{SurfHead} and their subexpressions being displayable. The \m{CommonExp} denotes an expression with displayable \m{Head} (named \m{CommonHead}) in the core language, together with displayable subexpressions. There exist some other expressions during our resugaring process, which have displayable \m{Head}, but one or more of their subexpressions should not be displayed. They are of \m{UndisplayableExp}.
 
 
 
@@ -257,10 +257,10 @@ Our resugaring algorithm works on the mixed language, based on the evaluation ru
 			\ENDIF
 		\ENDFOR
 		\RETURN \Code{ListofRule, tmpLHS}
-		
+
 	\end{algorithmic}
 \end{algorithm}
-The algorithm for the first part, \texttt{calcontext}, is described as Algorithm \ref{alg:f}. It works as follows. For sugar 
+The algorithm for the first part, \texttt{calcontext}, is described as Algorithm \ref{alg:f}. It works as follows. For sugar
 \[
 \drule{(\m{SurfHead}~e_1~e_2~\ldots~e_n)}{(\m{Head}~\ldots~e_1'~e_2'~\ldots~e_m')}
 \]
@@ -359,11 +359,11 @@ An expression \m{P} can be fully desugared if \Code{$\mathtt{D}(\m{P})$} is term
 	\[
 	\drule{\m{C}}{\m{S}.RHS[[\bigcdot]/e_i]}
 	\]
-	
+
 	\end{Def}
 
 
-\begin{property} \label{thm1} 
+\begin{property} \label{thm1}
 	For a program \m{P}=$\m{E}[\m{S}]$ of the mixed language which can be fully desugared, where \m{P'}=$\mathtt{D}(\m{P})$=$\m{E'}[\m{C}]$, and \m{S}=\Code{(SurfHead $e_1$ ... $e_n$)} in the program \m{P} together with \m{E'}=$\mathtt{D}(\m{E})$ (then of course \m{C}=$\mathtt{D}(\m{S})$); if $\redm{\m{E}[\m{S}]}{\m{E}[\m{S'}]}$ and $\drule{\m{S}}{\m{S'}}$, then $\redc{\m{E'}[\m{C}]}{\m{E'}[\m{C'}]}$ together with destroying the sugar's $RHS$ form of \m{S} by $\redc{\m{C}}{\m{C'}}$. An example in Fig. \ref{example:ppt1}.
 \end{property}
 \example{\tiny
@@ -381,7 +381,7 @@ An expression \m{P} can be fully desugared if \Code{$\mathtt{D}(\m{P})$} is term
 
 }{Example of property \ref{thm1}}{example:ppt1}
 
-\begin{property} \label{thm2} 
+\begin{property} \label{thm2}
 	For a program \m{P}=$\m{E}[\m{CC}]$ of the mixed language which can be fully desugared, where \m{P'}=$\mathtt{D}(\m{P})$=$\m{E'}[\m{C}]$, and \m{CC}=\Code{(CoreHead $e_1$ ... $e_n$)} in the program \m{P} together with \m{E'}=$\mathtt{D}(\m{E})$ (then of course \m{C}=$\mathtt{D}(\m{CC})$); if $\redm{\m{E}[\m{CC}]}{\m{E}[\m{CC'}]}$ reduced by the \m{CoreHead}'s reduction rule on \m{CC}, then for $\redm{\m{E'}[\m{C}]}{\m{E'}[\m{C'}]}$, it also reduced by the \m{CoreHead}'s reduction rule on \m{C}. An example in Fig. \ref{example:ppt2}.
 \end{property}
 
@@ -395,18 +395,18 @@ An expression \m{P} can be fully desugared if \Code{$\mathtt{D}(\m{P})$} is term
 	$\redm{\Code{(if (if \#t (And \#t \#f) \#t) \#f \#f)}}{\Code{(if (And \#t \#f) \#f \#f)}}$, \\
 	$\redc{\Code{(if (if \#t (if \#t \#f \#f) \#t) \#f \#f)}}{\Code{((if (if \#t \#f \#f) \#f \#f)}}$, \\
 	so \m{C'}=\Code{(And \#t \#f)},  \m{CC'}=\Code{(if \#t \#f \#f)}; thus \m{C} and \m{CC} are both reduced by \m{if}'s reduction rule.
-	
+
 \end{flushleft}
 
 }{Example of property \ref{thm1}}{example:ppt2}
 
-The properties limit the laziness of our mixed language---the resugaring sequences should behave as the sequences after desugared to the core language.    
+The properties limit the laziness of our mixed language---the resugaring sequences should behave as the sequences after desugared to the core language.
 
 Proof sketch in Appendix.
 
 \ignore{
 \begin{lemma}
-The context rules of syntactic sugar are correct if computable. 
+The context rules of syntactic sugar are correct if computable.
 
 Or to say, for sugar \m{S}, the context rules $C_1$, $C_2$ $\ldots$, if the context rules limit reduction order of $S.LHS$ in $\{e_i,~\ldots,~e_j\}$, then the reduction order of $S.RHS$ is also of this sequence.
 
@@ -419,7 +419,7 @@ In algo \ref{alg:f}, we recursively search the sugar's RHS to find $e_i$ $\ldots
 
 
 \begin{proof}[Proof of Theorem \ref{thm1}]
-Consider a context \m{C}, where the sugar \m{S} in the hole. So the P is the program \m{C[S/hole]}. 
+Consider a context \m{C}, where the sugar \m{S} in the hole. So the P is the program \m{C[S/hole]}.
 
 If no sugar expression in \m{C}, then it is to prove the program \m{C[fulldesugar(S)/hole]} will reduce on \m{fulldesugar(S)}. It is obvious because that is where the hole at.
 
@@ -431,7 +431,7 @@ According to the lemma, any sugar has the correct context rules. So the hole is 
 \end{proof}
 }
 
-\subsection{Combining with Other Desugaring}
+\subsection{Possible Extensions}
 
 We describe a resugaring approach based on a simple transformer. What if we need a more complex transformer system to describe more complex semantics for syntactic sugar? For example, we may need a type system for checking; we may specify the binding of syntactic sugar for more general hygiene (We solved the hygiene in our core language without specific the binding, as described in Section \ref{mark:hygiene}); we may use some other functions to help the desugaring. All of these extensions are possible as long as following some conditions. We summarize the conditions as follows.
 \begin{enumerate}
