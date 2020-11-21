@@ -8,8 +8,8 @@ In this section, we give a brief overview of our approach. To be concrete, we wi
 \begin{array}{lllll}
 e &::=& \m{CoreExp}\\
 \m{CoreExp} &::=& \Code{(if~$e$~$e$~$e$)} &\note{// if construct}\\
-& |& \true  & \note{// true value}\\
-& |& \false & \note{// false value}
+& |& \m{\true}  & \note{// true value}\\
+& |& \m{\false} & \note{// false value}
 \end{array}
 \]
 The semantics of the language is simple, consisting of the following context rule to specify the computational order:
@@ -22,14 +22,14 @@ C &:=& \Code{(if C $e$ $e$)}\\
 and two reduction rules (the letter c means core):
 \[
 \centering
- \redc{(\m{if}~\true~e_1~e_2)}{e_1}  \qquad \redc{(\m{if}~\false~e_1~e_2)}{e_2}
+ \redc{(\m{if}~\m{\true}~e_1~e_2)}{e_1}  \qquad \redc{(\m{if}~\m{\false}~e_1~e_2)}{e_2}
 \]
 Assume that our surface language is defined by two syntactic sugars defined by:
 %---\emph{and} sugar and \emph{or} sugar on the core language.
 \[
 \begin{array}{c}
-\drule{(\m{And}~e_1~e_2)}{(\m{if}~e_1~e_2~\false)}\\
-\drule{(\m{Or}~e_1~e_2)}{(\m{if}~e_1~\true~e_2)}
+\drule{(\m{And}~e_1~e_2)}{(\m{if}~e_1~e_2~\m{\false})}\\
+\drule{(\m{Or}~e_1~e_2)}{(\m{if}~e_1~\m{\true}~e_2)}
 \end{array}
 \]
 Now let us demonstrate how to execute \Code{(And (Or \true~\false) (And \false ~\true))}, and get the following resugaring sequence by our approach.
@@ -84,8 +84,8 @@ the program \Code{(And (Or \true~\false) (And \false~\true))} based on the compu
         \m{CoreExp} &::=& \Code{(if~$e$~$e$~$e$)}\\
         \m{SurfExp} &::=& \Code{(And~$e$~$e$)}\\
         &|&\Code{(Or~$e$~$e$)}\\
-        \m{CommonExp} &::=& \true\\
-        &|& \false\\
+        \m{CommonExp} &::=& \m{\true}\\
+        &|& \m{\false}\\
         \end{array}
         \]
     \end{flushleft}
@@ -113,10 +113,10 @@ the program \Code{(And (Or \true~\false) (And \false~\true))} based on the compu
     \begin{flushleft}
         \[
         \begin{array}{c}
-        \redm{(\m{And}~e_1~e_2)}{(\m{if}~e_1~e_2~\false)}\\
-        \redm{(\m{Or}~e_1~e_2)}{(\m{if}~e_1~\true~e_2)}\\
-        \redm{(\m{if}~\true~e_1~e_2)}{e_1}\\
-        \redm{(\m{if}~\false~e_1~e_2)}{e_2}
+        \redm{(\m{And}~e_1~e_2)}{(\m{if}~e_1~e_2~\m{\false})}\\
+        \redm{(\m{Or}~e_1~e_2)}{(\m{if}~e_1~\m{\true}~e_2)}\\
+        \redm{(\m{if}~\m{\true}~e_1~e_2)}{e_1}\\
+        \redm{(\m{if}~\m{\false}~e_1~e_2)}{e_2}
         \end{array}
         \]
     \end{flushleft}

@@ -2,7 +2,7 @@
 \section{Discussion}
 \label{sec5}
 
-\subsection{Model Assumption and a Black-box Extension}
+\subsection{Model Assumption and A Black-Box Extension}
 \label{sec5.1}
 
 
@@ -49,7 +49,7 @@ But that's not enough---the core language and the surface language cannot be mix
 \label{fig:dynamic}
 \end{figure*}
 
-Putting them in words.For expression \Code{(SurfHead $e_1$ $\ldots$ $e_n$)}, as we discussed in Section \ref{mark:correct}, only reduction on the $e_i$ of the sugar's $LHS$ will not destroy the $RHS$'s form. So we can just take a try after the expansion of \m{SurfHead}. 
+Putting them in words. For expression \Code{(SurfHead $e_1$ $\ldots$ $e_n$)}, as we discussed in Section \ref{mark:correct}, only reduction on the $e_i$ of the sugar's $LHS$ will not destroy the $RHS$'s form. So we can just take a try after the expansion of \m{SurfHead}. 
 
 For an expression \Code{(CoreHead $e_1$ $\ldots$ $e_n$)}  whose sub-expressions contain \m{SurfExp}, replacing all \m{SurfExp} sub-expressions with any reducible core language's expression $\m{tmpe}_i$ . Then getting a result after inputting the new expression $e'$ to the original black-box stepper. Then two possible cases come.
 
@@ -89,7 +89,7 @@ Then for any sugar expression, we can process them dynamically by "one-step-try"
 \end{array}
 }
 \]
-}{Example of One-step-try}{example:try}
+}{Example of One-Step-Try}{example:try}
 
 
 

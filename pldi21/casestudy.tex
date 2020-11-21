@@ -139,7 +139,7 @@ want to use the context rules of \m{if} to getting the resugaring sequence, we c
 
 
 
-\subsection{Sugars with Let-binding}
+\subsection{Sugars with Let-Binding}
 \label{mark:hygienic}
 
 
@@ -166,8 +166,8 @@ In practical application, we think hygiene can be easily processed by more compl
 Recursive sugar is a kind of syntactic sugars which calls itself or each other during the expansion. For example,
 \[
 \begin{array}{l}
-\drule{(\m{Odd}~e)}{(\m{let}~((x~e))~(\m{if}~(>~x~0)~(\m{Even}~(-~x~1))~\false))}\\
-\drule{(\m{Even}~e)}{(\m{let}~((x~e))~(\m{if}~(>~x~0)~(\m{Odd}~(-~x~1))~\true))}
+\drule{(\m{Odd}~e)}{(\m{let}~((x~e))~(\m{if}~(>~x~0)~(\m{Even}~(-~x~1))~\m{\false}))}\\
+\drule{(\m{Even}~e)}{(\m{let}~((x~e))~(\m{if}~(>~x~0)~(\m{Odd}~(-~x~1))~\m{\true}))}
 \end{array}
 \]
 are recursive sugars. The existing resugaring approach cannot process syntactic sugar written like this (non-pattern-based) easily, because boundary conditions are in the sugar itself.
