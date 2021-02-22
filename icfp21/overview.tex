@@ -1,0 +1,147 @@
+%!TEX root = ./main.tex
+\section{Overview}
+\label{sec2}
+
+
+In this section, we give a brief overview of our approach. \ycomment{Before stepping into the process, we give the whole picture of how our approach is used. 
+\begin{enumerate}
+    \item To define syntactic sugar, we need a core language. The core language can be large or small, but as an example, we make it tiny in this section.
+    \item Then some sugar definitions are needed to build the surface language.
+    \item We need some calculation based on our approach, described in next chapter.
+    \item Finally, given a program in the surface language, we will get the evaluation sequences of the program on the surface level.
+\end{enumerate}
+   }
+
+To be concrete, we will consider the following simple core language, defining boolean expressions using the \m{if} construct:
+\[
+\begin{array}{lllll}
+e &::=& \m{CoreExp}\\
+\m{CoreExp} &::=& \Code{(if~$e$~$e$~$e$)} &\note{// if construct}\\
+& |& \m{\true}  & \note{// true value}\\
+& |& \m{\false} & \note{// false value}
+\end{array}
+\]
+The semantics of the language is simple, consisting of the following context rules to specify the computational order:
+\[
+\begin{array}{lcl}
+C &:=& \Code{(if C $e$ $e$)}\\
+&|&[\bigcdot] \qquad \note{//evaluation context's hole}\\
+\end{array}
+\]
+and two reduction rules (the letter c means core):
+\[
+\centering
+ \redc{(\m{if}~\m{\true}~e_1~e_2)}{e_1}  \qquad \redc{(\m{if}~\m{\false}~e_1~e_2)}{e_2}
+\]
+Assume that our surface language is defined by two syntactic sugars defined by:
+%---\emph{and} sugar and \emph{or} sugar on the core language.
+\[
+\begin{array}{c}
+\drule{(\m{And}~e_1~e_2)}{(\m{if}~e_1~e_2~\m{\false})}\\
+\drule{(\m{Or}~e_1~e_2)}{(\m{if}~e_1~\m{\true}~e_2)}
+\end{array}
+\]
+Now let us demonstrate how to execute \Code{(And (Or \true~\false) (And \false ~\true))}, and get the following resugaring sequence by our approach.
+{\small
+\begin{Codes}
+    (And (Or \true \false) (And \false \true))
+\OneStep{ (And \true (And \false \true))}
+\OneStep{ (And \false \true)}
+\OneStep{ #f}
+\end{Codes}
+}
+
+Our new resugaring approach eliminates costly "reverse desugaring" by "lazy desugaring", where a syntactic sugar will be expanded only when it is necessary. It consists of the following three steps.
+
+{\em Step 1: Calculating Context Rules for Sugars.}
+While giving the evaluation rules of the core language, we can derive the following context rules of the surface language.
+\[
+\begin{array}{lcl}
+C &:=& (\m{And}~C~e)\\
+&|& (\m{Or}~C~e)\\
+&|&[\bigcdot]\\
+\end{array}
+\]
+From the context rules of \m{if}, we can find that the condition ($e_1$) is always evaluated first. Therefore, for expression \Code{(And $e_1$ $e_2$)} defined by syntactic sugar, $e_1$ is also evaluated first, which is the context rule of \m{And}. Similarly, we can calculate the context rule of \m{Or}.
+
+{\em Step 2: Forming Mixed Language.}
+We mix the surface language with the core language as in Fig. \ref{fig:mixexample}, where \m{CommonExp} means the expressions used in both the surface language and the core language both, and obtain $\to_m$, a one-step reduction in our mixed language, from the the reduction rules of fhe core language and the given desugaring rules. By using $\to_m$, we can get the following evaluation sequence in the mixed language for
+the program \Code{(And (Or \true~\false) (And \false~\true))} based on the computation order determined by the context rules obtained at Step 1.
+
+{\footnotesize
+\begin{Codes}
+    (And (Or \true \false) (And \false \true))
+\OneStep{ (And (if \true \true \false) (And \false \true))}
+\OneStep{ (And \true (And \false \true))}
+\OneStep{ (if \true (And \false \true) \false)}
+\OneStep{ (And \false \true)}
+\OneStep{ (if \false \true \false)}
+\OneStep{ \false}
+\end{Codes}
+}
+
+
+\begin{figure}[t]
+\centering
+\begin{subfigure}{0.3\linewidth}{\footnotesize
+    \begin{flushleft}
+        \[
+        \begin{array}{lll}
+        e &::=& \m{CoreExp} \\
+        &|&\m{SurfExp}\\
+        &|&\m{CommonExp}\\
+        \m{CoreExp} &::=& \Code{(if~$e$~$e$~$e$)}\\
+        \m{SurfExp} &::=& \Code{(And~$e$~$e$)}\\
+        &|&\Code{(Or~$e$~$e$)}\\
+        \m{CommonExp} &::=& \m{\true}\\
+        &|& \m{\false}\\
+        \end{array}
+        \]
+    \end{flushleft}
+    \caption{Syntax}
+    \label{fig:mixsyntax}
+}
+\end{subfigure}
+\begin{subfigure}{0.2\linewidth}{\footnotesize
+    \begin{flushleft}
+        \[\footnotesize
+        \begin{array}{lcl}
+        C &:=& (\m{if}~C~$e$~$e$)\\
+        &|& (\m{And}~C~$e$)\\
+        &|& (\m{Or}~C~$e$)\\
+        &|&[\bigcdot]\\[5em]
+        \end{array}
+        \]
+        \end{flushleft}
+    \caption{Context Rules}
+    \label{fig:mixcontext}
+}
+\end{subfigure}
+\begin{subfigure}{0.3\linewidth}{\footnotesize
+    \begin{flushleft}
+        \[
+        \begin{array}{c}
+        \redm{(\m{And}~e_1~e_2)}{(\m{if}~e_1~e_2~\m{\false})}\\
+        \redm{(\m{Or}~e_1~e_2)}{(\m{if}~e_1~\m{\true}~e_2)}\\
+        \redm{(\m{if}~\m{\true}~e_1~e_2)}{e_1}\\
+        \redm{(\m{if}~\m{\false}~e_1~e_2)}{e_2}\\[5em]
+        \end{array}
+        \]
+    \end{flushleft}
+    \caption{Reduction Rules}
+    \label{fig:mixreduction}
+}
+\end{subfigure}
+
+\caption{Mixed Language Example}
+\label{fig:mixexample}
+\end{figure}
+
+
+{\em Step 3: Removing Unnecessary Expressions.}
+We can just keep the intermediate sequences without \m{CoreExp} in any sub-expressions to get the resugaring sequence above.
+
+%Note that the context rules should restrict the computational order of a sugar expression's sub-expressions, thus we should let the context rules be correct---reflecting what should be executed in the desugared expression.
+Note that as the goal of resugaring is to present the evaluation of sugar programs, we are given a way to clearly specify which expression should be outputted. For the example in this section, of course, the sugar \m{And} and \m{Or} should be outputted, and also the boolean values should be. So we set boolean values as \m{CommonExp} in Fig. \ref{fig:mixsyntax}, so that they can be displayed though they are in the core language. By clearly separating what should be displayed, we can always get the resugaring evaluation sequences we need (this is slightly different from the existing approach's setting, as we will discuss in Section \ref{mark:correctness}).
+
+\ycomment{Another point is that the core language can be carefully designed to (1) powerful enough to express any computation, (2) slight enough to define sugar easily. Given a proper core language, the only afford to build any surface language is defining the desugaring rules. (Other steps of the resugaring can be done automatically.)}

@@ -1,0 +1,345 @@
+% !TEX program = pdflatex
+%!TEX spellcheck
+%%
+%% This is file `sample-acmsmall-submission.tex',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% samples.dtx  (with options: `acmsmall-submission')
+%% 
+%% IMPORTANT NOTICE:
+%% 
+%% For the copyright see the source file.
+%% 
+%% Any modified versions of this file must be renamed
+%% with new filenames distinct from sample-acmsmall-submission.tex.
+%% 
+%% For distribution of the original source see the terms
+%% for copying and modification in the file samples.dtx.
+%% 
+%% This generated file may be distributed as long as the
+%% original source files, as listed above, are part of the
+%% same distribution. (The sources need not necessarily be
+%% in the same archive or directory.)
+%%
+%% The first command in your LaTeX source must be the \documentclass command.
+\documentclass[acmsmall,screen,review,anonymous]{acmart}
+
+%%
+%% \BibTeX command to typeset BibTeX logo in the docs
+\AtBeginDocument{%
+  \providecommand\BibTeX{{%
+    \normalfont B\kern-0.5em{\scshape i\kern-0.25em b}\kern-0.8em\TeX}}}
+
+%% Rights management information.  This information is sent to you
+%% when you complete the rights form.  These commands have SAMPLE
+%% values in them; it is your responsibility as an author to replace
+%% the commands and values with those provided to you when you
+%% complete the rights form.
+\setcopyright{acmcopyright}
+\copyrightyear{2018}
+\acmYear{2018}
+\acmDOI{10.1145/1122445.1122456}
+
+
+%%
+%% These commands are for a JOURNAL article.
+\acmJournal{JACM}
+\acmVolume{37}
+\acmNumber{4}
+\acmArticle{111}
+\acmMonth{8}
+
+%%
+%% Submission ID.
+%% Use this when submitting an article to a sponsored event. You'll
+%% receive a unique submission ID from the organizers
+%% of the event, and this ID should be used as the parameter to this command.
+%%\acmSubmissionID{123-A56-BU3}
+
+%%
+%% The majority of ACM publications use numbered citations and
+%% references.  The command \citestyle{authoryear} switches to the
+%% "author year" style.
+%%
+%% If you are preparing content for an event
+%% sponsored by ACM SIGGRAPH, you must use the "author year" style of
+%% citations and references.
+%% Uncommenting
+%% the next command will enable that style.
+%%\citestyle{acmauthoryear}
+
+%% Bibliography style
+\bibliographystyle{ACM-Reference-Format}
+%% Citation style
+%\citestyle{acmauthoryear}  %% For author/year citations
+%\citestyle{acmnumeric}     %% For numeric citations
+%\setcitestyle{nosort}      %% With 'acmnumeric', to disable automatic
+                            %% sorting of references within a single citation;
+                            %% e.g., \cite{Smith99,Carpenter05,Baker12}
+                            %% rendered as [14,5,2] rather than [2,5,14].
+%\setcitesyle{nocompress}   %% With 'acmnumeric', to disable automatic
+                            %% compression of sequential references within a
+                            %% single citation;
+                            %% e.g., \cite{Baker12,Baker14,Baker16}
+                            %% rendered as [2,3,4] rather than [2-4].
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Note: Authors migrating a paper from traditional SIGPLAN
+%% proceedings format to PACMPL format must update the
+%% '\documentclass' and topmatter commands above; see
+%% 'acmart-pacmpl-template.tex'.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%% Some recommended packages.
+\usepackage{booktabs}   %% For formal tables:
+                        %% http://ctan.org/pkg/booktabs
+\usepackage{subcaption} %% For complex figures with subfigures/subcaptions
+                        %% http://ctan.org/pkg/subcaption
+
+\usepackage{algorithm}
+\usepackage{tabularx}
+\usepackage{algorithmic}
+\usepackage{proof}
+\usepackage{alltt}
+\usepackage{pgf}
+\usepackage{bcproof}
+\usepackage{setspace}
+
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+
+\newtheorem{Def}{Definition}[section]
+\newtheorem{mythm}{Theorem}[section]
+\newtheorem{property}{Property}[section]
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{Asm}{Assumption}
+
+\newcommand{\Code}[1]{\texttt{#1}}
+\newenvironment{Codes}
+  {\begin{alltt}\leftskip=1.5em} % \tiny
+  {\end{alltt}}
+
+\newenvironment{smallCodes}
+  {\begin{alltt}\leftskip=1.5em\small} %
+  {\end{alltt}}
+
+\newcommand{\OneStep}{{\rule{0pt}{1.2\baselineskip}{\ensuremath\longrightarrow}}}
+\newcommand{\DeStep}{{\rule{0pt}{1.2\baselineskip}{\ensuremath\dashrightarrow}}}
+
+\newcommand\m[1]{\mbox{\tt #1}}
+\newcommand\key[1]{\mbox{\rm \bf #1}}
+\newcommand\drule[2]{#1 ~\rightarrow_d~ #2}
+\newcommand\redc[2]{#1 ~\rightarrow_c~#2}
+\newcommand\rede[2]{#1 ~\rightarrow_e~#2}
+\newcommand\redm[2]{#1 ~\rightarrow_m~#2}
+\newcommand\note[1]{\mbox{{\scriptsize #1}}}
+\newcommand\ignore[1]{}
+
+\def\coreId{\m{cId}}
+\def\surfId{\m{sId}}
+\def\headId{\m{hId}}
+
+\def\true{\#t}
+\def\false{\#f}
+
+\def\myend{\flushright{\qed}}
+
+% some macros for editing/commenting the paper
+
+\def\modify#1#2#3{{\small\underline{\sf{#1}}:} {\color{red}{\small #2}}
+{{\color{red}\mbox{$\Rightarrow$}}} {\color{blue}{#3}}}
+
+\newcommand{\hmodify}[2]{\modify{Hu}{#1}{#2}}
+\newcommand\mymargin[1]{\marginpar{{\flushleft\textsc\footnotesize {#1}}}}
+\newcommand\hmargin[1]{\mymargin{Hu:\;#1}}
+
+\newcommand{\hmodifyok}[2]{#2}
+
+\newcommand{\mycomment}[2]{{\small\color{magenta}\underline{\sf{#1}}:} {\color{magenta}{\small #2}}}
+\newcommand{\hcomment}[1]{\mycomment{Hu}{#1}}
+\newcommand{\gcomment}[1]{\mycomment{G}{#1}}
+\newcommand{\todo}[1]{\mycomment{Todo}{#1}}
+
+\newcommand{\xcomment}[1]{\mycomment{X}{#1}}
+\newcommand{\ycomment}[1]{\mycomment{Y}{#1}}
+
+\newcommand{\reduce}[1]{{\color{blue}{#1}}}
+\newcommand{\reducedversion}[1]{{\color{blue}{#1}}}
+
+\newcommand{\example}[3]{
+\begin{figure}[thb]
+\begin{center}
+#1
+\end{center}
+\caption{#2}
+\label{#3}
+\end{figure}
+}
+
+\makeatletter
+\newcommand{\xleftrightarrow}[2][]{\ext@arrow 3359\leftrightarrowfill@{#1}{#2}}
+\newcommand{\xdashrightarrow}[2][]{\ext@arrow 0359\rightarrowfill@@{#1}{#2}}
+\newcommand{\xdashleftarrow}[2][]{\ext@arrow 3095\leftarrowfill@@{#1}{#2}}
+\newcommand{\xdashleftrightarrow}[2][]{\ext@arrow 3359\leftrightarrowfill@@{#1}{#2}}
+\def\rightarrowfill@@{\arrowfill@@\relax\relbar\rightarrow}
+\def\leftarrowfill@@{\arrowfill@@\leftarrow\relbar\relax}
+\def\leftrightarrowfill@@{\arrowfill@@\leftarrow\relbar\rightarrow}
+\def\arrowfill@@#1#2#3#4{%
+  $\m@th\thickmuskip0mu\medmuskip\thickmuskip\thinmuskip\thickmuskip
+   \relax#4#1
+   \xleaders\hbox{$#4#2$}\hfill
+   #3$%
+}
+\makeatother
+
+\makeatletter
+\newcommand*{\dashdownarrow}{%
+  \mathrel{%
+    \mathpalette\dasharrow@vert{-90}%
+  }%
+}
+\newcommand*{\dashuparrow}{%
+  \mathrel{%
+    \mathpalette\dasharrow@vert{90}%
+  }%
+}
+\newcommand*{\dasharrow@vert}[2]{%
+  \sbox0{$#1\vcenter{}$}%
+  \sbox2{$#1\dashrightarrow\m@th$}%
+  \dimen@=1.2\dimexpr\ht2-\ht0\relax
+  % 1/2 width of the new symbol with side bearing
+  \sbox2{\raisebox{-\ht0}{\unhcopy2}}%
+  \ht2=\z@
+  \dp2=\z@
+  \vcenter{\hbox to 2\dimen@{\hfill\rotatebox{#2}{\box2}\hfill}}%
+}
+\makeatother
+
+\makeatletter
+\newcommand*\bigcdot{\mathpalette\bigcdot@{.5}}
+\newcommand*\bigcdot@[2]{\mathbin{\vcenter{\hbox{\scalebox{#2}{$\m@th#1\bullet$}}}}}
+\makeatother
+
+\begin{document}
+
+%% Title information
+\title{Resugaring by Lazy Desugaring}         %% [Short Title] is optional;
+                                        %% when present, will be used in
+                                        %% header instead of Full Title.
+% \titlenote{with title note}             %% \titlenote is optional;
+%                                         %% can be repeated if necessary;
+%                                         %% contents suppressed with 'anonymous'
+% \subtitle{Subtitle}                     %% \subtitle is optional
+% \subtitlenote{with subtitle note}       %% \subtitlenote is optional;
+%                                         %% can be repeated if necessary;
+%                                         %% contents suppressed with 'anonymous'
+
+
+%% Author information
+%% Contents and number of authors suppressed with 'anonymous'.
+%% Each author should be introduced by \author, followed by
+%% \authornote (optional), \orcid (optional), \affiliation, and
+%% \email.
+%% An author may have multiple affiliations and/or emails; repeat the
+%% appropriate command.
+%% Many elements are not rendered, but should be provided for metadata
+%% extraction tools.
+
+\author{anony}
+\email{@}
+
+%% Abstract
+%% Note: \begin{abstract}...\end{abstract} environment must come
+%% before \maketitle command
+\begin{abstract}
+
+
+% Syntactic sugar, first coined by Peter J. Landin in 1964, has proved to be very useful for defining domain-specific languages and extending languages. Unfortunately, when syntactic sugar is eliminated by transformation, it obscures the relationship between the user’s source program and the transformed program. Resugaring is a powerful technique to resolve this problem, which automatically converts the evaluation sequences of desugared program in the core language into representative sugar's syntax in the surface language. However, the existing approach relies on the reverse application of desugaring rules to desugared core expression whenever possible. When a desugaring rule is complex and a desugared program is large, such reverse expansion becomes very complex and costive.
+
+% In this paper,
+We propose a \ycomment{macro-like} approach to resugaring, which can automatically convert the evaluation sequences of desugared program in the core language into representative sugar's syntax in the surface language by lazy desugaring.
+%which  is a technique to get the surface evaluation sequences of syntactic sugars, by lazy desugaring.
+We define the lazy desugaring by proposing a reduction strategy for the language combining the surface language with the core language, prove that it will produce correct resugaring evaluation sequences, and demonstrate that it is powerful enough to deal with hygienic, recursive and higher-order sugars.
+We have implemented a resugaring system based on this new approach, and the experimental results show that our approach is much more efficient and powerful than the existing ones.
+
+\end{abstract}
+
+
+%% 2012 ACM Computing Classification System (CSS) concepts
+%% Generate at 'http://dl.acm.org/ccs/ccs.cfm'.
+\begin{CCSXML}
+<ccs2012>
+<concept>
+<concept_id>10011007.10011006.10011008</concept_id>
+<concept_desc>Software and its engineering~General programming languages</concept_desc>
+<concept_significance>500</concept_significance>
+</concept>
+<concept>
+<concept_id>10003456.10003457.10003521.10003525</concept_id>
+<concept_desc>Social and professional topics~History of programming languages</concept_desc>
+<concept_significance>300</concept_significance>
+</concept>
+</ccs2012>
+\end{CCSXML}
+
+\ccsdesc[500]{Software and its engineering~General programming languages}
+\ccsdesc[300]{Social and professional topics~History of programming languages}
+%% End of generated code
+
+
+%% Keywords
+%% comma separated list
+\keywords{Resugaring, Syntactic Sugar, Domain-Specific Language, Reduction Semantics, Metaprogramming}  %% \keywords are mandatory in final camera-ready submission
+
+
+%% \maketitle
+%% Note: \maketitle command must come after title commands, author
+%% commands, abstract environment, Computing Classification System
+%% environment and commands, and keywords command.
+\maketitle
+
+
+\input{introduction}
+\input{overview}
+\input{ziyiapproach}
+\input{casestudy}
+\input{implementation}
+\input{comparison}
+\input{relatedWork}
+\input{conclusion}
+
+
+%% Acknowledgments
+\begin{acks}                            %% acks environment is optional
+                                        %% contents suppressed with 'anonymous'
+  %% Commands \grantsponsor{<sponsorID>}{<name>}{<url>} and
+  %% \grantnum[<url>]{<sponsorID>}{<number>} should be used to
+  %% acknowledge financial support and will be used by metadata
+  %% extraction tools.
+  This material is based upon work supported by the
+  \grantsponsor{GS100000001}{National Science
+    Foundation}{http://dx.doi.org/10.13039/100000001} under Grant
+  No.~\grantnum{GS100000001}{nnnnnnn} and Grant
+  No.~\grantnum{GS100000001}{mmmmmmm}.  Any opinions, findings, and
+  conclusions or recommendations expressed in this material are those
+  of the author and do not necessarily reflect the views of the
+  National Science Foundation.
+\end{acks}
+
+
+%% Bibliography
+\bibliography{reference}
+
+
+%% Appendix
+% \appendix
+% \section{Appendix}
+
+% Text of appendix \ldots
+
+\end{document}

@@ -1,0 +1,531 @@
+@inproceedings{10.5555/1792878.1792884,
+author = {Herman, David and Wand, Mitchell},
+title = {A Theory of Hygienic Macros},
+year = {2008},
+isbn = {3540787380},
+publisher = {Springer-Verlag},
+address = {Berlin, Heidelberg},
+abstract = {Hygienic macro systems, such as Scheme's, automatically rename variables to prevent unintentional variable capture--in short, they "just work." Yet hygiene has never been formally presented as a specification rather than an algorithm. According to folklore, the definition of hygienicmacro expansion hinges on the preservation of alpha-equivalence. But the only known notion of alpha-equivalence for programs with macros depends on the results of macro expansion! We break this circularity by introducing explicit binding specifications into the syntax of macro definitions, permitting a definition of alpha-equivalence independent of expansion. We define a semantics for a first-order subset of Scheme-like macros and prove hygiene as a consequence of confluence.},
+booktitle = {Proceedings of the Theory and Practice of Software, 17th European Conference on Programming Languages and Systems},
+pages = {48–62},
+numpages = {15},
+location = {Budapest, Hungary},
+series = {ESOP'08/ETAPS'08}
+}
+@inproceedings{10.1145/319838.319859,
+author = {Kohlbecker, Eugene and Friedman, Daniel P. and Felleisen, Matthias and Duba, Bruce},
+title = {Hygienic Macro Expansion},
+year = {1986},
+isbn = {0897912004},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/319838.319859},
+doi = {10.1145/319838.319859},
+booktitle = {Proceedings of the 1986 ACM Conference on LISP and Functional Programming},
+pages = {151–161},
+numpages = {11},
+location = {Cambridge, Massachusetts, USA},
+series = {LFP '86}
+}
+@article{lens07,
+  author = {Foster, J. Nathan and Greenwald, Michael B. and Moore, Jonathan T. and Pierce, Benjamin C. and Schmitt, Alan},
+  title = {Combinators for Bidirectional Tree Transformations: A Linguistic Approach to the View-Update Problem},
+  year = {2007},
+  issue_date = {May 2007},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  volume = {29},
+  number = {3},
+  journal = {ACM Trans. Program. Lang. Syst.},
+  month = may,
+  pages = {17–es},
+  numpages = {65},
+}
+
+@article{FellFFKBMT18,
+  author    = {Matthias Felleisen and
+               Robert Bruce Findler and
+               Matthew Flatt and
+               Shriram Krishnamurthi and
+               Eli Barzilay and
+               Jay A. McCarthy and
+               Sam Tobin{-}Hochstadt},
+  title     = {A programmable programming language},
+  journal   = {Commun. {ACM}},
+  volume    = {61},
+  number    = {3},
+  pages     = {62--71},
+  year      = {2018},
+}
+
+@inproceedings{CulpFFK19,
+  author    = {Ryan Culpepper and
+               Matthias Felleisen and
+               Matthew Flatt and
+               Shriram Krishnamurthi},
+  editor    = {Benjamin S. Lerner and
+               Rastislav Bod{\'{\i}}k and
+               Shriram Krishnamurthi},
+  title     = {From Macros to DSLs: The Evolution of Racket},
+  booktitle = {3rd Summit on Advances in Programming Languages, {SNAPL} 2019, May
+               16-17, 2019, Providence, RI, {USA}},
+  series    = {LIPIcs},
+  volume    = {136},
+  pages     = {5:1--5:19},
+  publisher = {Schloss Dagstuhl - Leibniz-Zentrum f{\"{u}}r Informatik},
+  year      = {2019},
+}
+
+@article{resugaring,
+	author = {Pombrio, Justin and Krishnamurthi, Shriram},
+	title = {Resugaring: Lifting Evaluation Sequences through Syntactic Sugar},
+	year = {2014},
+	issue_date = {June 2014},
+	publisher = {Association for Computing Machinery},
+	address = {New York, NY, USA},
+	volume = {49},
+	number = {6},
+	issn = {0362-1340},
+	url = {https://doi.org/10.1145/2666356.2594319},
+	doi = {10.1145/2666356.2594319},
+	journal = {SIGPLAN Not.},
+	month = jun,
+	pages = {361–371},
+	numpages = {11},
+	keywords = {syntactic sugar, macros, debugging, evaluation, programming languages, resugaring}
+}
+
+@article{hygienic,
+	author = {Pombrio, Justin and Krishnamurthi, Shriram},
+	title = {Hygienic Resugaring of Compositional Desugaring},
+	year = {2015},
+	issue_date = {September 2015},
+	publisher = {Association for Computing Machinery},
+	address = {New York, NY, USA},
+	volume = {50},
+	number = {9},
+	issn = {0362-1340},
+	url = {https://doi.org/10.1145/2858949.2784755},
+	doi = {10.1145/2858949.2784755},
+	journal = {SIGPLAN Not.},
+	month = aug,
+	pages = {75–87},
+	numpages = {13},
+	keywords = {resugaring, hygiene, abstract syntax DAG, syntactic sugar}
+}
+@book{dsl,
+	author    = {Martin Fowler},
+	title     = {Domain-Specific Languages},
+	series    = {The Addison-Wesley signature series},
+	publisher = {Addison-Wesley},
+	year      = {2011},
+	url       = {http://vig.pearsoned.com/store/product/1,1207,store-12521\_isbn-0321712943,00.html},
+	isbn      = {978-0-321-71294-3},
+	timestamp = {Mon, 23 Mar 2015 16:47:20 +0100},
+	biburl    = {https://dblp.org/rec/books/daglib/0034522.bib},
+	bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@article{syntacticsugar,
+	author = {Landin, P. J.},
+	title = "{The Mechanical Evaluation of Expressions}",
+	journal = {The Computer Journal},
+	volume = {6},
+	number = {4},
+	pages = {308-320},
+	year = {1964},
+	month = {01},
+	issn = {0010-4620},
+	doi = {10.1093/comjnl/6.4.308},
+	url = {https://doi.org/10.1093/comjnl/6.4.308},
+	eprint = {https://academic.oup.com/comjnl/article-pdf/6/4/308/1067901/6-4-308.pdf},
+}
+
+@book{SEwPR,
+	author = {Felleisen, Matthias and Findler, Robert Bruce and Flatt, Matthew},
+	title = {Semantics Engineering with PLT Redex},
+	year = {2009},
+	isbn = {0262062755},
+	publisher = {The MIT Press},
+	edition = {1st}
+}
+
+@article{churchrosser,
+	ISSN = {00029947},
+	URL = {http://www.jstor.org/stable/1989762},
+	author = {Alonzo Church and J. B. Rosser},
+	journal = {Transactions of the American Mathematical Society},
+	number = {3},
+	pages = {472--482},
+	publisher = {American Mathematical Society},
+	title = {Some Properties of Conversion},
+	volume = {39},
+	year = {1936}
+}
+
+@article{PLOTKIN,
+	title = "Call-by-name, call-by-value and the λ-calculus",
+	journal = "Theoretical Computer Science",
+	volume = "1",
+	number = "2",
+	pages = "125 - 159",
+	year = "1975",
+	issn = "0304-3975",
+	doi = "https://doi.org/10.1016/0304-3975(75)90017-1",
+	url = "http://www.sciencedirect.com/science/article/pii/0304397575900171",
+	author = "G.D. Plotkin"
+}
+
+@article{reduction,
+	author = {Felleisen, Matthias and Hieb, Robert},
+	title = {The Revised Report on the Syntactic Theories of Sequential Control and State},
+	year = {1992},
+	issue_date = {14 Sept. 1992},
+	publisher = {Elsevier Science Publishers Ltd.},
+	address = {GBR},
+	volume = {103},
+	number = {2},
+	issn = {0304-3975},
+	url = {https://doi.org/10.1016/0304-3975(92)90014-7},
+	doi = {10.1016/0304-3975(92)90014-7},
+	journal = {Theor. Comput. Sci.},
+	month = sep,
+	pages = {235–271},
+	numpages = {37}
+}
+
+@article{resugaringtype,
+	author = {Pombrio, Justin and Krishnamurthi, Shriram},
+	title = {Inferring Type Rules for Syntactic Sugar},
+	year = {2018},
+	issue_date = {April 2018},
+	publisher = {Association for Computing Machinery},
+	address = {New York, NY, USA},
+	volume = {53},
+	number = {4},
+	issn = {0362-1340},
+	url = {https://doi.org/10.1145/3296979.3192398},
+	doi = {10.1145/3296979.3192398},
+	journal = {SIGPLAN Not.},
+	month = jun,
+	pages = {812–825},
+	numpages = {14},
+	keywords = {Resugaring, Syntactic Sugar, Programming Languages, Macros, Type Systems}
+}
+
+@article{resugaringscope,
+	author = {Pombrio, Justin and Krishnamurthi, Shriram and Wand, Mitchell},
+	title = {Inferring Scope through Syntactic Sugar},
+	year = {2017},
+	issue_date = {September 2017},
+	publisher = {Association for Computing Machinery},
+	address = {New York, NY, USA},
+	volume = {1},
+	number = {ICFP},
+	url = {https://doi.org/10.1145/3110288},
+	doi = {10.1145/3110288},
+	journal = {Proc. ACM Program. Lang.},
+	month = aug,
+	articleno = {44},
+	numpages = {28},
+	keywords = {syntactic sugar, Scope, binding}
+}
+
+@inproceedings{Macrofication,
+	author = {Schuster, Christopher and Disney, Tim and Flanagan, Cormac},
+	title = {Macrofication: Refactoring by Reverse Macro Expansion},
+	year = {2016},
+	isbn = {9783662494974},
+	publisher = {Springer-Verlag},
+	address = {Berlin, Heidelberg},
+	booktitle = {Proceedings of the 25th European Symposium on Programming Languages and Systems - Volume 9632},
+	pages = {644–671},
+	numpages = {28}
+}
+
+@article{slicing,
+	author = {Ricciotti, Wilmer and Stolarek, Jan and Perera, Roly and Cheney, James},
+	title = {Imperative Functional Programs That Explain Their Work},
+	year = {2017},
+	issue_date = {September 2017},
+	publisher = {Association for Computing Machinery},
+	address = {New York, NY, USA},
+	volume = {1},
+	number = {ICFP},
+	url = {https://doi.org/10.1145/3110258},
+	doi = {10.1145/3110258},
+	journal = {Proc. ACM Program. Lang.},
+	month = aug,
+	articleno = {14},
+	numpages = {28},
+	keywords = {Galois connection, provenance, program slicing, debugging}
+}
+@article{10.1145/507669.507646,
+author = {Ganz, Steven E. and Sabry, Amr and Taha, Walid},
+title = {Macros as Multi-Stage Computations: Type-Safe, Generative, Binding Macros in MacroML},
+year = {2001},
+issue_date = {October 2001},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {36},
+number = {10},
+issn = {0362-1340},
+url = {https://doi.org/10.1145/507669.507646},
+doi = {10.1145/507669.507646},
+journal = {SIGPLAN Not.},
+month = oct,
+pages = {74–85},
+numpages = {12}
+}
+
+@inproceedings{multistage,
+author = {Ganz, Steven E. and Sabry, Amr and Taha, Walid},
+title = {Macros as Multi-Stage Computations: Type-Safe, Generative, Binding Macros in MacroML},
+year = {2001},
+isbn = {1581134150},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/507635.507646},
+doi = {10.1145/507635.507646},
+booktitle = {Proceedings of the Sixth ACM SIGPLAN International Conference on Functional Programming},
+pages = {74–85},
+numpages = {12},
+location = {Florence, Italy},
+series = {ICFP ’01}
+}
+
+@inproceedings{10.1145/1868294.1868314,
+author = {Rompf, Tiark and Odersky, Martin},
+title = {Lightweight Modular Staging: A Pragmatic Approach to Runtime Code Generation and Compiled DSLs},
+year = {2010},
+isbn = {9781450301541},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/1868294.1868314},
+doi = {10.1145/1868294.1868314},
+booktitle = {Proceedings of the Ninth International Conference on Generative Programming and Component Engineering},
+pages = {127–136},
+numpages = {10},
+keywords = {code generation, multi-stage programming, language virtualization, domain-specific languages},
+location = {Eindhoven, The Netherlands},
+series = {GPCE ’10}
+}
+
+@article{modularstaging,
+author = {Rompf, Tiark and Odersky, Martin},
+title = {Lightweight Modular Staging: A Pragmatic Approach to Runtime Code Generation and Compiled DSLs},
+year = {2010},
+issue_date = {Febuary 2011},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {46},
+number = {2},
+issn = {0362-1340},
+url = {https://doi.org/10.1145/1942788.1868314},
+doi = {10.1145/1942788.1868314},
+journal = {SIGPLAN Not.},
+month = oct,
+pages = {127–136},
+numpages = {10},
+keywords = {multi-stage programming, code generation, language virtualization, domain-specific languages}
+}
+
+@inproceedings{MSP,
+author = {Taha, Walid},
+year = {2003},
+month = {01},
+pages = {30-50},
+title = {A Gentle Introduction to Multi-stage Programming.}
+}
+
+@article{racket,
+	author = {Flatt, Matthew},
+	title = {Creating Languages in Racket},
+	year = {2012},
+	issue_date = {January 2012},
+	publisher = {Association for Computing Machinery},
+	address = {New York, NY, USA},
+	volume = {55},
+	number = {1},
+	issn = {0001-0782},
+	url = {https://doi.org/10.1145/2063176.2063195},
+	doi = {10.1145/2063176.2063195},
+	journal = {Commun. ACM},
+	month = jan,
+	pages = {48–56},
+	numpages = {9}
+}
+
+@article{Ksemantic,
+  title={An overview of the K semantic framework},
+  author={Grigore Rosu and Traian-Florin Serbanuta},
+  journal={J. Log. Algebraic Methods Program.},
+  year={2010},
+  volume={79},
+  pages={397-434}
+}
+
+@InProceedings{dynsem,
+  author =	{Vlad Vergu and Pierre Neron and Eelco Visser},
+  title =	{{DynSem: A DSL for Dynamic Semantics Specification}},
+  booktitle =	{26th International Conference on Rewriting Techniques and Applications (RTA 2015)},
+  pages =	{365--378},
+  series =	{Leibniz International Proceedings in Informatics (LIPIcs)},
+  ISBN =	{978-3-939897-85-9},
+  ISSN =	{1868-8969},
+  year =	{2015},
+  volume =	{36},
+  editor =	{Maribel Fern{\'a}ndez},
+  publisher =	{Schloss Dagstuhl--Leibniz-Zentrum fuer Informatik},
+  address =	{Dagstuhl, Germany},
+  URL =		{http://drops.dagstuhl.de/opus/volltexte/2015/5208},
+  URN =		{urn:nbn:de:0030-drops-52080},
+  doi =		{10.4230/LIPIcs.RTA.2015.365},
+  annote =	{Keywords: programming languages, dynamic semantics, reduction semantics, semantics engineering, IDE, interpreters, modularity}
+}
+
+@inproceedings{AbstractInterpretation,
+author = {Cousot, Patrick and Cousot, Radhia},
+title = {Abstract Interpretation: A Unified Lattice Model for Static Analysis of Programs by Construction or Approximation of Fixpoints},
+year = {1977},
+isbn = {9781450373500},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/512950.512973},
+doi = {10.1145/512950.512973},
+booktitle = {Proceedings of the 4th ACM SIGACT-SIGPLAN Symposium on Principles of Programming Languages},
+pages = {238–252},
+numpages = {15},
+location = {Los Angeles, California},
+series = {POPL ’77}
+}
+
+@ARTICLE{origintracking,
+    author = {A. Van Deursen and P. Klint and F. Tip},
+    title = {Origin Tracking},
+    journal = {JOURNAL OF SYMBOLIC COMPUTATION},
+    year = {1992},
+    volume = {15},
+    pages = {523--545}
+}
+
+
+@inproceedings{Ziggurat,
+author = {Fisher, David and Shivers, Olin},
+title = {Static Analysis for Syntax Objects},
+year = {2006},
+isbn = {1595933093},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/1159803.1159817},
+doi = {10.1145/1159803.1159817},
+booktitle = {Proceedings of the Eleventh ACM SIGPLAN International Conference on Functional Programming},
+pages = {111–121},
+numpages = {11},
+keywords = {language towers, extensible programming languages, domain-specific languages, flow analysis, macros, static analysis, lazy delegation, type inference},
+location = {Portland, Oregon, USA},
+series = {ICFP ’06}
+}
+
+@inproceedings{bx,
+author = {Czarnecki, Krzysztof and Foster, Nate and Hu, Zhenjiang and Lämmel, Ralf and Schürr, Andy and Terwilliger, James},
+year = {2009},
+month = {06},
+pages = {260-283},
+title = {Bidirectional Transformations: A Cross-Discipline Perspective},
+volume = {5563},
+doi = {10.1007/978-3-642-02408-5_19}
+}
+
+@inproceedings{hygienicmacro,
+author = {Kohlbecker, Eugene and Friedman, Daniel P. and Felleisen, Matthias and Duba, Bruce},
+title = {Hygienic Macro Expansion},
+year = {1986},
+isbn = {0897912004},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/319838.319859},
+doi = {10.1145/319838.319859},
+booktitle = {Proceedings of the 1986 ACM Conference on LISP and Functional Programming},
+pages = {151–161},
+numpages = {11},
+location = {Cambridge, Massachusetts, USA},
+series = {LFP '86}
+}
+
+@inproceedings{10.1145/2676726.2677013,
+author = {Adams, Michael D.},
+title = {Towards the Essence of Hygiene},
+year = {2015},
+isbn = {9781450333009},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/2676726.2677013},
+doi = {10.1145/2676726.2677013},
+abstract = {Hygiene is an essential aspect of Scheme's macro system that prevents unintended variable capture. However, previous work on hygiene has focused on algorithmic implementation rather than precise, mathematical definition of what constitutes hygiene. This is in stark contrast with lexical scope, alpha-equivalence and capture-avoiding substitution, which also deal with preventing unintended variable capture but have widely applicable and well-understood mathematical definitions.This paper presents such a precise, mathematical definition of hygiene. It reviews various kinds of hygiene violation and presents examples of how they occur. From these examples, we develop a practical algorithm for hygienic macro expansion. We then present algorithm-independent, mathematical criteria for whether a macro expansion algorithm is hygienic. This characterization corresponds closely to existing hygiene algorithms and sheds light on aspects of hygiene that are usually overlooked in informal definitions.},
+booktitle = {Proceedings of the 42nd Annual ACM SIGPLAN-SIGACT Symposium on Principles of Programming Languages},
+pages = {457–469},
+numpages = {13},
+keywords = {nominal logic, macros, hygiene},
+location = {Mumbai, India},
+series = {POPL '15}
+}
+
+@article{EssenceofHygiene,
+author = {Adams, Michael D.},
+title = {Towards the Essence of Hygiene},
+year = {2015},
+issue_date = {January 2015},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {50},
+number = {1},
+issn = {0362-1340},
+url = {https://doi.org/10.1145/2775051.2677013},
+doi = {10.1145/2775051.2677013},
+abstract = {Hygiene is an essential aspect of Scheme's macro system that prevents unintended variable capture. However, previous work on hygiene has focused on algorithmic implementation rather than precise, mathematical definition of what constitutes hygiene. This is in stark contrast with lexical scope, alpha-equivalence and capture-avoiding substitution, which also deal with preventing unintended variable capture but have widely applicable and well-understood mathematical definitions.This paper presents such a precise, mathematical definition of hygiene. It reviews various kinds of hygiene violation and presents examples of how they occur. From these examples, we develop a practical algorithm for hygienic macro expansion. We then present algorithm-independent, mathematical criteria for whether a macro expansion algorithm is hygienic. This characterization corresponds closely to existing hygiene algorithms and sheds light on aspects of hygiene that are usually overlooked in informal definitions.},
+journal = {SIGPLAN Not.},
+month = jan,
+pages = {457–469},
+numpages = {13},
+keywords = {hygiene, nominal logic, macros}
+}
+
+@article{10.1017/S0956796812000093,
+author = {Flatt, Matthew and Culpepper, Ryan and Darais, David and Findler, Robert bruce},
+title = {Macros That Work Together: Compile-Time Bindings, Partial Expansion, and Definition Contexts},
+year = {2012},
+issue_date = {March 2012},
+publisher = {Cambridge University Press},
+address = {USA},
+volume = {22},
+number = {2},
+issn = {0956-7968},
+url = {https://doi.org/10.1017/S0956796812000093},
+doi = {10.1017/S0956796812000093},
+abstract = {Racket is a large language that is built mostly within itself. Unlike the usual approach taken by non-Lisp languages, the self-hosting of Racket is not a matter of bootstrapping one implementation through a previous implementation, but instead a matter of building a tower of languages and libraries via macros. The upper layers of the tower include a class system, a component system, pedagogic variants of Scheme, a statically typed dialect of Scheme, and more. The demands of this language-construction effort require a macro system that is substantially more expressive than previous macro systems. In particular, while conventional Scheme macro systems handle stand-alone syntactic forms adequately, they provide weak support for macros that share information or macros that use existing syntactic forms in new contexts. This paper describes and models features of the Racket macro system, including support for general compile-time bindings, sub-form expansion and analysis, and environment management. The presentation assumes a basic familiarity with Lisp-style macros, and it takes for granted the need for macros that respect lexical scope. The model, however, strips away the pattern and template system that is normally associated with Scheme macros, isolating a core that is simpler, can support pattern and template forms themselves as macros, and generalizes naturally to Racket's other extensions.},
+journal = {J. Funct. Program.},
+month = mar,
+pages = {181–216},
+numpages = {36}
+}
+
+@article{10.1007/s001650200016,
+author = {Gabbay, Murdoch J. and Pitts, Andrew M.},
+title = {A New Approach to Abstract Syntax with Variable Binding},
+year = {2002},
+issue_date = {July      2002},
+publisher = {Springer-Verlag},
+address = {Berlin, Heidelberg},
+volume = {13},
+number = {3–5},
+issn = {0934-5043},
+url = {https://doi.org/10.1007/s001650200016},
+doi = {10.1007/s001650200016},
+abstract = {The permutation model of set theory with atoms (FM-sets), devised by Fraenkel and Mostowski in the 1930s, supports notions of `name-abstraction' and `fresh name' that provide a new way to represent, compute with, and reason about the syntax of formal systems involving variable-binding operations. Inductively defined FM-sets involving the name-abstraction set former (together with Cartesian product and disjoint union) can correctly encode syntax modulo renaming of bound variables. In this way, the standard theory of algebraic data types can be extended to encompass signatures involving binding operators. In particular, there is an associated notion of structural recursion for defining syntax-manipulating functions (such as capture avoiding substitution, set of free variables, etc.) and a notion of proof by structural induction, both of which remain pleasingly close to informal practice in computer science.},
+journal = {Form. Asp. Comput.},
+month = jul,
+pages = {341–363},
+numpages = {23},
+keywords = {Keywords: Abstract syntax; Alpha-conversion; Permutation actions; Set theory; Structural induction}
+}
