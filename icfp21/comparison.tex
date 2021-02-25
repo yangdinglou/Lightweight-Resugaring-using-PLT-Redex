@@ -93,12 +93,40 @@ Then for any sugar expression, we can process them dynamically by "one-step-try"
 \subsection{\ycomment{Side effect}}
 
 
-Side effect is a special issue in resugaring. In the previous section, we described the core language as a pure functional language, but some side effects are allowed according to the algorithm. Because the computational order calculated is correct, side effects does not matter if we only consider the evaluation result. But the actual issue is the presentation of resugaring sequences. Assuming that the core language can process side effects by adding an environment, with a \m{set} expression changing a value of a variable and a \m{begin} expression evaluating all sub-expressions and returning the last result in the core language .
+Side effect is a special issue in resugaring. In the previous section, we described the core language as a pure functional language, but some side effects are allowed according to the algorithm. Because the computational order calculated is correct, side effects does not matter if we only consider the evaluation result. But the actual issue is the output of resugaring sequences. Assuming that the core language can process side effects by adding an environment, with a \m{set} expression changing a value of a variable and a \m{begin} expression evaluating all sub-expressions and returning the last result in the core language for using the environment.
 
-Given a syntactic sugar 
+If \Code{(begin e ...)} has the context rules
+\[
+	{\footnotesize
+	\begin{array}{lcl}
+		\Code{C}&:==&\Code{(\m{begin~C})}\\
+		& | &\Code{(\m{begin~C~e~$\ldots$})}\\
+		& | &[\bigcdot]
+	\end{array}
+	}
+\]
+and reduction rules
+\[
+{\footnotesize
+		\begin{array}{lcl}
+		\Code{(begin~$\m{v}_1$~$\m{e}_2$~...)} &\redc{}{}& \Code{(begin~$\m{e}_2$~...)}\\
+		\Code{(begin~v)} &\redc{}{}& \Code{v}\\
+		\end{array}
+}
+\]
+given a syntactic sugar 
 \[\drule{\Code{(inc x y)}}{\Code{(begin (set x (+ x y)) x)}}\]
-and for the following expression \Code{(let (x 1) (inc x (+ 2 1)))}
+and for the following expression \Code{(let (x 1) (inc (+ 2 1) x))}, we will have the following evaluation sequence in the core language (omitted the desugaring process).
+\begin{center}
+	\Code{(let (x 1) (begin (set x (+ (+ 2 1) x) x)))}\\
+	$\downarrow$\\
+	\Code{(begin (set x (+ (+ 2 1) x) x)) [x:1]}\\
+	$\downarrow$\\
+	\Code{(begin (set x (+ 3 x) x)) [x:1]} {\footnotesize (inc (+ 2 1) x)}\\
+
+\end{center}
 \todo{}
+
 
 
 \subsection{Possible Extensions}
@@ -116,9 +144,6 @@ For instance, we may need a desugaring rule like
 \]
 where \m{Helper} is an external function, that means we don't have the evaluation rules of \m{Helper}. In this case, we have to force the expansion of sugar expressions headed by \m{Sugar}. We describe how to force the desugaring in Section \ref{mark:simple}.
 
-\subsection{Limitation on Presentation}
-\todo{}
-The context rules of our sugar setting limit the presentation of syntactic sugar. For example, it is difficult to present a sugar with ellipses as pattern variables in our current tool, because the form of its context rule may vary. It is still possible if we add some
-restriction (so that the algorithm \ref{alg:f} will work). On the other hand, we can just make it using the list operation just as what the sugar \m{Map, Filter} work. Overall, the presentation of our sugar system is not so flexible, but it won't affect the expressiveness.
+
 
 

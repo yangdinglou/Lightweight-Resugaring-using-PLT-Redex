@@ -5,7 +5,7 @@
 
 In this section, we present our new approach to resugaring. Different from the existing approach that clearly separates the surface from the core languages, we intentionally combine them as one mixed language, allowing free use of the language constructs in both languages. We will show that any expression in the mixed language can be evaluated in such a smart way that a sequence of all expressions that are necessary to be resugared can be correctly produced.
 
-\subsection{\ycomment{Pre-}Mixed Language for Resugaring}
+\subsection{Mixed Language for Resugaring}
 
 \begin{figure}[t]
 \begin{flushleft}
@@ -29,7 +29,7 @@ In this section, we present our new approach to resugaring. Different from the e
 	\label{fig:expression}
 \end{figure}
 
-We define a mixed language that combines a core language with a surface language (defined by syntactic sugars over the core language). Note that the mixture is unfinished until the process in next section, because of the lack of context rules for expressions headed with \m{SurfHead}. So we call it pre-mixed language in this section. We assume that the evaluation of the core language is  compositional (as the definition in \cite{hygienic}), that is, for evaluation contexts $E_1$ and $E_2$, $E_1[E_2]$ is also an evaluation context.
+We define a mixed language that combines a core language with a surface language (defined by syntactic sugars over the core language). Note that the mixture is unfinished until the process in next section, because of the lack of context rules for expressions headed with \m{SurfHead}. We assume that the evaluation of the core language is  compositional (as the definition in \cite{hygienic}), that is, for evaluation contexts $E_1$ and $E_2$, $E_1[E_2]$ is also an evaluation context.
 \subsubsection{Core Language}
 
 
@@ -195,7 +195,7 @@ Without loss of generosity, we assume all desugaring rules are not overlapped in
 \label{fig:mix}
 \end{figure}
 
-Our mixed language for resugaring combines the surface language and the core language, with the mixture of syntax, context rules, and reduction rules. The pre-mixed language contains the first two.
+Our mixed language for resugaring combines the surface language and the core language, with the mixture of syntax, context rules, and reduction rules. This section introduces the first two.
 
 The mixed syntax is described in Fig.  \ref{fig:mix}.
 %
@@ -400,6 +400,7 @@ So for convenience, we define destruction of a sugar's RHS when the second case 
 	$\redc{\mathtt{D}(\m{P})}{\m{P'}}$.
 	The $\redc{}{}$ is a destruction of \m{P}'s outermost sugar if the reduction is not at a recursive $\mathtt{D}(e_i)$.
 \end{Def}
+\todo{}
 
 \subsubsection{Properties and Proof Sketch}
 \todo{improve some sentences}
@@ -449,14 +450,23 @@ The properties restrict how the lazy desugaring of our mixed language should be-
 	\drule{(\m{SurfHead}~e_1~e_2~\ldots~e_n)}{(\m{Head}~\ldots~e_1'~e_2'~\ldots~e_m')}
 	\]
 	If the algorithm \m{calcontext} gets the context rules as follows.\\
-	\todo{}
-$S.LHS[[\bigcdot]/e_i]$\\
-$S.LHS[v_i/e_i, [\bigcdot]/e_j]$\\
-$\ldots$\\
-$S.LHS[v_i/e_i, v_j/e_j, \ldots, [\bigcdot]/e_p]$\\
-$S.LHS[v_i/e_i, v_j/e_j, \ldots, v_p/e_p, [\bigcdot]/e_q]$\\
-$\ldots$\\
-$S.LHS[v_i/e_i, v_j/e_j, \ldots, v_p/e_p, v_q/e_q, \ldots, [\bigcdot]/e_x]$\\
+
+\begin{center}
+	\[
+		\begin{array}{l}
+			S.LHS[[\bigcdot]/e_i]\\
+			S.LHS[v_i/e_i, [\bigcdot]/e_j]\\
+			\ldots\\
+			S.LHS[v_i/e_i, v_j/e_j, \ldots, [\bigcdot]/e_p]\\
+			S.LHS[v_i/e_i, v_j/e_j, \ldots, v_p/e_p, [\bigcdot]/e_q]\\
+			\ldots\\
+			S.LHS[v_i/e_i, v_j/e_j, \ldots, v_p/e_p, v_q/e_q, \ldots, [\bigcdot]/e_x]\\
+		\end{array}
+	\]
+
+
+\end{center}
+
 Then for any program \m{P} headed with \m{SurfHead}, if the sub-expressions $\{e_i, e_j, \ldots, e_p\}$ are all values, then $\redc{\mathtt{D}(\m{P})}{\m{P'}}$ will reduce on $\mathtt{D}(e_q)$.
 \end{lemma}
 \begin{proof}[Proof Sketch of lemma 1]
@@ -469,11 +479,20 @@ For a syntactic sugar $S$, with the desugaring rule
 \[
 \drule{(\m{SurfHead}~e_1~e_2~\ldots~e_n)}{(\m{Head}~\ldots~e_1'~e_2'~\ldots~e_m')}
 \]
-If the algorithm \m{calcontext} gets the context rules as follows.\\
-$S.LHS[[\bigcdot]/e_i]$\\
-$S.LHS[v_i/e_i, [\bigcdot]/e_j]$\\
-$\ldots$\\
-$S.LHS[v_i/e_i, v_j/e_j, \ldots, [\bigcdot]/e_x]$\\
+If the algorithm \m{calcontext} gets the context rules as follows.
+\begin{center}
+	\[
+		\begin{array}{l}
+			S.LHS[[\bigcdot]/e_i]\\
+			S.LHS[v_i/e_i, [\bigcdot]/e_j]\\
+			\ldots\\
+			S.LHS[v_i/e_i, v_j/e_j, \ldots, [\bigcdot]/e_x]\\
+		\end{array}
+	\]
+
+
+\end{center}
+
 Then for any program \m{P} headed with \m{SurfHead}, if the sub-expressions $\{e_i, e_j, \ldots, e_x\}$ are all values, $\redc{\mathtt{D}(\m{P})}{\m{P'}}$ will destroy the $S.RHS$'s form.
 \end{lemma}
 \begin{proof}[Proof Sketch of lemma 2]
