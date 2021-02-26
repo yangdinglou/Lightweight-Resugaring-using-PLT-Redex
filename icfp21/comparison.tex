@@ -63,7 +63,8 @@ Otherwise (no reduction on $\m{tmp}_i$), the stepper should return \Code{$e'$}, 
 \end{center}
 We call the extension "one-step-try", because it tries one step on the expression in the black-box stepper. The extension will not violate the properties of the original core language's evaluator. It is obvious that the evaluator with the extension will reduce at the sub-expression as it needs in the core language, if the reduction appears in a sub-expression. The stepper with extension behaves the same as mixing the evaluation rules of the core language and desugaring rules of surface language.
 
-But something goes wrong when substitution takes place during \m{CoreExt2}. For a program like \Code{(let (x 2) (Sugar x y))} as an example, it should reduce to \Code{(Sugar 2 y)} by the \m{CoreRed2} rule, but got \Code{(Sugar x y)} by the \m{CoreExt2} rule. So when using the extension of black-box stepper's rule (\m{ExtRed2}), we need some other information about in which sub-expression a substitution will occur. Then for these sub-expressions, we need to do the same substitution before replacing back. The substitution can be got by a similar idea as the dynamic reduction in our simple core language's setting. For example, we know the third sub-expression of an expression headed with \m{let} is to be substituted. we should first try \Code{(let (x 2) x)}, \Code{(let (x 2) y)} in one-step reduction to get the substitution [2/x], then, getting \Code{(Sugar 2 y)}.
+\todo{}
+But something goes wrong when substitution takes place during \m{CoreExt2}. For a program like \Code{(let (x 2) (Sugar x y))} as an example, it should reduce to \Code{(Sugar 2 y)} by the \m{CoreRed2} rule, but got \Code{(Sugar x y)} by the \m{CoreExt2} rule. So when using the extension of black-box stepper's rule (\m{ExtRed2}), we need some other information about in which sub-expression a substitution will occur. Then for these sub-expressions, we need to do the same substitution before replacing back. The substitution can be got by a similar idea as the dynamic reduction in our simple core language's setting. For example, we know the third sub-expression of an expression headed with \m{let} is to be substituted. We should first try \Code{(let (x 2) x)}, \Code{(let (x 2) y)} in one-step reduction to get the substitution [2/x], then, getting \Code{(Sugar 2 y)}.
 
 Then for any sugar expression, we can process them dynamically by "one-step-try" like the example in Fig.  \ref{example:try}. (The bold \m{Head} means trying on this expression.)
 \example{
@@ -93,51 +94,68 @@ Then for any sugar expression, we can process them dynamically by "one-step-try"
 \subsection{\ycomment{Side effect}}
 
 
-Side effect is a special issue in resugaring. In the previous section, we described the core language as a pure functional language, but some side effects are allowed according to the algorithm. Because the computational order calculated is correct, side effects does not matter if we only consider the evaluation result. But the actual issue is the output of resugaring sequences. Assuming that the core language can process side effects by adding an environment, with a \m{set} expression changing a value of a variable and a \m{begin} expression evaluating all sub-expressions and returning the last result in the core language for using the environment.
+Side effect is a special issue in resugaring. In the previous section, we described the core language as a pure functional language, but some side effects are allowed according to the algorithm. Because the computational order calculated is correct, side effects does not matter if we only consider the evaluation result. But the actual issue is the output of resugaring sequences. Assuming that the core language can process side effects by adding an environment, with a \m{set} expression changing a value of a variable (returning void), and a \m{begin} expression evaluating all sub-expressions and returning the last result in the core language for using the environment.
 
-If \Code{(begin e ...)} has the context rules
+% If \Code{(begin e ...)} has the context rules
+% \[
+% 	{\footnotesize
+% 	\begin{array}{lcl}
+% 		\Code{C}&:==&\Code{(\m{begin~C})}\\
+% 		& | &\Code{(\m{begin~C~e~$\ldots$})}\\
+% 		& | &[\bigcdot]
+% 	\end{array}
+% 	}
+% \]
+% and reduction rules
+% \[
+% {\footnotesize
+% 		\begin{array}{lcl}
+% 		\Code{(begin~$\m{v}_1$~$\m{e}_2$~...)} &\redc{}{}& \Code{(begin~$\m{e}_2$~...)}\\
+% 		\Code{(begin~v)} &\redc{}{}& \Code{v}\\
+% 		\end{array}
+% }
+% \]
+given a syntactic sugar 
+\[\drule{\Code{(inc x y)}}{\Code{(begin (set x (+ x y)) x)}}\]
+and for the expression \Code{(let (x 1) (inc x (+ 1 1)))}, we will have the following evaluation sequences in the core language (omitted the desugaring process).
+\begin{center}
+	\Code{(let (x 1) (begin (set x (+ x (+ 1 1))) x))}\\
+	$\downarrow$\\
+	\Code{(begin (set x (+ x (+ 1 1))) x) [x:1]} {\footnotesize resugar to \Code{(inc x (+ 1 1))}}\\
+	$\downarrow$\\
+	\Code{(begin (set x (+ 1 (+ 1 1))) x) [x:1]} \\
+	$\downarrow$\\
+	\Code{(begin (set x (+ 1 2)) x) [x:1]} {\footnotesize resugar to \Code{(inc x 2)}?}\\
+	$\ldots$
+\end{center}
+In the sequences, we would see the \m{x} in \Code{(+ x (+ 1 1)} was reduced to $1$ getting from the environment. But other \m{x} in the program cannot be replaced. So as we described in the Section \ref{mark:suflang}, resugaring for such sugar is unclear. Because we add \m{set} expression in the core language, the issue cannot be solved by a let binding (the \m{x} in RHS is always a reducible expression). 
+Another issue happened when the sub-expression \Code{(set x (+ 1 (+ 1 1)))} reduced to \Code{(set x (+ 1 2))}. As the \m{1} was reduced from \m{x}, we could record it and made the whole expression resugar to \Code{(inc x 2)}. Based on the issues above, an extension that marking the variable (which may appear at the first sub-expression of \m{set} expression) can make it. During the \m{calcontext} function, we can simply ignore the \m{x} as a possible hole for the sugar \m{inc}. So we could get the context rule 
 \[
 	{\footnotesize
 	\begin{array}{lcl}
-		\Code{C}&:==&\Code{(\m{begin~C})}\\
-		& | &\Code{(\m{begin~C~e~$\ldots$})}\\
+		\Code{C}&::=&\Code{(inc x C)}\\
 		& | &[\bigcdot]
 	\end{array}
 	}
 \]
-and reduction rules
-\[
-{\footnotesize
-		\begin{array}{lcl}
-		\Code{(begin~$\m{v}_1$~$\m{e}_2$~...)} &\redc{}{}& \Code{(begin~$\m{e}_2$~...)}\\
-		\Code{(begin~v)} &\redc{}{}& \Code{v}\\
-		\end{array}
-}
-\]
-given a syntactic sugar 
-\[\drule{\Code{(inc x y)}}{\Code{(begin (set x (+ x y)) x)}}\]
-and for the following expression \Code{(let (x 1) (inc (+ 2 1) x))}, we will have the following evaluation sequence in the core language (omitted the desugaring process).
-\begin{center}
-	\Code{(let (x 1) (begin (set x (+ (+ 2 1) x) x)))}\\
-	$\downarrow$\\
-	\Code{(begin (set x (+ (+ 2 1) x) x)) [x:1]}\\
-	$\downarrow$\\
-	\Code{(begin (set x (+ 3 x) x)) [x:1]} {\footnotesize (inc (+ 2 1) x)}\\
 
-\end{center}
-\todo{}
+But there is still another issue. If we want to make use of the side effect, things like \m{begin} expression in core language are needed. But such expressions are not suitable for the resugaring at all. For example, given a syntactic sugar 
+\[\drule{\Code{(inc2 x y z)}}{\Code{(begin (set x (+ y x)) (set x (+ z x)) x)}}\]
+and for the following expression \Code{(let (x 1) (inc2 x (+ 1 1) (+ 1 1)))}, once the first \m{set} expression was reduced to void, the \m{inc2} sugar will not have a chance for resugaring. If a syntactic sugar has more pattern variables, the process will lose more intermediate information. The same case happened in the existing approach\cite{resugaring}'s \m{letrec} example, which did not get any intermediate resugaring sequences.
 
+Overall, our approach is able to make an extension for a core language with side effects. But the lesson we get is that the pure functional language is better for resugaring.
 
 
 \subsection{Possible Extensions}
 
-So far, our desugaring rules are of a simple form. What if we need a more complex form to describe more complex semantics for syntactic sugar? For example, we may need a type system for checking during desugaring; we may specify the binding of syntactic sugar for more general hygiene; we may use some other functions to help the desugaring. All of these extensions are possible as long as the following conditions are satisfied.
+So far, we describe two extensions for our method. Are there any basic elements if we want to extend the approach? For example, we may need a type system for checking during desugaring; we may specify the binding of syntactic sugar for more general hygiene; we may use some other functions to help the desugaring. All of these extensions are possible as long as the following conditions are satisfied.
 \begin{enumerate}
 	\item \emph{Compositional}: Generally speaking, the desugaring order and should not affect the semantics of a sugar expression. Otherwise, the lazy desugaring will not be correct.
 	\item \emph{Unique Computational Order}: For any rules of syntactic sugar, the context rules should limit an expression to have only one computational order. Otherwise, the algorithm \m{calcontext} will not be deterministic.
-	\item \emph{Clear Semantic}: If a syntactic sugar's desugaring rule is ambiguous or wrong, the algorithm \m{calcontext} may go wrong.
+	\item \emph{Clear Semantics}: If a syntactic sugar's desugaring rule is ambiguous or wrong, the algorithm \m{calcontext} may go wrong.
 \end{enumerate}
 
+\todo{}
 For instance, we may need a desugaring rule like
 \[
 \drule{\Code{(Sugar $e_1$ $e_2$ $\ldots$ $e_n$)}}{\Code{(if (Helper $e_1$ $e_2$) $\ldots$)}}

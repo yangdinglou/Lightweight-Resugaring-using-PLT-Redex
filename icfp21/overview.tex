@@ -24,7 +24,7 @@ e &::=& \m{CoreExp}\\
 The semantics of the language is simple, consisting of the following context rules to specify the computational order:
 \[
 \begin{array}{lcl}
-C &:=& \Code{(if C $e$ $e$)}\\
+\m{C} &:=& \Code{(if C e e)}\\
 &|&[\bigcdot] \qquad \note{//evaluation context's hole}\\
 \end{array}
 \]
@@ -65,7 +65,7 @@ C &:=& (\m{And}~C~e)\\
 From the context rules of \m{if}, we can find that the condition ($e_1$) is always evaluated first. Therefore, for expression \Code{(And $e_1$ $e_2$)} defined by syntactic sugar, $e_1$ is also evaluated first, which is the context rule of \m{And}. Similarly, we can calculate the context rule of \m{Or}.
 
 {\em Step 2: Forming Mixed Language.}
-We mix the surface language with the core language as in Fig. \ref{fig:mixexample}, where \m{CommonExp} means the expressions used in both the surface language and the core language both, and obtain $\to_m$, a one-step reduction in our mixed language, from the the reduction rules of fhe core language and the given desugaring rules. By using $\to_m$, we can get the following evaluation sequence in the mixed language for
+We mix the surface language with the core language as in Fig. \ref{fig:mixexample}, where \m{CommonExp} means the expressions used in both the surface language and the core language, and obtain $\to_m$, a one-step reduction in our mixed language, from the the reduction rules of fhe core language and the given desugaring rules. By using $\to_m$, we can get the following evaluation sequence in the mixed language for
 the program \Code{(And (Or \true~\false) (And \false~\true))} based on the computation order determined by the context rules obtained at Step 1.
 
 {\footnotesize
@@ -142,6 +142,6 @@ the program \Code{(And (Or \true~\false) (And \false~\true))} based on the compu
 We can just keep the intermediate sequences without \m{CoreExp} in any sub-expressions to get the resugaring sequence above.
 
 %Note that the context rules should restrict the computational order of a sugar expression's sub-expressions, thus we should let the context rules be correct---reflecting what should be executed in the desugared expression.
-Note that as the goal of resugaring is to present the evaluation of sugar programs, we are given a way to clearly specify which expression should be outputted. For the example in this section, of course, the sugar \m{And} and \m{Or} should be outputted, and also the boolean values should be. So we set boolean values as \m{CommonExp} in Fig. \ref{fig:mixsyntax}, so that they can be displayed though they are in the core language. By clearly separating what should be displayed, we can always get the resugaring evaluation sequences we need (this is slightly different from the existing approach's setting, as we will discuss in Section \ref{mark:correctness}).
+Note that as the goal of resugaring is to present the evaluation of sugared programs, we are given a way to clearly specify which expression should be output. For the example in this section, of course, the sugar \m{And} and \m{Or} should be outputted, and also the boolean values should be. So we set boolean values as \m{CommonExp} in Fig. \ref{fig:mixsyntax}, so that they can be displayed though they are in the core language. By clearly separating what should be displayed, we can always get the resugaring evaluation sequences we need (this is slightly different from the existing approach's setting, as we will discuss in Section \ref{mark:correctness}).
 
-\ycomment{Another point is that the core language can be carefully designed to (1) powerful enough to express any computation, (2) slight enough to define sugar easily. Given a proper core language, the only afford to build any surface language is defining the desugaring rules. (Other steps of the resugaring can be done automatically.)}
+Another point is that the core language can be carefully designed to (1) powerful enough to express any computation, (2) slight enough to define sugar easily. Given a proper core language, the only afford to build any surface language is defining the desugaring rules. Then the resugaring will be done automatically.

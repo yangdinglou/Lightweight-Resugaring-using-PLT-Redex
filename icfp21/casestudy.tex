@@ -103,7 +103,7 @@ In this section, we present several examples to demonstrate the expressive power
 \subsection{Simple Sugars}
 \label{mark:simple}
 
-We construct some simple syntactic sugars and try it on our tool. Some sugars are inspired by the first work of resugaring \cite{resugaring}.
+We construct some simple syntactic sugars and try it on our tool. 
 Take an SKI combinator syntactic sugar as an example. We can regard \m{S} as an expression headed with S, without sub-expression. And for showing a concise result, we add the call-by-need lambda calculus in the core language for this example.
 \[
 \begin{array}{l}
@@ -116,8 +116,7 @@ Take an SKI combinator syntactic sugar as an example. We can regard \m{S} as an 
 
 
 
-Although SKI combinator calculus is a reduced version of lambda calculus, we can construct combinators' sugars based on call-by-need lambda calculus ($\lambda_N$) in our core language. For the sugar program \Code{(S (K (S I)) K xx yy)}, we get the resugaring sequences as Fig.  \ref{fig:SKI}. Here the sugars contain no sub-expression, then the sugar should just desugar to the core expression. It is interesting that the sugar without sub-expressions (written by lambda calculus) and the sugar with sub-expressions will behave differently. For example, in this case, we can write the sugar as \Code{(S e e e)} and so on, then the sugar may not have to be expanded. Moreover, we can use this difference to force a syntactic sugar desugared using call-by-need lambda calculus. See if we want a sugar \m{ForceAnd} which does not
-want to use the context rules of \m{if} to getting the resugaring sequence, we can just write the following sugar.
+Although SKI combinator calculus is a reduced version of lambda calculus, we can construct combinators' sugars based on call-by-need lambda calculus ($\lambda_N$) in our core language. For the sugar program \Code{(S (K (S I)) K xx yy)}, we get the resugaring sequences as Fig.  \ref{fig:SKI}. Here the sugars contain no sub-expression, then the sugar should just desugar to the core expression. This is an interesting feature that the sugar without sub-expressions (written by lambda calculus) and the sugar with sub-expressions will behave differently. For example, in this case, we can write the sugar as \Code{(S e e e)} and so on, then the sugar may not have to be expanded. Moreover, we can use this difference to force a syntactic sugar desugared using call-by-need lambda calculus. See if we want a sugar \m{ForceAnd} which does not want to use the context rules of \m{if} to getting the resugaring sequence, we can just write the following sugar.
 
 \[
 \drule{\Code{ForceAnd}}{\Code{($\lambda_N$ ($\m{x}_1$ $\m{x}_2$) (if $\m{x}_1$ $\m{x}_2$ \false))}}
@@ -132,7 +131,7 @@ want to use the context rules of \m{if} to getting the resugaring sequence, we c
 \label{mark:hygienic}
 
 
-Existing resugaring approach \cite{hygienic} uses a DAG representing the expression to solve the hygienic problem. However, hygiene is not hard to be handled by our lazy desugaring strategy. Our algorithm will expand sugars with let-binding before necessary to avoid hygienic problem.
+Existing resugaring approach \cite{hygienic} uses a DAG representing the expression to solve the hygienic problem. However, hygiene is not hard to be handled by our lazy desugaring strategy as described in Section \ref{mark:hygiene}.. Our algorithm will expand sugars with let-binding before necessary to avoid hygienic problem.
 A typical hygienic problem can be introduced by the following sugar.
 \[
 \drule{\Code{(HygienicAdd $e_1$ $e_2$)}}{\Code{(let (x $e_1$) (+ x $e_2$))}}
@@ -140,7 +139,7 @@ A typical hygienic problem can be introduced by the following sugar.
 % \begin{Codes}
 % 	(HygienicAdd e1 e2) \DeStep{ (let ((x e1)) (+ x e2))}
 % \end{Codes}
-For the original desugaring rule, if we want to get sequences of \Code{(let (x 2) (HygienicAdd 1 x))}, it will firstly desugar to \Code{(let (x 2) (let x 1 (+ x x)))}, which is awful because the two $x$ in \Code{(+ x x)} should be bound to different values. So the existing hygienic resugaring approach uses abstract syntax DAG to distinct different \m{x} in the desugared expression. But for our approach based on lazy desugaring, the \m{HygienicAdd} sugar does not have to expand until necessary, thus, getting resugaring sequences as Fig.  \ref{fig:hygienicadd} based on a non-hygienic transformer system. We will discuss hygienic problem in Section \ref{mark:hygiene}.
+For the original desugaring rule, if we want to get sequences of \Code{(let (x 2) (HygienicAdd 1 x))}, it will firstly desugar to \Code{(let (x 2) (let x 1 (+ x x)))}, which is undesirable because the two $x$ in \Code{(+ x x)} should be bound to different values. So the existing hygienic resugaring approach uses abstract syntax DAG to distinct different \m{x} in the desugared expression. But for our approach based on lazy desugaring, the \m{HygienicAdd} sugar does not have to expand until necessary, thus, getting resugaring sequences as Fig.  \ref{fig:hygienicadd} based on a non-hygienic transformer system.
 
 
 % The lazy desugaring is also convenient for achieving hygiene for non-hygienic core language. For example, \Code{(let x 1 (+ x (let x 2 (+ x 1))))} may be reduced to \Code{(+ 1 (let 1 2 (+ 1 1)))} by a simple core language whose \Code{let} expression does not handle cases like that. But by writing a sugar (not syntactic sugar in the usual sense, because we do not want it to behave as \m{let}) \m{Let}
@@ -212,27 +211,5 @@ Moreover, just like the \m{Odd} and \m{Even} sugar above, there are some sugars 
 
 Note that the \m{let} expression is to limit the sub-expression only appears once in RHS. In this example, we can find that the list \Code{(cons 1 (list 2))}, though equal to \Code{(list 1 2)}, is represented by core language's expression. So it will be difficult to naturally handle such inline boundary conditions for existing desugaring systems. (The case can be specific by some setting, such as local-expansion\cite{10.1017/S0956796812000093} in Racket language's macro.) But our approach is easy to handle cases like this without specifying the expansion.
 
-\ignore{
-\subsubsection{Limitation on Presentation}
-One may note that the context rules of our sugar setting limit the presentation of syntactic sugar. For example, it is difficult to present a sugar with ellipses, because the form of its context rule may vary. It is still possible if we add some
-restriction (so that the algorithm \ref{alg:f} will work), or we can just make it using the list operation just as what the sugar \m{Map, Filter} work. Overall, the presentation of our sugar system is not so flexible, but it won't affect the expressiveness.
-}
-
-%\subsection{Efficiency}
-% \begin{figure}[thb]
-%   \begin{center}\small
-%   \begin{tabular}{l | l | l |l}
-%     \emph{Sugar} & \emph{Ours Steps} & \emph{Existing's Steps} & \emph{Description} \\ \hline
-%     And, Or & 4  & 2+0+2=4 & \\
-%     And, Newor & 10 & 7+6+3=16 & Or with binding \\
-%     Filter & 29 & 22+78+10=110 &  \\
-%     Sg, and, or & 11 & 5+0+10=15 & Sg is nested \\
-%     HygienicAdd & 6 & 5+1+1=7 &  \\
-%     S, K, I & 16 & 11+13+10=34 &  \\
-%   \end{tabular}
-%   \end{center}
-%   \caption{Comparison on Reduction Steps}
-%   \label{fig:step}
-%   \end{figure}
-
+To sum up, we tried some basic syntactic sugar features to see if our approach could handle complex sugar. The result shows that our approach can easily handle which existing resugaring approach can deal with, together with some other features which existing one cannot support.
 

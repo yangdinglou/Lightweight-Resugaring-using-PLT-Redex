@@ -3,7 +3,7 @@
 \section{Resugaring by Lazy Desugaring}
 \label{sec3}
 
-In this section, we present our new approach to resugaring. Different from the existing approach that clearly separates the surface from the core languages, we intentionally combine them as one mixed language, allowing free use of the language constructs in both languages. We will show that any expression in the mixed language can be evaluated in such a smart way that a sequence of all expressions that are necessary to be resugared can be correctly produced.
+In this section, we present our new approach to resugaring. Different from the existing approach that clearly separates the surface from the core languages, we intentionally combine them as one mixed language, allowing free use of the language constructs in both languages. We will show that any expression in the mixed language can be evaluated in such a smart way that producing all necessary resugaring sequences.
 
 \subsection{Mixed Language for Resugaring}
 
@@ -13,11 +13,11 @@ In this section, we present our new approach to resugaring. Different from the e
 \[
 \begin{array}{lllll}
 \m{CoreExp} &::=& x  & \note{variable}\\
-&~|~& c  & \note{constant}\\
+&~|~& v  & \note{value}\\
 &~|~& (\m{CoreHead}~\m{CoreExp}_1~\ldots~\m{CoreExp}_n) & \note{constructor}\\
 \\
 \m{SurfExp} &::=& x  & \note{variable}\\
-&~|~& c  & \note{constant}\\
+&~|~& v  & \note{value}\\
 &~|~& (\m{SurfHead}~\m{SurfExp}_1~\ldots~\m{SurfExp}_n) & \note{sugar constructor}\\
 \end{array}
 \]
@@ -33,18 +33,18 @@ We define a mixed language that combines a core language with a surface language
 \subsubsection{Core Language}
 
 
-The evaluator of our core language is driven by evaluation rules (context rules and reduction rules), with three natural assumptions. First, the evaluation is deterministic, in the sense that any expression in the core language will be reduced by a unique reduction sequence (restricted by context rules). Second, the context rules have no conditions, which means the following rules are not permitted.
+The evaluator of our core language is driven by evaluation rules (context rules and reduction rules), with two natural assumptions. First, the evaluation is deterministic, in the sense that any expression in the core language will be reduced by a unique reduction sequence (restricted by context rules). Second, the context rules have no conditions, which means the following rules are not permitted (here $f_1$, $f_2$ are two auxiliary functions).
 
 {\footnotesize
 \[
 \begin{array}{lll}
 \m{C}& ::= & (\m{notif}~[\bigcdot]~e_2~e_3)\\
-&|& (\m{notif}~v_1~[\bigcdot]~e_3), \qquad \m{if}~(\m{equal}?~v_1~\m{\true})\\
-&|& (\m{notif}~v_1~e_2~[\bigcdot]), \qquad \m{if}~(\m{equal}?~v_1~\m{\false})
+&|& (\m{notif}~v_1~[\bigcdot]~e_3), \qquad \m{if}~(f_1~v_1)\\
+&|& (\m{notif}~v_1~e_2~[\bigcdot]), \qquad \m{if}~(f_2~v_1)
 \end{array}
 \]}
 
-The form of the expressions in our core language is defined in Fig. \ref{fig:expression}. It is a variable, a constant, or a (language) constructor expression. Here, $\m{CoreHead}$ stands for a language constructor such as $\m{if}$ and $\m{let}$. To be concrete, we will use the core language defined in Fig.  \ref{fig:core} to demonstrate our approach. It is a usual functional language and its semantics is defined by the context rules and the reduction rules. Here the [e/x] denotes capture-avoiding substitution.
+The form of the expressions in our core language is defined in Fig. \ref{fig:expression}. An expression can be a variable, a value, or a (language) constructor expression. Here, $\m{CoreHead}$ stands for a language constructor such as $\m{if}$ and $\m{let}$. Also, the sub-expressions can be nested for supporting expressions like \Code{(let (x e) $\ldots$)}. To be concrete, we will use the core language defined in Fig.  \ref{fig:core} to demonstrate our approach. It is a usual functional language and its semantics is defined by the context rules and the reduction rules. Here the [e/x] denotes capture-avoiding substitution.
 
 \begin{figure*}[thb]
 % \subcaptionbox{Syntax \label{fig:coresyntax}}[0.32\linewidth]{
@@ -133,8 +133,9 @@ The form of the expressions in our core language is defined in Fig. \ref{fig:exp
 %For simplicity, we use the prefix notation. For instance, we write $\m{if-then-else}~e_1~e_2~e_3$, which would be more readable if we write $\m{if}~e_1~\m{then}~e_2~\m{else}~e_3$. In this paper, we may write both if it is clear from the context.
 
 \subsubsection{Surface Language}
+\label{mark:suflang}
 
-Our surface language is defined by a set of syntactic sugars, together with some elements in the core language, such as constants and variables. The expression of a surface language has a similar form as shown in Fig.  \ref{fig:expression}. To separate surface language's \m{Head} from that of the core language, we capitalize the first letter of surface language's \m{Head}.
+Our surface language is defined by a set of syntactic sugars, together with some elements in the core language, such as values and variables. The expression of a surface language has a similar form as shown in Fig.  \ref{fig:expression}. To separate surface language's \m{Head} from that of the core language, we capitalize the first letter of surface language's \m{Head}.
 
 %Here we just assume a simple desugaring system for a syntactic sugar expression. We will show how this approach can be combined with other complex desugaring.
 A syntactic sugar \m{SurfHead} is defined by a desugaring rule in the following form
@@ -142,11 +143,12 @@ A syntactic sugar \m{SurfHead} is defined by a desugaring rule in the following 
 \[
 \drule{(\m{SurfHead}~e_1~e_2~\ldots~e_n)}{\m{exp}} %\todo{\text{font size in drule}}
 \]
-where its left-hand side (LHS) is a pattern and its left-hand side (RHS) is an expression of the surface language or the core language. The LHS may be nested , so we can write sugars like \Code{(SurfHead ($e_1$ ($e_2$ $e_3$)) $\ldots$ $e_n$)}. And any pattern variable (e.g., $e_1$) in LHS appears only once in RHS. For instance, we may define syntactic sugar \m{And} by
+where its left-hand side (LHS) is a pattern and its right-hand side (RHS) is an expression of the surface language or the core language. The LHS may be nested , so we can write sugars like \Code{(SurfHead ($e_1$ ($e_2$ $e_3$)) $\ldots$ $e_n$)}. For instance, we may define syntactic sugar \m{And} by
 \[
 \drule{(\m{And}~e_1~e_2)}{(\m{if}~e_1~e_2~\m{\false})}.
 \]
-If we need to use a pattern variable multiple times in RHS, a \m{let} binding may be used.\footnote{Of course, we can add the support for multiple appearance for a pattern variable by a special judgement. But we just make it easy for presentation.} To see the problem of multiple uses of variable, suppose we define a sugar as follows:
+And it will be better if any pattern variable (e.g., $e_1$) in LHS appears only once in RHS.
+If we need to use a pattern variable multiple times in RHS, a \m{let} binding may be used.\footnote{Of course, we can add the support for multiple appearance for a pattern variable by some special judgements. But we just make it easy for presentation.} To see the problem of multiple uses of variable, suppose we define a sugar as follows:
 \[
 \drule{(\m{Twice}~e_1)}{(+~e_1~e_1)}.
 \]
@@ -165,7 +167,7 @@ Note that in the desugaring rule, we relax the ordinary restriction that RHS mus
 
 %As described above, we only assume the desugaring is a transformer without other helper function, thus there will be many kinds of ill-formed syntactic sugar which cannot desugared well (just as the \m{Odd}, \m{Even} sugars above, although can be processed by our lazy desugaring), or the semantics of the sugar cannot be defined clearly.
 
-Without loss of generosity, we assume all desugaring rules are not overlapped in the sense that for any syntactic sugar in an expression, only one desugaring rule is applicable.
+Without loss of generality, we assume all desugaring rules are not overlapped in the sense that for any syntactic sugar in an expression, only one desugaring rule is applicable.
 
 
 \subsubsection{Mixed Language}
@@ -179,12 +181,12 @@ Without loss of generosity, we assume all desugaring rules are not overlapped in
 			\\
 			\m{DisplayableExp} &::=& \m{(SurfHead~DisplayableExp~$\ldots$)}\\
 			&|& \m{(CommonHead~DisplayableExp~$\ldots$)}\\
-			&|& c\\
+			&|& v\\
 			&|& x\\
 			\\
 			\m{MixedExp} &::=& \m{(SurfHead~MixedExp~$\ldots$)}\\
 			&|& \m{(CoreHead~MixedExp~$\ldots$)}\\
-			&|& c\\
+			&|& v\\
 			&|& x\\
 			\end{array}
 			\]
@@ -226,7 +228,7 @@ Our resugaring algorithm works on the mixed language, based on the evaluation ru
 \end{enumerate}
 
 \begin{algorithm}
-	\caption{\m{calcontext}}
+	\caption{\m{calcontext} \todo{check}}
 	\label{alg:f}     % 给算法一个标签，以便其它地方引用该算法
 	\begin{algorithmic}[1]       % 数字 "1" 表示为算法显示行号的时候，每几行显示一个行号，如："1" 表示每行都显示行号，"2" 表示每两行显示一个行号，也是为了方便其它地方的引用
 		\REQUIRE ~~\\      % 算法的输入参数说明部分
@@ -280,7 +282,7 @@ Consider a sugar \m{Sg0} defined by the following desugaring rule:
 \[
 \drule{\m{(Sg0}~e_1~e_2~e_3~e_4\m{)}}{\m{(+}~e_1~\m{(if}~e_2~e_3~e_4\m{))}}
 \]
-where we assume that $+$ computes its first argument and then its second argument before performing reduction, i.e., the context rules for $+$ are  $(+~[\bigcdot]~e_2)$ and $(+~v_1~[\bigcdot]~e_2)$. Now from $\m{(+}~e_1~\m{(if}~e_2~e_3~e_4\m{))}$, we can infer that $e_1$ should be computed first from the context rule of $+$, and then $e_2$ is computed from the context rule of the inner $\m{if}$, and finally it stops because no context rule is applicable for any remaining subexpression. Therefore we get the following context rules for \m{Sg0} as
+where we assume that $+$ computes its first argument and then its second argument before performing reduction, i.e., the context rules for $+$ are  $(+~[\bigcdot]~e_2)$ and $(+~v_1~[\bigcdot])$. Now from $\m{(+}~e_1~\m{(if}~e_2~e_3~e_4\m{))}$, we can infer that $e_1$ should be computed first from the context rule of $+$, and then $e_2$ is computed from the context rule of the inner $\m{if}$, and finally it stops because no context rule is applicable for any remaining subexpression. Therefore we get the following context rules for \m{Sg0} as
 $
 (\m{Sg0}~[\bigcdot]~e_2~e_3~e_4),~(\m{Sg0}~v_1~[\bigcdot]~e_3~e_4).
 $
@@ -353,7 +355,7 @@ As the second part of the whole process, our resugaring algorithm can be defined
 During the resugaring, we just apply the reduction ($\redm{}{}$) on the input program step by step until no reduction can be applied (\m{isNormal}, \m{value} in our setting), while outputting the intermediate expressions that belong to \m{DisplayableExp}.
 
 
-\subsection{Correctness\ycomment{(2 parts: first is some basic concepts and lemma, second is a formalized property set)}}
+\subsection{Correctness}
 \label{mark:correct}
 
 
@@ -361,8 +363,8 @@ We define following properties of our desugaring algorithm for correctness. Befo
 
 
 
-\subsubsection{Some Defination}
-First of all, we define a function $\mathtt{D}$ to recursively desugar all sugars in a program using desugaring rules.
+\subsubsection{Some Definition}
+First, we define a function $\mathtt{D}$ to recursively desugar all sugars in a program using desugaring rules.
 
 \begin{Def}[fully desugaring]
 \[
@@ -518,6 +520,8 @@ Because the sub-expression \m{CC} is reduced by its \Code{CoreHead}, so matter h
 \subsection{Properties and Trade-off}
 \label{mark:correctness}
 
+\todo{}
+
 The existing resugaring approaches \cite{resugaring,hygienic} proposed the following three properties to define the correctness.
 
 \begin{quote}
@@ -531,7 +535,7 @@ Here we will show what are the similarities and differences between theirs and o
 
 \emph{Emulation}: The properties in Section \ref{sec3} is just the same as the emulation property. It is the most basic one.
 
-\emph{Abstraction and Coverage}: Our reduction in the mixed language has some similarities to theirs. But since our framework has no execution for the fully desugared program and no reverse desugaring, there are some differences in details. \ycomment{For the coverage, our approach can guarantee that every step in the core languages' sequences can be reflected in the sequence before filtering, which is similar to the original one. But the abstraction and coverage are both about which kind of intermediate expression should be outputted. Especially, the abstraction property is not strict if willing to deal with some special cases.}
+\emph{Abstraction and Coverage}: Our reduction in the mixed language has some similarities to theirs. But since our framework has no execution for the fully desugared program and no reverse desugaring, there are some differences in details. For the coverage, our approach can guarantee that every step in the core languages' sequences can be reflected in the sequence before filtering, which is similar to the original one. But the abstraction and coverage are both about which kind of intermediate expression should be outputted. Especially, the abstraction property is not strict if willing to deal with some special cases.
 
 So in our approach, we provide a more flexible handling for the output thanks to the mixture of languages. Overall, our approach restricts the output by the \m{Head} of an expression and its sub-expressions. It is quite natural since the motivation of the resugaring is to show useful intermediate sequences, we think it will be better than restricting the output by judging whether the intermediate expressions contain some components desugared from the original program's components. Take the following sugar definitions as an example.
 \[
@@ -571,6 +575,7 @@ without showing the \m{if} expression expanded from \m{And}, we only need to set
 In summary, our approach chooses a slightly different way for the \emph{abstraction} for better \emph{coverage} in the real application.
 \subsection{Hygiene}
 \label{mark:hygiene}
+\todo{}
 
 As an important property for sugar or macro system, we used to think it necessary to achieve hygiene by combining the approach with an existing hygienic desugaring system. But during the experiment, we find it naturally solve the hygienic problem with the original desugaring system in our language setting.
 
