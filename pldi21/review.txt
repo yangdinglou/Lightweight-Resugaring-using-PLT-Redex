@@ -1,0 +1,415 @@
+PLDI 2021 Paper #461 Reviews and Comments
+===========================================================================
+Paper #461 Resugaring by Lazy Desugaring
+
+
+Review #461A
+===========================================================================
+
+Overall merit
+-------------
+D. I will argue against accepting this paper.
+
+Reviewer expertise
+------------------
+Y. **Knowledgeable** = "I follow the literature on this paper's topic(s)
+   but may have missed some relevant developments"
+
+Paper summary
+-------------
+This paper describes an approach to program evaluation with sugar by
+inferring evaluation rules from desugaring rules, instead of
+desugaring a program before running it --- thus avoiding the problem
+of having to resugar the program to present it to a programmer.
+
+Comments for author
+-------------------
+The idea of automatically inferring reduction rules for a sugared
+language seems interesting, but the work is not yet ready for
+publication at PLDI. The biggest question/limitation for this work is
+expressiveness: the core language is constrained to have no side
+effects, and patterns are constrained to disallow duplication of
+terms, so it's not immediately clear that this will scale up to
+practical applications. The paper's evaluation is quite limited. There
+are presentation issues where it's not clear what constraints on the
+language ensure that certain things are generally true (e.g., in
+section 4.2). The presentation also has a confusing detour into
+"sugar" that is recursive and cannot be expanded away, which does not
+seem to fit the definition of syntactic sugar. Finally, it becomes
+clear too late in the paper that the system here produces different
+results than the work it is being compared two; that difference needs
+more justification and evaluation.
+
+Presentation suggestions, editing suggestions, and typos:
+
+Line 40 uses a `let` with a single pair of parentheses around the
+binder and expression, while figure 1 uses Scheme-style parentheses.
+Figure 4(a) splits the difference by having one open parenthesis and
+two close parentheses. I'm guessing that a single pair of parentheses
+was intended everywhere.
+
+Line 196: "costive" -> "costly"
+
+Line 255: "Coreexp" -> "CoreExp"
+
+Line 259: "outputted" -> "output"
+
+Figure 2: It's not initially clear how much of this a programmer
+writes versus how much it is inferred. A programmer must be making a
+choice about CommonExp, but the context rules are derived from core
+context rules and desugaring rules, right?
+
+Line 287: I can't make sense of this sentence.
+
+Line 310: "No side conditions" doesn't seem like a clear enough
+description of the constraint, since a typical pattern notation would
+let you write #t and #f in place of v1. Maybe it's a question of
+constraining the pattern language to disallow literals.
+
+Figure 3: This figure confused me. The text at line 314 says that this
+figure defines the form of expression, so I spent a little time trying
+to fit something like (let ([x 1]) x) into the grammar, but the ([x
+1]) part doesn't fit. Line 326 more clearly suggests that it's meant
+to be a sketch for something like figure 4, rather than a fully
+general description of the format. Ditto for figure 5.
+
+Figure 4b: Missing `let` case with context in the binding RHS.
+
+Line 355: "left-hand side (RHS)" should be "right-hand side (RHS)"
+
+Line 369: Even with the restriction to using a pattern variable for an
+expression once, you can bind to a lambda form containing the pattern
+variable, and then call the bound function twice --- which causes the
+expression to be evaluated twice. Doesn't that create the same problem
+as using the pattern variable twice?
+
+Line 379: This suddenly does not look like macro-style sugar, because
+Odd and Even cannot be expanded away before evaluating. In section 3,
+you restrict your attention to programs that can be fully desugared.
+It's not clear what a reader should make of the departure from
+macro-style sugar here. I think this should probably go away, since
+the paper is supposed to be about sugar.
+
+Line 382: "loss of generosity" should be "loss of generality". (But
+this seems like a case of losing generality, although maybe it's
+reasonable to lose it.)
+
+Line 537: extra "e2"
+
+Line 692: "semantic" -> "semantics"
+
+Section 4.2: The assumption here seems to be roughly that `let` is not
+in the shared language, so it won't be exposed. Indeed, if you don't
+end up exposing things like `let`, and if you perform reduction of
+binding though substitution, then you're basically implementing
+function-like substitution of values into a function; in that case,
+capture is no problem if you have no free variables (because they were
+substituted away earlier). But I don't really get why `let` and other
+binding forms are guaranteed not to be exposed before terms to
+substitute are replaced by value.
+
+Section 4.3: As on line 379, this section seems off the rails. If it
+can't be expanded away, it's not sugar.
+
+After removing section 4.3, the only expressiveness examples are
+extremely simple. There's not really any evidence in this version of
+the paper that the system is usefully expressive. Compare the to
+substantial set of sugar forms demonstrated in [16].
+
+Section 6.1: Although there's some detail here, the section comes
+across as more speculative than worked out. That impression is
+increased around line 1075, which seems to say that the details given
+here are not really enough to make things work.
+
+Section 6.2: This information should be much sooner. A key point is
+that your system produces different results than the previous work, so
+figure 9 is an apples-to-oranges comparison. (It's very easy to make
+things fast if you change the rules of what is supposed to be
+produced.) You can certainly make a case that a different result is
+better, but that needs to be clear up front, and the evaluation should
+take that into account.
+
+Section 6.3: Same as section 4.2, I'm not following the
+constraints/assumptions that make this work.
+
+Line 1086: "we" -> "We"
+
+
+
+Review #461B
+===========================================================================
+
+Overall merit
+-------------
+C. I would not accept this paper but will not argue strongly against
+   accepting it.
+
+Reviewer expertise
+------------------
+Y. **Knowledgeable** = "I follow the literature on this paper's topic(s)
+   but may have missed some relevant developments"
+
+Paper summary
+-------------
+Resugaring is the reverse direction of desugaring.  This paper aims to
+address limitations of the prior work, namely, the performance
+bottlenecks that arises from the main pattern matching operation,
+which occurs frequently when desugaring rules are complex and
+reduction sequences are long.
+
+This paper advocates that surface and core terms be mixed into the
+same language --- the language designer or user essentially labels
+which expression forms they want to treat as surface forms. Then,
+given evaluation rules for core forms and desugaring rules for others,
+the paper describes an algorithm to derive additional contextual and
+evaluation rules for the surface terms, forming a full definition of
+evaluation for the mixed language. When displaying a reduction
+sequence, only terms that live within the "displayable" subset of the
+language are shown to users.
+
+The approach is formulated for a small language, and for several
+example sugared forms --- including boolean disjunction, conjunction,
+multi-arity addition, and list map and filter --- are demonstrated in
+their implementation.
+
+Comments for author
+-------------------
+Motivation for this work is compelling: syntactic sugar is used in
+various settings --- reducing the size of an evaluator, reusing
+analyses built for existing languages, supporting program
+understanding and education --- so generally improving the connections
+between surface and core terms is useful. Prior resugaring techniques
+may not scale for practical use, however, because of the reliance on
+very many expensive pattern matching operations, many of which are
+destined not to succeed, so it is natural to seek improvements.
+
+That said, I'm having trouble understanding exactly what the
+motivating usage scenario is for this work, as well as what exactly
+has been achieved.
+
+One question is why this is described as, and compared to, resugaring
+at all. The current approach does not have any "reverse"
+transformations at all; instead, it combines the "surface" and "core"
+terms into a single language, which hooks to support downstream
+presentation of (forward) evaluation sequences. A major design goal of
+the prior resugaring work, however, is to take a core language as it
+exists without modification (as acknowledged on L952), which leads to
+the need for reversing the desugaring rules. Modifying a language, as
+is done here, is a perfectly reasonable proposal which opens a
+different set of design decisions, but seems largely orthogonal to the
+ones considered by the prior work.
+
+My second major question is, what is the intended workflow for this
+approach? Will individual users mix up their own languages? Will
+language designers and tool builders identify useful display
+languages? The example language and small examples described in the
+paper do not paint a clear picture.
+
+To answer these two questions, it seems the work should be compared
+more directly to work on debuggers or macro expansion systems --- in
+which language designers or programmers makes more direct decisions to
+control their navigation of a program execution.
+
+In terms of the technical work itself, some of the development is
+carefully worked out, but overall I found the paper to be poorly
+written and formalized, without committing enough to any one
+particular language and demonstrating its benefits. Most of the paper
+deals with small examples involving Or and And. The larger examples,
+including map and filter, seem interesting. But again, I wonder: how
+might these examples be treated by, e.g., macro systems and
+single-step debuggers?
+
+Finally, the paper is motivated by the need to support complex
+desugaring rules, but the hypothetical, abstract "Hard" example is not
+particularly helpful. What are some specific use cases and example
+developments where the proposed approach --- picking which expression
+forms to display --- may work well? What are the current alternatives
+that users or language designers may employ for such scenarios?
+(Resugaring doesn't seem to be one of them.)
+
+Overall, the main idea --- to define an evaluator where the syntax can
+somehow be labeled to mark parts that should generally be shown or
+hidden --- is interesting. But the paper leaves many questions about
+the specific motivation and technical formulation for this idea. As a
+result, I do not think this paper should be published.
+
+
+Additional Comments
+
+Algorithm 1 / Sec 3.2: This algorithm does not seem to be depend on
+the particular forms of the language defined in Figures 4 and 5. How
+general is this methodology for deriving additional rules? And is
+there a particular reason why this algorithm is better described in
+this imperative fashion, rather than an inductive one based on the
+language syntax?
+
+Sec 3.4 / 6.4: It is hard for me to imagine these different extensions
+(type system, binding concerns, helper functions, ellipses as
+patterns) without more concrete examples. I did not understand the
+phrase: "that means we don't have the evaluation rules of Helper."
+
+Sec 6.1: I also had a hard time understanding this extension.
+
+Sec 6.3: I might be missing something, but is this section just saying
+that because the current approach is ordinary evaluation (which
+includes capture-avoiding substitution), there are no additional
+binding/hygiene issues?
+
+L1258-1272: I fail to see how these bidirectional programming,
+slicing, and provenance techniques are particularly related.
+
+
+
+Minor Comments and Typos
+
+L77: Is it important for this example to reduce the body of the let
+before performing the substitution of t?
+
+L117: "rules of _the_ surface language"
+
+L150: "experiment_s"
+
+L162: "word_s"
+
+L176: "context rule_s"
+
+L196: "costive" ==> "costly"
+
+L214: "both ... both"
+
+L255: "Coreexp" ==> "CoreExp"
+
+L258: "sugar_ed" programs"
+
+L267: ".)" => ")."
+
+L311: Have values v been defined?
+
+L315: "It is" ==> "An expression may be" or "Expressions include variables..."
+
+L356: "left-hand side (RHS)"
+
+L357: If the RHS expression is "of the surface language or the core
+language", can it not be mixed? I think it can, so perhaps rephrase
+this to something like "expression can include both surface and core
+language terms".
+
+L376: Here "ordinary" refers to form of desugaring rules in prior
+work, right? In prior work, can desugaring rules not be defined
+recursively? (L798 begins to address this, but not in detail.)
+
+L433: "let them _be_ displayed"
+
+L439: Referring to the \lambda form as the "lambda calculus" seems
+odd. Perhaps describe function abstraction and application explicitly.
+
+L479: "analyzing _the_ computational"
+
+L706: "CommonExp" ==> "CommonHead" ?
+
+L757: Perhaps rephrase "is awful" to "would be incorrect" or "would be
+undesirable".
+
+L1202: Is the let missing a var?
+
+
+
+Review #461C
+===========================================================================
+
+Overall merit
+-------------
+C. I would not accept this paper but will not argue strongly against
+   accepting it.
+
+Reviewer expertise
+------------------
+Y. **Knowledgeable** = "I follow the literature on this paper's topic(s)
+   but may have missed some relevant developments"
+
+Paper summary
+-------------
+When displaying reduction sequences for a programming language defined in terms of syntactic sugar, user-friendliness desires to maintain this sugar as long as possible. Prior approaches attempted do so by rediscovering the ability to resugar the result of a reduction step after the fact. This paper suggests a simpler alternative in which the expansion of sugar is not done in an upfront pass but instead interleaved with reduction and delayed until the latest possible time, only when the sugared term actually becomes a redex. The main prerequisite for that is the ability to automatically derive suitable evaluation contexts for the sugared constructs, from the definition of their expansions. The paper presents a suitable algorithm.
+
+Pros:
+
++ Simple but effective idea
++ Simplifies hygiene issues
+
+Cons:
+
+- Pervasive presentation issues
+- Can only handle some classes of sugar (e.g., with linear expansions)
+- Somewhat straightforward solution to a somewhat niche problem
+
+The basic idea here is fairly straightforward: instead of treating the expansion of sugar as a macro-like pre-pass over the program, it is integrated with the reduction relation, essentially adding a set of custom delta-reduction rules to it. To make that work in a call-by-value setting, however, reduction has to be able to first find and reduce possible redexes nested inside a piece of sugar. The main insight is that that is easy to achieve, because the necessary evaluation contexts can easily be derived from the sugar's definition. Essentially, this is a simple form of strictness (and evaluation order) analysis on macro definitions, even if the paper does not call it out as such (I wish it did, because that would short-cut some of the complexified explanation).
+
+The main contribution of the paper, as I see it, is the algorithm for this analysis. Nothing particularly deep here, it all is a simple idea, but nice and effective. I can see this approach being a vast improvement over the alternatives, especially in terms of performance.
+
+I have some quibbles about the distinction of core, common, and surface expressions, and how that is supposed to drive what steps are displayed. When an expansion uses common constructs, then I think the results might be rather incidental (see my question to authors re l.1148 below). But that's probably a secondary concern.
+
+The biggest issue with the paper is the presentation. Despite describing a fairly simple matter, various parts throughout the paper are surprisingly difficult to read and follow. Although it sports lots of useful examples, the explanation lackz clarity, and the paper makes rather ineffective and sloppy use of notation and technical devices, e.g., not distinguishing between different syntactic levels (which `e` is a macro parameter in a definition, which a meta variable of the reduction?), or using substitution whose domain seemingly are expressions instead of variables. Various typos, grammar issues, and formal bugs, too. See comments to authors for more details.
+
+These issues unfortunately extend to the core of the paper, the context algorithm itself, which could be presented in a much more succinct way, I think. Its task is not particularly complicated. But instead of formulating it in terms of some straightforward inductive definitions, it is presented as a verbose imperative algorithm with complex state, non-obvious types and invariants, and some unclear informal notation, all of which obscures what's going on.
+
+In summary, the _idea_ in this paper is nice, but the paper itself misses the mark. Besides serious presentation issues, I feel like it does not have quite enough meat for PLDI -- or perhaps I missed some interesting depth because of the presentation issues.
+
+Comments for author
+-------------------
+l.186: Some of the later definitions would be clearer and technically cleaner if you defined a grammar for sugar expansion rules, including a clean separation of variables in these rules that distinguishes then from meta variables. (See also some of the comments below.)
+
+l.333: Typo: superfluous parenthesis
+
+l.362: Is the restriction to linear expansions always necessary? For example, it seems fine to duplicate a term if neither of its occurrences is in a strict position.
+
+l.382: "generosity" -- Do you mean "generality", or is this some pun I did not get?
+
+l.388: The `let` construct seems misplaced in this definition of contexts.
+
+l.342: The reduction rule for application is missing a base case for empty parameter lists.
+
+l.407: I didn't fully understand this grammar. AFAICS, DisplayedExp is a sublanguage of MixedExp, which makes sense. But it follows that Exp defines the same language as MixedExp, so seems pointless?
+
+l.460: "if e1 is a SurfExp, it will be reduced by the desugaring rule of e1's head" -- Shouldn't that happen only after all its derived context rules have been exhausted?
+
+l.496: I found this algorithm unnecessarily hard to follow. Did you try to formulate the derivation in a more declarative manner, e.g., as inductive functions? Also, there is a bunch of notation that I couldn't interpret clearly:
+
+  * 2: "not-exists contexts rule of Head" -- exists where?
+  * 12: should e_i be e'_i here?
+  * 14: here too? Moreover, what does it mean to substitute for an expression? Is e_i a variable?
+
+l.537: Superfluous e2 in the second context.
+
+l.577: So what happens? I suppose the algorithm just diverges?
+
+l.595: Missing "else"?
+
+l.623: Again I have trouble understanding this definition, given the odd use of substitutions on e's. 
+
+l.691: The algorithm wouldn't be "non-deterministic", it would simply be ill-defined, i.e., not compute a defined result.
+
+l.693: What is meant by a rule being "wrong"?
+
+l.730: I had trouble understanding what the latter half of this paragraph is trying to say.
+
+l.742: This expansion would not seem to work, considering that your CoreExp grammar requires an explicit `apply` node to perform the necessary application.
+
+l.755: The explanation in this paragraph seems to be a complicated way of explaining the following: In your system, sugar reduction only substitutes closed terms. Consequently, by construction, there cannot be any accidental variable capture. Variable hygiene hence becomes a non-issue. Or am I missing some subtlety here?
+
+l.976: This is another paragraph I failed to parse. Can you try to reword it?
+
+l.1075: Similarly here. In general, the entirety of Section 6.1 was difficult to follow. It seems like it contains one of the more interesting ideas of the paper, about trying to reduce core rules and falling back to expanding sugar if that would get stuck. Or something like that. I couldn't distill the details properly. For example, it's never explained what rules SurfRed1/2 do, both of which I found somewhat perplexing, esp the role of e''_i. The paper might benefit from completely reworking this section.
+
+l.1148: I did not grasp your argument. The outer `not` and `And` are displayed in both cases. But why is it more desirable that the internal ones are visible, too? It seems like that introduces two classes of sugar, one that uses only common constructs and one that does not. Worse, if an expansion uses core constructs, but those are reduced before the entire expansion has been completely reduced, then isn't the user is going to spuriously seeing (the latter) half of its reduction sequence? That seems confusing at best.
+
+l.1233: "[...] but it won't affect expressiveness." -- That seems like an odd (and false) statement, since there clearly are a few restrictions that do restrict the expressiveness of the system, e.g., the requirement that each LHS parameter occurs only once in the RHS.
+
+l.1306: Can you elaborate how side effects would violate the emulation property? Maybe I'm misunderstanding the precise requirement of this property.
+
+There are various other typos and grammar issues throughout the paper that I quickly gave up on trying to collect. Please proof-read the paper.
+
+
+
+Response by Ziyi Yang <yangdinglou@pku.edu.cn>
+---------------------------------------------------------------------------
+Thank you all for the valuable comments. We will improve our work and paper.
