@@ -148,7 +148,7 @@ where its left-hand side (LHS) is a pattern and its right-hand side (RHS) is an 
 \drule{(\m{And}~e_1~e_2)}{(\m{if}~e_1~e_2~\m{\false})}.
 \]
 And it will be better if any pattern variable (e.g., $e_1$) in LHS appears only once in RHS.
-If we need to use a pattern variable multiple times in RHS, a \m{let} binding may be used.\footnote{Of course, we can add the support for multiple appearance for a pattern variable by some special judgements. But we just make it easy for presentation.} To see the problem of multiple uses of variable, suppose we define a sugar as follows:
+If we need to use a pattern variable multiple times in RHS, a \m{let} binding may be used.\footnote{Of course, we can add the support for multiple appearance for a pattern variable by some special judgements. But we just make it simple for presentation.} To see the problem of multiple uses of a variable, suppose we define a sugar as follows:
 \[
 \drule{(\m{Twice}~e_1)}{(+~e_1~e_1)}.
 \]
@@ -359,7 +359,7 @@ During the resugaring, we just apply the reduction ($\redm{}{}$) on the input pr
 \label{mark:correct}
 
 
-We define following properties of our desugaring algorithm for correctness. Before stepping in, let's generally describe why the algorithm is correct. For any program headed with \m{SurfHead}, we can expand the outermost sugar by the desugaring rule of \m{SurfHead}. The desugared expression contains some sub-expressions. Some of them are the original program's sub-expressions, some origin from the desugaring rule, while others consist of the previous ones. If the desugared expression should be reduced or recursively reduced at one of the original sub-expressions, the expression after that reduction can be resugared by reverse expansion of the desugaring rule. So these sub-expressions become the holes for context rules. Otherwise, the recursive reduction will not save the sugar's RHS structure. Such a program in the mixed language have to expand the outermost sugar because no more resugaring is available for it.
+We define the following properties of our desugaring algorithm for proving correctness. Before stepping in, we first explain intuitively why the algorithm is correct. For any program headed with \m{SurfHead}, we can expand the outermost sugar by the desugaring rule of \m{SurfHead}. The desugared expression contains some sub-expressions. Some of them are the original program's sub-expressions, some origin from the desugaring rule, while others consist of the previous ones. If the desugared expression should be reduced or recursively reduced at one of the original sub-expressions, the expression after that reduction can be resugared by reverse expansion of the desugaring rule. So these sub-expressions become the holes for context rules. Otherwise, the recursive reduction will not save the sugar's RHS structure. Such a program in the mixed language have to expand the outermost sugar because no more resugaring is available for it.
 
 
 
@@ -406,6 +406,8 @@ So for convenience, we define destruction of a sugar's RHS when the second case 
 
 \subsubsection{Properties and Proof Sketch}
 \todo{improve some sentences}
+
+\xcomment{State the properties intuitively first (i.e.\ three properties in previous work)?}
 
 \begin{property} \label{thm1}
 	For a program \m{P}=$\m{E}[\m{S}]$ of the mixed language which can be fully desugared, where \m{P'}=$\mathtt{D}(\m{P})$=$\m{E'}[\m{C}]$, and \m{S}=\Code{(SurfHead $e_1$ ... $e_n$)} in the program \m{P} together with \m{E'}=$\mathtt{D}(\m{E})$ (then of course \m{C}=$\mathtt{D}(\m{S})$); if $\redm{\m{E}[\m{S}]}{\m{E}[\m{S'}]}$ and $\drule{\m{S}}{\m{S'}}$, then $\redc{\m{E'}[\m{C}]}{\m{E'}[\m{C'}]}$ together with destroying the sugar's RHS form of \m{S} by $\redc{\m{C}}{\m{C'}}$. An example in Fig. \ref{example:ppt1}.
@@ -526,11 +528,14 @@ Because the sub-expression \m{CC} is reduced by its \Code{CoreHead}, so matter h
 The existing resugaring approaches \cite{resugaring,hygienic} proposed the following three properties to define the correctness.
 
 \begin{quote}
-Emulation:
-Each term in the generated surface evaluation sequence desugars into the core term which it is meant to represent.\\
-Abstraction:
-Code introduced by desugaring is never revealed in the surface evaluation sequence, and code originating from the original input program is never hidden by resugaring.\\
-Coverage: Resugaring is attempted on every core step, and as few core steps are skipped as possible.\\
+% enhanced formatting
+\begin{itemize}
+    \item Emulation:
+Each term in the generated surface evaluation sequence desugars into the core term which it is meant to represent.
+    \item Abstraction:
+Code introduced by desugaring is never revealed in the surface evaluation sequence, and code originating from the original input program is never hidden by resugaring.
+    \item Coverage: Resugaring is attempted on every core step, and as few core steps are skipped as possible.
+\end{itemize}
 \end{quote}
 Here we will show what are the similarities and differences between theirs and our properties.
 
