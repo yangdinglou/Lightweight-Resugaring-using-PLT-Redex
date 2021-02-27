@@ -53,12 +53,12 @@ Putting them in words. For expression \Code{(SurfHead $e_1$ $\ldots$ $e_n$)}, as
 For an expression \Code{(CoreHead $e_1$ $\ldots$ $e_n$)}  whose sub-expressions contain \m{SurfExp}, replacing all \m{SurfExp} sub-expressions with any reducible core language's expression $\m{tmpe}_i$ . Then getting a result after inputting the new expression $e'$ to the original black-box stepper. Then two possible cases come.
 
 If reduction appears at a sub-expression at $\m{tmpe}_i$'s location, then the stepper with the extension should return \Code{(CoreHead $e_1$ $\ldots$ $e_i'$ $\ldots$ $e_n$)}, where $e_i'$ is $e_i$ after the mixed language's one-step reduction ($\redm{}{}$) as the following example (rule $\mathtt{CoreExt1}$)
-\begin{center}\scriptsize
+\begin{center}\footnotesize
 	\Code{(if (and e1 e2) (or e1 e2) \#f)}\\ $\Downarrow_{replace}$\\ \Code{(if (not \#t) (not \#t) \#f)}\\ $\;\;\Downarrow_{blackbox}$\\ \Code{(if \#f (not \#t) \#f)}\\ $\quad\Downarrow_{reduction}$\\ \Code{(if (if e1 e2 \#f) (or e1 e2) \#f)}
 \end{center}
 
 Otherwise (no reduction on $\m{tmp}_i$), the stepper should return \Code{$e'$}, with all the replaced sub-expressions replacing back (rule $\mathtt{CoreExt2}$).
-\begin{center}\scriptsize
+\begin{center}\footnotesize
 	\Code{(if \#t (and ...) (or ...))}\\ $\Downarrow_{replace}$ \\\Code{ (if \#t $\m{tmpe}_2$ $\m{tmpe}_3$)}\\ $\;\;\Downarrow_{blackbox}$\\  \Code{$\m{tmpe}_2$}\\ $\quad\;\;\;\Downarrow_{replaceback}$\\ \Code{(and ...)}
 \end{center}
 We call the extension "one-step-try", because it tries one step on the expression in the black-box stepper. The extension will not violate the properties of the original core language's evaluator. It is obvious that the evaluator with the extension will reduce at the sub-expression as it needs in the core language, if the reduction appears in a sub-expression. The stepper with extension behaves the same as mixing the evaluation rules of the core language and desugaring rules of surface language.
@@ -118,15 +118,16 @@ Side effect is a special issue in resugaring. In the previous section, we descri
 given a syntactic sugar 
 \[\drule{\Code{(inc x y)}}{\Code{(begin (set x (+ x y)) x)}}\]
 and for the expression \Code{(let (x 1) (inc x (+ 1 1)))}, we will have the following evaluation sequences in the core language (omitted the desugaring process).
-\begin{center}
+\begin{center}{\footnotesize
 	\Code{(let (x 1) (begin (set x (+ x (+ 1 1))) x))}\\
 	$\downarrow$\\
-	\Code{(begin (set x (+ x (+ 1 1))) x) [x:1]} {\footnotesize resugar to \Code{(inc x (+ 1 1))}}\\
+	\Code{(begin (set x (+ x (+ 1 1))) x) [x:1]} \qquad//{\scriptsize\emph{resugar to \Code{(inc x (+ 1 1))}}}\\
 	$\downarrow$\\
 	\Code{(begin (set x (+ 1 (+ 1 1))) x) [x:1]} \\
 	$\downarrow$\\
-	\Code{(begin (set x (+ 1 2)) x) [x:1]} {\footnotesize resugar to \Code{(inc x 2)}?}\\
+	\Code{(begin (set x (+ 1 2)) x) [x:1]} \qquad//{\scriptsize\emph{resugar to \Code{(inc x 2)}}?}\\
 	$\ldots$
+}
 \end{center}
 In the sequences, we would see the \m{x} in \Code{(+ x (+ 1 1)} was reduced to $1$ getting from the environment. But other \m{x} in the program cannot be replaced. So as we described in the Section \ref{mark:suflang}, resugaring for such sugar is unclear. Because we add \m{set} expression in the core language, the issue cannot be solved by a let binding (the \m{x} in RHS is always a reducible expression). 
 Another issue happened when the sub-expression \Code{(set x (+ 1 (+ 1 1)))} reduced to \Code{(set x (+ 1 2))}. As the \m{1} was reduced from \m{x}, we could record it and made the whole expression resugar to \Code{(inc x 2)}. Based on the issues above, an extension that marking the variable (which may appear at the first sub-expression of \m{set} expression) can make it. During the \m{calcontext} function, we can simply ignore the \m{x} as a possible hole for the sugar \m{inc}. So we could get the context rule 

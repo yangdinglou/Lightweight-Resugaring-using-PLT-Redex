@@ -39,8 +39,8 @@ The evaluator of our core language is driven by evaluation rules (context rules 
 \[
 \begin{array}{lll}
 \m{C}& ::= & (\m{notif}~[\bigcdot]~e_2~e_3)\\
-&|& (\m{notif}~v_1~[\bigcdot]~e_3), \qquad \m{if}~(f_1~v_1)\\
-&|& (\m{notif}~v_1~e_2~[\bigcdot]), \qquad \m{if}~(f_2~v_1)
+&|& (\m{notif}~v_1~[\bigcdot]~e_3), \qquad \m{when}~(f_1~v_1)\\
+&|& (\m{notif}~v_1~e_2~[\bigcdot]), \qquad \m{when}~(f_2~v_1)
 \end{array}
 \]}
 
@@ -453,7 +453,7 @@ The properties restrict how the lazy desugaring of our mixed language should be-
 	\]
 	If the algorithm \m{calcontext} gets the context rules as follows.\\
 
-\begin{center}
+
 	\[
 		\begin{array}{l}
 			S.LHS[[\bigcdot]/e_i]\\
@@ -466,8 +466,9 @@ The properties restrict how the lazy desugaring of our mixed language should be-
 		\end{array}
 	\]
 
+	
 
-\end{center}
+
 
 Then for any program \m{P} headed with \m{SurfHead}, if the sub-expressions $\{e_i, e_j, \ldots, e_p\}$ are all values, then $\redc{\mathtt{D}(\m{P})}{\m{P'}}$ will reduce on $\mathtt{D}(e_q)$.
 \end{lemma}
