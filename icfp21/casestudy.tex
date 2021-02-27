@@ -160,7 +160,7 @@ Recursive sugar is a kind of syntactic sugars which calls itself or each other d
 \]
 are recursive sugars. The existing resugaring approach cannot process syntactic sugar written like this (non-pattern-based) easily, because boundary conditions are in the sugar itself.
 
-Take \Code{(Odd 2)} as an example. The previous work will firstly desugar the program using the rules. Then the desugaring will never terminate as the following shows.
+Take \Code{(Odd 2)} as an example. The previous work will first desugar the program using the rules. Then the desugaring will never terminate as the following shows.
 \begin{footnotesize}
 \begin{Codes}
    (Odd 2)
@@ -191,7 +191,7 @@ We construct some higher-order syntactic sugars and test them. The higher-order 
 and getting resugaring sequences as Fig.  \ref{fig:Filter}.
 Here, although the sugar can be processed by the existing resugaring approach, it will be redundant. The reason is that a \m{Filter} program for a list of length $n$ will match to find possible resugaring $n*(n-1)/2$ times. 
 
-Moreover, just like the \m{Odd} and \m{Even} sugar above, there are some sugars that need to be expressed by the expressions in core language as branching conditions, or sometimes the pattern-matching desugaring rules are not useful enough to express a syntactic sugar. Take the example of another higher-order sugar \m{Map} as an example, sometimes only inline condition like \Code{(empty? x)} can judge the branch. That is hard to solve by a simple desugaring. We get resugaring sequences as Fig.  \ref{fig:Map}.
+Moreover, just like the \m{Odd} and \m{Even} sugar above, there are some sugars that need to be expressed by the expressions in the core language as branching conditions, or sometimes the pattern-matching desugaring rules are not useful enough to express a syntactic sugar. Take the example of another higher-order sugar \m{Map} as an example, sometimes only inline condition like \Code{(empty? x)} can judge the branch. That is hard to solve by a simple desugaring. We get resugaring sequences as Fig.  \ref{fig:Map}.
 \[
 \begin{array}{l}
 \drule{\Code{\small(Map $e_1$ $e_2$)}}{}\\

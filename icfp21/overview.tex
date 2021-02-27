@@ -21,19 +21,19 @@ e &::=& \m{CoreExp}\\
 & |& \m{\false} & \note{// false value}
 \end{array}
 \]
-The semantics of the language is simple, consisting of the following context rules to specify the computational order:
+\xcomment{The semantics of the language is given by a reduction semantics, with the following context rules to specify the computational order}
 \[
 \begin{array}{lcl}
 \m{C} &:=& \Code{(if C e e)}\\
 &|&[\bigcdot] \qquad \note{//evaluation context's hole}\\
 \end{array}
 \]
-and two reduction rules (the letter c means core):
+and with the following two reduction rules (the letter c means core):
 \[
 \centering
  \redc{(\m{if}~\m{\true}~e_1~e_2)}{e_1}  \qquad \redc{(\m{if}~\m{\false}~e_1~e_2)}{e_2}
 \]
-Assume that our surface language is defined by two syntactic sugars defined by:
+Assume that our surface language is defined by two syntactic sugars:
 %---\emph{and} sugar and \emph{or} sugar on the core language.
 \[
 \begin{array}{c}
@@ -51,7 +51,7 @@ Now let us demonstrate how to execute \Code{(And (Or \true~\false) (And \false ~
 \end{Codes}
 }
 
-Our new resugaring approach eliminates costly "reverse desugaring" by "lazy desugaring", where a syntactic sugar will be expanded only when it is necessary. It consists of the following three steps.
+Our new resugaring approach eliminates costly "reverse desugaring" by "lazy desugaring", where a syntactic sugar will be expanded only when necessary. It consists of the following three steps.
 
 {\em Step 1: Calculating Context Rules for Sugars.}
 While giving the evaluation rules of the core language, we can derive the following context rules of the surface language.
