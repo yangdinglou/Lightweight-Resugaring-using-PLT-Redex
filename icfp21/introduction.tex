@@ -26,7 +26,7 @@ As a simple example, consider \Code{Or1}, a syntactic sugar defined by the follo
 \[
 \drule{\Code{(Or1 $e_1$ $e_2$)}}{\Code{(let (t $e_1$) (if t t $e_2$))}}.
 \]
-Figure \ref{fig:resugar1} demonstrates a resugaring process in the existing approach for
+Figure \ref{fig:resugar1} demonstrates a resugaring process for
 \[
 \Code{(Or1 (not \#t) \#t)}
 \]
@@ -55,26 +55,6 @@ by the existing approach. The sequence of expressions on the left is obtained fr
 \end{figure}
 
 
-\ignore{
-But it is not as easy as the example above. Sometimes the program in the core language contains a desugared form of a syntactic sugar, but the form may belong to the original (not desugared) program. In the following example, the reverse expansion of sugar should be noticed.
-\begin{center}
-\[
-{\footnotesize
-	\begin{array}{lcl}
-	Surface&&Core\\
-	\Code{(let ((t \#t)))}&\xrightarrow{desugar}&\Code{(let ((t \#t)))}\\
-	\Code{\quad(if t t (Newor \#t \#f)))}&\xleftarrow[resugar]&\Code{\quad(if t t (let\ldots))}\\
-	\qquad\qquad\dashdownarrow& &\qquad\qquad\downarrow\\
-	\qquad\qquad\vdots& &\qquad\qquad\vdots\\
-	\qquad\qquad\dashdownarrow& &\qquad\qquad\downarrow\\
-	\Code{(Newor \#t \#t)}& &\Code{(let ((t \#t))}\\
-	&\xleftarrow[resugar?]&\Code{\quad(if t t \#t))}\\
-	\qquad\qquad\vdots& &\qquad\qquad\vdots\\
-\end{array}
-}
-\]
-\end{center}
-}
 
 Resugaring becomes complex, if we use core language constructs in  surface programs. For instance, for the following surface program
 \[
@@ -82,11 +62,11 @@ Resugaring becomes complex, if we use core language constructs in  surface progr
 \]
 after one-step reduction on the desugared program, we get
 \[
-\Code{(let (t \#t) (if t t \#t))}
+\Code{(let (t \#t) (if t t \#t))},
 \]
 but we do not want to further get \Code{(Or1 \#t \#t)} by reverse application of the desugaring rule of \Code{Or1}, because this \Code{let} was originally used in the surface program.
 
-Resugaring becomes hard, if we allow sugars to be recursive, be higher-order, and be with binding.
+Resugaring becomes hard, if we allow sugar to be recursive, be higher-order, and be with binding.
 For instance, when meeting hygienic sugar, the reverse expansion by a simple match and substitution will not work. Consider the following hygienic sugar:
 \[
 \drule{\Code{(Double $e_1$)}}{\Code{(let (t $e_1$) (* 2 t))}}
@@ -123,12 +103,7 @@ However, there is a key step that makes the existing approaches less practical--
 
 \label{mark:mention}
 In this paper, we propose a new approach to resugaring, \emph{which does not use reverse expansion (reverse desugaring) at all}.
-The key idea is \emph{lazy} desugaring, in the sense that desugaring is done lazily  so that the reverse application of desugaring rules becomes unnecessary. The approach is of macro-style, because it (automatically) specifies an expansion order of syntactic sugar. As the motivation and the result of our method are similar to existing resugaring, we called it another resugaring approach though there is no reverse desugaring. And rather than assuming a black-box stepper for the core language as the existing approaches, we treat the core language as a white-box, explicitly using
-%our resugaring approach is based on the
-its evaluation rules (consisting of the context rules and reduction rules) of the core language.
-%So our approach seems to be a meta-level language feature rather than a tool for existing languages. (Although it can also work with a black-box stepper, as we will discuss in Section \ref{sec5.1})
-Our idea is to consider the surface language and the core language as one mixed language. We regard desugaring rules as reduction rules of the surface language and calculate the context rules of the surface language to show when desugaring
-should be done. Our method can guarantee that the intermediate evaluation steps of the mixed language will contain the correct resugaring evaluation sequence for a surface program.
+The key idea is \emph{lazy} desugaring, in the sense that desugaring is done lazily  so that the reverse application of desugaring rules becomes unnecessary. The approach is of macro-style, because it (automatically) specifies an expansion order of syntactic sugar. As the motivation and the result of our method are similar to existing resugaring, we called it another resugaring approach though there is no reverse desugaring. And rather than assuming a black-box stepper for the core language as the existing approaches, we treat the core language as a white-box, explicitly using its evaluation rules (consisting of the context rules and reduction rules) of the core language. Our idea is to consider the surface language and the core language as one mixed language. We regard desugaring rules as reduction rules of the surface language and calculate the context rules of the surface language to show when desugaring should be done. Our method can guarantee that the intermediate evaluation steps of the mixed language will contain the correct resugaring evaluation sequence for a surface program.
 
 Our main technical contributions can be summarized as follows.
 \begin{itemize}

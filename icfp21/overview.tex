@@ -6,9 +6,9 @@
 In this section, we give a brief overview of our approach. \ycomment{Before stepping into the process, we give the whole picture of how our approach is used. 
 \begin{enumerate}
     \item To define syntactic sugar, we need a core language. The core language can be large or small, but as an example, we make it tiny in this section.
-    \item Then some sugar definitions are needed to build the surface language.
-    \item We need some calculation based on our approach, described in next chapter.
-    \item Finally, given a program in the surface language, we will get the evaluation sequences of the program on the surface level.
+    \item Then some sugar definitions are needed to construct the surface language.
+    \item We need some calculation based on our approach, described in the following chapter.
+    \item Finally, given a program in the surface language, we will obtain the evaluation sequences of the program at the surface level.
 \end{enumerate}
    }
 
@@ -65,7 +65,7 @@ C &:=& (\m{And}~C~e)\\
 From the context rules of \m{if}, we can find that the condition ($e_1$) is always evaluated first. Therefore, for expression \Code{(And $e_1$ $e_2$)} defined by syntactic sugar, $e_1$ is also evaluated first, which is the context rule of \m{And}. Similarly, we can calculate the context rule of \m{Or}.
 
 {\em Step 2: Forming Mixed Language.}
-We mix the surface language with the core language as in Fig. \ref{fig:mixexample}, where \m{CommonExp} means the expressions used in both the surface language and the core language, and obtain $\to_m$, a one-step reduction in our mixed language (the letter m means mix), from the reduction rules of the core language and the modified desugaring rules of the surface language. We modified the desugaring rules based on the context rules calculated in {\em Step 1}, so that the sugar expression won't be expanded before it should be. It is necessary because any expression should be reduced by a unique rule. By using $\to_m$, we can get the following evaluation sequence in the mixed language for
+We mix the surface language with the core language as in Fig. \ref{fig:mixexample}, where \m{CommonExp} means the expressions used in both the surface language and the core language, and obtain $\to_m$, a one-step reduction in our mixed language (the letter m means mix), from the reduction rules of the core language and the modified desugaring rules of the surface language. We modified the desugaring rules based on the context rules calculated at {\em Step 1}, so that the sugar expression will not be expanded before it should be. It is necessary because any expression should be reduced by a unique rule. By using $\to_m$, we can get the following evaluation sequence in the mixed language for
 the program \Code{(And (Or \true~\false) (And \false~\true))} based on the computation order determined by the context rules obtained at Step 1.
 
 {\footnotesize
@@ -144,4 +144,4 @@ We can just keep the intermediate sequences without \m{CoreExp} in any sub-expre
 %Note that the context rules should restrict the computational order of a sugar expression's sub-expressions, thus we should let the context rules be correct---reflecting what should be executed in the desugared expression.
 Note that as the goal of resugaring is to present the evaluation of sugared programs, we are given a way to clearly specify which expression should be output. For the example in this section, of course, the sugar \m{And} and \m{Or} should be outputted, and also the boolean values should be. So we set boolean values as \m{CommonExp} in Fig. \ref{fig:mixsyntax}, so that they can be displayed though they are in the core language. By clearly separating what should be displayed, we can always get the resugaring evaluation sequences we need (this is slightly different from the existing approach's setting, as we will discuss in Section \ref{mark:correctness}).
 
-Another point is that the core language can be carefully designed to (1) powerful enough to express any computation, (2) slight enough to define sugar easily. Given a proper core language, the only afford to build any surface language is defining the desugaring rules. Then the resugaring will be done automatically.
+Another point is that the core language can be carefully designed to (1) powerful enough to express any calculation, (2) lightweight enough to define sugar easily. Given an appropriate core language, the only afford to build any surface language is defining the desugaring rules. Then the resugaring will be done automatically.

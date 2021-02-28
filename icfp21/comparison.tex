@@ -1,7 +1,7 @@
 %!TEX root = ./main.tex
 \section{Extensions}
 \label{sec5}
-\ycomment{So far, we have introduced our approach with the basic setting. We have shown the exciting results with the simple but novel lazy desugaring. In the following chapter, we will give some possible extensions of the basic approach. Just as the \m{DisplayableExp} can make the output practical, The flexibility of our approach is another good feature when considering the diverse application.}
+\ycomment{So far, we have introduced our approach with the basic setting. We have shown the exciting results with the simple but novel lazy desugaring. In the following chapter, we will give some possible extensions of the basic approach. Just as the \m{DisplayableExp} can make the output convenient, The flexibility of our approach is another good feature when considering the diverse application.}
 \subsection{Model Assumption and A Black-Box Extension}
 
 
@@ -93,7 +93,7 @@ Then for any sugar expression, we can process them dynamically by "one-step-try"
 \subsection{\ycomment{Side effect}}
 
 
-Side effect is a special issue in resugaring. In the previous section, we described the core language as a pure functional language, but some side effects are allowed according to the algorithm. Because the computational order calculated is correct, side effects does not matter if we only consider the evaluation result. But the actual issue is the output of resugaring sequences. Assuming that the core language can process side effects by adding an environment, with a \m{set} expression changing a value of a variable (returning void), and a \m{begin} expression evaluating all sub-expressions and returning the last result in the core language for using the environment.
+The side effect is a special issue in resugaring. In the previous section, we described the core language as a pure functional language, but side effects are allowed according to the algorithm. Since the computational order calculated is correct, side effects does not matter if we only consider the evaluation result. But the actual issue is the output of resugaring sequences. Assuming that the core language can process side effects by adding an environment, with a \m{set} expression changing a value of a variable (returning void), and a \m{begin} expression evaluating all sub-expressions and returning the last result in the core language for using the environment.
 
 % If \Code{(begin e ...)} has the context rules
 % \[
@@ -141,7 +141,7 @@ Another issue happened when the sub-expression \Code{(set x (+ 1 (+ 1 1)))} redu
 
 But there is still another issue. If we want to make use of the side effect, things like \m{begin} expression in core language are needed. But such expressions are not suitable for the resugaring at all. For example, given a syntactic sugar 
 \[\drule{\Code{(inc2 x y z)}}{\Code{(begin (set x (+ y x)) (set x (+ z x)) x)}}\]
-and for the following expression \Code{(let (x 1) (inc2 x (+ 1 1) (+ 1 1)))}, once the first \m{set} expression was reduced to void, the \m{inc2} sugar will not have a chance for resugaring. If a syntactic sugar has more pattern variables, the process will lose more intermediate information. The same case happened in the existing approach\cite{resugaring}'s \m{letrec} example, which did not get any intermediate resugaring sequences.
+and for the following expression \Code{(let (x 1) (inc2 x (+ 1 1) (+ 1 1)))}, once the first \m{set} expression was reduced to \m{void}, the \m{inc2} sugar will not have a chance for resugaring. If a syntactic sugar has more pattern variables, the process will lose more intermediate information. The same case happened in the existing approach\cite{resugaring}'s \m{letrec} example, which did not get any intermediate resugaring sequences.
 
 Overall, our approach is able to make an extension for a core language with side effects. But the lesson we get is that the pure functional language is better for resugaring.
 

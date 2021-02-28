@@ -76,7 +76,7 @@ The form of the expressions in our core language is defined in Fig. \ref{fig:exp
 		\m{CoreExp} &::=& \Code{(apply~CoreExp~CoreExp~...)}\\
 
 		&|& \m{(if~CoreExp~CoreExp~CoreExp)} ~~\note{// condition}\\
-		&|& \m{(let~(x~CoreExp))~CoreExp)} ~~\note{// binding}\\
+		&|& \m{(let~(x~CoreExp)~CoreExp)} ~~\note{// binding}\\
 		&|& \m{(listop~CoreExp)} ~~\note{// first, rest, empty?}\\
 		&|& \m{(cons~CoreExp~CoreExp)} ~~\note{// data structure of list}\\
 		&|& \m{(arithop~CoreExp~CoreExp)} ~~\note{// +, -, *, /, >, <, =}\\
@@ -95,7 +95,7 @@ The form of the expressions in our core language is defined in Fig. \ref{fig:exp
 		\begin{array}{lcl}
 		\Code{C} &::=& \Code{(apply~value~...~C~CoreExp~...)}\\
 		&|& \Code{(if~C~CoreExp~CoreExp)}\\
-		&|& \Code{(let~(x~value)~CoreExp)}\\
+		&|& \Code{(let~(x~C)~CoreExp)}\\
 		&|& \Code{(listop~C)}\\
 		&|& \Code{(cons~C~CoreExp)}\\
 		&|& \Code{(cons~value~C)}\\
@@ -128,7 +128,6 @@ The form of the expressions in our core language is defined in Fig. \ref{fig:exp
 \label{fig:core}
 \end{figure*}
 
-\gcomment{Fig.4 (a) (let (x CoreExp) CoreExp); Fig.4 (b) it should be | (let (x C) CoreExp) Maybe? }
 
 %For simplicity, we use the prefix notation. For instance, we write $\m{if-then-else}~e_1~e_2~e_3$, which would be more readable if we write $\m{if}~e_1~\m{then}~e_2~\m{else}~e_3$. In this paper, we may write both if it is clear from the context.
 
@@ -268,7 +267,7 @@ we may assume \m{arithop}, \m{$\lambda$} (call-by-value lambda calculus), \m{con
 \label{fig:mixofcontext}
 \end{figure}
 
-\ycomment{For the context rules, their function is to restrict the computational order of an expression based on the \m{Head}, so they can simply mixed as described in Fig. \ref{fig:mixcontext}. And if we want to limit the unique reduction of an expression, we should modify the desugaring rules to be correct for reduction.} For example, if we have the context rules as in Fig. \ref{fig:mixcontext}, then for the expression 
+\ycomment{For the context rules, their function is to restrict the computational order for an expression based on the \m{Head}, so that they can be simply mixed as described in Fig. \ref{fig:mixcontext}. And if we want to limit the unique reduction of an expression, we should modify the desugaring rules to be correct for the reduction.} For example, if we have the context rules as in Fig. \ref{fig:mixcontext}, then for the expression 
 \[
 	\Code{(if (And (And \true~\true) \false) \false~\true)}
 \]
@@ -281,7 +280,7 @@ to
 	\drule{(\m{And}~v_1~e_2)}{(\m{if}~v_1~e_2~\m{\false})}
 \]
 
-After the mixture of reduction rules in the core language ($\redc{}{}$) and the modified desugaring rules for the syntactic sugars in the surface language ($\drule{}{}$), any expression in the mixed language can be reduced step by step. For example, in the mixed language some expressions with \m{CoreHead} may contain sub-expressions with \m{SurfHead}. We process these expressions by the context rules of the core language, so that the reduction rules of the core language and the desugaring rules of surface language can be mixed as a whole
+After the mixture of reduction rules in the core language ($\redc{}{}$) and the modified desugaring rules for the syntactic sugars in the surface language ($\drule{}{}$),\ycomment{one more figure?} any expression in the mixed language can be reduced step by step. For example, in the mixed language, some expressions with \m{CoreHead} may contain sub-expressions with \m{SurfHead}. We process these expressions by the context rules of the core language, so that the reduction rules of the core language and the desugaring rules of surface language can be mixed as a whole
  (the $\redm{}{}$ in Fig. \ref{fig:mixexample}). For example, suppose we have the context rule of \m{if} expression\footnote{Another presentation of \Code{(if $[\bigcdot]$ e e)}. Use this here for convenience.}
 \[
 \infer{(\m{if}~e_1~e_2~e_3) \rightarrow (\m{if}~e_1'~e_2~e_3)}{e_1 \rightarrow e_1'}
@@ -420,11 +419,10 @@ As the second part of the whole process, our resugaring algorithm can be defined
               & & \key{else}~\\
 							& & \qquad \key{let}~\redm{e}{e'}~\key{in}\\
 							& & \qquad \key{if}~e' \in~\m{DisplayableExp} \\
-							& & \qquad \qquad \m{output}(e'),~\m{resugar}(e')\\
+							& & \qquad \key{then}~\m{output}(e'),~\m{resugar}(e')\\
 							& & \qquad \key{else}~\m{resugar}(e')
 \end{array}
 \]
-\gcomment{miss then?}
 During the resugaring, we just apply the reduction ($\redm{}{}$) on the input program step by step until no reduction can be applied (\m{isNormal}, \m{value} in our setting), while outputting the intermediate expressions that belong to \m{DisplayableExp}.
 
 
@@ -432,7 +430,7 @@ During the resugaring, we just apply the reduction ($\redm{}{}$) on the input pr
 \label{mark:correct}
 
 
-We define the following properties of our desugaring algorithm for proving correctness. Before stepping in, we first explain intuitively why the algorithm is correct. For any program headed with \m{SurfHead}, we can expand the outermost sugar by the desugaring rule of \m{SurfHead}. The desugared expression contains some sub-expressions. Some of them are the original program's sub-expressions, some origin from the desugaring rule, while others consist of the previous ones. If the desugared expression should be reduced or recursively reduced at one of the original sub-expressions, the expression after that reduction can be resugared by reverse expansion of the desugaring rule. So these sub-expressions become the holes for context rules. Otherwise, the recursive reduction will not save the sugar's RHS structure. Such a program in the mixed language have to expand the outermost sugar because no more resugaring is available for it. We will give the properties to describe the correctness by some definitions, and give proof sketch of them.
+We define the following properties of our desugaring algorithm for demonstrating the correctness. Before stepping in, we intuitively explain why the algorithm is correct. For any program headed with \m{SurfHead}, we can expand the outermost sugar by the desugaring rule of \m{SurfHead}. The desugared expression contains some sub-expressions. Some of them are the original program's sub-expressions, some origin from the desugaring rule, while others consist of the previous two parts. If the desugared expression should be reduced or recursively reduced at one of the original sub-expressions, the expression after that reduction can be resugared by reverse expansion of the desugaring rule. So these sub-expressions become the holes for context rules. Otherwise, the recursive reduction will not save the sugar's RHS structure. Such a program in the mixed language have to expand the outermost sugar because no more resugaring is available for it. We will give the properties to describe the correctness by certain definitions, and give proof sketch of them.
 
 
 
@@ -587,7 +585,7 @@ Because the sub-expression \m{HH} is reduced by its \Code{CoreHead}, so matter h
 
 \end{proof}
 
-\subsection{Properties and Trade-off}
+\subsection{Trade-off of Properties}
 \label{mark:correctness}
 
 
@@ -607,7 +605,7 @@ Here we will show what are the similarities and differences between theirs and o
 
 \emph{Emulation}: The properties in Section \ref{sec3} is just the same as the emulation property. It is the most basic one.
 
-\emph{Abstraction and Coverage}: Our reduction in the mixed language has some similarities to theirs. But since our framework has no execution for the fully desugared program and no reverse desugaring, there are some differences in details. For the coverage, our approach can guarantee that every step in the core languages' sequences can be reflected in the sequence before filtering, which is similar to the original one. But the abstraction and coverage are both about which kind of intermediate expression should be outputted \gcomment{or output}. Especially, the abstraction property does not need to be strict if willing to have better coverage for some cases (as mentioned in Section 3.4 in \cite{resugaring}).
+\emph{Abstraction and Coverage}: Our reduction in the mixed language has some similarities to theirs. But since our framework has no execution for the fully desugared program and no reverse desugaring, there are some differences in details. For the coverage, our approach can guarantee that every step in the core languages' sequences can be reflected in the sequence before filtering, which is similar to the original one. But the abstraction and coverage are both about which kind of intermediate expression should be output. Especially, the abstraction property does not need to be strict if willing to have better coverage for some cases (as mentioned in Section 3.4 in \cite{resugaring}).
 
 So in our approach, we provide a more flexible handling for the output thanks to the mixture of languages. Overall, our approach restricts the output by the \m{Head} of an expression and its sub-expressions. It is quite natural since the motivation of the resugaring is to show useful intermediate sequences, we think it will be better than restricting the output by judging whether the intermediate expressions contain some components desugared from the original program's components. Take the following sugar definitions as an example.
 \[
