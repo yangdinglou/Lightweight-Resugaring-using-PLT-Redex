@@ -128,7 +128,7 @@ The form of the expressions in our core language is defined in Fig. \ref{fig:exp
 \label{fig:core}
 \end{figure*}
 
-
+\gcomment{Fig.4 (a) (let (x CoreExp) CoreExp); Fig.4 (b) it should be | (let (x C) CoreExp) Maybe? }
 
 %For simplicity, we use the prefix notation. For instance, we write $\m{if-then-else}~e_1~e_2~e_3$, which would be more readable if we write $\m{if}~e_1~\m{then}~e_2~\m{else}~e_3$. In this paper, we may write both if it is clear from the context.
 
@@ -143,6 +143,9 @@ A syntactic sugar \m{SurfHead} is defined by a desugaring rule in the following 
 \[
 \drule{(\m{SurfHead}~e_1~e_2~\ldots~e_n)}{\m{exp}} %\todo{\text{font size in drule}}
 \]
+
+\gcomment{is this exp same as the Exp in Fig. 5? Maybe it is confusing here.}
+
 where its left-hand side (LHS) is a pattern and its right-hand side (RHS) is an expression of the surface language or the core language. The LHS may be nested , so we can write sugars like \Code{(SurfHead ($e_1$ ($e_2$ $e_3$)) $\ldots$ $e_n$)}. For instance, we may define syntactic sugar \m{And} by
 \[
 \drule{(\m{And}~e_1~e_2)}{(\m{if}~e_1~e_2~\m{\false})}.
@@ -421,6 +424,7 @@ As the second part of the whole process, our resugaring algorithm can be defined
 							& & \qquad \key{else}~\m{resugar}(e')
 \end{array}
 \]
+\gcomment{miss then?}
 During the resugaring, we just apply the reduction ($\redm{}{}$) on the input program step by step until no reduction can be applied (\m{isNormal}, \m{value} in our setting), while outputting the intermediate expressions that belong to \m{DisplayableExp}.
 
 
@@ -603,7 +607,7 @@ Here we will show what are the similarities and differences between theirs and o
 
 \emph{Emulation}: The properties in Section \ref{sec3} is just the same as the emulation property. It is the most basic one.
 
-\emph{Abstraction and Coverage}: Our reduction in the mixed language has some similarities to theirs. But since our framework has no execution for the fully desugared program and no reverse desugaring, there are some differences in details. For the coverage, our approach can guarantee that every step in the core languages' sequences can be reflected in the sequence before filtering, which is similar to the original one. But the abstraction and coverage are both about which kind of intermediate expression should be outputted. Especially, the abstraction property does not need to be strict if willing to have better coverage for some cases (as mentioned in Section 3.4 in \cite{resugaring}).
+\emph{Abstraction and Coverage}: Our reduction in the mixed language has some similarities to theirs. But since our framework has no execution for the fully desugared program and no reverse desugaring, there are some differences in details. For the coverage, our approach can guarantee that every step in the core languages' sequences can be reflected in the sequence before filtering, which is similar to the original one. But the abstraction and coverage are both about which kind of intermediate expression should be outputted \gcomment{or output}. Especially, the abstraction property does not need to be strict if willing to have better coverage for some cases (as mentioned in Section 3.4 in \cite{resugaring}).
 
 So in our approach, we provide a more flexible handling for the output thanks to the mixture of languages. Overall, our approach restricts the output by the \m{Head} of an expression and its sub-expressions. It is quite natural since the motivation of the resugaring is to show useful intermediate sequences, we think it will be better than restricting the output by judging whether the intermediate expressions contain some components desugared from the original program's components. Take the following sugar definitions as an example.
 \[
