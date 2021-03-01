@@ -54,9 +54,7 @@ by the existing approach. The sequence of expressions on the left is obtained fr
 \label{fig:resugar1}
 \end{figure}
 
-
-
-Resugaring becomes complex, if we use core language constructs in  surface programs. For instance, for the following surface program
+The existing approaches smartly tackle some hard cases in resugaring. For instance, for the following surface program
 \[
 \Code{(let (t (Or1 \#t \#f)) (if t t \#t))}
 \]
@@ -64,38 +62,10 @@ after one-step reduction on the desugared program, we get
 \[
 \Code{(let (t \#t) (if t t \#t))},
 \]
-but we do not want to further get \Code{(Or1 \#t \#t)} by reverse application of the desugaring rule of \Code{Or1}, because this \Code{let} was originally used in the surface program.
+but we do not want to further get \Code{(Or1 \#t \#t)} by reverse application of the desugaring rule of \Code{Or1}, because this \Code{let} was originally used in the surface program. The problem is solved by "tagging" \cite{resugaring}. Some more afford has been made to solve the hygienic problems by "abstract syntax DAG" \cite{hygienic}.
+Overall, The mechanisms introduced in those papers keep applying the desugaring rules reversibly as much as possible to find surface-level representations of the expression during core expression's evaluation, with something helping the match-substitution.
 
-Resugaring becomes hard, if we allow sugar to be recursive, be higher-order, and be with binding.
-For instance, when meeting hygienic sugar, the reverse expansion by a simple match and substitution will not work. Consider the following hygienic sugar:
-\[
-\drule{\Code{(Double $e_1$)}}{\Code{(let (t $e_1$) (* 2 t))}}
-\]
-which uses a local binding for \Code{t}. For the surface program
-\[
-\Code{(let (t 1) (Double t))}
-\]
-which introduces a local binding for \Code{t} again, a more involved reverse expansion is needed.
-\ignore{
-\[
-{\footnotesize
-	\begin{array}{lcl}
-	Surface&&Core\\
-	\Code{(let (t 1)}&\xrightarrow{desugar}&\Code{(let (t 1)}\\
-	\Code{\quad(Double t))}&&\Code{\quad(let (t' t) (* 2 t')))}\\
-	\qquad\qquad\dashdownarrow& &\qquad\qquad\downarrow\\
-	\Code{(Double 1)}&\xdashleftarrow[resugar?]&\Code{(let (t' 1) (* 2 t')))}\\
-\end{array}
-}
-\]
-\end{center}
-If we use binder renaming for solving the case as above, some other information is needed (such as the permutation $\m{t} \to \m{t'}$).
-}
-% \todo{Examples of 2 resugaring method(what is, why hard)}
-
-Some attempts have been made to tackle these problems by "tagging" \cite{resugaring} and "abstract syntax DAG" \cite{hygienic}.
-The mechanisms introduced in those papers remember where the reverse expansion should be done, and use new representation of programs and improve the match-substitution algorithms.
-However, there is a key step that makes the existing approaches less practical---the reverse expansion of sugars needs to match the desugared expressions to see if they can be resugared. It would be very expensive if a surface program uses many syntactic sugars or some syntactic sugars are desugared to large core expressions.
+However, there is a key step that makes the existing approaches less practical---the reverse expansion of sugars needs to match the desugared expressions to see if they can be resugared. It would be very expensive if a surface program uses many syntactic sugars, or some syntactic sugars are desugared to large core expressions.
 %Also, as the debugging for surface languages can be a good application of resugaring, the efficiency matters.
 
 
