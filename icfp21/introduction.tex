@@ -16,10 +16,11 @@
 
 
 Syntactic sugar, first coined by Peter J. Landin in 1964 \cite{syntacticsugar}, was introduced to describe the surface syntax of a simple ALGOL-like programming language which was defined semantically in terms of the applicative expressions of the core lambda calculus. It has been proved to be very useful for defining domain-specific languages (DSLs) and extending languages \cite{FellFFKBMT18,CulpFFK19}.
-Unfortunately, when syntactic sugar is eliminated by transformation, it obscures the relationship between the user’s source program and the transformed program. For example, in a domain outside the traditional programming, the execution of a sugar program will contains the concepts of the core languages, but some expressions are desugared from the sugar of that domain.
+Unfortunately, when syntactic sugar is eliminated by transformation, it obscures the relationship between the user’s source program and the transformed program. For example, a programmer who only knows the surface language cannot understand the execution of programs in the core language.
+%, in a domain outside the traditional programming, the execution of a sugar program will contains the concepts of the core languages, but some expressions are desugared from the sugar of that domain.
 
-So there is a natural idea to rebuild the sugars.
-Resugaring \cite{resugaring,hygienic} is a powerful technique that has been proposed to resolve this problem above. It  can automatically convert the evaluation sequences of a desugared program in the core language into representative sugar's syntax in the surface language.
+%To resolve this problem, we need to have a way to transform back the desugared core program back to that in the surface language.
+Resugaring \cite{resugaring,hygienic} is a powerful technique that has been proposed to resolve this problem above. It  can automatically convert the evaluation sequences of a desugared program in the core language into representationsentative sugar's syntax in the surface language.
 %Just like the existing approach, it is natural to try matching the expressions after the desugared with syntactic sugars' dusugaring rules to reversely expand the sugars---that why it was named "resugaring". Here we use the sugar \Code{Newor} to see how the existing resugaring approach works, with following desugaring rule. (Considering the \m{not} as a core language's constructor)
 %
 As a simple example, consider \Code{Or1}, a syntactic sugar defined by the following desugaring rule:
@@ -30,7 +31,7 @@ Figure \ref{fig:resugar1} demonstrates a resugaring process for
 \[
 \Code{(Or1 (not \#t) \#t)}
 \]
-by the existing approach. The sequence of expressions on the left is obtained from the evaluation sequence of the desugared program (in the core language) on the right by repeated reverse expansion of the sugar (reverse application of the desugaring rule through match and substitution).
+by the existing approach. The sequence of expressions on the left is obtained from the evaluation sequence of the desugared program (in the core language) on the right by repeated reverse expansion of the sugar. It is the reverse application of the desugaring rule, and thus called "resugaring".
 \begin{figure}
 \begin{center}
 	\[
