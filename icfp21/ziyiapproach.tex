@@ -3,14 +3,14 @@
 \section{Resugaring by Lazy Desugaring}
 \label{sec:algo}
 
-In this section, we present our core algorithm for resugaring.  We will show that any expression in the mixed language can be evaluated in such a smart way that producing all necessary resugaring sequences. We will discuss the properties of our approach to show the correctness and the practicality.
+In this section, we present our core algorithm for resugaring.  We will show that any expression in the mixed language can be evaluated in such a smart way that producing all necessary resugaring sequences. We will discuss the properties of our approach to show correctness and practicality.
 
 
 
 
 \subsection{Resugaring Algorithm}
 
-Our resugaring algorithm works on the mixed language, based on the evaluation rules of the core language and the desugaring rules for defining the surface language. The process of  getting the resugaring sequence contains two separate parts.
+Our resugaring algorithm works on the mixed language, based on the evaluation rules of the core language and the desugaring rules for defining the surface language. The process of getting the resugaring sequence contains two separate parts.
 
 \begin{enumerate}
 \item Calculating the context rules of syntactic sugars.
@@ -62,7 +62,7 @@ Given a sugar \m{SurfHead} defined by
 \[
 \drule{(\m{SurfHead}~e_1~e_2~\ldots~e_n)}{(\m{Head}~\ldots~e_1'~e_2'~\ldots~e_m')}
 \]
-the context rule derivation is to infer which and in which order $e_i$ should be computed before this desugaring rule is applied. This information can be derived by analyzing computational order of each sub-expression in RHS of the desugaring rule. The reason we can derive the context rules of syntactic sugar is that, for any sugar's RHS, a reduction will either reduce on the $e_i$ of its $LHS$, or reduction on other component of RHS to destroy the RHS's form (which means the sugar has to be expanded). So we can trace the order before the destruction. (We will give the formal definition of RHS's destruction in next section.) The algorithm for this derivation, \texttt{calcontext}, is described as Algorithm \ref{alg:f}. Running
+the context rule derivation is to infer which and in which order $e_i$ should be computed before this desugaring rule is applied. This information can be derived by analyzing the computational order of each sub-expression in RHS of the desugaring rule. The reason we can derive the context rules of syntactic sugar is that, for any sugar's RHS, a reduction will either reduce on the $e_i$ of its $LHS$, or reduction on other components of RHS to destroy the RHS's form (which means the sugar has to be expanded). So we can trace the order before the destruction. (We will give the formal definition of RHS's destruction in the next section.) The algorithm for this derivation, \texttt{calcontext}, is described as Algorithm \ref{alg:f}. Running
 \[
  \Code{calcontext(\m{SurfHead}.LHS,~\m{SurfHead}.RHS, \{\})}
 \]
@@ -127,11 +127,11 @@ If the \m{Head} is a \m{SurfHead} with its context rules calculated, then we reg
 
 After calculating all context rules of a surface language, we can mix the context rules with core language's. And we can modify the desugaring rules of sugar expression then generate the mixed language.
 
-%\todo{Add explanantion of the above rule.}
+%\todo{Add explanation of the above rule.}
 
 \subsubsection{Filtering and Main Algorithm}
 
-As the second part of the whole process, our resugaring algorithm can be defined based on evaluation rules of the mixed language. Let $\redm{}{}$ be one-step reduction in the mixed language.
+As the second part of the whole process, our resugaring algorithm can be defined based on evaluation rules of the mixed language. Let $\redm{}{}$ be a one-step reduction in the mixed language.
 
 \[
 \begin{array}{llll}
@@ -143,10 +143,10 @@ As the second part of the whole process, our resugaring algorithm can be defined
 							& & \qquad \key{else}~\m{resugar}(e')
 \end{array}
 \]
-During the resugaring, we just apply the reduction ($\redm{}{}$) on the input program step by step until no reduction can be applied (\m{isNormal}, \m{value} in our setting), while outputting the intermediate expressions that belong to \m{DisplayableExp}.
+During the resugaring, we just apply the reduction ($\redm{}{}$) on the input program step by step until no reduction can be applied (\m{isNormal}, \m{value} in our setting) while outputting the intermediate expressions that belong to \m{DisplayableExp}.
 
 \subsection{Resugaring Examples}
-We will present some resugaring examples in details by some sugars defined in Section \ref{mark:suflang}, to demonstrate the expressive power of our approach.
+We will present some resugaring examples in detail by some sugars defined in Section \ref{mark:suflang}, to demonstrate the expressive power of our approach.
 
 \subsubsection{Simple Sugars}
 \label{mark:simple}
@@ -178,7 +178,7 @@ We construct several simple sugars by our approach. Take the SKI combinator as a
 
 
 
-Here the sugars contain no sub-expression (so no context rules), then the sugar should just desugar to the core expression by the context rules in Fig. \ref{fig:core}.
+Here the sugars contain no sub-expression (so no context rules), then the sugar should just desugar to the core expression by the context rules in Fig. \ref{fig:core}. \gcomment{no sub-expression*s* or no parameters}
 We obtain the resugaring sequences as expected without any reverse desugaring.
 
 Another interesting point we get from this example is, we can use the call-by-need lambda calculus to force an expansion of sugar. Considering the sugar \m{S} in the example above, we may write it by another form with \Code{(S $e_1$ $e_2$ $e_3$)} as its LHS, then the context rules can be calculated, and the sugar may not be expanded. By writing a sugar with call-by-need lambda calculus, such as the following one,
@@ -209,7 +209,7 @@ A typical hygienic problem can be introduced by the sugar \m{HygienicAdd} (see S
 	\end{array}
 \]
 
- To discuss more cases of hygienic problem, we should find when the problem happens. In our approach, the sugar can contain some bindings, written by the core language's \m{let}. The hygienic problem only happens when binders of an expanded sugar conflict with other binders. We classify them into following two cases. Any hygienic problems are composite by the two cases.
+ To discuss more cases of hygienic problems, we should find when the problem happens. In our approach, the sugar can contain some bindings, written by the core language's \m{let}. The hygienic problem only happens when binders of an expanded sugar conflict with other binders. We classify them into the following two cases. Any hygienic problems are composite by the two cases.
 
 The first one is that, a sugar expression exists in binding's evaluation context. For the sugar \m{Or1} with following rule,
 \[\drule{\Code{(Or1~$e_1$~$e_2$)}}{\Code{(let (t $e_1$) (if t t $e_2$))}}\]
@@ -221,8 +221,10 @@ The second one is that, a sugar expression which introduced binding by the sugar
 \]
 The program \Code{(Subst (+ f (let (f 1) f)) f 5)} is of the case. The sugar introduces a local-binding on the variable \m{f}, with its sub-expression contains multiple \m{f}. By calculating the context rules of sugar \m{Subst}, the sugar has to be expanded after the $e_3$ being a value. After desugaring to \Code{(let (f 5) (+ f (let (f 1) (+ f 1))))},  no hygienic problem will take place because of the capture-avoiding substitution in the core language.
 
+\gcomment{I think e2 in Subst is not appropriate here. Using x is better?}
+
 Because of the definition of desugaring in our approach, we cannot achieve hygiene by proving the $\alpha-equivalence$.
-Here what we want to show is that, even without complex things in macro systems, scope specification and so on, the lazy desugaring itself will solve the common hygienic problem with carefully-designed core language. And of course the lazy desugaring will also work together with a hygienic desugaring system (e.g., by specific the binding scope \cite{10.5555/1792878.1792884}).
+Here what we want to show is that, even without complex things in macro systems, scope specification, and so on, the lazy desugaring itself will solve the common hygienic problem with carefully-designed core language. And of course the lazy desugaring will also work together with a hygienic desugaring system (e.g., by specific the binding scope \cite{10.5555/1792878.1792884}).
 
 \todo{check}
 
@@ -291,7 +293,7 @@ To sum up, we tried some basic syntactic sugar features to see if our approach c
 \label{mark:correct}
 
 
-We define the following properties of our desugaring algorithm for demonstrating the correctness. Before stepping in, we intuitively explain why the algorithm is correct. For any program headed with \m{SurfHead}, we can expand the outermost sugar by the desugaring rule of \m{SurfHead}. The desugared expression contains some sub-expressions. Some of them are the original program's sub-expressions, some origin from the desugaring rule, while others consist of the previous two parts. If the desugared expression should be reduced or recursively reduced at one of the original sub-expressions, the expression after that reduction can be resugared by reverse expansion of the desugaring rule. So these sub-expressions become the holes for context rules. Otherwise, the recursive reduction will not save the sugar's RHS structure. Such a program in the mixed language have to expand the outermost sugar because no more resugaring is available for it. We will give the properties to describe the correctness by certain definitions, and give proof sketch of them.
+We define the following properties of our desugaring algorithm for demonstrating the correctness. Before stepping in, we intuitively explain why the algorithm is correct. For any program headed with \m{SurfHead}, we can expand the outermost sugar by the desugaring rule of \m{SurfHead}. The desugared expression contains some sub-expressions. Some of them are the original program's sub-expressions, some origin from the desugaring rule, while others consist of the previous two parts. If the desugared expression should be reduced or recursively reduced at one of the original sub-expressions, the expression after that reduction can be resugared by the reverse expansion of the desugaring rule. So these sub-expressions become the holes for context rules. Otherwise, the recursive reduction will not save the sugar's RHS structure. Such a program in the mixed language has to expand the outermost sugar because no more resugaring is available for it. We will give the properties to describe the correctness by certain definitions, and give a proof sketch of them.
 
 
 
@@ -325,7 +327,7 @@ An expression \m{E} can be fully desugared if \Code{$\mathtt{D}(\m{E})$} termina
 	\]
 
 \end{Def}
-As the evaluation rules of the mixed language defined, there are only two kinds of reductions---(1) desugaring on an expression headed with \m{SurfHead}; (2) reduction on an expression headed with \m{CoreHead}. And because we need the mixed language's reduction corresponds to the execution of the fully desugared program, for any expression \m{E} in the mixed language, if it reduces by expanding a sugar, then the reduction will occur in  the expression after the sugar expanded in $\mathtt{D}(\m{E})$; otherwise (reduced by \m{CoreHead}), the reduction will be also by the same \m{CoreHead} in $\mathtt{D}(\m{E})$.
+As the evaluation rules of the mixed language defined, there are only two kinds of reductions---(1) desugaring on an expression headed with \m{SurfHead}; (2) reduction on an expression headed with \m{CoreHead}. And because we need the mixed language's reduction corresponds to the execution of the fully desugared program, for any expression \m{E} in the mixed language, if it reduces by expanding a sugar, then the reduction will occur in the expression after the sugar expanded in $\mathtt{D}(\m{E})$; otherwise (reduced by \m{CoreHead}), the reduction will be also by the same \m{CoreHead} in $\mathtt{D}(\m{E})$.
 So for convenience, we define destruction of a sugar's RHS when the second case happens in $\mathtt{D}(\m{E})$.
 
 \begin{Def}[Destruction of a sugar's RHS]
@@ -350,9 +352,10 @@ that no matter whether the expression \m{E} reduced by $\redm{}{}$ is headed by 
     \Code{(if (if \#t \#f \#f) \#f \#f)} & \Code{(if $[\bigcdot]$ \#f \#f)} & \Code{(if \#t \#f \#f)}   \\ \hline
   \end{tabular}
 \begin{flushleft}
-	$\redm{\Code{(And (And \#t \#f) \#f)}}{\Code{(And (if \#t \#f \#f) \#f)}}$, reduced by \m{And}.\\
-	$\redc{\Code{(if (if \#t \#f \#f) \#f \#f)}}{\Code{(if \#f \#f \#f)}}$, reduced on the expression expanded from \m{And} sugar.\\
-	So \m{S'}=\Code{(if \#t \#f \#f)}, \m{H'}=\Code{\#f}; thus the $\redc{}{}$ destroyed the sugar form of \Code{(And \#t \#f)}.
+    \vspace{1em}
+	\hspace{5em} $\redm{\Code{(And (And \#t \#f) \#f)}}{\Code{(And (if \#t \#f \#f) \#f)}}$, reduced by \m{And}.\\
+	\hspace{5em} $\redc{\Code{(if (if \#t \#f \#f) \#f \#f)}}{\Code{(if \#f \#f \#f)}}$, reduced on the expression expanded from \m{And} sugar.\\
+	\hspace{5em} So \m{S'}=\Code{(if \#t \#f \#f)}, \m{H'}=\Code{\#f}; thus the $\redc{}{}$ destroyed the sugar form of \Code{(And \#t \#f)}.
 
 \end{flushleft}
 
@@ -365,9 +368,10 @@ that no matter whether the expression \m{E} reduced by $\redm{}{}$ is headed by 
     \Code{(if (if \#t (if \#t \#f \#f) \#t) \#f \#f)} & \Code{(if $[\bigcdot]$ \#f \#f)} & \Code{(if \#t (if \#t \#f \#t) \#f)}   \\ \hline
   \end{tabular}
 \begin{flushleft}
-	$\redm{\Code{(if (if \#t (And \#t \#f) \#t) \#f \#f)}}{\Code{(if (And \#t \#f) \#f \#f)}}$, reduced on \m{if}.\\
-	$\redc{\Code{(if (if \#t (if \#t \#f \#f) \#t) \#f \#f)}}{\Code{((if (if \#t \#f \#f) \#f \#f)}}$, on the same \m{if}.\\
-	So \m{H'}=\Code{(And \#t \#f)},  \m{HH'}=\Code{(if \#t \#f \#f)}; thus \m{H} and \m{HH} are both reduced by \m{if}'s reduction rule.
+    \vspace{1em}
+	\hspace{5em} $\redm{\Code{(if (if \#t (And \#t \#f) \#t) \#f \#f)}}{\Code{(if (And \#t \#f) \#f \#f)}}$, reduced on \m{if}.\\
+	\hspace{5em} $\redc{\Code{(if (if \#t (if \#t \#f \#f) \#t) \#f \#f)}}{\Code{((if (if \#t \#f \#f) \#f \#f)}}$, on the same \m{if}.\\
+	\hspace{5em} So \m{H'}=\Code{(And \#t \#f)},  \m{HH'}=\Code{(if \#t \#f \#f)}; thus \m{H} and \m{HH} are both reduced by \m{if}'s reduction rule.
 
 \end{flushleft}
 
@@ -443,7 +447,7 @@ According to lemma 2, the reduction will destroy the $RHS$'s form of the sugar $
 \begin{proof} [Proof Sketch of Property \ref{thm2}]
 If $\redm{\m{C}[\m{HH}]}{\m{C}[\m{HH'}]}$ reduced by the \m{CoreHead}'s reduction rule on \m{HH}, according to lemma 1 and context rules of core language's expression, the expression \m{E} reduces recursively on the correct sub-expression, so for $\redm{\m{C'}[\m{H}]}{\m{C'}[\m{H'}]}$, it will reduce on the same sub-expression.
 
-Because the sub-expression \m{HH} is reduced by its \Code{CoreHead}, so matter how its inner expressions desugared, according to the context rules, the fully desugared \m{H} will also reduced by its \m{CoreHead}.
+Because the sub-expression \m{HH} is reduced by its \Code{CoreHead}, so matter how its inner expressions desugared, according to the context rules, the fully desugared \m{H} will also be reduced by its \m{CoreHead}.
 
 \end{proof}
 
@@ -502,6 +506,6 @@ while ours will produce the following sequences.
 \end{footnotesize}
 
 Also, if we want to display the core language's expression only when it is originated from the input program, we can just make a mirror for it as a \m{CommonHead}. For example, when we want to show resugaring sequences of \Code{(And (if (And \#t \#f) ...) ...)}
-without showing the \m{if} expression expanded from \m{And}, we only need to set \m{If} as \m{CommonHead} together with its evaluation rules same as \m{if}. Then inputting \Code{(And (If (And \#t \#f) ...) ...)} to the main algorithm will get what we need. Thus, our approach is able to get the resugaring sequence as the existing one.
+without showing the \m{if} expression expanded from \m{And}, we only need to set \m{If} as \m{CommonHead} together with its evaluation rules same as \m{if}. Then inputting \Code{(And (If (And \#t \#f) ...) ...)} to the main algorithm will get what we need. Thus, our approach can get the resugaring sequence as the existing one.
 
 In summary, our approach chooses a slightly different way for the \emph{abstraction} for better \emph{coverage} in the real application.
