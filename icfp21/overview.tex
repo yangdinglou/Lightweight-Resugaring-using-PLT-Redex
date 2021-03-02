@@ -46,11 +46,11 @@ Now let us demonstrate how to execute \Code{(And (Or \true~\false) (And \false ~
 \end{Codes}
 }
 
-Our esugaring approach eliminates "reverse desugaring" by "lazy desugaring", where a syntactic sugar will be expanded only when necessary. It consists of the following three steps.
+Our resugaring approach eliminates "reverse desugaring" by "lazy desugaring", where a syntactic sugar will be expanded only when necessary. It consists of the following three steps.
 
 \subsection*{Step 1: Calculating Context Rules for Sugars}
 
-For lazy desugaring, we should decide when a sugar should be desugared. To this end, from the context rules of the core language, we derive the following context rules of the surface language, showing that when we meet a sugar such as $\m{And}$, we should use the context rules whenver possible to continue reduction without desugaring it.
+For lazy desugaring, we should decide when a sugar should be desugared. To this end, from the context rules of the core language, we derive the following context rules of the surface language, showing that when we meet a sugar such as $\m{And}$, we should use the context rules whenever possible to continue reduction without desugaring it.
 \[
 \begin{array}{lcl}
 C &:=& (\m{And}~C~e)\\
