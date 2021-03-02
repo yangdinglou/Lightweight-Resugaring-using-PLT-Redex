@@ -1,7 +1,7 @@
 %!TEX root = ./main.tex
 \section{Extensions}
 \label{sec:ext}
-\ycomment{So far, we have introduced our approach with the basic setting. We have shown the exciting results with the simple but novel lazy desugaring. In the following chapter, we will give some possible extensions of the basic approach. Just as the \m{DisplayableExp} can make the output convenient, The flexibility of our approach is another good feature when considering the diverse application.}
+{So far, we have introduced our approach with the basic setting. We have shown the exciting results with the simple but novel lazy desugaring. In the following chapter, we will give some possible extensions of the basic approach. Just as the \m{DisplayableExp} can make the output convenient, The flexibility of our approach is another good feature when considering the diverse application.
 \subsection{Model Assumption and A Black-Box Extension}
 
 
@@ -90,7 +90,7 @@ Then for any sugar expression, we can process them dynamically by "one-step-try"
 \]
 }{Example of One-Step-Try}{example:try}
 
-\subsection{\ycomment{Side effect}}
+\subsection{Side effect}
 
 
 The side effect is a special issue in resugaring. In the previous section, we described the core language as a pure functional language, but side effects are allowed according to the algorithm. Since the computational order calculated is correct, side effects does not matter if we only consider the evaluation result. But the actual issue is the output of resugaring sequences. Assuming that the core language can process side effects by adding an environment, with a \m{set} expression changing a value of a variable (returning void), and a \m{begin} expression evaluating all sub-expressions and returning the last result in the core language for using the environment.
@@ -116,7 +116,7 @@ The side effect is a special issue in resugaring. In the previous section, we de
 % \]
 Given a syntactic sugar 
 \[\drule{\Code{(inc x y)}}{\Code{(begin (set x (+ x y)) x)}}\]
-and for the expression \Code{(let (x 1) (inc x (+ 1 1)))}, we will have the following evaluation sequences in the core language (omitted the desugaring process).
+and for the expression \Code{(let (x 1) (inc x (+ 1 1)))}, we will have the following evaluation sequences in the core language (omitted the desugaring process).\todo{}
 \begin{center}{\footnotesize
 	\Code{(let (x 1) (begin (set x (+ x (+ 1 1))) x))}\\
 	$\downarrow$\\

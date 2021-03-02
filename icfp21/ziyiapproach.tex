@@ -3,289 +3,9 @@
 \section{Resugaring by Lazy Desugaring}
 \label{sec:algo}
 
-In this section, we present our new approach to resugaring. Different from the existing approach that clearly separates the surface from the core languages, we intentionally combine them as one mixed language, allowing free use of the language constructs in both languages. We will show that any expression in the mixed language can be evaluated in such a smart way that producing all necessary resugaring sequences.
-
-\subsection{Mixed Language for Resugaring}
-
-\begin{figure}[t]
-\begin{flushleft}
-{\footnotesize
-\[
-\begin{array}{lllll}
-\m{CoreExp} &::=& x  & \note{variable}\\
-&~|~& v  & \note{value}\\
-&~|~& (\m{CoreHead}~\m{CoreExp}_1~\ldots~\m{CoreExp}_n) & \note{constructor}\\
-\\
-\m{SurfExp} &::=& x  & \note{variable}\\
-&~|~& v  & \note{value}\\
-&~|~& (\m{SurfHead}~\m{SurfExp}_1~\ldots~\m{SurfExp}_n) & \note{sugar constructor}\\
-\end{array}
-\]
-}
-\end{flushleft}
+In this section, we present our new approach to resugaring.  We will show that any expression in the mixed language can be evaluated in such a smart way that producing all necessary resugaring sequences. We will discuss the properties of our approach to show the correctness and the practicality.
 
 
-	\caption{Core and Surface Expressions}
-	\label{fig:expression}
-\end{figure}
-
-We define a mixed language that combines a core language with a surface language (defined by syntactic sugars over the core language). Note that the mixture is unfinished until the process in next section, because of the lack of context rules for expressions headed with \m{SurfHead}. We assume that the evaluation of the core language is  compositional (as the definition in \cite{hygienic}), that is, for evaluation contexts $C_1$ and $C_2$, $C_1[C_2]$ is also an evaluation context.
-\subsubsection{Core Language}
-
-
-The evaluator of our core language is driven by evaluation rules (context rules and reduction rules), with two natural assumptions. First, the evaluation is deterministic, in the sense that any expression in the core language will be reduced by a unique reduction sequence (restricted by context rules). Second, the context rules have no conditions, which means the following rules are not permitted (here $f_1$, $f_2$ are two auxiliary functions).
-
-{\footnotesize
-\[
-\begin{array}{lll}
-\m{C}& ::= & (\m{notif}~[\bigcdot]~e_2~e_3)\\
-&|& (\m{notif}~v_1~[\bigcdot]~e_3), \qquad \m{when}~(f_1~v_1)\\
-&|& (\m{notif}~v_1~e_2~[\bigcdot]), \qquad \m{when}~(f_2~v_1)
-\end{array}
-\]}
-
-The form of the expressions in our core language is defined in Fig. \ref{fig:expression}. An expression can be a variable, a value, or a (language) constructor expression. Here, $\m{CoreHead}$ stands for a language constructor such as $\m{if}$ and $\m{let}$. Also, the sub-expressions can be nested for supporting expressions like \Code{(let (x e) $\ldots$)}. To be concrete, we will use the core language defined in Fig.  \ref{fig:core} to demonstrate our approach. It is a usual functional language and its semantics is defined by the context rules and the reduction rules. Here the [e/x] denotes capture-avoiding substitution.
-
-\begin{figure*}[thb]
-% \subcaptionbox{Syntax \label{fig:coresyntax}}[0.32\linewidth]{
-% \begin{flushleft}
-% \[
-% {\footnotesize
-% 		\begin{array}{lcl}
-% 		\m{CoreExp} &::=& \Code{(CoreExp~CoreExp~...)} ~~\note{// apply}\\
-
-% 		&|& \m{(if~CoreExp~CoreExp~CoreExp)} ~~\note{// condition}\\
-% 		&|& \m{(let~((x~CoreExp)~...)~CoreExp)} ~~\note{// binding}\\
-% 		&|& \m{(listop~CoreExp)} ~~\note{// first, rest, empty?}\\
-% 		&|& \m{(cons~CoreExp~CoreExp)} ~~\note{// data structure of list}\\
-% 		&|& \m{(arithop~CoreExp~CoreExp)} ~~\note{// +, -, *, /, >, <, =}\\
-% 		&|& \m{x} ~~\note{// variable}\\
-% 		&|& \m{value}\\
-% 		\m{value} &::=& \m{($\lambda$~(x~...)~CoreExp)} ~~\note{// call-by-value}\\
-% 		&|& \m{c} ~~\note{// boolean, number and list}
-% 		\end{array}
-% }
-% \]
-% \end{flushleft}
-
-% }
-\begin{subfigure}{0.55\linewidth}
-\[
-{\footnotesize
-		\begin{array}{lcl}
-		\m{CoreExp} &::=& \Code{(apply~CoreExp~CoreExp~...)}\\
-
-		&|& \m{(if~CoreExp~CoreExp~CoreExp)} ~~\note{// condition}\\
-		&|& \m{(let~(x~CoreExp)~CoreExp)} ~~\note{// binding}\\
-		&|& \m{(listop~CoreExp)} ~~\note{// first, rest, empty?}\\
-		&|& \m{(cons~CoreExp~CoreExp)} ~~\note{// data structure of list}\\
-		&|& \m{(arithop~CoreExp~CoreExp)} ~~\note{// +, -, *, /, >, <, =}\\
-		&|& \m{x} ~~\note{// variable}\\
-		&|& \m{value}\\
-		\m{value} &::=& \m{($\lambda$~(x~...)~CoreExp)} ~~\note{// call-by-value}\\
-		&|& \m{c} ~~\note{// boolean, number and list}
-		\end{array}
-}
-\]
-\caption{Syntax}
-\end{subfigure}
-\begin{subfigure}{0.4\linewidth}
-\[
-{\footnotesize
-		\begin{array}{lcl}
-		\Code{C} &::=& \Code{(apply~value~...~C~CoreExp~...)}\\
-		&|& \Code{(if~C~CoreExp~CoreExp)}\\
-		&|& \Code{(let~(x~C)~CoreExp)}\\
-		&|& \Code{(listop~C)}\\
-		&|& \Code{(cons~C~CoreExp)}\\
-		&|& \Code{(cons~value~C)}\\
-		&|& \Code{(arithop~C~CoreExp)}\\
-		&|& \Code{(arithop~value~C)}\\
-		&|& [\bigcdot]\\[1.5em]
-		\end{array}
-}
-\]
-\caption{Context Rules}
-\end{subfigure}
-
-\begin{subfigure}{0.99\linewidth}
-	\[
-{\footnotesize
-		\begin{array}{lcl}
-		\Code{(($\lambda$~($x_1$~$x_2$~...)~CoreExp)~$\m{value}_1$~$\m{value}_2$~...)} &\redc{}{}& \Code{(($\lambda$~($x_2$~...)~CoreExp[$\m{value}_1$/$x_1$])~$\m{value}_2$~...)}\\
-
-		\Code{(if~$\m{\true}$~$\m{CoreExp}_1$~$\m{CoreExp}_2$)}&\redc{}{}& \Code{$\m{CoreExp}_1$}\\
-		\Code{(if~$\m{\false}$~$\m{CoreExp}_1$~$\m{CoreExp}_2$)}&\redc{}{}& \Code{$\m{CoreExp}_2$}\\
-		\Code{(let~($x$~$\m{value}$)~CoreExp)}&\redc{}{}&\Code{CoreExp[\m{value}/$x$]}\\
-		\ldots&&
-		\end{array}
-}
-\]
-	\caption{Part of Reduction Rules}
-\end{subfigure}
-
-\caption{A Core Language's Example}
-\label{fig:core}
-\end{figure*}
-
-
-%For simplicity, we use the prefix notation. For instance, we write $\m{if-then-else}~e_1~e_2~e_3$, which would be more readable if we write $\m{if}~e_1~\m{then}~e_2~\m{else}~e_3$. In this paper, we may write both if it is clear from the context.
-
-\subsubsection{Surface Language}
-\label{mark:suflang}
-
-Our surface language is defined by a set of syntactic sugars, together with some elements in the core language, such as values and variables. The expression of a surface language has a similar form as shown in Fig.  \ref{fig:expression}. To separate surface language's \m{Head} from that of the core language, we capitalize the first letter of surface language's \m{Head}.
-
-%Here we just assume a simple desugaring system for a syntactic sugar expression. We will show how this approach can be combined with other complex desugaring.
-A syntactic sugar \m{SurfHead} is defined by a desugaring rule in the following form
-
-\[
-\drule{(\m{SurfHead}~e_1~e_2~\ldots~e_n)}{\m{exp}} %\todo{\text{font size in drule}}
-\]
-
-\gcomment{is this exp same as the Exp in Fig. 5? Maybe it is confusing here.}
-
-where its left-hand side (LHS) is a pattern and its right-hand side (RHS) is an expression of the surface language or the core language. The LHS may be nested , so we can write sugars like \Code{(SurfHead ($e_1$ ($e_2$ $e_3$)) $\ldots$ $e_n$)}. For instance, we may define syntactic sugar \m{And} by
-\[
-\drule{(\m{And}~e_1~e_2)}{(\m{if}~e_1~e_2~\m{\false})}.
-\]
-And it will be better if any pattern variable (e.g., $e_1$) in LHS appears only once in RHS.
-If we need to use a pattern variable multiple times in RHS, a \m{let} binding may be used.\footnote{Of course, we can add the support for multiple appearance for a pattern variable by some special judgements. But we just make it simple for presentation.} To see the problem of multiple uses of a variable, suppose we define a sugar as follows:
-\[
-\drule{(\m{Twice}~e_1)}{(+~e_1~e_1)}.
-\]
-If we execute \Code{(Twice (+ 1 1))}, it will first be desugared to \Code{(+ (+ 1 1) (+ 1 1))}, then reduced to \Code{(+ 2 (+ 1 1))} by one step. The sub-expression \Code{(+ 1 1)} has been reduced but should not be resugared to the surface, because the other \Code{(+ 1 1)} has not been reduced yet.
-So we just use a \m{let} binding to resolve this problem. The RHS should be \Code{(let (x $e_1$) (+ x x))} in this case.
-
-
-Note that in the desugaring rule, we relax the ordinary restriction that RHS must be a $\m{CoreExp}$. This makes it possible to define recursive sugars:
-%, which We can use $\m{SurfExp}$ (more precisely, we allow the mixture use of syntactic sugars and core expressions) to define recursive syntactic sugars, as seen in the following example.
-\[
-\begin{array}{l}
-\drule{(\m{Odd}~e)}{(\m{let}~(x~e)~(\m{if}~(>~x~0)~(\m{Even}~(-~x~1))~\m{\false}))}\\
-\drule{(\m{Even}~e)}{(\m{let}~(x~e)~(\m{if}~(>~x~0)~(\m{Odd}~(-~x~1))~\m{\true}))}
-\end{array}
-\]
-
-%As described above, we only assume the desugaring is a transformer without other helper function, thus there will be many kinds of ill-formed syntactic sugar which cannot desugared well (just as the \m{Odd}, \m{Even} sugars above, although can be processed by our lazy desugaring), or the semantics of the sugar cannot be defined clearly.
-
-Without loss of generality, we assume all desugaring rules are not overlapped in the sense that for any syntactic sugar in an expression, only one desugaring rule is applicable.
-
-
-\subsubsection{Mixed Language}
-\begin{figure}[t]
-\begin{centering}
-{\footnotesize
-\[
-			\begin{array}{lcl}
-			\m{Exp} &::=& \m{DisplayableExp}\\
-			&|& \m{MixedExp}\\
-			\\
-			\m{DisplayableExp} &::=& \m{(SurfHead~DisplayableExp~$\ldots$)}\\
-			&|& \m{(CommonHead~DisplayableExp~$\ldots$)}\\
-			&|& v\\
-			&|& x\\
-			\\
-			\m{MixedExp} &::=& \m{(SurfHead~MixedExp~$\ldots$)}\\
-			&|& \m{(CoreHead~MixedExp~$\ldots$)}\\
-			&|& v\\
-			&|& x\\
-			\end{array}
-			\]
-}
-
-\end{centering}
-\caption{Syntax of the Mixed Language}
-\label{fig:mix}
-\end{figure}
-
-Our mixed language for resugaring combines the surface language and the core language, with the mixture of syntax, context rules, and reduction rules. Note that the context rules of sugar expression are calculated by the algorithm in next section, here we assume that we have got the calculated context rules.
-
-The mixed syntax is described in Fig.  \ref{fig:mix}.
-%
-The differences between expressions in our core language and those in our surface language are identified by their \m{Head}. But there may be some expressions in the core language which are also used in the surface language for convenience, or to say, we need some core language's expressions to help us get better resugaring sequences. So we take \m{CommonHead} as a subset of the \m{CoreHead}, which can be displayed in resugaring sequences (just as the \m{CommonExp} in our Section \ref{sec2}). Then if any sub-expression in an expression contains no \m{CoreHead} except for \m{CommonHead}, we should let them displayed during the evaluation process (named \m{DisplayableExp}). Otherwise, the expression should not be displayed. We just use a \m{MixedExp} expression to represent the expressions that are unnecessarily displayed for concision, and discuss more on \m{DisplayableExp}  in Section \ref{sec5}.
-
- % The \m{SurfExp} denotes an expression that have \m{SurfHead} and their subexpressions being displayable. The \m{CommonExp} denotes an expression with displayable \m{Head} (named \m{CommonHead}) in the core language, together with displayable subexpressions. There exist some other expressions during our resugaring process, which have displayable \m{Head}, but one or more of their subexpressions should not be displayed. They are of \m{UndisplayableExp}.
-
-
-
-As an example, for the core language in Fig.  \ref{fig:core},
-we may assume \m{arithop}, \m{$\lambda$} (call-by-value lambda calculus), \m{cons} as \m{CommonHead}, \m{if}, \m{let}, \m{listop} as \m{CoreHead} but out of \m{CommonHead}. This will allow \m{arithop}, \m{$\lambda$} and \m{cons} to appear in the resugaring sequences, and thus display more useful intermediate steps during resugaring.
-
-\begin{figure}[t]
-	\centering
-	\begin{subfigure}{0.3\linewidth}{\footnotesize
-		\begin{flushleft}
-			\[
-			\begin{array}{lcl}
-			\m{C} &:=& (\m{CoreHead1}~$\ldots$~C~$\ldots$)\\
-			&|& (\m{CoreHead2}~$\ldots$~C~$\ldots$)\\
-			&|& $\ldots$\\
-			&|&[\bigcdot]\\[4em]
-			\end{array}
-			\]
-			\end{flushleft}
-		\caption{Core's Context Rules}
-		\label{fig:corecontext}
-	}
-	\end{subfigure}
-	\begin{subfigure}{0.3\linewidth}{\footnotesize
-		\begin{flushleft}
-			\[
-			\begin{array}{lcl}
-			\m{C} &:=& (\m{SurfHead1}~$\ldots$~C~$\ldots$)\\
-			&|& (\m{SurfHead2}~$\ldots$~C~$\ldots$)\\
-			&|& $\ldots$\\
-			&|&[\bigcdot]\\[4em]
-			\end{array}
-			\]
-			\end{flushleft}
-		\caption{Surface's Context Rules}
-		\label{fig:surfcontext}
-	}
-	\end{subfigure}
-	\begin{subfigure}{0.3\linewidth}{\footnotesize
-		\begin{flushleft}
-			\[
-			\begin{array}{lcl}
-			\m{C} &:=& (\m{CoreHead1}~$\ldots$~C~$\ldots$)\\
-			&|& (\m{CoreHead2}~$\ldots$~C~$\ldots$)\\
-			&|& $\ldots$\\
-			&|& (\m{SurfHead1}~$\ldots$~C~$\ldots$)\\
-			&|& (\m{SurfHead2}~$\ldots$~C~$\ldots$)\\
-			&|& $\ldots$\\
-			&|&[\bigcdot]\\
-			\end{array}
-			\]
-			\end{flushleft}
-		\caption{Mixed's Context Rules}
-		\label{fig:mixedcontext}
-	}
-	\end{subfigure}
-	
-\caption{Mixture of Context Rules}
-\label{fig:mixofcontext}
-\end{figure}
-
-\ycomment{For the context rules, their function is to restrict the computational order for an expression based on the \m{Head}, so that they can be simply mixed as described in Fig. \ref{fig:mixcontext}. And if we want to limit the unique reduction of an expression, we should modify the desugaring rules to be correct for the reduction.} For example, if we have the context rules as in Fig. \ref{fig:mixcontext}, then for the expression 
-\[
-	\Code{(if (And (And \true~\true) \false) \false~\true)}
-\]
-it will reduce at the sub-expression \Code{(And (And \true~\true) \false)}. But the outer \m{And} sugar should not be expanded according to the context rules of \m{And}, so we should make a modification of 
-\[
-	\drule{(\m{And}~e_1~e_2)}{(\m{if}~e_1~e_2~\m{\false})}
-\]
-to
-\[
-	\drule{(\m{And}~v_1~e_2)}{(\m{if}~v_1~e_2~\m{\false})}
-\]
-
-After the mixture of reduction rules in the core language ($\redc{}{}$) and the modified desugaring rules for the syntactic sugars in the surface language ($\drule{}{}$),\ycomment{one more figure?} any expression in the mixed language can be reduced step by step. For example, in the mixed language, some expressions with \m{CoreHead} may contain sub-expressions with \m{SurfHead}. We process these expressions by the context rules of the core language, so that the reduction rules of the core language and the desugaring rules of surface language can be mixed as a whole
- (the $\redm{}{}$ in Fig. \ref{fig:mixexample}). For example, suppose we have the context rule of \m{if} expression\footnote{Another presentation of \Code{(if $[\bigcdot]$ e e)}. Use this here for convenience.}
-\[
-\infer{(\m{if}~e_1~e_2~e_3) \rightarrow (\m{if}~e_1'~e_2~e_3)}{e_1 \rightarrow e_1'}
-\]
-then if $e_1$ is headed with \m{CoreHead}, the reduction will use the \m{CoreHead}'s reduction rules recursively. So does it if $e_1$ headed with \m{SurfHead}. Finally, the $e_1$ is reduced to a value, then we can use the reduction rule of \m{if}.
 
 
 \subsection{Resugaring Algorithm}
@@ -425,6 +145,147 @@ As the second part of the whole process, our resugaring algorithm can be defined
 \]
 During the resugaring, we just apply the reduction ($\redm{}{}$) on the input program step by step until no reduction can be applied (\m{isNormal}, \m{value} in our setting), while outputting the intermediate expressions that belong to \m{DisplayableExp}.
 
+\subsection{Resugaring Examples}
+We will present some resugaring examples in details by some sugars defined in Section \ref{mark:suflang}, to demonstrate the expressive power of our approach.
+
+\subsubsection{Simple Sugars}
+\label{mark:simple}
+
+We construct several simple sugars by our approach. Take the SKI combinator as an example, for the program \Code{(S (K (S I)) K xx yy)}, we get the resugaring sequences as follows.
+\[
+	\begin{array}{l}
+		\quad\;\;\Code{ (S (K (S I)) K xx yy)}\\
+	\OneStep{ \Code{ (((K (S I)) xx (K xx)) yy)}}\\
+	\OneStep{ \Code{ (((S I) (K xx)) yy)}}\\
+	\OneStep{ \Code{ (I yy ((K xx) yy))}}\\
+	\OneStep{ \Code{ (yy ((K xx) yy))}}\\
+	\OneStep{ \Code{ (yy xx)}}\\
+	\end{array}
+\]
+	% \begin{flushleft}
+	% {\scriptsize
+	% % \begin{Codes}
+	% 	\quad\;\;\;\Code{ (S (K (S I)) K xx yy)}\\
+	% \OneStep{ \Code{ (((K (S I)) xx (K xx)) yy)}}\\
+	% \OneStep{ \Code{ (((S I) (K xx)) yy)}}\\
+	% \OneStep{ \Code{ (I yy ((K xx) yy))}}\\
+	% \OneStep{ \Code{ (yy ((K xx) yy))}}\\
+	% \OneStep{ \Code{ (yy xx)}}\\
+	% % \end{Codes}
+	% }
+	% \end{flushleft}
+
+	
+
+
+Here the sugars contain no sub-expression (so no context rules), then the sugar should just desugar to the core expression by the context rules in Fig. \ref{fig:core}.
+We obtain the resugaring sequences as expected without any reverse desugaring.
+
+Another interesting point we get from this example is, we can use the call-by-need lambda calculus to force an expansion of sugar. Considering the sugar \m{S} in the example above, we may write it by another form with \Code{(S $e_1$ $e_2$ $e_3$)} as its LHS, then the context rules can be calculated, and the sugar may not be expanded. By writing a sugar with call-by-need lambda calculus, such as the following one,
+\[
+\drule{\Code{ForceAnd}}{\Code{($\lambda_N$ ($\m{x}_1$ $\m{x}_2$) (if $\m{x}_1$ $\m{x}_2$ \false))}}
+\]
+given any program with \Code{(ForceAnd $e_1$ $e_2$)} as its inner expression, when the reduction should happen at the sub-expression \Code{(ForceAnd $e_1$ $e_2$)}, we will get the evaluation sequences as follows,
+\[
+	\begin{array}{l}
+		\quad\;\;\Code{ ($\ldots$ (ForceAnd $e_1$ $e_2$) $\ldots$)}\\
+	\OneStep{ \Code{ ($\ldots$ (($\lambda_N$ ($\m{x}_1$ $\m{x}_2$) (if $\m{x}_1$ $\m{x}_2$ \false)) $e_1$ $e_2$) $\ldots$)}}\\
+	\OneStep{ \Code{ ($\ldots$ (if $e_1$ $e_2$ \false) $\ldots$)}}\\
+	\OneStep{ \Code{ $\ldots$}}\\
+	\end{array}
+\]
+\subsubsection{Sugars with Let-Binding}
+\label{mark:hygienic}
+
+As an important property for sugar or macro system, we used to think it is necessary to achieve hygiene by combining the approach with an existing hygienic desugaring system. But during the experiment, we find it naturally solve the hygienic problem with the original desugaring system in our language setting. 
+
+A typical hygienic problem can be introduced by the sugar \m{HygienicAdd} (see Section \ref{mark:suflang}). For the program \Code{(let (x 2) (HygienicAdd 1 x))}, the existing approach uses an abstract syntax DAG to distinct different x in the desugared expression \Code{(let (x 2) (let x 1 (+ x x)))}. But for our approach based on lazy desugaring, the \m{HygienicAdd} sugar does not have to expand until necessary, thus, getting resugaring sequences as follows based on a non-hygienic transformer system.
+\[
+	\begin{array}{l}
+		\quad\;\;\Code{ (let x 2 (HygienicAdd 1 x))}\\
+		\OneStep{ \Code{ (HygienicAdd 1 2)}}\\
+		\OneStep{ \Code{ (+ 1 2)}}\\
+		\OneStep{ \Code{ 3}}
+	\end{array}
+\]
+
+ To discuss more cases of hygienic problem, we should find when the problem happens. In our approach, the sugar can contain some bindings, written by the core language's \m{let}. The hygienic problem only happens when binders of an expanded sugar conflict with other binders. We classify them into following two cases. Any hygienic problems are composite by the two cases.
+
+The first one is that, a sugar expression exists in binding's evaluation context. For the sugar \m{Or1} with following rule,
+\[\drule{\Code{(Or1~$e_1$~$e_2$)}}{\Code{(let (t $e_1$) (if t t $e_2$))}}\]
+The program \Code{(let (t \#t) (Or1 \#f t))} is of the case. But because of the context rule of \m{let}, the sugar \m{Or1} will not be expanded before the \m{t} is substituted. So the program reduces to \Code{(Or1 \#f \#t)} first, so avoiding the hygienic problem. Because the bound variables in sugar expressions are only introduced by let-binding, all of them can "delay" the expansion of the syntactic sugar.
+
+The second one is that, a sugar expression which introduced binding by the sugar expansion contains bindings in its sub-expression. For the sugar \m{Subst} with following rule,
+\[
+\drule{\Code{(Subst $e_1$ $e_2$ $e_3$)}}{\Code{(let ($e_2$ $e_3$) $e_1$)}}
+\]
+The program \Code{(Subst (+ f (let (f 1) f)) f 5)} is of the case. The sugar introduces a local-binding on the variable \m{f}, with its sub-expression contains multiple \m{f}. By calculating the context rules of sugar \m{Subst}, the sugar has to be expanded after the $e_3$ being a value. After desugaring to \Code{(let (f 5) (+ f (let (f 1) (+ f 1))))},  no hygienic problem will take place because of the capture-avoiding substitution in the core language.
+
+Because of the definition of desugaring in our approach, we cannot achieve hygiene by proving the $\alpha-equivalence$.
+Here what we want to show is that, even without complex things in macro systems, scope specification and so on, the lazy desugaring itself will solve the common hygienic problem with carefully-designed core language. And of course the lazy desugaring will also work together with a hygienic desugaring system (e.g., by specific the binding scope \cite{10.5555/1792878.1792884}).
+
+\todo{check}
+
+\subsubsection{Recursive Sugars}
+\label{sec:recursiveSugar}
+
+It is common to write recursive sugar because of its usefulness. However, the existing syntactic sugar has a disadvantage when meeting a special case---though the sugar's definition expresses the correct meaning, the sugar can be ill-formed (for traditional sugar system), such as the \m{Odd/Even} sugars in Section \ref{mark:suflang}. Take \Code{(Odd 2)} as an example. The previous work will first desugar the program using the rules. Then the desugaring will never terminate as the following shows.
+\[
+	\begin{array}{l}
+		\quad\;\ \Code{(Odd 2)}\\
+		\DeStep{\Code{ (let (x 2) (if (> x 0) (Even (- x 1)) \false))}}\\
+		\DeStep{\Code{ (let (x 2) (if (> x 0)}}\\
+		\qquad\qquad\qquad\qquad\quad \Code{(let (x1 (- x 1)) (if (> x1 0) (Odd (- x1 1)) \#t))}\\
+		\qquad\qquad\qquad\qquad\quad \Code{\false))}\\
+		\DeStep{\Code{ $\ldots$}}
+	\end{array}
+\]
+
+
+
+Then an advantage of our approach is embodied. Our approach does not require a fully desugaring of the sugar expression, which gives the framework chances to judge boundary conditions in sugars themselves and shows more intermediate sequences. We get the resugaring sequences of the former example as follows,
+\[
+	\begin{array}{l}
+		\quad\;\;\Code{ (Odd 2)}\\
+		\OneStep{ \Code{ (Even (- 2 1))}}\\
+		\OneStep{ \Code{ (Even 1)}}\\
+		\OneStep{ \Code{ (Odd (- 1 1))}}\\
+		\OneStep{ \Code{ (Odd 0)}}\\
+		\OneStep{ \Code{ \#f}}
+	\end{array}
+\]
+
+We construct some higher-order syntactic sugars and test them. The higher-order feature is important for constructing practical syntactic sugars. And many higher-order sugars should be constructed by recursive definition. Note that we set call-by-value lambda calculus as terms in \m{CommonExp}, because we want to output some intermediate expressions including it in the following examples. It is easy if we want to skip them. The first sugar is \m{Filter} in Section \ref{mark:suflang}, implemented by pattern matching. We obtain a resugaring sequences as follows,
+\[
+	\begin{array}{l}
+		\quad\;\;\Code{ (Filter ($\lambda$ (x) (and (> x 1) (< x 4))) (list 1 2 3 4))}\\
+			\OneStep{ \Code{ (Filter ($\lambda$ (x) (and (> x 1) (< x 4))) (list 2 3 4))}}\\
+			\OneStep{ \Code{ (cons 2 (Filter ($\lambda$ (x) (and (> x 1) (< x 4))) (list 3 4)))}}\\
+			\OneStep{ \Code{ (cons 2 (cons 3 (Filter ($\lambda$ (x) (and (> x 1) (< x 4))) (list 4))))}}\\
+			\OneStep{ \Code{ (cons 2 (cons 3 (Filter ($\lambda$ (x) (and (> x 1) (< x 4))) (list))))}}\\
+			\OneStep{ \Code{ (cons 2 (cons 3 (list)))}}\\
+			\OneStep{ \Code{ (cons 2 (list 3))}}\\
+			\OneStep{ \Code{ (list 2 3)}}
+	\end{array}
+\]
+Although the resugaring can be processed by the existing resugaring approach, it will be redundant. The reason is that a \m{Filter} program for a list of length $n$ will match to find possible reverse desugaring $n*(n-1)/2$ times.
+
+Moreover, just like the sugar \m{Map}, it can be convenient if the desugaring allows inline boundary conditions. We obtain the resugaring sequences for a \m{Map} sugar as follows,
+\[
+	\begin{array}{l}
+		\quad\;\;\Code{ (Map ($\lambda$ (x) (+ x 1)) (cons 1 (list 2)))}\\
+			\OneStep{ \Code{ (Map ($\lambda$ (x) (+ x 1)) (list 1 2))}}\\
+			\OneStep{ \Code{ (cons 2 (Map ($\lambda$ (x) (+ 1 x)) (list 2)))}}\\
+			\OneStep{ \Code{ (cons 2 (cons 3 (Map ($\lambda$ (x) (+ 1 x)) (list))))}}\\
+			\OneStep{ \Code{ (cons 2 (cons 3 (list)))}}\\
+			\OneStep{ \Code{ (cons 2 (list 3))}}\\
+			\OneStep{ \Code{ (list 2 3)}}\\
+	\end{array}
+\]
+
+In this example, we can find that the list \Code{(cons 1 (list 2))}, though equal to \Code{(list 1 2)}, is represented by core language's expression. So it will be difficult to be handled by existing desugaring systems. (The case can be specific by some setting, such as local-expansion\cite{10.1017/S0956796812000093} in Racket language's macro.) But it is easy to be processed by our approach without specifying the expansion.
+
+To sum up, we tried some basic syntactic sugar features to see if our approach could handle complex sugar. The result shows that our approach can easily handle which existing resugaring approach can deal with, together with some other features which existing one cannot support.
 
 \subsection{Correctness}
 \label{mark:correct}
@@ -474,7 +335,7 @@ So for convenience, we define destruction of a sugar's RHS when the second case 
 	The $\redc{}{}$ is a destruction of \m{E}'s outermost sugar if the reduction is not at a recursive $\mathtt{D}(e_i)$.
 \end{Def}
 For example, \m{E} is \Code{(And (And \true~\true) \false)}, then $\mathtt{D}(\m{E})$ is \Code{(if (if \true~\true~\false) \false~\false)}. $\redc{\mathtt{D}(\m{E})}{\m{E'}}$ will reduce at the \Code{(if \true~\true~\false)} which is $\mathtt{D}(e_1)$ of \m{E}, so it is not a destruction of \m{And}'s RHS.
-\subsubsection{Properties and Proof Sketch}
+\subsubsection{Properties}
 
 To describe the following properties in a word---no matter the expression \m{E} reduced by $\redm{}{}$ is headed by \m{SurfHead} or \m{CoreHead}, the reduction is correct because it showed or was to show the reduction of $\mathtt{D}(P)$.
 
@@ -543,7 +404,7 @@ The properties restrict how the lazy desugaring of our mixed language should be.
 
 Then for any expression \m{E} headed with \m{SurfHead}, if the sub-expressions $\{e_i, e_j, \ldots, e_p\}$ are all values, then $\redc{\mathtt{D}(\m{E})}{\m{E'}}$ will reduce on $\mathtt{D}(e_q)$.
 \end{lemma}
-\begin{proof}[Proof Sketch of lemma 1]
+\begin{proof}[Proof Sketch]
 In the algorithm \m{calcontext}, the computational order of $S.RHS$ is iterated. So the context rules of the sugar correspond to the computational order.
 So if the expression \m{E} will reduce on $e_q$, the desugared $\mathtt{D}(\m{E})$ will also reduce on the same part.
 \end{proof}
@@ -565,7 +426,7 @@ If the algorithm \m{calcontext} gets the context rules as follows.
 
 Then for any expression \m{E} headed with \m{SurfHead}, if the sub-expressions $\{e_i, e_j, \ldots, e_x\}$ are all values, $\redc{\mathtt{D}(\m{E})}{\m{E'}}$ will destroy the $S.RHS$'s form.
 \end{lemma}
-\begin{proof}[Proof Sketch of lemma 2]
+\begin{proof}[Proof Sketch]
 In the algorithm \m{calcontext}, the iteration recursively runs on the first inner sub-expression which is not $e_i$ or values, then it should be a reduciable expression. Because the computational order is on it, the inner sub-expression can be reduced (which means the $RHS$'s form is destroyed) if its context rules are iterated. So whenever the recursive call on \m{calcontext} is returned, the whole \m{calcontext} should break.
 
 If $\redc{\mathtt{D}(\m{E})}{\m{E'}}$ is not a destruction of $S.RHS$'s form, the reduction will be on $e_i$, which is conflicted with our algorithm \m{calcontext}.
@@ -585,25 +446,25 @@ Because the sub-expression \m{HH} is reduced by its \Code{CoreHead}, so matter h
 
 \end{proof}
 
-\subsection{Trade-off of Properties}
+\subsection{Output by DisplayableExp}
 \label{mark:correctness}
 
 
-The existing resugaring approaches \cite{resugaring,hygienic} proposed the following three properties to define the correctness.
+% The existing resugaring approaches \cite{resugaring,hygienic} proposed the following three properties to define the correctness.
 
-\begin{quote}
-% enhanced formatting
-\begin{itemize}
-    \item Emulation:
-Each term in the generated surface evaluation sequence desugars into the core term which it is meant to represent.
-    \item Abstraction:
-Code introduced by desugaring is never revealed in the surface evaluation sequence, and code originating from the original input program is never hidden by resugaring.
-    \item Coverage: Resugaring is attempted on every core step, and as few core steps are skipped as possible.
-\end{itemize}
-\end{quote}
-Here we will show what are the similarities and differences between theirs and our properties.
+% \begin{quote}
+% % enhanced formatting
+% \begin{itemize}
+%     \item Emulation:
+% Each term in the generated surface evaluation sequence desugars into the core term which it is meant to represent.
+%     \item Abstraction:
+% Code introduced by desugaring is never revealed in the surface evaluation sequence, and code originating from the original input program is never hidden by resugaring.
+%     \item Coverage: Resugaring is attempted on every core step, and as few core steps are skipped as possible.
+% \end{itemize}
+% \end{quote}
+% Here we will show what are the similarities and differences between theirs and our properties.
+\todo{(1) introduce ours (2) compare (3) trade-off}
 
-\emph{Emulation}: The properties in Section \ref{sec3} is just the same as the emulation property. It is the most basic one.
 
 \emph{Abstraction and Coverage}: Our reduction in the mixed language has some similarities to theirs. But since our framework has no execution for the fully desugared program and no reverse desugaring, there are some differences in details. For the coverage, our approach can guarantee that every step in the core languages' sequences can be reflected in the sequence before filtering, which is similar to the original one. But the abstraction and coverage are both about which kind of intermediate expression should be output. Especially, the abstraction property does not need to be strict if willing to have better coverage for some cases (as mentioned in Section 3.4 in \cite{resugaring}).
 
@@ -643,23 +504,3 @@ Also, if we want to display the core language's expression only when it is origi
 without showing the \m{if} expression expanded from \m{And}, we only need to set \m{If} as \m{CommonHead} together with its evaluation rules same as \m{if}. Then inputting \Code{(And (If (And \#t \#f) ...) ...)} to the main algorithm will get what we need. Thus, our approach is able to get the resugaring sequence as the existing one.
 
 In summary, our approach chooses a slightly different way for the \emph{abstraction} for better \emph{coverage} in the real application.
-\subsection{Hygiene}
-\label{mark:hygiene}
-\todo{An overview may need}
-
-As an important property for sugar or macro system, we used to think it is necessary to achieve hygiene by combining the approach with an existing hygienic desugaring system. But during the experiment, we find it naturally solve the hygienic problem with the original desugaring system in our language setting.
-
-In our approach, the sugar can contain some bindings, written by the core language's \m{let}. The hygienic problem only happens when binders of an expanded sugar conflict with other binders. We classify them into following two cases. Any hygienic problems are composite by the two cases.
-
-The first one is that, a sugar expression exists in binding's evaluation context. For the sugar \m{Or1} with following rule,
-\[\drule{\Code{(Or1~$e_1$~$e_2$)}}{\Code{(let (t $e_1$) (if t t $e_2$))}}\]
-The program \Code{(let (t \#t) (Or1 \#f t))} is of the case. But because of the context rule of \m{let}, the sugar \m{Or1} will not be expanded before the \m{t} is substituted. So the program reduces to \Code{(Or1 \#f \#t)} first, so avoiding the hygienic problem. Because the bound variables in sugar expressions are only introduced by let-binding, all of them can "delay" the expansion of the syntactic sugar.
-
-The second one is that, a sugar expression which introduced binding by the sugar expansion contains bindings in its sub-expression. For the sugar \m{Subst} with following rule,
-\[
-\drule{\Code{(Subst $e_1$ $e_2$ $e_3$)}}{\Code{(let ($e_2$ $e_3$) $e_1$)}}
-\]
-The program \Code{(Subst (+ f (let (f 1) f)) f 5)} is of the case. The sugar introduces a local-binding on the variable \m{f}, with its sub-expression contains multiple \m{f}. By calculating the context rules of \m{Subst}, the sugar has to be expanded after the $e_3$ being a value. After desugaring to \Code{(let (f 5) (+ f (let (f 1) (+ f 1))))},  no hygienic problem will take place because of the capture-avoiding substitution in the core language.
-
-Because of the definition of desugaring in our approach, we cannot achieve hygiene by proving the $\alpha-equivalence$.
-Here what we want to show is that, even without complex things in macro systems, scope specification and so on, the lazy desugaring itself will solve the common hygienic problem with carefully-designed core language. And of course the lazy desugaring will also work together with a hygienic desugaring system (e.g., by specific the binding scope \cite{10.5555/1792878.1792884}).
