@@ -3,7 +3,7 @@
 \section{Resugaring by Lazy Desugaring}
 \label{sec:algo}
 
-In this section, we present our new approach to resugaring.  We will show that any expression in the mixed language can be evaluated in such a smart way that producing all necessary resugaring sequences. We will discuss the properties of our approach to show the correctness and the practicality.
+In this section, we present our core algorithm for resugaring.  We will show that any expression in the mixed language can be evaluated in such a smart way that producing all necessary resugaring sequences. We will discuss the properties of our approach to show the correctness and the practicality.
 
 
 
@@ -100,9 +100,9 @@ But for instance of \m{Sg2}:
 \[
 \drule{(\m{Sg2}~e_1~e_2~e_3~e_4)}{\m{(+~(+~(+}~e_1~e_2\m{)}~e_3\m{)}~e_4\m{)}}
 \]
-once the sub-expressions $e_1$ and $e_2$ are reduced to value, the sugar has to be expanded, because if being desugared to the core language, the sub-expression \Code{(+ $v_1~v_2$)} will be reduced, then the sugar form of RHS is destroyed. 
+once the sub-expressions $e_1$ and $e_2$ are reduced to value, the sugar has to be expanded, because if being desugared to the core language, the sub-expression \Code{(+ $v_1~v_2$)} will be reduced, then the sugar form of RHS is destroyed.
 \begin{footnotesize}
-	
+
 
 	\[
 \begin{array}{l}
@@ -175,7 +175,7 @@ We construct several simple sugars by our approach. Take the SKI combinator as a
 	% }
 	% \end{flushleft}
 
-	
+
 
 
 Here the sugars contain no sub-expression (so no context rules), then the sugar should just desugar to the core expression by the context rules in Fig. \ref{fig:core}.
@@ -197,7 +197,7 @@ given any program with \Code{(ForceAnd $e_1$ $e_2$)} as its inner expression, wh
 \subsubsection{Sugars with Let-Binding}
 \label{mark:hygienic}
 
-As an important property for sugar or macro system, we used to think it is necessary to achieve hygiene by combining the approach with an existing hygienic desugaring system. But during the experiment, we find it naturally solve the hygienic problem with the original desugaring system in our language setting. 
+As an important property for sugar or macro system, we used to think it is necessary to achieve hygiene by combining the approach with an existing hygienic desugaring system. But during the experiment, we find it naturally solve the hygienic problem with the original desugaring system in our language setting.
 
 A typical hygienic problem can be introduced by the sugar \m{HygienicAdd} (see Section \ref{mark:suflang}). For the program \Code{(let (x 2) (HygienicAdd 1 x))}, the existing approach uses an abstract syntax DAG to distinct different x in the desugared expression \Code{(let (x 2) (let x 1 (+ x x)))}. But for our approach based on lazy desugaring, the \m{HygienicAdd} sugar does not have to expand until necessary, thus, getting resugaring sequences as follows based on a non-hygienic transformer system.
 \[
@@ -295,7 +295,7 @@ We define the following properties of our desugaring algorithm for demonstrating
 
 
 
-\subsubsection{Some Definition}
+\subsubsection{Basic Definitions}
 First, we define a function $\mathtt{D}$ to recursively desugar all sugars in a program using desugaring rules.
 
 \begin{Def}[fully desugaring]
@@ -335,13 +335,14 @@ So for convenience, we define destruction of a sugar's RHS when the second case 
 	The $\redc{}{}$ is a destruction of \m{E}'s outermost sugar if the reduction is not at a recursive $\mathtt{D}(e_i)$.
 \end{Def}
 For example, \m{E} is \Code{(And (And \true~\true) \false)}, then $\mathtt{D}(\m{E})$ is \Code{(if (if \true~\true~\false) \false~\false)}. $\redc{\mathtt{D}(\m{E})}{\m{E'}}$ will reduce at the \Code{(if \true~\true~\false)} which is $\mathtt{D}(e_1)$ of \m{E}, so it is not a destruction of \m{And}'s RHS.
+
 \subsubsection{Properties}
 
-To describe the following properties in a word---no matter the expression \m{E} reduced by $\redm{}{}$ is headed by \m{SurfHead} or \m{CoreHead}, the reduction is correct because it showed or was to show the reduction of $\mathtt{D}(P)$.
+%To describe the following properties in a word---
+We shall explain several properties, showing
+that no matter whether the expression \m{E} reduced by $\redm{}{}$ is headed by \m{SurfHead} or \m{CoreHead}, the reduction is correct because it has shown or is to show the reduction of $\mathtt{D}(P)$.
 
-\begin{property} \label{thm1}
-	For an expression \m{E}=$\m{C}[\m{S}]$ of the mixed language which can be fully desugared, where \m{E'}=$\mathtt{D}(\m{E})$=$\m{C'}[\m{H}]$, and \m{S}=\Code{(SurfHead $e_1$ ... $e_n$)} in the expression \m{E} together with \m{C'}=$\mathtt{D}(\m{C})$ (then of course \m{H}=$\mathtt{D}(\m{S})$); if $\redm{\m{C}[\m{S}]}{\m{C}[\m{S'}]}$ and $\drule{\m{S}}{\m{S'}}$, then $\redc{\m{C'}[\m{H}]}{\m{C'}[\m{H'}]}$ together with destroying the sugar's RHS form of \m{S} by $\redc{\m{H}}{\m{H'}}$. An example in Fig. \ref{example:ppt1}.
-\end{property}
+
 \example{\footnotesize
 \begin{tabular}{|l | l | l |}\hline
     \m{E}(above)/\m{E'}(below) & \m{C}(above)/\m{C'}(below) & \m{S}(above)/\m{H}(below)\\ \hline
@@ -355,13 +356,7 @@ To describe the following properties in a word---no matter the expression \m{E} 
 
 \end{flushleft}
 
-}{Example of property \ref{thm1}}{example:ppt1}
-
-
-
-\begin{property} \label{thm2}
-	For an expression \m{E}=$\m{C}[\m{HH}]$ of the mixed language which can be fully desugared, where \m{E'}=$\mathtt{D}(\m{E})$=$\m{C'}[\m{H}]$, and \m{HH}=\Code{(CoreHead $e_1$ ... $e_n$)} in the expression \m{E} together with \m{C'}=$\mathtt{D}(\m{C})$ (then of course \m{H}=$\mathtt{D}(\m{HH})$); if $\redm{\m{C}[\m{HH}]}{\m{C}[\m{HH'}]}$ reduced by the \m{CoreHead}'s reduction rule on \m{HH}, then for $\redm{\m{C'}[\m{H}]}{\m{C'}[\m{H'}]}$, it also reduced by the \m{CoreHead}'s reduction rule on \m{H}. An example in Fig. \ref{example:ppt2}.
-\end{property}
+}{Example of Property \ref{thm1}}{example:ppt1}
 
 \example{\footnotesize
 \begin{tabular}{|l | l | l |}\hline
@@ -376,16 +371,28 @@ To describe the following properties in a word---no matter the expression \m{E} 
 
 \end{flushleft}
 
-}{Example of property \ref{thm2}}{example:ppt2}
+}{Example of Property \ref{thm2}}{example:ppt2}
 
-The properties restrict how the lazy desugaring of our mixed language should be. We give the proof sketch as follows.
+\begin{property} \label{thm1}
+	For an expression \m{E}=$\m{C}[\m{S}]$ of the mixed language which can be fully desugared, where \m{E'}=$\mathtt{D}(\m{E})$=$\m{C'}[\m{H}]$, and \m{S}=\Code{(SurfHead $e_1$ ... $e_n$)} in the expression \m{E} together with \m{C'}=$\mathtt{D}(\m{C})$ (then of course \m{H}=$\mathtt{D}(\m{S})$); if $\redm{\m{C}[\m{S}]}{\m{C}[\m{S'}]}$ and $\drule{\m{S}}{\m{S'}}$, then $\redc{\m{C'}[\m{H}]}{\m{C'}[\m{H'}]}$ together with destroying the sugar's RHS form of \m{S} by $\redc{\m{H}}{\m{H'}}$.
+\end{property}
+
+\hmodify{An example in Fig. \ref{example:ppt1}.}{Please use this example to briefly explain the property.}
+
+\begin{property} \label{thm2}
+	For an expression \m{E}=$\m{C}[\m{HH}]$ of the mixed language which can be fully desugared, where \m{E'}=$\mathtt{D}(\m{E})$=$\m{C'}[\m{H}]$, and \m{HH}=\Code{(CoreHead $e_1$ ... $e_n$)} in the expression \m{E} together with \m{C'}=$\mathtt{D}(\m{C})$ (then of course \m{H}=$\mathtt{D}(\m{HH})$); if $\redm{\m{C}[\m{HH}]}{\m{C}[\m{HH'}]}$ reduced by the \m{CoreHead}'s reduction rule on \m{HH}, then for $\redm{\m{C'}[\m{H}]}{\m{C'}[\m{H'}]}$, it also reduced by the \m{CoreHead}'s reduction rule on \m{H}. An example in Fig. \ref{example:ppt2}.
+\end{property}
+
+\hmodify{An example in Fig. \ref{example:ppt2}.}{Please use this example to briefly explain the property.}
+
+These properties restrict how the lazy desugaring of our mixed language should be. We give the proof sketch as follows.
 
 \begin{lemma}
 	For a syntactic sugar $S$, with the desugaring rule
 	\[
 	\drule{(\m{SurfHead}~e_1~e_2~\ldots~e_n)}{(\m{Head}~\ldots~e_1'~e_2'~\ldots~e_m')}
 	\]
-	If the algorithm \m{calcontext} gets the context rules as follows.
+	If the algorithm \m{calcontext} gets the context rules as follows:
 	\[
 		\begin{array}{l}
 			S.LHS[[\bigcdot]/e_i]\\
@@ -397,12 +404,7 @@ The properties restrict how the lazy desugaring of our mixed language should be.
 			S.LHS[v_i/e_i, v_j/e_j, \ldots, v_p/e_p, v_q/e_q, \ldots, [\bigcdot]/e_x]\\
 		\end{array}
 	\]
-
-	
-
-
-
-Then for any expression \m{E} headed with \m{SurfHead}, if the sub-expressions $\{e_i, e_j, \ldots, e_p\}$ are all values, then $\redc{\mathtt{D}(\m{E})}{\m{E'}}$ will reduce on $\mathtt{D}(e_q)$.
+then for any expression \m{E} headed with \m{SurfHead}, if the sub-expressions $\{e_i, e_j, \ldots, e_p\}$ are all values, then $\redc{\mathtt{D}(\m{E})}{\m{E'}}$ will reduce on $\mathtt{D}(e_q)$.
 \end{lemma}
 \begin{proof}[Proof Sketch]
 In the algorithm \m{calcontext}, the computational order of $S.RHS$ is iterated. So the context rules of the sugar correspond to the computational order.
@@ -414,7 +416,7 @@ For a syntactic sugar $S$, with the desugaring rule
 \[
 \drule{(\m{SurfHead}~e_1~e_2~\ldots~e_n)}{(\m{Head}~\ldots~e_1'~e_2'~\ldots~e_m')}
 \]
-If the algorithm \m{calcontext} gets the context rules as follows.
+If the algorithm \m{calcontext} gets the context rules as follows:
 	\[
 		\begin{array}{l}
 			S.LHS[[\bigcdot]/e_i]\\
@@ -423,8 +425,7 @@ If the algorithm \m{calcontext} gets the context rules as follows.
 			S.LHS[v_i/e_i, v_j/e_j, \ldots, [\bigcdot]/e_x]\\
 		\end{array}
 	\]
-
-Then for any expression \m{E} headed with \m{SurfHead}, if the sub-expressions $\{e_i, e_j, \ldots, e_x\}$ are all values, $\redc{\mathtt{D}(\m{E})}{\m{E'}}$ will destroy the $S.RHS$'s form.
+then for any expression \m{E} headed with \m{SurfHead}, if the sub-expressions $\{e_i, e_j, \ldots, e_x\}$ are all values, $\redc{\mathtt{D}(\m{E})}{\m{E'}}$ will destroy the $S.RHS$'s form.
 \end{lemma}
 \begin{proof}[Proof Sketch]
 In the algorithm \m{calcontext}, the iteration recursively runs on the first inner sub-expression which is not $e_i$ or values, then it should be a reduciable expression. Because the computational order is on it, the inner sub-expression can be reduced (which means the $RHS$'s form is destroyed) if its context rules are iterated. So whenever the recursive call on \m{calcontext} is returned, the whole \m{calcontext} should break.
@@ -433,13 +434,13 @@ If $\redc{\mathtt{D}(\m{E})}{\m{E'}}$ is not a destruction of $S.RHS$'s form, th
 \end{proof}
 
 
-\begin{proof} [Proof Sketch of Property 3.1]
+\begin{proof} [Proof Sketch of Property \ref{thm1}]
 If $\redm{\m{C}[\m{S}]}{\m{C}[\m{S'}]}$ and $\drule{\m{S}}{\m{S'}}$, according to lemma 1 and context rules of core language's expression, the expression \m{E} reduces recursively on the correct sub-expression, so $\redc{\m{C'}[\m{H}]}{\m{C'}[\m{H'}]}$.
 According to lemma 2, the reduction will destroy the $RHS$'s form of the sugar $S$.
 
 \end{proof}
 
-\begin{proof} [Proof Sketch of Property 3.2]
+\begin{proof} [Proof Sketch of Property \ref{thm2}]
 If $\redm{\m{C}[\m{HH}]}{\m{C}[\m{HH'}]}$ reduced by the \m{CoreHead}'s reduction rule on \m{HH}, according to lemma 1 and context rules of core language's expression, the expression \m{E} reduces recursively on the correct sub-expression, so for $\redm{\m{C'}[\m{H}]}{\m{C'}[\m{H'}]}$, it will reduce on the same sub-expression.
 
 Because the sub-expression \m{HH} is reduced by its \Code{CoreHead}, so matter how its inner expressions desugared, according to the context rules, the fully desugared \m{H} will also reduced by its \m{CoreHead}.
