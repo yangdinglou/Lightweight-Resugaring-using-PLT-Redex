@@ -80,11 +80,11 @@ Any language can serve as our core language. For simplicity, we assume that the 
 	\[
 {\footnotesize
 		\begin{array}{lcl}
-		\Code{(($\lambda$~($x_1$~$x_2$~...)~CoreExp)~$\m{value}_1$~$\m{value}_2$~...)} &\redc{}{}& \Code{(($\lambda$~($x_2$~...)~CoreExp[$\m{value}_1$/$x_1$])~$\m{value}_2$~...)}\\
+		\Code{(($\lambda$~($\m{x}_1$~$\m{x}_2$~...)~CoreExp)~$\m{value}_1$~$\m{value}_2$~...)} &\redc{}{}& \Code{(($\lambda$~($\m{x}_2$~...)~CoreExp[$\m{value}_1$/$\m{x}_1$])~$\m{value}_2$~...)}\\
 
 		\Code{(if~$\m{\true}$~$\m{CoreExp}_1$~$\m{CoreExp}_2$)}&\redc{}{}& \Code{$\m{CoreExp}_1$}\\
 		\Code{(if~$\m{\false}$~$\m{CoreExp}_1$~$\m{CoreExp}_2$)}&\redc{}{}& \Code{$\m{CoreExp}_2$}\\
-		\Code{(let~($x$~$\m{value}$)~CoreExp)}&\redc{}{}&\Code{CoreExp[\m{value}/$x$]}\\
+		\Code{(let~(x~$\m{value}$)~CoreExp)}&\redc{}{}&\Code{CoreExp[\m{value}/x]}\\
 		\ldots&&
 		\end{array}
 }
@@ -92,7 +92,6 @@ Any language can serve as our core language. For simplicity, we assume that the 
 	\caption{Part of Reduction Rules}
 \end{subfigure}
 
-\gcomment{x in Fig4(c) have a different font from (a)}
 
 \caption{A Core Language}
 \label{fig:core}
@@ -151,7 +150,7 @@ In this paper, we just use a \m{let} binding to resolve this problem, and define
 \drule{(\m{Twice}~e_1)}{\Code{(let (x $e_1$) (+ x x))} }.
 \]
 
-\subsubsection{Hygienic Sugars}
+\subsubsection{Sugars with let-binding}
 The use of \m{let} binding is useful, but it introduces the hygienic problem for desugaring. For example, considering we have the following syntactic sugar
 \[
 \drule{\Code{(HygienicAdd $e_1$ $e_2$)}}{\Code{(let (x $e_1$) (+ x $e_2$))}}
@@ -172,11 +171,11 @@ In the desugaring rule, we relax the ordinary restriction that RHS must be a $\m
 	\end{array}
 \]
 
-Moreover, we allow more involved recursive syntactic sugars, which is ill-formed from the traditional view of desugaring. For example, the following sugar is not allowed by simple desugaring \cite{resugaring}, because the expansion of sugar will not stop. Fortunately, it is allowed in our context.
+Moreover, we allow more involved recursive syntactic sugars, which is ill-formed from the traditional view of desugaring. For example, the following sugar is not allowed by simple desugaring, because the expansion of sugar will not stop. Fortunately, it is allowed in our context.
 \[
 \begin{array}{l}
-\drule{(\m{Odd}~e)}{(\m{let}~(x~e)~(\m{if}~(>~x~0)~(\m{Even}~(-~x~1))~\m{\false}))}\\
-\drule{(\m{Even}~e)}{(\m{let}~(x~e)~(\m{if}~(>~x~0)~(\m{Odd}~(-~x~1))~\m{\true}))}
+\drule{\Code{(Odd e)}}{\Code{(let (x~e)~(if~(>~x~0)~(Even~(-~x~1))~\m{\false}))}}\\
+\drule{\Code{(Even e)}}{\Code{(let (x~e)~(if~(>~x~0)~(Odd~(-~x~1))~\m{\true}))}}
 \end{array}
 \]
 %However, the "semantics" of such syntactic sugar is sound, so we have a chance to handle this case by our lazy desugaring. This can be practical, though we should have written the \m{Odd, Even} sugars by a pattern matching like \m{Filter}.
@@ -225,13 +224,14 @@ We will return to the examples in this section to show how resugaring can be don
 }
 
 \end{centering}
-\caption{Syntax of the Mixed Language\todo{explain}}
+\caption{Syntax of the Mixed Language}
 \label{fig:mix}
 \end{figure}
 
-A mixed language for resugaring combines the surface language and the core language, with the mixture of syntax, context rules, and reduction rules. As discussed at the beginning of this section, since  the context rules of the sugars are calculated by the algorithm later, we assume here that we have their context rules.
+A mixed language for resugaring combines the surface language and the core language, with the mixture of syntax, context rules, and reduction rules. The mixture can be done automatically, and the generation of the mixed language can be flexible (we will discuss in Section \ref{mark:correctness}). As discussed at the beginning of this section, since the context rules of the sugars are calculated by the algorithm later, we assume here that we have their context rules.
 
 \subsubsection{Mixing Syntax}
+\label{mark:displayable}
 The mixed syntax is described in Fig.  \ref{fig:mix}.
 %
 The differences between expressions in our core language and those in our surface language are identified by their \m{Head}. But there may be some expressions in the core language which are also used in the surface language for convenience, or to say, we need some core language's expressions to help us get better resugaring sequences. So we take \m{CommonHead} as a subset of the \m{CoreHead}, which can be displayed in resugaring sequences (just as the \m{CommonExp} in our Section \ref{sec2}). Then if any sub-expression in an expression contains no \m{CoreHead} except for \m{CommonHead}, we should let them displayed during the evaluation process (named \m{DisplayableExp}). Otherwise, the expression should not be displayed. We just use a \m{MixedExp} expression to represent the expressions that are unnecessarily displayed for concision, and discuss more on \m{DisplayableExp}  in Section \ref{mark:correctness}.
@@ -304,15 +304,22 @@ The context rules specify the computational order for an expression based on the
 \[
 	\Code{(if (And (And \true~\true) \false) \false~\true)}
 \]
-it will reduce at the sub-expression \Code{(And (And \true~\true) \false)}. But the outer \m{And} sugar should not be expanded according to the context rules of \m{And}, so we should change
+it will reduce at the sub-expression \Code{(And (And \true~\true) \false)}. But the outer \m{And} sugar should not be expanded according to the context rules of \m{And}, we should change
 \[
 	\drule{(\m{And}~e_1~e_2)}{(\m{if}~e_1~e_2~\m{\false})}
 \]
 to
 \[
-	\drule{(\m{And}~v_1~e_2)}{(\m{if}~v_1~e_2~\m{\false})}.
+	\drule{(\m{And}~v_1~e_2)}{(\m{if}~v_1~e_2~\m{\false})}
 \]
-\hmodify{Question}{What is $v$? This example is a bit difficult to understand.}
+so that the expression above will reduce by proper order as follows, in the mixed language.
+\[
+	\begin{array}{l}
+		\qquad\Code{(if (And (And \true~\true) \false) \false~\true)}\\
+		\OneStep{ \Code{ (if (And (if \true~\true~\false) \false) \false~\true)}}\\
+		\OneStep{ \Code{ $\ldots$}}
+	\end{array}
+\]
 
 After the mixture of reduction rules in the core language ($\redc{}{}$) and the  desugaring rules for the syntactic sugars in the surface language ($\drule{}{}$), any expression in the mixed language can be reduced step by step. For example, in the mixed language, some expressions with \m{CoreHead} may contain sub-expressions with \m{SurfHead}. We process these expressions by the context rules of the core language, so that the reduction rules of the core language and the desugaring rules of surface language can be mixed as a whole
  (the $\redm{}{}$ in Fig. \ref{fig:mixexample}). For example, suppose we have the context rule of \m{if} expression\footnote{Another presentation of \Code{(if $[\bigcdot]$ e e)}. Use this here for convenience.}
