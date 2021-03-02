@@ -17,10 +17,10 @@
 
 Syntactic sugar, first coined by Peter J. Landin in 1964 \cite{syntacticsugar}, was introduced to describe the surface syntax of a simple ALGOL-like programming language which was defined semantically in terms of the applicative expressions of the core lambda calculus. It has been proved to be very useful for defining domain-specific languages (DSLs) and extending languages \cite{FellFFKBMT18,CulpFFK19}.
 Unfortunately, when syntactic sugar is eliminated by transformation, it obscures the relationship between the user’s source program and the transformed program. For example, a programmer who only knows the surface language cannot understand the execution of programs in the core language.
-%, in a domain outside the traditional programming, the execution of a sugar program will contains the concepts of the core languages, but some expressions are desugared from the sugar of that domain.
+%, in a domain outside the traditional programming, the execution of a sugar program will contain the concepts of the core languages, but some expressions are desugared from the sugar of that domain.
 
 %To resolve this problem, we need to have a way to transform back the desugared core program back to that in the surface language.
-Resugaring \cite{resugaring,hygienic} is a powerful technique that has been proposed to resolve this problem above. It  can automatically convert the evaluation sequences of a desugared program in the core language into representationsentative sugar's syntax in the surface language.
+Resugaring \cite{resugaring,hygienic} is a powerful technique that has been proposed to resolve this problem above. It can automatically convert the evaluation sequences of a desugared program in the core language into representationsentative sugar's syntax in the surface language. 
 %Just like the existing approach, it is natural to try matching the expressions after the desugared with syntactic sugars' dusugaring rules to reversely expand the sugars---that why it was named "resugaring". Here we use the sugar \Code{Newor} to see how the existing resugaring approach works, with following desugaring rule. (Considering the \m{not} as a core language's constructor)
 %
 As a simple example, consider \Code{Or1}, a syntactic sugar defined by the following desugaring rule:
@@ -31,7 +31,7 @@ Figure \ref{fig:resugar1} demonstrates a resugaring process for
 \[
 \Code{(Or1 (not \#t) \#t)}
 \]
-by the existing approach. The sequence of expressions on the left is obtained from the evaluation sequence of the desugared program (in the core language) on the right by repeated reverse expansion of the sugar. It is the reverse application of the desugaring rule, and thus called "resugaring".
+by the existing approach. The sequence of expressions on the left is obtained from the evaluation sequence of the desugared program (in the core language) on the right by the repeated reverse expansion of the sugar. It is the reverse application of the desugaring rule, and thus called "resugaring".
 \begin{figure}
 \begin{center}
 	\[
@@ -55,11 +55,11 @@ by the existing approach. The sequence of expressions on the left is obtained fr
 \label{fig:resugar1}
 \end{figure}
 
-As discussed in \cite{resugaring,hygienic}, a resugaring process is indeed complex and should be carefully designed to cope with reverse application of involved desugaring rules for defining, say hygienic sugars and higher order sugars. In addition, it should keep track of where desugaring happens so that it does resugaring where it should be. For instance, for the following surface program
+As discussed in \cite{resugaring,hygienic}, a resugaring process is indeed complex and should be carefully designed to cope with reverse application of involved desugaring rules for defining, say hygienic sugars and higher-order sugars. Also, it should keep track of where desugaring happens so that it does resugaring where it should be. For instance, for the following surface program
 \[
 \Code{(let (t (Or1 \#t \#f)) (if t t \#t))}
 \]
-after one-step reduction on the desugared program, we get
+after a one-step reduction on the desugared program, we get
 \[
 \Code{(let (t \#t) (if t t \#t))},
 \]
@@ -68,11 +68,11 @@ but we do not want to further get \Code{(Or1 \#t \#t)} by reverse application of
 Overall, the mechanisms introduced so far keep applying the desugaring rules reversibly as much as possible to find surface-level representations of the expression during core expression's evaluation.
 %with something helping the match-substitution.
 
-While it is natural to consider reverse application of desugaring rules for resugaring, there are two problems for practical use. First, as the reverse expansion of sugars needs to match the desugared expressions to see if they can be resugared, it would be very expensive if a surface program uses many syntactic sugars, or some syntactic sugars are desugared to large core expressions like
+While it is natural to consider the reverse application of desugaring rules for resugaring, there are two problems for practical use. First, as the reverse expansion of sugars needs to match the desugared expressions to see if they can be resugared, it would be very expensive if a surface program uses many syntactic sugars, or some syntactic sugars are desugared to large core expressions like
 \[
 \drule{\Code{(sugar $e_1$ $e_2$)}}{\mbox{a long code in the core language}}.
 \]
-Second, in the resugaring process, many core programs cannot be reversed  back to surface programs, which means that many reverse applications of the desugaring rules actually fail. It would be more efficient if we could avoid such failures.
+Second, in the resugaring process, many core programs cannot be reversed back to surface programs, which means that many reverse applications of the desugaring rules actually fail. It would be more efficient if we could avoid such failures.
 
 %Also, as the debugging for surface languages can be a good application of resugaring, the efficiency matters.
 
@@ -81,7 +81,7 @@ Second, in the resugaring process, many core programs cannot be reversed  back t
 
 \label{mark:mention}
 In this paper, we propose a novel approach to resugaring, \emph{which does not use reverse expansion (reverse application of desugaring rules) at all}. Our key observation is that
-if we consider desugaring rules as kind of reduction rules like those in the core language,  then resugaring sequence of a surface program should exist in a reduction sequence by these reduction rules. To see this, let us return to the example in Figure \ref{fig:resugar1}. The following shows a reduction sequence using the given desugaring rules and the reduction rules in the core language, and the underlined part forms a  resugaring sequence which is the same as that on the left in Figure \ref{fig:resugar1}.
+if we consider desugaring rules as a kind of reduction rules like those in the core language,  then the resugaring sequence of a surface program should exist in a reduction sequence by these reduction rules. To see this, let us return to the example in Figure \ref{fig:resugar1}. The following shows a reduction sequence using the given desugaring rules and the reduction rules in the core language, and the underlined part forms a  resugaring sequence which is the same as that on the left in Figure \ref{fig:resugar1}.
 \[
 \begin{array}{llll}
 \underline{\Code{(Or1 (not \#t) \#t}}
@@ -92,7 +92,7 @@ if we consider desugaring rules as kind of reduction rules like those in the cor
 \end{array}
 \]
 Different from the reduction strategy in Figure \ref{fig:resugar1}, where we expand sugars first and then try to reverse the sugar expansion during reduction, we delay the sugar expansion until it is necessary so that the later reverse of the sugar expansion becomes unnecessary.
-%The key idea is \emph{lazy} desugaring, in the sense that desugaring is done lazily  so that the reverse application of desugaring rules becomes unnecessary. The approach is of macro-style, because it (automatically) specifies an expansion order of syntactic sugar. As the motivation and the result of our method are similar to existing resugaring, we called it another resugaring approach though there is no reverse desugaring. And rather than assuming a black-box stepper for the core language as the existing approaches, we treat the core language as a white-box, explicitly using its evaluation rules (consisting of the context rules and reduction rules) of the core language.
+%The key idea is \emph{lazy} desugaring, in the sense that desugaring is done lazily so that the reverse application of desugaring rules becomes unnecessary. The approach is of macro-style, because it (automatically) specifies an expansion order of syntactic sugar. As the motivation and the result of our method are similar to existing resugaring, we called it another resugaring approach though there is no reverse desugaring. And rather than assuming a black-box stepper for the core language as the existing approaches, we treat the core language as a white-box, explicitly using its evaluation rules (consisting of the context rules and reduction rules) of the core language.
 Based on this observation, we propose the idea of {\em lazy desugaring} for resugaring.
 We consider the surface language and the core language as one mixed language. We regard desugaring rules as reduction rules of the mixed language and derive the context rules of the surface language to indicate when desugaring should be done. Our method can guarantee that the intermediate evaluation steps of the mixed language will contain the correct resugaring evaluation sequence for a surface program.
 
@@ -100,9 +100,9 @@ Our main technical contributions can be summarized as follows.
 \begin{itemize}
 \item We propose a novel approach to resugaring by lazy desugaring, where the reverse application of desugaring rules is unnecessary. The new approach has two new features: (1) it is powerful, providing a new way to deal with hygienic sugars and a new kind of recursive sugars; and (2) it is efficient because it completely avoids unnecessary complexity of the reverse desugaring.
 
-\item We present an algorithm to calculate the context rules for syntactic sugars, and propose a new reduction strategy, based on the evaluator of the core languages and the desugaring rules together with the context rules of syntactic sugar, guaranteeing to produce all necessary resugared expressions on the surface language.
+\item We present an algorithm to calculate the context rules for syntactic sugars and propose a new reduction strategy, based on the evaluator of the core languages and the desugaring rules together with the context rules of syntactic sugar, guaranteeing to produce all necessary resugared expressions on the surface language.
 
-\item We have implemented a system based on the new approach to show its expressiveness and efficiency. We demonstrate with many examples that our system is powerful enough to deal with hygienic, recursive and higher-order sugars. All the examples in this paper have passed the test of the system. Furthermore, we highlight interesting extension to show generality of the approach.
+\item We have implemented a system based on the new approach to show its expressiveness and efficiency. We demonstrate with many examples that our system is powerful enough to deal with hygienic, recursive, and higher-order sugars. All the examples in this paper have passed the test of the system. Furthermore, we highlight interesting extensions to show the generality of the approach.
 
 
 \end{itemize}
@@ -114,4 +114,4 @@ The rest of our paper is organized as follows. We start with an overview of our 
 %	\item \emph{program} v.s. \emph{expression};
 %	\item \emph{desugar/desugaring} v.s. \emph{expand/expansion}.
 %\end{enumerate}
-%We use the word \emph{program} if an expression is the input program in the  resugaring process, while using \emph{expression} otherwise. We use the words \emph{expand/expansion} when discussing desugaring on a syntactic sugar, while using \emph{desugar/desugaring} when discussing desugaring on an expression or else.
+%We use the word \emph{program} if an expression is the input program in the resugaring process, while using \emph{expression} otherwise. We use the words \emph{expand/expansion} when discussing desugaring on a syntactic sugar, while using \emph{desugar/desugaring} when discussing desugaring on an expression or else.

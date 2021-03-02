@@ -4,8 +4,8 @@
 %Explain the work that are related to your problem, and to your three contributions.
 \todo{checking the sentense}
 
-As discussed many times before, our work is much related to the pioneering work of \emph{resugaring} in \cite{resugaring}. The idea of "tagging" and "reverse desugaring" is a clear explanation of "resugaring", but it becomes very complex when the RHS of the desugaring rule becomes complex. Our approach does not need to reverse desugaring, and is more powerful, and efficient.
-For hygienic resugaring, compared with the approach of using DAG to solve the variable binding  problem in \cite{hygienic}, our approach of "lazy desugaring" can achieve kind of natural hygiene within our core language.
+As discussed many times before, our work is much related to the pioneering work of \emph{resugaring} in \cite{resugaring}. The idea of "tagging" and "reverse desugaring" is a clear explanation of "resugaring", but it becomes very complex when the RHS of the desugaring rule becomes complex. Our approach does not need to reverse desugaring and is more powerful, and efficient.
+For hygienic resugaring, compared with the approach of using DAG to solve the variable binding problem in \cite{hygienic}, our approach of "lazy desugaring" can achieve a kind of natural hygiene within our core language.
 
 
 
@@ -16,10 +16,10 @@ Our work is related to the \emph{Galois slicing for imperative functional progra
 This can also be considered as a bidirectional transformation \cite{bx,lens07} and the round-tripping between desugaring and resugaring in the existing approach. In contrast to these works, our resugaring approach is basically unidirectional. 
 
 
-There is a long history of hygienic macro expansion\cite{hygienicmacro}, and a formal specific hygiene definition was given \cite{10.5555/1792878.1792884} by specific the binding scopes of macros. another formal definition of the hygienic macro\cite{EssenceofHygiene} is based on nominal logic\cite{10.1007/s001650200016}. Instead of using the desugaring rule or something else to achieve hygiene, we use the lazy desugaring with the small core language to avoid hygienic problem in our approach.
+There is a long history of hygienic macro expansion\cite{hygienicmacro}, and a formal specific hygiene definition was given \cite{10.5555/1792878.1792884} by specific the binding scopes of macros. another formal definition of the hygienic macro\cite{EssenceofHygiene} is based on nominal logic\cite{10.1007/s001650200016}. Instead of using the desugaring rule or something else to achieve hygiene, we use the lazy desugaring with the small core language to avoid hygienic problems in our approach.
 %
 %When the tracking in their notation can be easily done for sugar whose rules can be derived automatically.
 
 Our implementation is built upon the PLT Redex \cite{SEwPR}, a semantics engineering tool, but it is possible to implement our approach on other semantics engineering tools such as those in \cite{dynsem,Ksemantic} which aim to test or verify the semantics of languages. The methods of these researches can be easily combined with our approach to implementing more general rule derivation. \emph{Ziggurat} \cite{Ziggurat} is a semantic extension framework, also allowing defining new macros with semantics based on existing terms in a language. It is should be useful for static analysis of macros.
-%Instead of semantics based on core language, the reduction rules of sugar derived by our approach is independent of core language, which may be more concise for static analysis.
+%Instead of semantics based on core language, the reduction rules of sugar derived by our approach are independent of the core language, which may be more concise for static analysis.
 

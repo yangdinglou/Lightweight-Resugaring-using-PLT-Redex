@@ -4,7 +4,7 @@
 
 
 In this section, we give a brief overview of our approach. Given a very tiny core language for defining the surface language by syntactic sugar, we shall demonstrate how we can obtain resugaring sequence by lazy desugaring.
-%to  Then given any program in the whole language\footnote{The program does not have to be in the surface language for convenience, but we restrict the output sequences based on the language setting.}, we can obtain the evaluation sequences of the program at the surface level after some calculation described in the following chapter.
+%to  Then given any program in the whole language\footnote{The program does not have to be in the surface language for convenience, but we restrict the output sequences based on the language setting.}, we can obtain the evaluation sequences of the program at the surface level after some calculations described in the following chapter.
 
 
 To be concrete, we will consider the following simple core language, defining boolean expressions using the \m{if} construct:
@@ -152,10 +152,10 @@ We can just keep the intermediate sequences without \m{CoreExp} in any sub-expre
 
 
 %Note that the context rules should restrict the computational order of a sugar expression's sub-expressions, thus we should let the context rules be correct---reflecting what should be executed in the desugared expression.
-Note that as the goal of resugaring is to present the evaluation of sugared programs, we are given a way to clearly specify which expression should be output. For the example in this section, of course, the sugar \m{And} and \m{Or} should be outputted, and also the boolean values should be. So we set boolean values as \m{CommonExp} in Fig. \ref{fig:mixsyntax}, so that they can be displayed though they are in the core language. By clearly separating what should be displayed, we can always get the resugaring evaluation sequences we need (this is slightly different from the existing approach's setting, as we will discuss in Section \ref{mark:correctness}).
+Note that as the goal of resugaring is to present the evaluation of sugared programs, we are given a method to clearly specify which expression should be output. For the example in this section, of course, the sugar \m{And} and \m{Or} should be outputted, and also the boolean values should be. So we set boolean values as \m{CommonExp} in Fig. \ref{fig:mixsyntax}, so that they can be displayed though they are in the core language. By clearly separating what should be displayed, we can always get the resugaring evaluation sequences we need (this is slightly different from the existing approach's setting, as we will discuss in Section \ref{mark:correctness}).
 
 %Another point is that the core language can be carefully designed to (1) powerful enough to express any calculation, (2) lightweight enough to define sugar easily.
 
 \medskip
 
-So much for a short explanation of our three steps, which will be explain in detail later. Given an appropriate core language, the only afford to build any surface language is defining the desugaring rules. Then the resugaring will be done automatically.
+So much for a short explanation of our three steps, which will be explained in detail later. Given an appropriate core language, the only afford to build any surface language is defining the desugaring rules. Then the resugaring will be done automatically.
