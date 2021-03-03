@@ -34,15 +34,14 @@ assuming that the first step of calculating the context rules for the surface la
 
 \subsection{Core Language}
 
-Any language can serve as our core language. For simplicity, we assume that the form of the expressions in our core language is defined as in Fig. \ref{fig:expression}. An expression can be a variable, a value, or a (language) constructor expression. Here, $\m{CoreHead}$ stands for a language constructor such as $\m{if}$ and $\m{let}$. Also, the sub-expressions can be nested for supporting expressions like \Code{(let (x e) $\ldots$)}. To be concrete, in this paper we will use the core language defined in Fig.  \ref{fig:core} to demonstrate our approach. It is a usual functional language and its semantics is defined by the context rules and the reduction rules. Here the [e/x] denotes capture-avoiding substitution.
+There are many possible forms of the core language. For simplicity, we assume that the form of the expressions in our core language is defined as in Fig. \ref{fig:expression}. An expression can be a variable, a value, or a (language) constructor expression. Here, $\m{CoreHead}$ stands for a language constructor such as $\m{if}$ and $\m{let}$. Also, the sub-expressions can be nested for supporting expressions like \Code{(let (x e) $\ldots$)}. To be concrete, in this paper we will use the core language defined in Fig.  \ref{fig:core} to demonstrate our approach. It is a usual functional language and its semantics is defined by the context rules and the reduction rules. Here the [e/x] denotes capture-avoiding substitution.
 
 \begin{figure*}[t]
 \begin{subfigure}{0.55\linewidth}
 \[
 {\footnotesize
 		\begin{array}{lcl}
-		\m{CoreExp} &::=& \Code{(CoreExp~CoreExp~...)} ~~\note{// application}\\\\
-
+		\m{CoreExp} &::=& \Code{(CoreExp~CoreExp~...)} ~~\note{// application}\\
 		&|& \m{(if~CoreExp~CoreExp~CoreExp)} ~~\note{// condition}\\
 		&|& \m{(let~(x~CoreExp)~CoreExp)} ~~\note{// binding}\\
 		&|& \m{(listop~CoreExp)} ~~\note{// first, rest, empty?}\\
@@ -129,6 +128,7 @@ For instance, we may define syntactic sugar \m{And} by
 In the following, we give some interesting cases for defining sugars, showing our extension and demonstrating its power in defining surface language.
 
 \subsubsection{Sugars with no Arguments}
+\label{mark:SKI}
 A sugar definition does not need to have pattern variables at LHS, because we can use the $\lambda$ abstraction in the core language. For example, we can define the sugar of SKI combinator by following rules. ($\lambda_N$ here is the call-by-need lambda calculus.)
 \[
 \begin{array}{l}
@@ -151,6 +151,7 @@ In this paper, we just use a \m{let} binding to resolve this problem, and define
 \]
 
 \subsubsection{Sugars with let-binding}
+\label{mark:let}
 The use of \m{let} binding is useful, but it introduces the hygienic problem for desugaring. For example, considering we have the following syntactic sugar
 \[
 \drule{\Code{(HygienicAdd $e_1$ $e_2$)}}{\Code{(let (x $e_1$) (+ x $e_2$))}}
@@ -158,6 +159,7 @@ The use of \m{let} binding is useful, but it introduces the hygienic problem for
 for the program \Code{(let (x 2) (HygienicAdd 1 x))}, it would be desugared by a simple expansion to the unexpected expression \Code{(let (x 2) (let x 1 (+ x x)))}. We will show how we solve this problem later.
 
 \subsubsection{Recursive and Higher Order Sugars}
+\label{mark:recsugar}
 In the desugaring rule, we relax the ordinary restriction that RHS must be a $\m{CoreExp}$. This makes it possible to define recursive sugars as follows:
 
 \[\begin{array}{l}
@@ -315,9 +317,9 @@ to
 so that the expression above will reduce by proper order as follows, in the mixed language.
 \[
 	\begin{array}{l}
-		\qquad\Code{(if (And (And \true~\true) \false) \false~\true)}\\
-		\OneStep{ \Code{ (if (And (if \true~\true~\false) \false) \false~\true)}}\\
-		\OneStep{ \Code{ $\ldots$}}
+		\qquad\Code{  (if (And (And \true~\true) \false) \false~\true)}\\
+		\redm{}\Code{(if (And (if \true~\true~\false) \false) \false~\true)}\\
+		\redm{}\Code{$\ldots$}
 	\end{array}
 \]
 

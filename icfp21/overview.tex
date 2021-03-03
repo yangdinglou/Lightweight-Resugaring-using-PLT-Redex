@@ -25,8 +25,10 @@ The semantics of the language is given by the following context rules to specify
 \]
 and two reduction rules (the letter $c$ means core):
 \[
-\centering
- \redc{(\m{if}~\m{\true}~e_1~e_2)}{e_1}  \qquad \redc{(\m{if}~\m{\false}~e_1~e_2)}{e_2}
+\begin{array}{c}
+    \redc{(\m{if}~\m{\true}~e_1~e_2)}{e_1}\\
+    \redc{(\m{if}~\m{\false}~e_1~e_2)}{e_2}
+\end{array}
 \]
 Assume that our surface language is defined by two syntactic sugars:
 %---\emph{and} sugar and \emph{or} sugar on the core language.
@@ -60,7 +62,7 @@ C &:=& (\m{And}~C~e)\\
 \end{array}
 \]
 
-From the context rules of \m{if}, we can see that the condition ($e_1$) is always evaluated first. Therefore, for expression \Code{(And $e_1$ $e_2$)} defined by syntactic sugar, $e_1$ should also evaluated first, which is the context rule of \m{And}. Similarly, we can calculate the context rule of \m{Or}.
+From the context rules of \m{if}, we can see that the condition ($e_1$) is always evaluated first. Therefore, for expression \Code{(And $e_1$ $e_2$)} defined by syntactic sugar, $e_1$ should also evaluate first, which is the context rule of \m{And}. Similarly, we can calculate the context rule of \m{Or}.
 
 \subsection*{Step 2: Forming Mixed Language with Mixed Reductions}
 
