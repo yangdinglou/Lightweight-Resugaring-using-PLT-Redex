@@ -16,7 +16,7 @@ In addition, as what we need for the lazy desugaring is basically to decide the 
 \end{center}
 
 
-But that's not enough---the core language and the surface language cannot be mixed easily because of the lack of evaluation rules for the core language. We should do the same try during the evaluation to make the core language's stepper useful when meeting some surface language's expression. Here we give a dynamic on-step reduction of the mixed language. Note that here we only define the reduction for unnested syntactic sugar for convenience. It is easy to extend to nested sugar (but so huge to express).
+But that's not enough---the core language and the surface language cannot be mixed easily because of the lack of evaluation rules for the core language. We should do the same try during the evaluation to make the core language's stepper useful when meeting some surface language's expression. Here we give a dynamic one-step reduction of the mixed language. Note that here we only define the reduction for unnested syntactic sugar for convenience. It is easy to extend to nested sugar (but so huge to express).
 
 \begin{Def}[Dynamic mixed language's one-step reduction $\redm{}{}$] Defined in Fig.  \ref{fig:dynamic}.
 \end{Def}
@@ -129,7 +129,7 @@ and for the expression \Code{(let (x 1) (inc x (+ 1 1)))}, we will have the foll
 	\end{array}
 \]
 
-In the sequences, we would see the \m{x} in \Code{(+ x (+ 1 1)} was reduced to $1$ getting from the environment. But other \m{x} in the program cannot be replaced. So as we described in Section \ref{mark:suflang}, resugaring for such sugar is unclear. Because we add \m{set} expression in the core language, the issue cannot be solved by a let binding (the \m{x} in RHS is always a reducible expression).
+In the sequences, we would see the \m{x} in \Code{(+ x (+ 1 1)} was reduced to $1$ getting from the environment. But other \m{x} in the program cannot be replaced. So as we described in Section \ref{mark:suflang}, resugaring for such sugar needs some special judgements. Because we add \m{set} expression in the core language, the issue cannot be solved by a let binding (the \m{x} in RHS is always a reducible expression).
 Another issue happened when the sub-expression \Code{(set x (+ 1 (+ 1 1)))} reduced to \Code{(set x (+ 1 2))}. As the \m{1} was reduced from \m{x}, we could record it and made the whole expression resugar to \Code{(inc x 2)}. Based on the issues above, an extension that marking the variable (which may appear at the first sub-expression of \m{set} expression) can make it. During the \m{calcontext} function, we can simply ignore the \m{x} as a possible hole for the sugar \m{inc}. So we could get the context rule
 \[
 	{\footnotesize

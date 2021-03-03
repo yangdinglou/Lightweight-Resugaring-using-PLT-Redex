@@ -10,7 +10,7 @@ In this section, we present our core algorithm for resugaring.  We will show tha
 
 \subsection{Resugaring Algorithm}
 
-Our resugaring algorithm works on the mixed language, based on the evaluation rules of the core language and the desugaring rules for defining the surface language. The process of getting the resugaring sequence contains two separate parts.
+Our resugaring algorithm works on the mixed language, based on the evaluation rules of the core language and the desugaring rules for defining the surface language. The process of getting the resugaring sequence contains two separate parts (the second one contains the last two steps in Section \ref{sec2}).
 
 \begin{enumerate}
 \item Calculating the context rules of syntactic sugars.
@@ -150,7 +150,7 @@ We will present some resugaring examples in detail by some sugars defined in Sec
 \subsubsection{Simple Sugars}
 \label{mark:simple}
 
-We construct several simple sugars by our approach. Take the SKI combinator as an example, for the program \Code{(S (K (S I)) K xx yy)}, we get the resugaring sequences as follows.
+We construct several simple sugars by our approach. Take the SKI combinator (described in Section \ref{mark:SKI}) as an example, for the program \Code{(S (K (S I)) K xx yy)}, we get the resugaring sequences as follows.
 \[
 	\begin{array}{l}
 		\quad\;\;\Code{ (S (K (S I)) K xx yy)}\\
@@ -198,7 +198,7 @@ given any program with \Code{(ForceAnd $e_1$ $e_2$)} as its inner expression, wh
 
 As an important property for sugar or macro system, we used to think it is necessary to achieve hygiene by combining the approach with an existing hygienic desugaring system. But during the experiment, we find it naturally solve the hygienic problem with the original desugaring system in our language setting.
 
-A typical hygienic problem can be introduced by the sugar \m{HygienicAdd} (see Section \ref{mark:suflang}). For the program \Code{(let (x 2) (HygienicAdd 1 x))}, the existing approach uses an abstract syntax DAG to distinct different x in the desugared expression \Code{(let (x 2) (let x 1 (+ x x)))}. But for our approach based on lazy desugaring, the \m{HygienicAdd} sugar does not have to expand until necessary, thus, getting resugaring sequences as follows based on a non-hygienic transformer system.
+A typical hygienic problem can be introduced by the sugar \m{HygienicAdd} (see Section \ref{mark:let}). For the program \Code{(let (x 2) (HygienicAdd 1 x))}, the existing approach uses an abstract syntax DAG to distinct different x in the desugared expression \Code{(let (x 2) (let x 1 (+ x x)))}. But for our approach based on lazy desugaring, the \m{HygienicAdd} sugar does not have to expand until necessary, thus, getting resugaring sequences as follows based on a non-hygienic transformer system.
 \[
 	\begin{array}{l}
 		\quad\;\;\Code{ (let x 2 (HygienicAdd 1 x))}\\
@@ -226,7 +226,7 @@ Here what we want to show is that, even without complex things in macro systems,
 \subsubsection{Recursive Sugars}
 \label{sec:recursiveSugar}
 
-It is common to write recursive sugar because of its usefulness. However, the existing syntactic sugar has a disadvantage when meeting a special case---though the sugar's definition expresses the correct meaning, the sugar can be ill-formed (for traditional sugar system), such as the \m{Odd/Even} sugars in Section \ref{mark:suflang}. Take \Code{(Odd 2)} as an example. The previous work will first desugar the program using the rules. Then the desugaring will never terminate as the following shows.
+It is common to write recursive sugar because of its usefulness. However, the existing syntactic sugar has a disadvantage when meeting a special case---though the sugar's definition expresses the correct meaning, the sugar can be ill-formed (for traditional sugar system), such as the \m{Odd/Even} sugars in Section \ref{mark:recsugar}. Take \Code{(Odd 2)} as an example. The previous work will first desugar the program using the rules. Then the desugaring will never terminate as the following shows.
 \[
 	\begin{array}{l}
 		\quad\;\ \Code{(Odd 2)}\\
@@ -252,7 +252,7 @@ Then an advantage of our approach is embodied. Our approach does not require a f
 	\end{array}
 \]
 
-We construct some higher-order syntactic sugars and test them. The higher-order feature is important for constructing practical syntactic sugars. And many higher-order sugars should be constructed by recursive definition. Note that we set call-by-value lambda calculus as terms in \m{CommonExp}, because we want to output some intermediate expressions including it in the following examples. It is easy if we want to skip them. The first sugar is \m{Filter} in Section \ref{mark:suflang}, implemented by pattern matching. We obtain a resugaring sequences as follows,
+We construct some higher-order syntactic sugars and test them. The higher-order feature is important for constructing practical syntactic sugars. And many higher-order sugars should be constructed by recursive definition. Note that we set call-by-value lambda calculus as terms in \m{CommonExp}, because we want to output some intermediate expressions including it in the following examples. It is easy if we want to skip them. The first sugar is \m{Filter} in Section \ref{mark:recsugar}, implemented by pattern matching. We obtain a resugaring sequences as follows,
 \[
 	\begin{array}{l}
 		\quad\;\;\Code{ (Filter ($\lambda$ (x) (and (> x 1) (< x 4))) (list 1 2 3 4))}\\

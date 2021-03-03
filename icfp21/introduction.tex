@@ -87,7 +87,7 @@ if we consider desugaring rules as a kind of reduction rules like those in the c
 \underline{\Code{(Or1 (not \#t) \#t}}
   & \xrightarrow{core} & \underline{\Code{(Or1 \#f \#t)}}\\
   & \xrightarrow{desugar} & \Code{(let (t \#f) (if t t \#t)) }\\
-	& \xrightarrow{core} & \Code{if \#f \#f \#t}\\
+	& \xrightarrow{core} & \Code{(if \#f \#f \#t)}\\
 	& \xrightarrow{core} & \underline{\Code{\#t}}
 \end{array}
 \]
