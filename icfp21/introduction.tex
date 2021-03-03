@@ -70,7 +70,7 @@ Overall, the mechanisms introduced so far keep applying the desugaring rules rev
 
 While it is natural to consider the reverse application of desugaring rules for resugaring, there are two problems for practical use. First, as the reverse expansion of sugars needs to match the desugared expressions to see if they can be resugared, it would be very expensive if a surface program uses many syntactic sugars, or some syntactic sugars are desugared to large core expressions like
 \[
-\drule{\Code{(sugar $e_1$ $e_2$)}}{\mbox{a long code in the core language}}.
+\drule{\Code{(sugar $e_1$ $e_2$)}}{\mbox{a long piece of codes in the core language}}.
 \]
 Second, in the resugaring process, many core programs cannot be reversed back to surface programs, which means that many reverse applications of the desugaring rules actually fail. It would be more efficient if we could avoid such failures.
 
@@ -87,7 +87,7 @@ if we consider desugaring rules as a kind of reduction rules like those in the c
 \underline{\Code{(Or1 (not \#t) \#t}}
   & \xrightarrow{core} & \underline{\Code{(Or1 \#f \#t)}}\\
   & \xrightarrow{desugar} & \Code{(let (t \#f) (if t t \#t)) }\\
-	& \xrightarrow{core} & \Code{if \#f \#f \#t}\\
+	& \xrightarrow{core} & \Code{(if \#f \#f \#t)}\\
 	& \xrightarrow{core} & \underline{\Code{\#t}}
 \end{array}
 \]

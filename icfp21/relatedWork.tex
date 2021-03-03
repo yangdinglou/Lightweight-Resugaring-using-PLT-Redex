@@ -2,7 +2,6 @@
 \section{Related Work}
 \label{sec6}
 %Explain the work that are related to your problem, and to your three contributions.
-\todo{checking the sentense}
 
 As we discussed before, our work is much related to the pioneering work of \emph{resugaring} in \cite{resugaring}. The idea of "tagging" and "reverse desugaring" is a clear explanation of "resugaring", but it becomes very complex when the RHS of the desugaring rule becomes complex. Our approach does not need reverse desugaring, and is both more powerful and efficient.
 For hygienic resugaring, compared with the approach of using DAG to solve the variable binding problem in \cite{hygienic}, our approach of "lazy desugaring" can achieve natural hygiene within our core language.
@@ -11,6 +10,13 @@ For hygienic resugaring, compared with the approach of using DAG to solve the va
 
 Our work is related to the \emph{Galois slicing for imperative functional programs} \cite{slicing}, a work for dynamically analyzing functional programs during execution. The forward component of the Galois connection maps a partial input $x$ to the greatest partial output $y$ that can be computed from $x$; the backward component of the Galois connection maps a partial output $y$ to the least partial input $x$ from which we can compute $y$.
 %Our approach used a similar idea on slicing expressions and processing on subexpressions.
+
+
+\emph{Macros as multi-stage computations} \cite{multistage} is a work related to our lazy expansion for sugars. Some other researches \cite{modularstaging} about multi-stage programming \cite{MSP} indicate that it is useful for implementing domain-specific languages. However, multi-stage programming is a metaprogramming method, which mainly works for run-time code generation and optimization. In contrast, our lazy resugaring approach treats sugars as part of a mixed language, rather than separate them by staging. Moreover, the lazy desugaring gives us a chance to derive evaluation rules of sugars, which is a new good point compared to multi-stage programming.
+
+Resugaring is related to the \emph{Galois slicing for imperative functional programs} \cite{slicing}, a work for dynamic analyzing functional programs during execution. The forward component of the Galois connection maps a partial input $x$ to the greatest partial output $y$ that can be computed from $x$; the backward component of the Galois connection maps a partial output $y$ to the least partial input $x$ from which we can compute $y$.
+Our approach has a similar idea on slicing expressions and processing on sub-expressions.
+
 This can also be considered as a bidirectional transformation \cite{bx,lens07} and the round-tripping between desugaring and resugaring in the existing approach. In contrast to these works, our resugaring approach is basically unidirectional. 
 
 
