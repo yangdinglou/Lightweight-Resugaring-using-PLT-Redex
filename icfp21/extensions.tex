@@ -7,16 +7,16 @@ So far, we have introduced our approach with the basic setting. We have shown ex
 \subsection{Model Assumption and A Black-Box Extension}
 
 
-As we mentioned in the introduction (Section \ref{mark:mention}), our approach assumes a more specific model (evaluation rules) compared to the existing approach (black-box stepper). Here is a small gap between the motivation of the existing approach and ours---the existing approach focused mainly on a tool for existing language, while our approach considered more on a meta-level feature for language implementation. Some examples in the previous section will show how lazy desugaring solves some problems in practice.
+As mentioned in the introduction (Section \ref{mark:mention}), our approach assumes a more specific model (evaluation rules) compared to the existing approach (black-box stepper). There is a small gap between the motivation of the existing approach and ours---the existing approach focuses mainly on a tool for existing language, while our approach considers more on a meta-level feature for language implementation. Some examples in the previous section has shown how lazy desugaring solves some problems in practice.
 
-In addition, as what we need for the lazy desugaring is just the computational order of the syntactic sugar, we can make an extension for the resugaring algorithm to work with only a black-box core language stepper. The most important difference between the black-box stepper and the evaluation rules is the computational order---while the same language behaves uniquely, the evaluation rules can show the computational order statically (without running the program). So when meeting the black-box stepper for the core language, we can just use some simple program to "get" the computational order of the core language as the following example shows: we simply let the sub-expressions of a \m{Head} be some reducible expressions and test the computational order.
+In addition, as what we need for the lazy desugaring is basically to decide the computational order of the syntactic sugar, we can make an extension for the resugaring algorithm to work with a black-box core language stepper. The most important difference between the black-box stepper and the evaluation rules is the computational order---while the same language behaves uniquely, the evaluation rules can show the computational order statically (without running the program). So when meeting the black-box stepper for the core language, we can use some simple program to "get" the computational order of the core language as the following example shows: we simply let the sub-expressions of a \m{Head} be some reducible expressions and test the computational order.
 
 \begin{center}
 	\Code{(if $\m{tmpe}_1$ $\m{tmpe}_2$ $\m{tmpe}_3$)}\\ $\Downarrow_{stepper}$\\ \Code{\qquad\qquad\qquad\qquad\;\;(if $\m{tmpe}_1$' $\m{tmpe}_2$ $\m{tmpe}_3$)} \note{//getting a context rule}\\ $\Downarrow_{getnext}$\\ \Code{(if $\m{tmpv}_1$ $\m{tmpe}_2$ $\m{tmpe}_3$)}\\ $\Downarrow_{stepper}$\\ \qquad\Code{$\m{tmpe}_i$}\note{//no more rules}\\
 \end{center}
 
 
-But that's not enough---the core language and the surface language cannot be mixed easily because of the lack of evaluation rules for the core language. We should do the same try during the evaluation to make the core language's stepper useful when meeting some surface language's expression. Here we give a dynamic on-step reduction of the mixed language. Note that here we only define the reduction for unnested syntactic sugar for convenience. It is easy to extend to nested sugar (but so huge to express). 
+But that's not enough---the core language and the surface language cannot be mixed easily because of the lack of evaluation rules for the core language. We should do the same try during the evaluation to make the core language's stepper useful when meeting some surface language's expression. Here we give a dynamic on-step reduction of the mixed language. Note that here we only define the reduction for unnested syntactic sugar for convenience. It is easy to extend to nested sugar (but so huge to express).
 
 \begin{Def}[Dynamic mixed language's one-step reduction $\redm{}{}$] Defined in Fig.  \ref{fig:dynamic}.
 \end{Def}
@@ -50,7 +50,7 @@ But that's not enough---the core language and the surface language cannot be mix
 \label{fig:dynamic}
 \end{figure*}
 
-Putting them in words. For expression \Code{(SurfHead $e_1$ $\ldots$ $e_n$)}, as we discussed in Section \ref{mark:correct}, only reduction on the $e_i$ of the sugar's $LHS$ will not destroy the $RHS$'s form. So we can just take a try after the expansion of \m{SurfHead}. 
+Putting them in words. For expression \Code{(SurfHead $e_1$ $\ldots$ $e_n$)}, as we discussed in Section \ref{mark:correct}, only reduction on the $e_i$ of the sugar's $LHS$ will not destroy the $RHS$'s form. So we can just take a try after the expansion of \m{SurfHead}.
 
 For an expression \Code{(CoreHead $e_1$ $\ldots$ $e_n$)}  whose sub-expressions contain \m{SurfExp}, replacing all \m{SurfExp} sub-expressions with any reducible core language's expression $\m{tmpe}_i$ . Then getting a result after inputting the new expression $e'$ to the original black-box stepper. Then two possible cases come.
 
@@ -116,7 +116,7 @@ The side effect is a special issue in resugaring. In the previous section, we de
 % 		\end{array}
 % }
 % \]
-Given a syntactic sugar 
+Given a syntactic sugar
 \[\drule{\Code{(inc x y)}}{\Code{(begin (set x (+ x y)) x)}}\]
 and for the expression \Code{(let (x 1) (inc x (+ 1 1)))}, we will have the following evaluation sequences in the core language (omitted the desugaring process).
 \[
@@ -129,8 +129,8 @@ and for the expression \Code{(let (x 1) (inc x (+ 1 1)))}, we will have the foll
 	\end{array}
 \]
 
-In the sequences, we would see the \m{x} in \Code{(+ x (+ 1 1)} was reduced to $1$ getting from the environment. But other \m{x} in the program cannot be replaced. So as we described in Section \ref{mark:suflang}, resugaring for such sugar is unclear. Because we add \m{set} expression in the core language, the issue cannot be solved by a let binding (the \m{x} in RHS is always a reducible expression). 
-Another issue happened when the sub-expression \Code{(set x (+ 1 (+ 1 1)))} reduced to \Code{(set x (+ 1 2))}. As the \m{1} was reduced from \m{x}, we could record it and made the whole expression resugar to \Code{(inc x 2)}. Based on the issues above, an extension that marking the variable (which may appear at the first sub-expression of \m{set} expression) can make it. During the \m{calcontext} function, we can simply ignore the \m{x} as a possible hole for the sugar \m{inc}. So we could get the context rule 
+In the sequences, we would see the \m{x} in \Code{(+ x (+ 1 1)} was reduced to $1$ getting from the environment. But other \m{x} in the program cannot be replaced. So as we described in Section \ref{mark:suflang}, resugaring for such sugar is unclear. Because we add \m{set} expression in the core language, the issue cannot be solved by a let binding (the \m{x} in RHS is always a reducible expression).
+Another issue happened when the sub-expression \Code{(set x (+ 1 (+ 1 1)))} reduced to \Code{(set x (+ 1 2))}. As the \m{1} was reduced from \m{x}, we could record it and made the whole expression resugar to \Code{(inc x 2)}. Based on the issues above, an extension that marking the variable (which may appear at the first sub-expression of \m{set} expression) can make it. During the \m{calcontext} function, we can simply ignore the \m{x} as a possible hole for the sugar \m{inc}. So we could get the context rule
 \[
 	{\footnotesize
 	\begin{array}{lcl}
@@ -140,9 +140,8 @@ Another issue happened when the sub-expression \Code{(set x (+ 1 (+ 1 1)))} redu
 	}
 \]
 
-But there is still another issue. If we want to make use of the side effect, things like \m{begin} expression in core language are needed. But such expressions are not suitable for the resugaring at all. For example, given a syntactic sugar 
+But there is still another issue. If we want to make use of the side effect, things like \m{begin} expression in core language are needed. But such expressions are not suitable for the resugaring at all. For example, given a syntactic sugar
 \[\drule{\Code{(inc2 x y z)}}{\Code{(begin (set x (+ y x)) (set x (+ z x)) x)}}\]
 and for the following expression \Code{(let (x 1) (inc2 x (+ 1 1) (+ 1 1)))}, once the first \m{set} expression was reduced to \m{void}, the \m{inc2} sugar will not have a chance for resugaring. If a syntactic sugar has more pattern variables, the process will lose more intermediate information. The same case happened in the existing approach\cite{resugaring}'s \m{letrec} example, which did not get any intermediate resugaring sequences.
 
 Overall, our approach can make an extension for a core language with side effects. But the lesson we get is that the pure functional language is better for resugaring.
-

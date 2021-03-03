@@ -177,7 +177,7 @@ We construct several simple sugars by our approach. Take the SKI combinator as a
 
 
 
-Here the sugars contain no sub-expressions (so no context rules), then the sugar should just desugar to the core expression by the context rules in Fig. \ref{fig:core}. 
+Here the sugars contain no sub-expressions (so no context rules), then the sugar should just desugar to the core expression by the context rules in Fig. \ref{fig:core}.
 We obtain the resugaring sequences as expected without any reverse desugaring.
 
 Another interesting point we get from this example is, we can use the call-by-need lambda calculus to force an expansion of sugar. Considering the sugar \m{S} in the example above, we may write it by another form with \Code{(S $e_1$ $e_2$ $e_3$)} as its LHS, then the context rules can be calculated, and the sugar may not be expanded. By writing a sugar with call-by-need lambda calculus, such as the following one,
@@ -282,13 +282,22 @@ Moreover, just like the sugar \m{Map}, it can be convenient if the desugaring al
 
 In this example, we can find that the list \Code{(cons 1 (list 2))}, though equal to \Code{(list 1 2)}, is represented by core language's expression. So it will be difficult to be handled by existing desugaring systems. (The case can be specific by some setting, such as local-expansion\cite{10.1017/S0956796812000093} in Racket language's macro.) But it is easy to be processed by our approach without specifying the expansion.
 
-To sum up, we tried some basic syntactic sugar features to see if our approach could handle complex sugar. The result shows that our approach can easily handle which existing resugaring approach can deal with, together with some other features which existing one cannot support.
+\medskip
+To sum up, we have shown some basic features to demonstrate that our approach can handle various kinds of sugars; it cannot only handle typical cases where the existing resugaring approach can deal with, but also some other cases where the existing one cannot support.
 
 \subsection{Correctness}
 \label{mark:correct}
 
 
-We define the following properties of our desugaring algorithm for demonstrating the correctness. Before stepping in, we intuitively explain why the algorithm is correct. For any program headed with \m{SurfHead}, we can expand the outermost sugar by the desugaring rule of \m{SurfHead}. The desugared expression contains some sub-expressions. Some of them are the original program's sub-expressions, some origin from the desugaring rule, while others consist of the previous two parts. If the desugared expression should be reduced or recursively reduced at one of the original sub-expressions, the expression after that reduction can be resugared by the reverse expansion of the desugaring rule. So these sub-expressions become the holes for context rules. Otherwise, the recursive reduction will not save the sugar's RHS structure. Such a program in the mixed language has to expand the outermost sugar because no more resugaring is available for it. We will give the properties to describe the correctness by certain definitions, and give a proof sketch of them.
+We shall prove two properties of our desugaring algorithm to show the correctness of our resugaring. Before giving formal definitions and proofs, we intuitively explain why the algorithm is correct in output we expand sugars in a suitable timing for resugaring. For any program headed with \m{SurfHead}, supposing that we expand the outermost sugar by the desugaring rule of \m{SurfHead}, then for the sub-expression of the desugared expression, some are the original program's sub-expressions and some are from the desugaring rule.
+%, and others consist of the previous two parts.
+There are two cases.
+(1) If the desugared expression is reduced at one of the original sub-expressions at the next step,  then the expression after this reduction should keep the sugar's RHS structure, making it possible to reverse this expansion.
+This means that the expansion of the sugar \m{SurfHead} is too earlier and should be delayed, which is reflected in the context rules for the sugar \m{SurfHead}.
+(2) Otherwise, the reduction breaks the sugar's RHS structure, which means no possibility for future reverse expansion of this sugar, so we can safely expand the sugar.
+
+%Such a program in the mixed language has to expand the outermost sugar because no more resugaring is available for it.
+%We will give the properties to describe the correctness by certain definitions, and give a proof sketch of them.
 
 
 
@@ -379,21 +388,21 @@ that no matter whether the expression \m{E} reduced by $\redm{}{}$ is headed by 
 An example of this property is in Fig. \ref{example:ppt1}. Here for the expression \m{E},
 % =\Code{(And (And \#t \#f) \#f)}
 the reduction in the mixed language that desugar the inner \m{And} sugar of \m{S}
-% =\Code{(And \#t \#f)} 
+% =\Code{(And \#t \#f)}
 is correct, because if we fully desugar the \m{E}, the reduction of \m{E'} will destroy the \m{And}'s RHS by reducing \m{H}.
 % =\Code{(if \#t \#f \#f)}
 Then the \m{And} has to be expanded to show the correct resugaring sequences because it should never appear in the following sequences.
 
 \begin{property} \label{thm2}
-	For an expression \m{E}=$\m{C}[\m{HH}]$ of the mixed language which can be fully desugared, where \m{E'}=$\mathtt{D}(\m{E})$=$\m{C'}[\m{H}]$, and \m{HH}=\Code{(CoreHead $e_1$ ... $e_n$)} in the expression \m{E} together with \m{C'}=$\mathtt{D}(\m{C})$ (then of course \m{H}=$\mathtt{D}(\m{HH})$); if $\redm{\m{C}[\m{HH}]}{\m{C}[\m{HH'}]}$ reduced by the \m{CoreHead}'s reduction rule on \m{HH}, then for $\redm{\m{C'}[\m{H}]}{\m{C'}[\m{H'}]}$, it also reduced by the \m{CoreHead}'s reduction rule on \m{H}. 
+	For an expression \m{E}=$\m{C}[\m{HH}]$ of the mixed language which can be fully desugared, where \m{E'}=$\mathtt{D}(\m{E})$=$\m{C'}[\m{H}]$, and \m{HH}=\Code{(CoreHead $e_1$ ... $e_n$)} in the expression \m{E} together with \m{C'}=$\mathtt{D}(\m{C})$ (then of course \m{H}=$\mathtt{D}(\m{HH})$); if $\redm{\m{C}[\m{HH}]}{\m{C}[\m{HH'}]}$ reduced by the \m{CoreHead}'s reduction rule on \m{HH}, then for $\redm{\m{C'}[\m{H}]}{\m{C'}[\m{H'}]}$, it also reduced by the \m{CoreHead}'s reduction rule on \m{H}.
 \end{property}
 
 An example of this property is in Fig. \ref{example:ppt2}. Here for the expression \m{E},
-% =\Code{(if (if \#t (And \#t \#f) \#t) \#f \#f)}, 
+% =\Code{(if (if \#t (And \#t \#f) \#t) \#f \#f)},
 the reduction in the mixed language that reduce at the inner \m{if} of \m{H}
-% =\Code{(if \#t (And \#t \#f) \#t)} 
+% =\Code{(if \#t (And \#t \#f) \#t)}
 is correct, because if we fully desugar the \m{E}, the reduction of \m{E'} will reduce at the \m{HH}.
-% =\Code{(if \#t (if \#t \#f \#f) \#t)}. 
+% =\Code{(if \#t (if \#t \#f \#f) \#t)}.
 So the reduction in the mixed language correctly shows the reduction of $\mathtt{D}(\m{E})$ in the core language.
 
 These properties restrict how the lazy desugaring of our mixed language should be. We give the proof sketch as follows.
@@ -458,7 +467,7 @@ Because the sub-expression \m{HH} is reduced by its \Code{CoreHead}, so matter h
 
 \end{proof}
 
-\subsection{Output by DisplayableExp}
+\subsection{Flexible Output by DisplayableExp}
 \label{mark:correctness}
 
 In our resugaring approach, we restrict the output sequences by defining the \m{DisplayableExp}, which is judged by the \m{Head} of an expression and its sub-expressions, as described in Section \ref{mark:displayable}. The reason we adopt this strategy is that, it provides a flexible way to obtain the sequences we need. Considering the motivation of resugaring, we want to get the evaluation at the surface level for showing the \emph{useful} intermediate sequences. Here, the "usefulness" may vary. When using the resugaring as a debugger for syntactic sugar, maybe we don't need anything expanded from sugars. But for some cases, especially when the sugars' RHS contains other sugars, it can be useful to show something expanded from sugars.
@@ -470,9 +479,9 @@ Take the following sugar definitions as an example.
 \[
 \drule{\Code{(And~x~y)}}{\Code{(if~x~y~\false)}}
 \]
-Then if people use the tiny surface language as a DSL for logic domain, what should be a resugaring sequence of the following program? 
+Then if people use the tiny surface language as a DSL for logic domain, what should be a resugaring sequence of the following program?
 \[
-	\Code{(not (And (Nor \false~\true) \true))} 
+	\Code{(not (And (Nor \false~\true) \true))}
 \]
 In our opinion, if the outer \m{not}, \m{And} can be displayed, so they should be after desugared. So by making \m{not} a \m{CommonHead}, we are able to get the following resugaring sequences.
 \[

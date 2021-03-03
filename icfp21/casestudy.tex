@@ -37,7 +37,7 @@ assuming that the first step of calculating the context rules for the surface la
 Any language can serve as our core language. For simplicity, we assume that the form of the expressions in our core language is defined as in Fig. \ref{fig:expression}. An expression can be a variable, a value, or a (language) constructor expression. Here, $\m{CoreHead}$ stands for a language constructor such as $\m{if}$ and $\m{let}$. Also, the sub-expressions can be nested for supporting expressions like \Code{(let (x e) $\ldots$)}. To be concrete, in this paper we will use the core language defined in Fig.  \ref{fig:core} to demonstrate our approach. It is a usual functional language and its semantics is defined by the context rules and the reduction rules. Here the [e/x] denotes capture-avoiding substitution.
 
 \begin{figure*}[t]
-\begin{subfigure}{0.55\linewidth}
+\begin{subfigure}{0.95\linewidth}
 \[
 {\footnotesize
 		\begin{array}{lcl}
@@ -57,7 +57,9 @@ Any language can serve as our core language. For simplicity, we assume that the 
 \]
 \caption{Syntax}
 \end{subfigure}
-\begin{subfigure}{0.4\linewidth}
+\\
+\medskip
+\begin{subfigure}{0.9\linewidth}
 \[
 {\footnotesize
 		\begin{array}{lcl}
@@ -69,14 +71,16 @@ Any language can serve as our core language. For simplicity, we assume that the 
 		&|& \Code{(cons~value~C)}\\
 		&|& \Code{(arithop~C~CoreExp)}\\
 		&|& \Code{(arithop~value~C)}\\
-		&|& [\bigcdot]\\[1.5em]
+		&|& [\bigcdot]
+		%\\[1.5em]
 		\end{array}
 }
 \]
 \caption{Context Rules}
 \end{subfigure}
-
-\begin{subfigure}{0.99\linewidth}
+\\
+\medskip
+\begin{subfigure}{0.9\linewidth}
 	\[
 {\footnotesize
 		\begin{array}{lcl}
@@ -204,7 +208,7 @@ We will return to the examples in this section to show how resugaring can be don
 \subsection{Mixed Language}
 \begin{figure}[t]
 \begin{centering}
-{\footnotesize
+{\small
 \[
 			\begin{array}{lcl}
 			\m{Exp} &::=& \m{DisplayableExp}\\
