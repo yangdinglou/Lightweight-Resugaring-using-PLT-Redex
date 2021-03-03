@@ -20,7 +20,7 @@ But that's not enough---the core language and the surface language cannot be mix
 
 \begin{Def}[Dynamic mixed language's one-step reduction $\redm{}{}$] Defined in Fig.  \ref{fig:dynamic}.
 \end{Def}
-\begin{figure*}[t]\footnotesize
+\begin{figure*}[t]\small
 \infrule[CoreRed]
 { \forall~i.~e_i\in \m{CoreExp}\\
 \redc{(\m{CoreHead}~e_1~\ldots~e_n)}{e'}}
@@ -70,9 +70,9 @@ Some other processes are needed during \m{CoreExt2}. For a program \Code{(let (x
 Then for any sugar expression, we can process them dynamically by "one-step-try" like the example in Fig.  \ref{example:try}. (The bold \m{Head} means trying on this expression.)
 \example{
 \[
-{\footnotesize
+{\small
 	\begin{array}{lcl}
-	\text{Resugaring}&&\text{One-step-try}\\
+	\text{Resugaring}&&\text{One-Step-Try}\\
 	\Code{({\bfseries And} (Or \#t \#f)}&\xrightarrow{try}&\Code{(if ({\bfseries Or} \#t \#f)}\\
 	\Code{\qquad\hspace{0.5em}(And \#f \#t))}&&\Code{\qquad(And \#f \#t)}\\
 	& &\Code{\qquad\#f)}\\
@@ -90,7 +90,7 @@ Then for any sugar expression, we can process them dynamically by "one-step-try"
 \end{array}
 }
 \]
-}{An Example of One-step-try}{example:try}
+}{An Example of One-Step-Try}{example:try}
 
 \subsection{Side effect}
 
@@ -132,7 +132,7 @@ and for the expression \Code{(let (x 1) (inc x (+ 1 1)))}, we will have the foll
 In the sequences, we would see the \m{x} in \Code{(+ x (+ 1 1)} was reduced to $1$ getting from the environment. But other \m{x} in the program cannot be replaced. So as we described in Section \ref{mark:suflang}, resugaring for such sugar needs some special judgements. Because we add \m{set} expression in the core language, the issue cannot be solved by a let binding (the \m{x} in RHS is always a reducible expression).
 Another issue happened when the sub-expression \Code{(set x (+ 1 (+ 1 1)))} reduced to \Code{(set x (+ 1 2))}. As the \m{1} was reduced from \m{x}, we could record it and made the whole expression resugar to \Code{(inc x 2)}. Based on the issues above, an extension that marking the variable (which may appear at the first sub-expression of \m{set} expression) can make it. During the \m{calcontext} function, we can simply ignore the \m{x} as a possible hole for the sugar \m{inc}. So we could get the context rule
 \[
-	{\footnotesize
+	{\small
 	\begin{array}{lcl}
 		\Code{C}&::=&\Code{(inc x C)}\\
 		& | &[\bigcdot]
