@@ -201,7 +201,7 @@ As an important property for sugar or macro system, we used to think it is neces
 A typical hygienic problem can be introduced by the sugar \m{HygienicAdd} (see Section \ref{mark:let}). For the program \Code{(let (x 2) (HygienicAdd 1 x))}, the existing approach uses an abstract syntax DAG to distinct different x in the desugared expression \Code{(let (x 2) (let x 1 (+ x x)))}. But for our approach based on lazy desugaring, the \m{HygienicAdd} sugar does not have to expand until necessary, thus, getting resugaring sequences as follows based on a non-hygienic transformer system.
 \[
 	\begin{array}{l}
-		\quad\;\;\Code{ (let x 2 (HygienicAdd 1 x))}\\
+		\quad\;\;\Code{ (let (x 2) (HygienicAdd 1 x))}\\
 		\OneStep{ \Code{ (HygienicAdd 1 2)}}\\
 		\OneStep{ \Code{ (+ 1 2)}}\\
 		\OneStep{ \Code{ 3}}

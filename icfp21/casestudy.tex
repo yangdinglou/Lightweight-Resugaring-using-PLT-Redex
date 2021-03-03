@@ -124,7 +124,7 @@ A syntactic sugar \m{SurfHead} is defined by a desugaring rule in the following 
 \]
 where its left-hand side (LHS) is a pattern and its right-hand side (RHS) is an expression of the mixed language (described in the next section).
 %The LHS may be nested, so we can write sugars like \Code{(SurfHead ($e_1$ ($e_2$ $e_3$)) $\ldots$ $e_n$)}.
-For instance, we may define syntactic sugar \m{And} by
+For instance, we may define a syntactic sugar \m{And} by
 \[
 \drule{(\m{And}~e_1~e_2)}{(\m{if}~e_1~e_2~\m{\false})}.
 \]
